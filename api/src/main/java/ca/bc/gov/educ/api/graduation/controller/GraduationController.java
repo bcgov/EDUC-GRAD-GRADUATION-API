@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.PermissionsContants;
+import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,14 +35,20 @@ public class GraduationController {
 
     @Autowired
     GraduationService gradService;
+    
+    @Autowired
+   	GradValidation validation;
+       
+    @Autowired
+   	ResponseHelper response;
 
     @GetMapping (EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    public GraduationStatus graduateStudent(@PathVariable String pen) {
+    public  ResponseEntity<GraduationStatus> graduateStudent(@PathVariable String pen) {
         logger.debug("Graduate Student for PEN: " + pen);
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
     	String accessToken = auth.getTokenValue();
-        return gradService.graduateStudentByPen(pen,accessToken);
+        return response.GET(gradService.graduateStudentByPen(pen,accessToken));
     }    
    
 }

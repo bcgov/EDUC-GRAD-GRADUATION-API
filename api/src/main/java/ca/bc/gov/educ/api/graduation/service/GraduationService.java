@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 
 @Service
 public class GraduationService {
@@ -33,13 +34,18 @@ public class GraduationService {
 	public GraduationStatus graduateStudentByPen(String pen, String accessToken) {
 		logger.info("graduateStudentByPen");
 		HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
+		try {
 		GraduationStatus graduationStatus = restTemplate.exchange(String.format(graduateStudent,pen), HttpMethod.GET,
 				new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
 		GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
 				new HttpEntity<>(graduationStatus,httpHeaders), GraduationStatus.class).getBody();
 		//create reportparameter and call report api.		
 		//Save generated reports in Student Report Table		
-		return graduationStatusResponse;	    
+		return graduationStatusResponse;	
+		}catch(Exception e) {
+			new GradBusinessRuleException("Error Graduating Student. Please try again...");
+		}
+		return null;
 	}
 
     
