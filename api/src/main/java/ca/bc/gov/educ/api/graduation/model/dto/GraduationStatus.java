@@ -3,10 +3,12 @@ package ca.bc.gov.educ.api.graduation.model.dto;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Component
-public class GraduationStatus {
+public class GraduationStatus extends BaseModel{
 
 	public GraduationStatus() {
         studentGradData = new StringBuffer();
@@ -17,8 +19,6 @@ public class GraduationStatus {
     private String gradProgram;
     private String graduationDate; 
     private String sccpGraduationDate;
-    private String schoolAtGrad;
-    private String gradProgramAtGraduation;
     private String studentGradeAtGraduation;
     private String gpa;
     private String honoursFlag;
@@ -30,13 +30,9 @@ public class GraduationStatus {
     private String advancePlacementParticipation;    
     private String careerProgramParticipation;
     private String recalculateFlag;
-    private String dualDogwoodEligibility;
     private String ibParticipationFlag;    
-    private String transcriptDate;    
-    private String createdBy;
-    private String createdTimestamp;
-    private String updatedBy;
-    private String updatedTimestamp;
-	
+    private String transcriptDate;  
+    private String schoolOfRecord;
+    private String studentGrade;	
 				
 }

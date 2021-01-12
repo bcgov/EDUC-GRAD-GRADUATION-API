@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.springframework.http.HttpHeaders;
+
 public class EducGraduationApiUtils {
 
     public static String formatDate (Date date) {
@@ -66,5 +68,13 @@ public class EducGraduationApiUtils {
             e.printStackTrace();
             return null;
         }       
+    }
+    
+    public static HttpHeaders getHeaders (String accessToken)
+    {
+		HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/json");
+        httpHeaders.setBearerAuth(accessToken);
+        return httpHeaders;
     }
 }
