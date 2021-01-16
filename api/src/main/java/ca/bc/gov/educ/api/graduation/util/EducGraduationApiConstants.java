@@ -14,6 +14,8 @@ public class EducGraduationApiConstants {
 
     public static final String ENDPOINT_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.gradalgorithm}";
     public static final String ENDPOINT_GRAD_STATUS_UPDATE_URL = "${endpoint.graduation-status-api.update-grad-status}";
+    public static final String ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL = "${endpoint.grad-common-api.update-grad-student-report.url}";
+    public static final String ENDPOINT_REPORT_API_URL = "${endpoint.report-api.report}";
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
