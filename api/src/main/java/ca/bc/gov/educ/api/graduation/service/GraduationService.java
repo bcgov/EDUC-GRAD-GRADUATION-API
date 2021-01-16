@@ -1,8 +1,12 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -11,10 +15,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ca.bc.gov.educ.api.graduation.model.dto.GenerateReport;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
+import ca.bc.gov.educ.api.graduation.model.dto.ReportOptions;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
+
 
 @Service
 public class GraduationService {
@@ -28,25 +43,85 @@ public class GraduationService {
     private String graduateStudent;
     
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_UPDATE_URL)
-    private String updateGradStatusForStudent;    
+    private String updateGradStatusForStudent;   
+    
+    @Value(EducGraduationApiConstants.ENDPOINT_REPORT_API_URL)
+    private String reportURL;
+    
+    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
+    private String updateGradStudentReportForStudent;
+    
 
     
 	public GraduationStatus graduateStudentByPen(String pen, String accessToken) {
 		logger.info("graduateStudentByPen");
 		HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
 		try {
-		GraduationStatus graduationStatus = restTemplate.exchange(String.format(graduateStudent,pen), HttpMethod.GET,
-				new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
-		GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
-				new HttpEntity<>(graduationStatus,httpHeaders), GraduationStatus.class).getBody();
-		//create reportparameter and call report api.		
-		//Save generated reports in Student Report Table		
-		return graduationStatusResponse;	
+			
+		GraduationStatus gradResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
+					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
+		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getGradProgram()), HttpMethod.GET,
+				new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
+		
+		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
+		ReportData data = prepareReportData(graduationDataStatus);
+		if(toBeSaved != null && toBeSaved.getPen() != null) {
+			GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
+					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
+				
+			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);			
+			GradStudentReport requestObj = new GradStudentReport();
+			requestObj.setPen(pen);
+			requestObj.setStudentAchievementReport(encodedPdfReportAchievement);
+			//TODO:set transcript report when ready requestObj.setStudentTranscriptReport(generateStudentTranscriptReport(data,httpHeaders));
+			
+			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+			return graduationStatusResponse;
+		}
 		}catch(Exception e) {
 			new GradBusinessRuleException("Error Graduating Student. Please try again...");
 		}
 		return null;
 	}
 
-    
+
+
+	private String generateStudentAchievementReport(ReportData data, HttpHeaders httpHeaders) {
+		GenerateReport reportParams = new GenerateReport();
+		
+		reportParams.setData(data);
+		reportParams.setOptions(new ReportOptions("achievement"));		
+		byte[] bytesSAR = restTemplate.exchange(reportURL, HttpMethod.POST,
+				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
+		byte[] encoded = Base64.encodeBase64(bytesSAR);
+	    return new String(encoded,StandardCharsets.US_ASCII);
+		
+	}
+
+
+
+	private ReportData prepareReportData(GraduationData graduationDataStatus) {
+		GradStudent gradStudent = graduationDataStatus.getGradStudent();				
+		ReportData data = new ReportData();
+		StudentDemographics studentDemo = new  StudentDemographics();
+		BeanUtils.copyProperties(gradStudent, studentDemo);
+		data.setDemographics(studentDemo);
+		data.setStudentCourse(graduationDataStatus.getStudentCourses().getStudentCourseList());
+		return data;
+	}
+
+
+
+	private GraduationStatus prepareGraduationStatusObj(GraduationData graduationDataStatus) {
+		GraduationStatus obj = new GraduationStatus();
+		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
+		try {
+			obj.getStudentGradData().append(new ObjectMapper().writeValueAsString(graduationDataStatus));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return obj;
+	}    
 }
