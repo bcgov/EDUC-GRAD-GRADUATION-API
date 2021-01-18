@@ -14,5 +14,6 @@ public class ReportData {
 	private List<StudentCourse> studentCourse;
 	private List<StudentAssessments> studentAssessment;
 	private List<StudentExams> studentExam;
+	private GraduationMessages graduationMessages;
 	
 }
