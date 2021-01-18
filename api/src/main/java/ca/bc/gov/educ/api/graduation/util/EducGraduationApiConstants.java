@@ -16,6 +16,7 @@ public class EducGraduationApiConstants {
     public static final String ENDPOINT_GRAD_STATUS_UPDATE_URL = "${endpoint.graduation-status-api.update-grad-status}";
     public static final String ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL = "${endpoint.grad-common-api.update-grad-student-report.url}";
     public static final String ENDPOINT_REPORT_API_URL = "${endpoint.report-api.report}";
+    public static final String ENDPOINT_GRAD_CERTIFICATE_TYPE_URL = "${endpoint.grad-code-api.get-certificate-name}";
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
@@ -27,4 +28,5 @@ public class EducGraduationApiConstants {
     public static final String DEFAULT_DATE_FORMAT = "dd-MMM-yyyy";
     
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
+	
 }

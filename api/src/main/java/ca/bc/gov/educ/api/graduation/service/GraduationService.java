@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.graduation.service;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -18,10 +20,14 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.GenerateReport;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportOptions;
@@ -51,30 +57,37 @@ public class GraduationService {
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
     private String updateGradStudentReportForStudent;
     
+    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_CERTIFICATE_TYPE_URL)
+    private String getGradCertificateType;
+    
 
     
 	public GraduationStatus graduateStudentByPen(String pen, String accessToken) {
-		logger.info("graduateStudentByPen");
+		logger.debug("graduateStudentByPen");
 		HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
 		try {
 			
 		GraduationStatus gradResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
 					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
+		logger.debug("Receieved PEN and Grad PRogram");
+		logger.debug("Calling Grad Algorithm");
 		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getGradProgram()), HttpMethod.GET,
 				new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
-		
+		logger.debug("Algorithm complete");
 		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
-		ReportData data = prepareReportData(graduationDataStatus);
+		ReportData data = prepareReportData(graduationDataStatus,httpHeaders);
 		if(toBeSaved != null && toBeSaved.getPen() != null) {
+			logger.debug("Save Student Grad status");
 			GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
 					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
-				
+			logger.debug("Save Student Grad status Complete");
+			logger.debug("Report Create Call");
 			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);			
 			GradStudentReport requestObj = new GradStudentReport();
 			requestObj.setPen(pen);
 			requestObj.setStudentAchievementReport(encodedPdfReportAchievement);
 			//TODO:set transcript report when ready requestObj.setStudentTranscriptReport(generateStudentTranscriptReport(data,httpHeaders));
-			
+			logger.debug("Report Save Call");
 			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
 							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
 			return graduationStatusResponse;
@@ -101,13 +114,58 @@ public class GraduationService {
 
 
 
-	private ReportData prepareReportData(GraduationData graduationDataStatus) {
-		GradStudent gradStudent = graduationDataStatus.getGradStudent();				
+	private ReportData prepareReportData(GraduationData graduationDataStatus, HttpHeaders httpHeaders) {
+		GradStudent gradStudent = graduationDataStatus.getGradStudent();	
+		GradAlgorithmGraduationStatus gradAlgorithm = graduationDataStatus.getGradStatus();
 		ReportData data = new ReportData();
 		StudentDemographics studentDemo = new  StudentDemographics();
 		BeanUtils.copyProperties(gradStudent, studentDemo);
 		data.setDemographics(studentDemo);
 		data.setStudentCourse(graduationDataStatus.getStudentCourses().getStudentCourseList());
+		GraduationMessages graduationMessages = new GraduationMessages();
+		graduationMessages.setGradProgram(gradAlgorithm.getGradProgram());
+		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
+		graduationMessages.setGpa(gradAlgorithm.getGpa());
+		List<CodeDTO> participatedProgram = new ArrayList<>();
+		List<CodeDTO> certificateProgram = new ArrayList<>();
+		CodeDTO cDTO = null;
+		if(gradAlgorithm.getAdvancePlacementParticipation().equalsIgnoreCase("Y")) {
+			cDTO = new CodeDTO();
+			cDTO.setCode("AP");
+			cDTO.setName("Advance Placement");
+			participatedProgram.add(cDTO);
+		}
+		if(gradAlgorithm.getIbParticipationFlag().equalsIgnoreCase("Y")) {
+			cDTO = new CodeDTO();
+			cDTO.setCode("IB");
+			cDTO.setName("International Baccalaureate");
+			participatedProgram.add(cDTO);
+		}
+		graduationMessages.setParticipatedProgram(participatedProgram);
+		if(gradAlgorithm.getCertificateType1() != null) {
+			cDTO = new CodeDTO();
+			GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,gradAlgorithm.getCertificateType1()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradCertificateTypes.class).getBody();
+    		if(gradCertificateTypes != null) {
+    			cDTO.setCode(gradCertificateTypes.getCode());
+    			cDTO.setName(gradCertificateTypes.getDescription());
+    		}			
+    		certificateProgram.add(cDTO);
+		}
+		
+		if(gradAlgorithm.getCertificateType2() != null) {
+			cDTO = new CodeDTO();
+			GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,gradAlgorithm.getCertificateType2()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradCertificateTypes.class).getBody();
+    		if(gradCertificateTypes != null) {
+    			cDTO.setCode(gradCertificateTypes.getCode());
+    			cDTO.setName(gradCertificateTypes.getDescription());
+    		}			
+    		certificateProgram.add(cDTO);
+		}
+		graduationMessages.setCertificateProgram(certificateProgram);
+		data.setGraduationMessages(graduationMessages);
+		
 		return data;
 	}
 
