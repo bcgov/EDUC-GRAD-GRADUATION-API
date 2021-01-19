@@ -93,7 +93,7 @@ public class GraduationService {
 			return graduationStatusResponse;
 		}
 		}catch(Exception e) {
-			new GradBusinessRuleException("Error Graduating Student. Please try again...");
+			throw new GradBusinessRuleException("Error Graduating Student. Please try again...");
 		}
 		return null;
 	}
@@ -101,10 +101,8 @@ public class GraduationService {
 
 
 	private String generateStudentAchievementReport(ReportData data, HttpHeaders httpHeaders) {
-		GenerateReport reportParams = new GenerateReport();
-		
-		reportParams.setData(data);
-		reportParams.setOptions(new ReportOptions("achievement"));		
+		GenerateReport reportParams = new GenerateReport();		
+		reportParams.setData(data);				
 		byte[] bytesSAR = restTemplate.exchange(reportURL, HttpMethod.POST,
 				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
@@ -129,17 +127,21 @@ public class GraduationService {
 		List<CodeDTO> participatedProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
 		CodeDTO cDTO = null;
-		if(gradAlgorithm.getAdvancePlacementParticipation().equalsIgnoreCase("Y")) {
-			cDTO = new CodeDTO();
-			cDTO.setCode("AP");
-			cDTO.setName("Advance Placement");
-			participatedProgram.add(cDTO);
+		if(gradAlgorithm.getAdvancePlacementParticipation() != null)  {
+			if(gradAlgorithm.getAdvancePlacementParticipation().equalsIgnoreCase("Y")) {
+				cDTO = new CodeDTO();
+				cDTO.setCode("AP");
+				cDTO.setName("Advance Placement");
+				participatedProgram.add(cDTO);
+			}
 		}
-		if(gradAlgorithm.getIbParticipationFlag().equalsIgnoreCase("Y")) {
-			cDTO = new CodeDTO();
-			cDTO.setCode("IB");
-			cDTO.setName("International Baccalaureate");
-			participatedProgram.add(cDTO);
+		if(gradAlgorithm.getIbParticipationFlag() != null) {
+			if(gradAlgorithm.getIbParticipationFlag().equalsIgnoreCase("Y")) {
+				cDTO = new CodeDTO();
+				cDTO.setCode("IB");
+				cDTO.setName("International Baccalaureate");
+				participatedProgram.add(cDTO);
+			}
 		}
 		graduationMessages.setParticipatedProgram(participatedProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
