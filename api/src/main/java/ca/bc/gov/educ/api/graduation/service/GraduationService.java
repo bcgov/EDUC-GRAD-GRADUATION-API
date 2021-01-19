@@ -30,7 +30,6 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
-import ca.bc.gov.educ.api.graduation.model.dto.ReportOptions;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
@@ -71,7 +70,7 @@ public class GraduationService {
 					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
 		logger.debug("Receieved PEN and Grad PRogram");
 		logger.debug("Calling Grad Algorithm");
-		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getGradProgram()), HttpMethod.GET,
+		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getProgram()), HttpMethod.GET,
 				new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
 		logger.debug("Algorithm complete");
 		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
@@ -121,28 +120,12 @@ public class GraduationService {
 		data.setDemographics(studentDemo);
 		data.setStudentCourse(graduationDataStatus.getStudentCourses().getStudentCourseList());
 		GraduationMessages graduationMessages = new GraduationMessages();
-		graduationMessages.setGradProgram(gradAlgorithm.getGradProgram());
+		graduationMessages.setGradProgram(gradAlgorithm.getProgram());
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
 		List<CodeDTO> participatedProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
 		CodeDTO cDTO = null;
-		if(gradAlgorithm.getAdvancePlacementParticipation() != null)  {
-			if(gradAlgorithm.getAdvancePlacementParticipation().equalsIgnoreCase("Y")) {
-				cDTO = new CodeDTO();
-				cDTO.setCode("AP");
-				cDTO.setName("Advance Placement");
-				participatedProgram.add(cDTO);
-			}
-		}
-		if(gradAlgorithm.getIbParticipationFlag() != null) {
-			if(gradAlgorithm.getIbParticipationFlag().equalsIgnoreCase("Y")) {
-				cDTO = new CodeDTO();
-				cDTO.setCode("IB");
-				cDTO.setName("International Baccalaureate");
-				participatedProgram.add(cDTO);
-			}
-		}
 		graduationMessages.setParticipatedProgram(participatedProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
 			cDTO = new CodeDTO();
@@ -179,7 +162,6 @@ public class GraduationService {
 		try {
 			obj.getStudentGradData().append(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return obj;
