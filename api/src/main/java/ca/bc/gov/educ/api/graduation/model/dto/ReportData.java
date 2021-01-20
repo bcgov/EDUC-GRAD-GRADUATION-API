@@ -10,6 +10,7 @@ import lombok.Data;
 @Component
 public class ReportData {
 
+	private String isaDate;
 	private StudentDemographics demographics;
 	private List<StudentCourse> studentCourse;
 	private List<StudentAssessments> studentAssessment;
