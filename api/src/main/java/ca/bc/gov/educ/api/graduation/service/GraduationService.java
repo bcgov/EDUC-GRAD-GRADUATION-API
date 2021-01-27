@@ -81,6 +81,7 @@ public class GraduationService {
 					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
 			logger.debug("Save Student Grad status Complete");
 			logger.debug("Report Create Call");
+			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
 			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);			
 			GradStudentReport requestObj = new GradStudentReport();
 			requestObj.setPen(pen);
