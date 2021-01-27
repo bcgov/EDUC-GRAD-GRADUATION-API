@@ -123,10 +123,10 @@ public class GraduationService {
 		graduationMessages.setGradProgram(gradAlgorithm.getProgram());
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
-		List<CodeDTO> participatedProgram = new ArrayList<>();
+		List<CodeDTO> specialProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
 		CodeDTO cDTO = null;
-		graduationMessages.setParticipatedProgram(participatedProgram);
+		graduationMessages.setSpecialProgram(specialProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
 			cDTO = new CodeDTO();
 			GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,gradAlgorithm.getCertificateType1()), HttpMethod.GET,

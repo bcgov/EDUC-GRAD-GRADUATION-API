@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class ReasonDTO {
 
-	private String reason;
+	private String rule;
+	private String description;
 }
