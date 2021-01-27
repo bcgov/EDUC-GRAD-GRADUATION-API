@@ -8,6 +8,7 @@ import lombok.Data;
 @Component
 public class StudentDemographics {
 	private String schoolName;
+	private String minCode;
 	private String pen;
 	private String studentLocalId;
 	private String studSurname;
