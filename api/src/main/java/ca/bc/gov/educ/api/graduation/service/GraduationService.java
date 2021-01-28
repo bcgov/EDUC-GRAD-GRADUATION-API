@@ -24,6 +24,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.GenerateReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
+import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
@@ -59,6 +60,9 @@ public class GraduationService {
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_CERTIFICATE_TYPE_URL)
     private String getGradCertificateType;
     
+    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_PROGRAM_NAME_URL)
+    private String getGradProgramName;
+    
 
     
 	public GraduationStatus graduateStudentByPen(String pen, String accessToken) {
@@ -82,6 +86,8 @@ public class GraduationService {
 			logger.debug("Save Student Grad status Complete");
 			logger.debug("Report Create Call");
 			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
+			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
+			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);			
 			GradStudentReport requestObj = new GradStudentReport();
 			requestObj.setPen(pen);
@@ -123,7 +129,11 @@ public class GraduationService {
 		data.setStudentAssessment(graduationDataStatus.getStudentAssessments().getStudentAssessmentList());
 		data.setStudentExam(graduationDataStatus.getStudentExams().getStudentExamList());
 		GraduationMessages graduationMessages = new GraduationMessages();
-		graduationMessages.setGradProgram(gradAlgorithm.getProgram());
+		if(gradAlgorithm.getProgram() != null) {
+			GradProgram gradProgram = restTemplate.exchange(String.format(getGradProgramName,gradAlgorithm.getProgram()), HttpMethod.GET,
+    				new HttpEntity<>(httpHeaders), GradProgram.class).getBody();
+			graduationMessages.setGradProgram(gradProgram.getProgramName());
+		}
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
 		List<CodeDTO> specialProgram = new ArrayList<>();
@@ -153,6 +163,15 @@ public class GraduationService {
 		}
 		graduationMessages.setCertificateProgram(certificateProgram);
 		data.setGraduationMessages(graduationMessages);
+		
+		//get Transcript Banner
+		if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("1")) {
+			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 1");
+		}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2")) {
+			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 2");
+		}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("4")) {
+			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 4");
+		}
 		
 		return data;
 	}
