@@ -77,4 +77,17 @@ public class EducGraduationApiUtils {
         httpHeaders.setBearerAuth(accessToken);
         return httpHeaders;
     }
+
+	public static String formatDateForReport(String updatedTimestamp) {
+		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
+		try {
+			return myFormat.format(fromUser.parse(updatedTimestamp));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return updatedTimestamp;
+		
+	}
 }
