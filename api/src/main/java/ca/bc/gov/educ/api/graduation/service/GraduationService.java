@@ -120,6 +120,8 @@ public class GraduationService {
 		BeanUtils.copyProperties(gradStudent, studentDemo);
 		data.setDemographics(studentDemo);
 		data.setStudentCourse(graduationDataStatus.getStudentCourses().getStudentCourseList());
+		data.setStudentAssessment(graduationDataStatus.getStudentAssessments().getStudentAssessmentList());
+		data.setStudentExam(graduationDataStatus.getStudentExams().getStudentExamList());
 		GraduationMessages graduationMessages = new GraduationMessages();
 		graduationMessages.setGradProgram(gradAlgorithm.getProgram());
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
