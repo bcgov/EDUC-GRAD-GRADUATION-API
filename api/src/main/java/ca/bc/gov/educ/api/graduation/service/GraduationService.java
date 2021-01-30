@@ -51,8 +51,11 @@ public class GraduationService {
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_UPDATE_URL)
     private String updateGradStatusForStudent;   
     
-    @Value(EducGraduationApiConstants.ENDPOINT_REPORT_API_URL)
-    private String reportURL;
+    @Value(EducGraduationApiConstants.ENDPOINT_ACHIEVEMENT_REPORT_API_URL)
+    private String reportAchievementURL;
+    
+    @Value(EducGraduationApiConstants.ENDPOINT_TRANSCRIPT_REPORT_API_URL)
+    private String reportTranscriptURL;
     
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
     private String updateGradStudentReportForStudent;
@@ -88,10 +91,12 @@ public class GraduationService {
 			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);			
+			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
+			String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
 			GradStudentReport requestObj = new GradStudentReport();
 			requestObj.setPen(pen);
 			requestObj.setStudentAchievementReport(encodedPdfReportAchievement);
+			requestObj.setStudentTranscriptReport(encodedPdfReportTranscript);
 			//TODO:set transcript report when ready requestObj.setStudentTranscriptReport(generateStudentTranscriptReport(data,httpHeaders));
 			logger.debug("Report Save Call");
 			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
@@ -106,10 +111,21 @@ public class GraduationService {
 
 
 
+	private String generateStudentTranscriptReport(ReportData data, HttpHeaders httpHeaders) {
+		GenerateReport reportParams = new GenerateReport();		
+		reportParams.setData(data);				
+		byte[] bytesSAR = restTemplate.exchange(reportTranscriptURL, HttpMethod.POST,
+				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
+		byte[] encoded = Base64.encodeBase64(bytesSAR);
+	    return new String(encoded,StandardCharsets.US_ASCII);
+	}
+
+
+
 	private String generateStudentAchievementReport(ReportData data, HttpHeaders httpHeaders) {
 		GenerateReport reportParams = new GenerateReport();		
 		reportParams.setData(data);				
-		byte[] bytesSAR = restTemplate.exchange(reportURL, HttpMethod.POST,
+		byte[] bytesSAR = restTemplate.exchange(reportAchievementURL, HttpMethod.POST,
 				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
@@ -165,12 +181,14 @@ public class GraduationService {
 		data.setGraduationMessages(graduationMessages);
 		
 		//get Transcript Banner
-		if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("1")) {
-			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 1");
-		}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2")) {
-			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 2");
-		}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("4")) {
-			data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 4");
+		if(graduationDataStatus.getSchool() != null) {
+			if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("1")) {
+				data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 1");
+			}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2")) {
+				data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 2");
+			}else if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("4")) {
+				data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 4");
+			}
 		}
 		
 		return data;
