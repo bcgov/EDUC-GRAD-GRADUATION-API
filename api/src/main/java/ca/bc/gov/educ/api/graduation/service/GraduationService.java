@@ -30,6 +30,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.ReasonDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
@@ -150,10 +151,14 @@ public class GraduationService {
     				new HttpEntity<>(httpHeaders), GradProgram.class).getBody();
 			graduationMessages.setGradProgram(gradProgram.getProgramName());
 		}
+		List<ReasonDTO> nonGradReasons = new ArrayList<ReasonDTO>();
+		BeanUtils.copyProperties(graduationDataStatus.getNonGradReasons(),nonGradReasons);
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
+		graduationMessages.setNonGradReasons(nonGradReasons);
 		List<CodeDTO> specialProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
+		
 		CodeDTO cDTO = null;
 		graduationMessages.setSpecialProgram(specialProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
