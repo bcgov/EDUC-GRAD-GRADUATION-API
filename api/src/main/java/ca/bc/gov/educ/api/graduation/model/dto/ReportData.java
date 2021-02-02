@@ -13,6 +13,7 @@ public class ReportData {
 	private String isaDate;
 	private String transcriptBanner;
 	private String issueDate;
+	private School school;
 	private StudentDemographics demographics;
 	private List<StudentCourse> studentCourse;
 	private List<StudentAssessment> studentAssessment;
