@@ -1,12 +1,13 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Data
 @Component
@@ -20,8 +21,8 @@ public class GraduationData {
     private StudentCourses studentCourses;
     private StudentAssessments studentAssessments;
     private StudentExams studentExams;
-    private List<String> nonGradReasons;
-    private List<String> requirementsMet;
+    private List<GradRequirement> nonGradReasons;
+    private List<GradRequirement> requirementsMet;
     //Grad Message
     //Student Career Programs
     private boolean isGraduated;
