@@ -158,6 +158,7 @@ public class GraduationService {
 		graduationMessages.setNonGradReasons(nonGradReasons);
 		List<CodeDTO> specialProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
+		
 		CodeDTO cDTO = null;
 		graduationMessages.setSpecialProgram(specialProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
