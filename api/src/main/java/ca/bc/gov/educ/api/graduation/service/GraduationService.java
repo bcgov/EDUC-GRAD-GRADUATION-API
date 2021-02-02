@@ -145,6 +145,7 @@ public class GraduationService {
 		data.setStudentCourse(graduationDataStatus.getStudentCourses().getStudentCourseList());
 		data.setStudentAssessment(graduationDataStatus.getStudentAssessments().getStudentAssessmentList());
 		data.setStudentExam(graduationDataStatus.getStudentExams().getStudentExamList());
+		data.setSchool(graduationDataStatus.getSchool());
 		GraduationMessages graduationMessages = new GraduationMessages();
 		if(gradAlgorithm.getProgram() != null) {
 			GradProgram gradProgram = restTemplate.exchange(String.format(getGradProgramName,gradAlgorithm.getProgram()), HttpMethod.GET,
