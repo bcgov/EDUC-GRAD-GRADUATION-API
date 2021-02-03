@@ -16,5 +16,5 @@ public class GraduationMessages {
 	private List<CodeDTO> specialProgram;
 	private List<CodeDTO> careerProgram;
 	private List<CodeDTO> certificateProgram;
-	private List<ReasonDTO> nonGradReasons;
+	private List<GradRequirement> nonGradReasons;
 }
