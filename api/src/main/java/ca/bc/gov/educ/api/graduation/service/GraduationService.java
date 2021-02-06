@@ -27,6 +27,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
@@ -93,11 +94,20 @@ public class GraduationService {
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
 			String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
-			GradStudentReport requestObj = new GradStudentReport();
+			GradStudentReports requestObj = new GradStudentReports();
+			//Save Student Achievement Report
 			requestObj.setPen(pen);
-			requestObj.setStudentAchievementReport(encodedPdfReportAchievement);
-			requestObj.setStudentTranscriptReport(encodedPdfReportTranscript);
-			//TODO:set transcript report when ready requestObj.setStudentTranscriptReport(generateStudentTranscriptReport(data,httpHeaders));
+			requestObj.setReport(encodedPdfReportAchievement);
+			requestObj.setGradReportTypeCode("ACHV");
+			
+			logger.debug("Report Save Call");
+			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+			requestObj = new GradStudentReports();
+			//Save Student Transcript Report
+			requestObj.setPen(pen);
+			requestObj.setReport(encodedPdfReportTranscript);
+			requestObj.setGradReportTypeCode("TRAN");
 			logger.debug("Report Save Call");
 			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
 							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
@@ -203,7 +213,7 @@ public class GraduationService {
 		GraduationStatus obj = new GraduationStatus();
 		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
 		try {
-			obj.getStudentGradData().append(new ObjectMapper().writeValueAsString(graduationDataStatus));
+			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
