@@ -111,6 +111,12 @@ public class GraduationService {
 			logger.debug("Report Save Call");
 			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
 							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+			if(graduationDataStatus.isGraduated()) {
+				//TODO:Save certificates
+				//Create Certificate 
+			}
+			
+			
 			return graduationStatusResponse;
 		}
 		}catch(Exception e) {
@@ -160,6 +166,7 @@ public class GraduationService {
 			GradProgram gradProgram = restTemplate.exchange(String.format(getGradProgramName,gradAlgorithm.getProgram()), HttpMethod.GET,
     				new HttpEntity<>(httpHeaders), GradProgram.class).getBody();
 			graduationMessages.setGradProgram(gradProgram.getProgramName());
+			data.getDemographics().setGradProgram(gradProgram.getProgramCode());
 		}
 		graduationMessages.setHonours(gradAlgorithm.getHonoursFlag());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());

@@ -24,7 +24,7 @@ public class StudentDemographics {
     private String studSex;
     private String studentGrade;
     private String studentCitizenship;
-    private int gradRequirementYear;
+    private String gradProgram;
     private String programCode;
     private String programCode2;
     private String programCode3;
