@@ -56,7 +56,7 @@ public class EducGraduationApiUtils {
         if (sessionDate == null)
             return null;
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGraduationApiConstants.TRAX_DATE_FORMAT);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         Date date = new Date();
 
         try {
