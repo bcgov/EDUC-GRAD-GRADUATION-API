@@ -106,7 +106,6 @@ public class GraduationService {
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			saveStudentAchievementReport(pen,data,httpHeaders);
 			saveStudentTranscriptReport(pen,data,httpHeaders);
-			graduationStatusResponse.setProgramCompletionDate(EducGraduationApiUtils.parseTraxDate(graduationStatusResponse.getProgramCompletionDate()));
 			if(graduationDataStatus.isGraduated()) {
 				//TODO:Save certificates
 				//Create Certificate 
