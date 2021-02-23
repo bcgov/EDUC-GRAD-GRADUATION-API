@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,6 +29,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgramData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
@@ -76,41 +79,34 @@ public class GraduationService {
 			
 		GraduationStatus gradResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
 					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
-		logger.debug("Receieved PEN and Grad PRogram");
-		logger.debug("Calling Grad Algorithm");
+		//Run Grad Algorithm
 		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getProgram()), HttpMethod.GET,
 				new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
-		logger.debug("Algorithm complete");
+		
+//		List<GradStudentSpecialProgram> gradSpecialResponseList = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
+//				new HttpEntity<>(httpHeaders), new ParameterizedTypeReference<List<GradStudentSpecialProgram>>() {}).getBody();
+//		//Run Special Program Algorithm
+//		for(int i=0; i<gradSpecialResponseList.size();i++) {
+//			GradStudentSpecialProgram specialProgram = gradSpecialResponseList.get(i);
+//			GradStudentSpecialProgramData gradStudentSpecialProgramData = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getProgram()), HttpMethod.GET,
+//					new HttpEntity<>(httpHeaders), GradStudentSpecialProgramData.class).getBody();
+//			specialProgram.setSpecialProgramCompletionDate(gradStudentSpecialProgramData.getGradStatus().getSpecialProgramCompletionDate());
+//			specialProgram.setStudentSpecialProgramData(prepareGradStudentSpecialObj(gradStudentSpecialProgramData));
+//		}
+		
 		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
 		ReportData data = prepareReportData(graduationDataStatus,httpHeaders);
 		if(toBeSaved != null && toBeSaved.getPen() != null) {
-			logger.debug("Save Student Grad status");
 			GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
 					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
-			logger.debug("Save Student Grad status Complete");
-			logger.debug("Report Create Call");
+			
+			//Reports
 			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
-			String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
-			GradStudentReports requestObj = new GradStudentReports();
-			//Save Student Achievement Report
-			requestObj.setPen(pen);
-			requestObj.setReport(encodedPdfReportAchievement);
-			requestObj.setGradReportTypeCode("ACHV");
-			
-			logger.debug("Report Save Call");
-			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
-			requestObj = new GradStudentReports();
-			//Save Student Transcript Report
-			requestObj.setPen(pen);
-			requestObj.setReport(encodedPdfReportTranscript);
-			requestObj.setGradReportTypeCode("TRAN");
-			logger.debug("Report Save Call");
-			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+			saveStudentAchievementReport(pen,data,httpHeaders);
+			saveStudentTranscriptReport(pen,data,httpHeaders);
+			graduationStatusResponse.setProgramCompletionDate(EducGraduationApiUtils.parseTraxDate(graduationStatusResponse.getProgramCompletionDate()));
 			if(graduationDataStatus.isGraduated()) {
 				//TODO:Save certificates
 				//Create Certificate 
@@ -125,7 +121,30 @@ public class GraduationService {
 		return null;
 	}
 
+	private String prepareGradStudentSpecialObj(GradStudentSpecialProgramData gradStudentSpecialProgramData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
+	public void saveStudentAchievementReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+		String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
+		GradStudentReports requestObj = new GradStudentReports();
+		requestObj.setPen(pen);
+		requestObj.setReport(encodedPdfReportAchievement);
+		requestObj.setGradReportTypeCode("ACHV");
+		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+	}
+
+	public void saveStudentTranscriptReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+		String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
+		GradStudentReports requestObj = new GradStudentReports();
+		requestObj.setPen(pen);
+		requestObj.setReport(encodedPdfReportTranscript);
+		requestObj.setGradReportTypeCode("TRAN");
+		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+	}
 
 	private String generateStudentTranscriptReport(ReportData data, HttpHeaders httpHeaders) {
 		GenerateReport reportParams = new GenerateReport();		
