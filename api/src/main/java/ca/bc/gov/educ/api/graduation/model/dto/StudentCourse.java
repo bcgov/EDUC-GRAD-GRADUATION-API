@@ -30,8 +30,11 @@ public class StudentCourse {
 	private String relatedLevel;
 	private String hasRelatedCourse;
 	private boolean isNotCompleted;
+	private boolean isProjected;
 	private boolean isFailed;
 	private boolean isDuplicate;
+	private boolean isCareerPrep;
+	private boolean isLocallyDeveloped;
 	private boolean isUsed;
 
 	@Override
@@ -42,7 +45,10 @@ public class StudentCourse {
 				+ completedCoursePercentage + ", completedCourseLetterGrade=" + completedCourseLetterGrade
 				+ ", interimPercent=" + interimPercent + ", interimLetterGrade=" + interimLetterGrade + ", credits="
 				+ credits + ", creditsUsedForGrad=" + creditsUsedForGrad + ", relatedCourse=" + relatedCourse
-				+ ", relatedLevel=" + relatedLevel + ", hasRelatedCourse=" + hasRelatedCourse + "]";
+				+ ", relatedLevel=" + relatedLevel + ", hasRelatedCourse=" + hasRelatedCourse
+				+ ", isNotCompleted=" + isNotCompleted + ", isProjected=" + isProjected + ", isFailed=" + isFailed
+				+ ", isDuplicate=" + isDuplicate + ", isCareerPrep=" + isCareerPrep + ", isLocallyDeveloped="
+				+ isLocallyDeveloped + ", isUsed=" + isUsed + "]";
 	}
 
 	public Integer getCreditsUsedForGrad() {
