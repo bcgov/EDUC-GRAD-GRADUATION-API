@@ -8,11 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
@@ -31,24 +27,31 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This Read API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
-	private static Logger logger = LoggerFactory.getLogger(GraduationController.class);
+    private static Logger logger = LoggerFactory.getLogger(GraduationController.class);
 
     @Autowired
     GraduationService gradService;
-    
-    @Autowired
-   	GradValidation validation;
-       
-    @Autowired
-   	ResponseHelper response;
 
-    @GetMapping (EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
+    @Autowired
+    GradValidation validation;
+
+    @Autowired
+    ResponseHelper response;
+
+    @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    public  ResponseEntity<GraduationStatus> graduateStudent(@PathVariable String pen) {
+    public ResponseEntity<GraduationStatus> graduateStudent(@PathVariable String pen,
+                                                            @RequestParam(required = false) boolean projected) {
         logger.debug("Graduate Student for PEN: " + pen);
-        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails(); 
-    	String accessToken = auth.getTokenValue();
-        return response.GET(gradService.graduateStudentByPen(pen,accessToken));
-    }    
-   
+        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        String accessToken = auth.getTokenValue();
+
+        if (projected) {
+            logger.info(" Running PROJECTED GRAD...");
+            return response.GET(gradService.projectStudentGraduationByPen(pen, accessToken));
+        }
+
+        return response.GET(gradService.graduateStudentByPen(pen, accessToken));
+    }
+
 }
