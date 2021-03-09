@@ -13,6 +13,7 @@ public class EducGraduationApiConstants {
     public static final String STUDENT_TRANSCRIPT_BY_PEN = "pen/{pen}/transcript";
 
     public static final String ENDPOINT_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.gradalgorithm}";
+    public static final String ENDPOINT_PROJECTED_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.projectedgradalgorithm}";
     public static final String ENDPOINT_GRAD_STATUS_UPDATE_URL = "${endpoint.graduation-status-api.update-grad-status}";
     public static final String ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL = "${endpoint.grad-common-api.update-grad-student-report.url}";
     public static final String ENDPOINT_ACHIEVEMENT_REPORT_API_URL = "${endpoint.report-api.achievement_report}";
@@ -27,7 +28,7 @@ public class EducGraduationApiConstants {
     public static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
 
     //Default Date format constants
-    public static final String DEFAULT_DATE_FORMAT = "dd-MMM-yyyy";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
 	

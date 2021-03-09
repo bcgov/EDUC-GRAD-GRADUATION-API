@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -28,6 +29,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgramData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
@@ -45,78 +48,73 @@ public class GraduationService {
 
     @Autowired
     RestTemplate restTemplate;
-    
+
     @Value(EducGraduationApiConstants.ENDPOINT_GRADUATION_ALGORITHM_URL)
     private String graduateStudent;
-    
+
+	@Value(EducGraduationApiConstants.ENDPOINT_PROJECTED_GRADUATION_ALGORITHM_URL)
+	private String projectedStudentGraduation;
+
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_UPDATE_URL)
-    private String updateGradStatusForStudent;   
-    
+    private String updateGradStatusForStudent;
+
     @Value(EducGraduationApiConstants.ENDPOINT_ACHIEVEMENT_REPORT_API_URL)
     private String reportAchievementURL;
-    
+
     @Value(EducGraduationApiConstants.ENDPOINT_TRANSCRIPT_REPORT_API_URL)
     private String reportTranscriptURL;
-    
+
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
     private String updateGradStudentReportForStudent;
-    
+
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_CERTIFICATE_TYPE_URL)
     private String getGradCertificateType;
-    
+
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_PROGRAM_NAME_URL)
     private String getGradProgramName;
-    
 
-    
+
+
 	public GraduationStatus graduateStudentByPen(String pen, String accessToken) {
 		logger.debug("graduateStudentByPen");
 		HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
 		try {
-			
+
 		GraduationStatus gradResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
 					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
-		logger.debug("Receieved PEN and Grad PRogram");
-		logger.debug("Calling Grad Algorithm");
+		//Run Grad Algorithm
 		GraduationData graduationDataStatus = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getProgram()), HttpMethod.GET,
 				new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
-		logger.debug("Algorithm complete");
+
+//		List<GradStudentSpecialProgram> gradSpecialResponseList = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
+//				new HttpEntity<>(httpHeaders), new ParameterizedTypeReference<List<GradStudentSpecialProgram>>() {}).getBody();
+//		//Run Special Program Algorithm
+//		for(int i=0; i<gradSpecialResponseList.size();i++) {
+//			GradStudentSpecialProgram specialProgram = gradSpecialResponseList.get(i);
+//			GradStudentSpecialProgramData gradStudentSpecialProgramData = restTemplate.exchange(String.format(graduateStudent,pen,gradResponse.getProgram()), HttpMethod.GET,
+//					new HttpEntity<>(httpHeaders), GradStudentSpecialProgramData.class).getBody();
+//			specialProgram.setSpecialProgramCompletionDate(gradStudentSpecialProgramData.getGradStatus().getSpecialProgramCompletionDate());
+//			specialProgram.setStudentSpecialProgramData(prepareGradStudentSpecialObj(gradStudentSpecialProgramData));
+//		}
+
 		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
 		ReportData data = prepareReportData(graduationDataStatus,httpHeaders);
 		if(toBeSaved != null && toBeSaved.getPen() != null) {
-			logger.debug("Save Student Grad status");
 			GraduationStatus graduationStatusResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.POST,
 					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
-			logger.debug("Save Student Grad status Complete");
-			logger.debug("Report Create Call");
+
+			//Reports
 			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
-			String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
-			GradStudentReports requestObj = new GradStudentReports();
-			//Save Student Achievement Report
-			requestObj.setPen(pen);
-			requestObj.setReport(encodedPdfReportAchievement);
-			requestObj.setGradReportTypeCode("ACHV");
-			
-			logger.debug("Report Save Call");
-			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
-			requestObj = new GradStudentReports();
-			//Save Student Transcript Report
-			requestObj.setPen(pen);
-			requestObj.setReport(encodedPdfReportTranscript);
-			requestObj.setGradReportTypeCode("TRAN");
-			logger.debug("Report Save Call");
-			restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-							new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+			saveStudentAchievementReport(pen,data,httpHeaders);
+			saveStudentTranscriptReport(pen,data,httpHeaders);
 			if(graduationDataStatus.isGraduated()) {
 				//TODO:Save certificates
-				//Create Certificate 
+				//Create Certificate
 			}
-			
-			
+
+
 			return graduationStatusResponse;
 		}
 		}catch(Exception e) {
@@ -125,11 +123,67 @@ public class GraduationService {
 		return null;
 	}
 
+	public GraduationStatus projectStudentGraduationByPen(String pen, String accessToken) {
 
+		logger.debug("projectStudentGraduationByPen");
+
+		HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
+
+		try {
+
+			GraduationStatus gradResponse = restTemplate.exchange(String.format(updateGradStatusForStudent,pen), HttpMethod.GET,
+					new HttpEntity<>(httpHeaders), GraduationStatus.class).getBody();
+
+			//Run Grad Algorithm
+			GraduationData graduationDataStatus = restTemplate.exchange(String.format(projectedStudentGraduation, pen,
+					gradResponse.getProgram(), true), HttpMethod.GET,
+					new HttpEntity<>(httpHeaders), GraduationData.class).getBody();
+
+			gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+			gradResponse.setPen(graduationDataStatus.getGradStatus().getPen());
+			gradResponse.setProgram(graduationDataStatus.getGradStatus().getProgram());
+			gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
+			gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
+			gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursFlag());
+			gradResponse.setRecalculateGradStatus(graduationDataStatus.getGradStatus().getRecalculateFlag());
+			gradResponse.setSchoolOfRecord(graduationDataStatus.getGradStatus().getSchoolOfRecord());
+			gradResponse.setStudentGrade(graduationDataStatus.getGradStatus().getStudentGrade());
+
+			return gradResponse;
+
+		}catch(Exception e) {
+			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again...");
+		}
+	}
+
+	private String prepareGradStudentSpecialObj(GradStudentSpecialProgramData gradStudentSpecialProgramData) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void saveStudentAchievementReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+		String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
+		GradStudentReports requestObj = new GradStudentReports();
+		requestObj.setPen(pen);
+		requestObj.setReport(encodedPdfReportAchievement);
+		requestObj.setGradReportTypeCode("ACHV");
+		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+	}
+
+	public void saveStudentTranscriptReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+		String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
+		GradStudentReports requestObj = new GradStudentReports();
+		requestObj.setPen(pen);
+		requestObj.setReport(encodedPdfReportTranscript);
+		requestObj.setGradReportTypeCode("TRAN");
+		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+	}
 
 	private String generateStudentTranscriptReport(ReportData data, HttpHeaders httpHeaders) {
-		GenerateReport reportParams = new GenerateReport();		
-		reportParams.setData(data);				
+		GenerateReport reportParams = new GenerateReport();
+		reportParams.setData(data);
 		byte[] bytesSAR = restTemplate.exchange(reportTranscriptURL, HttpMethod.POST,
 				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
@@ -139,19 +193,19 @@ public class GraduationService {
 
 
 	private String generateStudentAchievementReport(ReportData data, HttpHeaders httpHeaders) {
-		GenerateReport reportParams = new GenerateReport();		
-		reportParams.setData(data);				
+		GenerateReport reportParams = new GenerateReport();
+		reportParams.setData(data);
 		byte[] bytesSAR = restTemplate.exchange(reportAchievementURL, HttpMethod.POST,
 				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
-		
+
 	}
 
 
 
 	private ReportData prepareReportData(GraduationData graduationDataStatus, HttpHeaders httpHeaders) {
-		GradStudent gradStudent = graduationDataStatus.getGradStudent();	
+		GradStudent gradStudent = graduationDataStatus.getGradStudent();
 		GradAlgorithmGraduationStatus gradAlgorithm = graduationDataStatus.getGradStatus();
 		ReportData data = new ReportData();
 		StudentDemographics studentDemo = new  StudentDemographics();
@@ -173,7 +227,7 @@ public class GraduationService {
 		graduationMessages.setNonGradReasons(graduationDataStatus.getNonGradReasons());
 		List<CodeDTO> specialProgram = new ArrayList<>();
 		List<CodeDTO> certificateProgram = new ArrayList<>();
-		
+
 		CodeDTO cDTO = null;
 		graduationMessages.setSpecialProgram(specialProgram);
 		if(gradAlgorithm.getCertificateType1() != null) {
@@ -183,10 +237,10 @@ public class GraduationService {
     		if(gradCertificateTypes != null) {
     			cDTO.setCode(gradCertificateTypes.getCode());
     			cDTO.setName(gradCertificateTypes.getDescription());
-    		}			
+    		}
     		certificateProgram.add(cDTO);
 		}
-		
+
 		if(gradAlgorithm.getCertificateType2() != null) {
 			cDTO = new CodeDTO();
 			GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,gradAlgorithm.getCertificateType2()), HttpMethod.GET,
@@ -194,12 +248,12 @@ public class GraduationService {
     		if(gradCertificateTypes != null) {
     			cDTO.setCode(gradCertificateTypes.getCode());
     			cDTO.setName(gradCertificateTypes.getDescription());
-    		}			
+    		}
     		certificateProgram.add(cDTO);
 		}
 		graduationMessages.setCertificateProgram(certificateProgram);
 		data.setGraduationMessages(graduationMessages);
-		
+
 		//get Transcript Banner
 		if(graduationDataStatus.getSchool() != null) {
 			if(graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("1")) {
@@ -210,7 +264,7 @@ public class GraduationService {
 				data.setTranscriptBanner("B.C. INDEPENDENT SCHOOLS – GROUP 4");
 			}
 		}
-		
+
 		return data;
 	}
 
@@ -225,5 +279,5 @@ public class GraduationService {
 			e.printStackTrace();
 		}
 		return obj;
-	}    
+	}
 }
