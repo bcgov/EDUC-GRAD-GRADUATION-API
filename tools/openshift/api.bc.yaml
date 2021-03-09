@@ -12,11 +12,11 @@ objects:
       labels:
         build: educ-grad-graduation-api-pipeline
       name: educ-grad-graduation--pipeline
-      namespace: wbmfsf-tools
+      namespace: 77c02f-tools
     spec:
       source:
         git:
-          ref: master
+          ref: main
           uri: 'https://github.com/bcgov/EDUC-GRAD-GRADUATION-API'
         type: Git
       strategy:
