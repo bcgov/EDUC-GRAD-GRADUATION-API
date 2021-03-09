@@ -48,6 +48,13 @@ objects:
               ports:
                 - containerPort: ${{CONTAINER_PORT}}
                   protocol: TCP
+              envFrom:
+                - configMapRef:
+                    name: educ-grad-api-config-map
+                - secretRef:
+                    name: educ-grad-db-secret
+                - secretRef:
+                    name: grad-keycloak-pk-secret
               resources: {}
       test: false
       triggers:
