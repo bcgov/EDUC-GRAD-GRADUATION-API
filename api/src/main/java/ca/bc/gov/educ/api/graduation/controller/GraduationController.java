@@ -8,9 +8,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -40,7 +45,7 @@ public class GraduationController {
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    public ResponseEntity<GraduationStatus> graduateStudent(@PathVariable String pen,
+    public ResponseEntity<AlgorithmResponse> graduateStudent(@PathVariable String pen,
                                                             @RequestParam(required = false) boolean projected) {
         logger.debug("Graduate Student for PEN: " + pen);
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();

@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Component
-public class GradStudentSpecialAlgorithm {
+public class SpecialGradAlgorithmGraduationStatus {
 
 	private String pen;
     private UUID specialProgramID;

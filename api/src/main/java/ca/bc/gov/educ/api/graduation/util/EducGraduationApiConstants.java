@@ -20,6 +20,9 @@ public class EducGraduationApiConstants {
     public static final String ENDPOINT_TRANSCRIPT_REPORT_API_URL = "${endpoint.report-api.transcript_report}";
     public static final String ENDPOINT_GRAD_CERTIFICATE_TYPE_URL = "${endpoint.grad-code-api.get-certificate-name}";
     public static final String ENDPOINT_GRAD_PROGRAM_NAME_URL = "${endpoint.grad-program-management-api.program_name_by_program_code.url}";
+    public static final String ENDPOINT_SPECIAL_GRAD_STATUS_READ = "${endpoint.graduation-status-api.read-special-program-grad-status}";
+    public static final String ENDPOINT_SPECIAL_GRAD_STATUS_SAVE = "${endpoint.graduation-status-api.save-special-program-grad-status}";
+    public static final String ENDPOINT_SPECIAL_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.specialgradalgorithm}";
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
