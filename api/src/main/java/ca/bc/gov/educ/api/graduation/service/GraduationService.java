@@ -28,6 +28,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
+import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
@@ -61,12 +62,18 @@ public class GraduationService {
 
     @Value(EducGraduationApiConstants.ENDPOINT_ACHIEVEMENT_REPORT_API_URL)
     private String reportAchievementURL;
+    
+    @Value(EducGraduationApiConstants.ENDPOINT_CERTIFICATE_REPORT_API_URL)
+    private String reportCertificateURL;
 
     @Value(EducGraduationApiConstants.ENDPOINT_TRANSCRIPT_REPORT_API_URL)
     private String reportTranscriptURL;
 
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
     private String updateGradStudentReportForStudent;
+    
+    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_CERTIFICATE_UPDATE_URL)
+    private String updateGradStudentCertificateForStudent;
 
     @Value(EducGraduationApiConstants.ENDPOINT_GRAD_CERTIFICATE_TYPE_URL)
     private String getGradCertificateType;
@@ -129,11 +136,27 @@ public class GraduationService {
 			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
+			data.setStudentName(data.getDemographics().getStudGiven()+" "+data.getDemographics().getStudMiddle()+" "+data.getDemographics().getStudSurname());
+			data.setStudentSchool(data.getSchool().getSchoolName());
+			if(gradSpecialResponseList.size() > 0) {
+				data.getGraduationMessages().setHasSpecialProgram(true);
+			}
+			data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			saveStudentAchievementReport(pen,data,httpHeaders);
 			saveStudentTranscriptReport(pen,data,httpHeaders);
 			if(graduationDataStatus.isGraduated()) {
 				//TODO:Save certificates
-				//Create Certificate
+				String certificateType="";
+				if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
+					if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
+						certificateType = "E";
+					}else {
+						certificateType = "EI";
+					}
+				}else {
+					certificateType="S";
+				}
+				saveStudentCertificateReport(pen,data,httpHeaders,certificateType);
 			}
 
 			algorithmResponse.setGraduationStatus(graduationStatusResponse);
@@ -201,7 +224,17 @@ public class GraduationService {
 		requestObj.setReport(encodedPdfReportAchievement);
 		requestObj.setGradReportTypeCode("ACHV");
 		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReports.class).getBody();
+	}
+	
+	public void saveStudentCertificateReport(String pen, ReportData data, HttpHeaders httpHeaders,String certificateType) {
+		String encodedPdfReportCertificate = generateStudentCertificateReport(data,httpHeaders);
+		GradStudentCertificates requestObj = new GradStudentCertificates();
+		requestObj.setPen(pen);
+		requestObj.setCertificate(encodedPdfReportCertificate);
+		requestObj.setGradCertificateTypeCode(certificateType);
+		restTemplate.exchange(String.format(updateGradStudentCertificateForStudent,pen), HttpMethod.POST,
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentCertificates.class).getBody();
 	}
 
 	public void saveStudentTranscriptReport(String pen, ReportData data, HttpHeaders httpHeaders) {
@@ -211,7 +244,7 @@ public class GraduationService {
 		requestObj.setReport(encodedPdfReportTranscript);
 		requestObj.setGradReportTypeCode("TRAN");
 		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
-						new HttpEntity<>(requestObj,httpHeaders), GradStudentReport.class).getBody();
+						new HttpEntity<>(requestObj,httpHeaders), GradStudentReports.class).getBody();
 	}
 
 	private String generateStudentTranscriptReport(ReportData data, HttpHeaders httpHeaders) {
@@ -229,6 +262,16 @@ public class GraduationService {
 		GenerateReport reportParams = new GenerateReport();
 		reportParams.setData(data);
 		byte[] bytesSAR = restTemplate.exchange(reportAchievementURL, HttpMethod.POST,
+				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
+		byte[] encoded = Base64.encodeBase64(bytesSAR);
+	    return new String(encoded,StandardCharsets.US_ASCII);
+
+	}
+
+	private String generateStudentCertificateReport(ReportData data, HttpHeaders httpHeaders) {
+		GenerateReport reportParams = new GenerateReport();
+		reportParams.setData(data);
+		byte[] bytesSAR = restTemplate.exchange(reportCertificateURL, HttpMethod.POST,
 				new HttpEntity<>(reportParams,httpHeaders), byte[].class).getBody();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
