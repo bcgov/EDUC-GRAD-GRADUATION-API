@@ -22,14 +22,17 @@ import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.PermissionsContants;
 import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @CrossOrigin
 @RestController
 @RequestMapping(EducGraduationApiConstants.GRADUATION_API_ROOT_MAPPING)
 @EnableResourceServer
-@OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This Read API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
+@OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
     private static Logger logger = LoggerFactory.getLogger(GraduationController.class);
@@ -45,6 +48,8 @@ public class GraduationController {
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "Graduate Student by PEN or get projected grad by projected =true", description = "Graduate Student by PEN or get projected grad by projected =true", tags = { "Graduation" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<AlgorithmResponse> graduateStudent(@PathVariable String pen,
                                                             @RequestParam(required = false) boolean projected) {
         logger.debug("Graduate Student for PEN: " + pen);
