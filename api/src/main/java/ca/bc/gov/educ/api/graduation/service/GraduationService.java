@@ -85,16 +85,9 @@ public class GraduationService {
     @Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_GRAD_STATUS_READ)
     private String readSpecialGradStatusForStudent;
     
-    @Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_GRADUATION_ALGORITHM_URL)
-    private String specialProgramGraduateStudent;
-    
     @Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_PROGRAM_DETAILS_URL)
     private String specialProgramDetails;
     
-    
-
-
-
 	public AlgorithmResponse graduateStudentByPen(String pen, String accessToken) {
 		logger.debug("graduateStudentByPen");
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
