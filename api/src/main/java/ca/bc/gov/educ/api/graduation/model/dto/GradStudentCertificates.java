@@ -14,4 +14,5 @@ public class GradStudentCertificates extends BaseModel{
 	private String certificate;
 	private String gradCertificateTypeCode;
 	private String gradCertificateTypeDesc;
+	private UUID studentID;
 }
