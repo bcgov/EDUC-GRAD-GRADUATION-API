@@ -20,5 +20,6 @@ public class GradStudentSpecialProgram extends BaseModel{
     private String specialProgramName;
     private String specialProgramCode;
     private String mainProgramCode;
+    private UUID studentID;
 				
 }
