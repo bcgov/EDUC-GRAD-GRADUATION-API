@@ -4,6 +4,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -130,9 +131,7 @@ public class GraduationService {
 			data.getDemographics().setMincode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			data.setStudentName(data.getDemographics().getLegalFirstName() != null ? data.getDemographics().getLegalFirstName().trim():""
-			+" "+data.getDemographics().getLegalMiddleNames() != null ? data.getDemographics().getLegalMiddleNames().trim():""
-			+" "+data.getDemographics().getLegalLastName() != null ? data.getDemographics().getLegalLastName().trim():"");
+			data.setStudentName(data.getDemographics().getLegalFirstName()+" "+data.getDemographics().getLegalMiddleNames()+" "+data.getDemographics().getLegalLastName());
 			
 			data.setStudentSchool(data.getSchool().getSchoolName());
 			if(graduationDataStatus.getSpecialGradStatus().size() > 0) {
@@ -150,7 +149,7 @@ public class GraduationService {
 				}else {
 					certificateType="S";
 				}
-				saveStudentCertificateReport(pen,data,httpHeaders,certificateType);
+				saveStudentCertificateReport(pen,data,httpHeaders,certificateType,graduationStatusResponse.getStudentID());
 			}
 			List<CodeDTO> certificateProgram = new ArrayList<>();
 			CodeDTO cDTO = new CodeDTO();
@@ -162,8 +161,8 @@ public class GraduationService {
     		}
     		certificateProgram.add(cDTO);
 			data.getGraduationMessages().setCertificateProgram(certificateProgram);
-			saveStudentAchievementReport(pen,data,httpHeaders);
-			saveStudentTranscriptReport(pen,data,httpHeaders);			
+			saveStudentAchievementReport(pen,data,httpHeaders,graduationStatusResponse.getStudentID());
+			saveStudentTranscriptReport(pen,data,httpHeaders,graduationStatusResponse.getStudentID());			
 
 			algorithmResponse.setGraduationStatus(graduationStatusResponse);
 			algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
@@ -224,31 +223,34 @@ public class GraduationService {
 		}
 	}
 
-	public void saveStudentAchievementReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+	public void saveStudentAchievementReport(String pen, ReportData data, HttpHeaders httpHeaders, UUID studentID) {
 		String encodedPdfReportAchievement = generateStudentAchievementReport(data,httpHeaders);
 		GradStudentReports requestObj = new GradStudentReports();
 		requestObj.setPen(pen);
+		requestObj.setStudentID(studentID);
 		requestObj.setReport(encodedPdfReportAchievement);
 		requestObj.setGradReportTypeCode("ACHV");
 		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
 						new HttpEntity<>(requestObj,httpHeaders), GradStudentReports.class).getBody();
 	}
 	
-	public void saveStudentCertificateReport(String pen, ReportData data, HttpHeaders httpHeaders,String certificateType) {
+	public void saveStudentCertificateReport(String pen, ReportData data, HttpHeaders httpHeaders,String certificateType, UUID studentID) {
 		String encodedPdfReportCertificate = generateStudentCertificateReport(data,httpHeaders);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(pen);
+		requestObj.setStudentID(studentID);
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certificateType);
 		restTemplate.exchange(String.format(updateGradStudentCertificateForStudent,pen), HttpMethod.POST,
 						new HttpEntity<>(requestObj,httpHeaders), GradStudentCertificates.class).getBody();
 	}
 
-	public void saveStudentTranscriptReport(String pen, ReportData data, HttpHeaders httpHeaders) {
+	public void saveStudentTranscriptReport(String pen, ReportData data, HttpHeaders httpHeaders,UUID studentID) {
 		String encodedPdfReportTranscript = generateStudentTranscriptReport(data,httpHeaders);
 		GradStudentReports requestObj = new GradStudentReports();
 		requestObj.setPen(pen);
 		requestObj.setReport(encodedPdfReportTranscript);
+		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
 		restTemplate.exchange(String.format(updateGradStudentReportForStudent,pen), HttpMethod.POST,
 						new HttpEntity<>(requestObj,httpHeaders), GradStudentReports.class).getBody();

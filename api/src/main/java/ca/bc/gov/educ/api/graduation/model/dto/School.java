@@ -23,6 +23,7 @@ public class School {
     private String countryCode;
     private String countryName;
     private String postal;
+    private String independentAffiliation;
 
     @Override
     public String toString() {
