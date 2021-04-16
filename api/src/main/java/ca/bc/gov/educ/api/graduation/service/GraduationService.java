@@ -138,9 +138,8 @@ public class GraduationService {
 				data.getGraduationMessages().setHasSpecialProgram(true);
 			}
 			data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			String certificateType="";
+			List<String> certificateList = new ArrayList<String>();
 			if(graduationDataStatus.isGraduated()) {				
-				List<String> certificateList = new ArrayList<String>();
 				if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
 					if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
 						certificateList.add("E");
@@ -165,15 +164,18 @@ public class GraduationService {
 				
 			}
 			List<CodeDTO> certificateProgram = new ArrayList<>();
-			CodeDTO cDTO = new CodeDTO();
-			GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,certificateType), HttpMethod.GET,
-    				new HttpEntity<>(httpHeaders), GradCertificateTypes.class).getBody();
-    		if(gradCertificateTypes != null) {
-    			cDTO.setCode(gradCertificateTypes.getCode());
-    			cDTO.setName(gradCertificateTypes.getDescription());
-    		}
-    		certificateProgram.add(cDTO);
+			for(String certType : certificateList) {
+				CodeDTO cDTO = new CodeDTO();
+				GradCertificateTypes gradCertificateTypes = restTemplate.exchange(String.format(getGradCertificateType,certType), HttpMethod.GET,
+	    				new HttpEntity<>(httpHeaders), GradCertificateTypes.class).getBody();
+	    		if(gradCertificateTypes != null) {
+	    			cDTO.setCode(gradCertificateTypes.getCode());
+	    			cDTO.setName(gradCertificateTypes.getDescription());
+	    		}
+	    		certificateProgram.add(cDTO);
+			}
 			data.getGraduationMessages().setCertificateProgram(certificateProgram);
+			data.getGraduationMessages().setHasCareerProgram(certificateProgram.size() > 0 ? true:false);
 			saveStudentAchievementReport(pen,data,httpHeaders,graduationStatusResponse.getStudentID());
 			saveStudentTranscriptReport(pen,data,httpHeaders,graduationStatusResponse.getStudentID());			
 
