@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class GraduationData {
-    private GradStudent gradStudent;
+    private GradSearchStudent gradStudent;
     private GradAlgorithmGraduationStatus gradStatus;
     private List<SpecialGradAlgorithmGraduationStatus> specialGradStatus;
     private School school;

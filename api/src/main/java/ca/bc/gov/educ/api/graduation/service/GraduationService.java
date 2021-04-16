@@ -26,7 +26,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GenerateReport;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudent;
+import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
@@ -127,10 +127,13 @@ public class GraduationService {
 					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStatus.class).getBody();
 
 			//Reports
-			data.getDemographics().setMinCode(graduationStatusResponse.getSchoolOfRecord());
+			data.getDemographics().setMincode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-			data.setStudentName(data.getDemographics().getStudGiven()+" "+data.getDemographics().getStudMiddle()+" "+data.getDemographics().getStudSurname());
+			data.setStudentName(data.getDemographics().getLegalFirstName() != null ? data.getDemographics().getLegalFirstName().trim():""
+			+" "+data.getDemographics().getLegalMiddleNames() != null ? data.getDemographics().getLegalMiddleNames().trim():""
+			+" "+data.getDemographics().getLegalLastName() != null ? data.getDemographics().getLegalLastName().trim():"");
+			
 			data.setStudentSchool(data.getSchool().getSchoolName());
 			if(graduationDataStatus.getSpecialGradStatus().size() > 0) {
 				data.getGraduationMessages().setHasSpecialProgram(true);
@@ -285,7 +288,7 @@ public class GraduationService {
 
 
 	private ReportData prepareReportData(GraduationData graduationDataStatus, HttpHeaders httpHeaders,List<CodeDTO> specialProgram) {
-		GradStudent gradStudent = graduationDataStatus.getGradStudent();
+		GradSearchStudent gradStudent = graduationDataStatus.getGradStudent();
 		GradAlgorithmGraduationStatus gradAlgorithm = graduationDataStatus.getGradStatus();
 		ReportData data = new ReportData();
 		StudentDemographics studentDemo = new  StudentDemographics();
@@ -302,7 +305,7 @@ public class GraduationService {
 			GradProgram gradProgram = restTemplate.exchange(String.format(getGradProgramName,gradAlgorithm.getProgram()), HttpMethod.GET,
     				new HttpEntity<>(httpHeaders), GradProgram.class).getBody();
 			graduationMessages.setGradProgram(gradProgram.getProgramName());
-			data.getDemographics().setGradProgram(gradProgram.getProgramCode());
+			data.getDemographics().setProgram(gradProgram.getProgramCode());
 		}
 		graduationMessages.setHonours(gradAlgorithm.getHonoursStanding());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
