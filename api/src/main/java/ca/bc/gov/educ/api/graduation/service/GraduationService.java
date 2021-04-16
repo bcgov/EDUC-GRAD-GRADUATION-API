@@ -140,16 +140,29 @@ public class GraduationService {
 			data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
 			String certificateType="";
 			if(graduationDataStatus.isGraduated()) {				
+				List<String> certificateList = new ArrayList<String>();
 				if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
 					if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
-						certificateType = "E";
+						certificateList.add("E");
 					}else {
-						certificateType = "EI";
+						certificateList.add("EI");
+					}
+					if(projectedSpecialGradResponse.size() > 0) {
+						for(GradStudentSpecialProgram specialPrograms : projectedSpecialGradResponse) {
+							if(specialPrograms.getSpecialProgramCode().equals("FI")) {
+								certificateList.add("F");
+							}
+						}
 					}
 				}else {
-					certificateType="S";
+					certificateList.add("S");
 				}
-				saveStudentCertificateReport(pen,data,httpHeaders,certificateType,graduationStatusResponse.getStudentID());
+				
+				for(String certType : certificateList) {
+					saveStudentCertificateReport(pen,data,httpHeaders,certType,graduationStatusResponse.getStudentID());
+				}
+				
+				
 			}
 			List<CodeDTO> certificateProgram = new ArrayList<>();
 			CodeDTO cDTO = new CodeDTO();
