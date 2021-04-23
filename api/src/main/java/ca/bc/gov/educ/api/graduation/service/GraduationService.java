@@ -111,7 +111,7 @@ public class GraduationService {
 			gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
 			
 			//Save Special Grad Status
-			webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class);
+			webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
 			specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
 			specialProgram.add(specialProgramCode);
