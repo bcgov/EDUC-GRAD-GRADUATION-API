@@ -20,4 +20,5 @@ public class GradAlgorithmGraduationStatus {
     private String studentGrade;
     private String studentStatus;
     private UUID studentID;
+    private String schoolAtGrad;
 }
