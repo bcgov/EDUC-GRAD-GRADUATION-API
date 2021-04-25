@@ -91,22 +91,22 @@ public class GraduationService {
     @Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_PROGRAM_DETAILS_URL)
     private String specialProgramDetails;
     
-	public AlgorithmResponse graduateStudentByPen(String pen, String accessToken) {
+	public AlgorithmResponse graduateStudentByStudentID(String studentID, String accessToken) {
 		logger.debug("graduateStudentByPen");
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		List<CodeDTO> specialProgram = new ArrayList<>();
 		try {
 
-		GraduationStatus gradResponse = webClient.get().uri(String.format(updateGradStatusForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
+		GraduationStatus gradResponse = webClient.get().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
 		//Run Grad Algorithm
-		GraduationData graduationDataStatus = webClient.get().uri(String.format(graduateStudent,pen,gradResponse.getProgram())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
+		GraduationData graduationDataStatus = webClient.get().uri(String.format(graduateStudent,gradResponse.getPen(),gradResponse.getProgram())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 		 
 		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<GradStudentSpecialProgram>();
 		//Run Special Program Algorithm
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			CodeDTO specialProgramCode = new CodeDTO();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
-			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,pen,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
 			gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
 			
@@ -121,7 +121,7 @@ public class GraduationService {
 		GraduationStatus toBeSaved = prepareGraduationStatusObj(graduationDataStatus);
 		ReportData data = prepareReportData(graduationDataStatus,accessToken,specialProgram);
 		if(toBeSaved != null && toBeSaved.getPen() != null) {
-			GraduationStatus graduationStatusResponse = webClient.post().uri(String.format(updateGradStatusForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
+			GraduationStatus graduationStatusResponse = webClient.post().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
 			//Reports
 			data.getDemographics().setMincode(graduationStatusResponse.getSchoolOfRecord());
 			data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
@@ -153,10 +153,8 @@ public class GraduationService {
 				}
 				
 				for(String certType : certificateList) {
-					saveStudentCertificateReport(pen,data,accessToken,certType,graduationStatusResponse.getStudentID());
+					saveStudentCertificateReport(graduationStatusResponse.getPen(),data,accessToken,certType,graduationStatusResponse.getStudentID());
 				}
-				
-				
 			}
 			List<CodeDTO> certificateProgram = new ArrayList<>();
 			for(String certType : certificateList) {
@@ -170,8 +168,8 @@ public class GraduationService {
 			}
 			data.getGraduationMessages().setCertificateProgram(certificateProgram);
 			data.getGraduationMessages().setHasCareerProgram(certificateProgram.size() > 0 ? true:false);
-			saveStudentAchievementReport(pen,data,accessToken,graduationStatusResponse.getStudentID());
-			saveStudentTranscriptReport(pen,data,accessToken,graduationStatusResponse.getStudentID());			
+			saveStudentAchievementReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());
+			saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());			
 
 			algorithmResponse.setGraduationStatus(graduationStatusResponse);
 			algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
@@ -183,16 +181,16 @@ public class GraduationService {
 		return null;
 	}
 
-	public AlgorithmResponse projectStudentGraduationByPen(String pen, String accessToken) {
+	public AlgorithmResponse projectStudentGraduationByStudentID(String studentID, String accessToken) {
 
 		logger.debug("projectStudentGraduationByPen");
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		try {
 
-			GraduationStatus gradResponse = webClient.get().uri(String.format(updateGradStatusForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
+			GraduationStatus gradResponse = webClient.get().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
 
 			//Run Grad Algorithm
-			GraduationData graduationDataStatus = webClient.get().uri(String.format(projectedStudentGraduation, pen,gradResponse.getProgram(), true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
+			GraduationData graduationDataStatus = webClient.get().uri(String.format(projectedStudentGraduation, gradResponse.getPen(),gradResponse.getProgram(), true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 			
 			gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 			gradResponse.setPen(graduationDataStatus.getGradStatus().getPen());
@@ -209,10 +207,10 @@ public class GraduationService {
 			for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 				GradStudentSpecialProgram specialProgramProjectedObj = new GradStudentSpecialProgram();
 				SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
-				GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,pen,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+				GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 				specialProgramProjectedObj.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
 				specialProgramProjectedObj.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
-				specialProgramProjectedObj.setPen(pen);
+				specialProgramProjectedObj.setPen(gradSpecialProgram.getPen());
 				specialProgramProjectedObj.setMainProgramCode(gradSpecialProgram.getMainProgramCode());
 				specialProgramProjectedObj.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
 				specialProgramProjectedObj.setSpecialProgramName(gradSpecialProgram.getSpecialProgramName());
