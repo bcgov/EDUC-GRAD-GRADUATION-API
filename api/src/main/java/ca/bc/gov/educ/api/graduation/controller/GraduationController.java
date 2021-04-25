@@ -46,7 +46,7 @@ public class GraduationController {
     @Autowired
     ResponseHelper response;
 
-    @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
+    @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_STUDENT_ID)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "Graduate Student by Student ID or get projected grad by projected =true", description = "Graduate Student by Student ID or get projected grad by projected =true", tags = { "Graduation" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})

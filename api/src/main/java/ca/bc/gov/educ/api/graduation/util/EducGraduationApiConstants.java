@@ -8,7 +8,7 @@ public class EducGraduationApiConstants {
 	public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRADUATION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/graduate";
-    public static final String GRADUATE_STUDENT_BY_PEN = "/pen/{pen}";
+    public static final String GRADUATE_STUDENT_BY_STUDENT_ID = "/studentid/{studentID}";
     public static final String STUDENT_ACHIEVEMENT_REPORT_BY_PEN = "pen/{pen}/achievementreport";
     public static final String STUDENT_TRANSCRIPT_BY_PEN = "pen/{pen}/transcript";
 
