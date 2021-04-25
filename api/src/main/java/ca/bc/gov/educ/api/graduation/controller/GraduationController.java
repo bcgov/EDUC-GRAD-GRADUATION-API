@@ -48,20 +48,20 @@ public class GraduationController {
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    @Operation(summary = "Graduate Student by PEN or get projected grad by projected =true", description = "Graduate Student by PEN or get projected grad by projected =true", tags = { "Graduation" })
+    @Operation(summary = "Graduate Student by Student ID or get projected grad by projected =true", description = "Graduate Student by Student ID or get projected grad by projected =true", tags = { "Graduation" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<AlgorithmResponse> graduateStudent(@PathVariable String pen,
+    public ResponseEntity<AlgorithmResponse> graduateStudent(@PathVariable String studentID,
                                                             @RequestParam(required = false) boolean projected) {
-        logger.debug("Graduate Student for PEN: " + pen);
+        logger.debug("Graduate Student for Student ID: " + studentID);
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
         String accessToken = auth.getTokenValue();
 
         if (projected) {
             logger.info(" Running PROJECTED GRAD...");
-            return response.GET(gradService.projectStudentGraduationByPen(pen, accessToken));
+            return response.GET(gradService.projectStudentGraduationByStudentID(studentID, accessToken));
         }
 
-        return response.GET(gradService.graduateStudentByPen(pen, accessToken));
+        return response.GET(gradService.graduateStudentByStudentID(studentID, accessToken));
     }
 
 }
