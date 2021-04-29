@@ -16,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import reactor.netty.http.client.HttpClient;
+
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableCaching
@@ -38,7 +40,9 @@ public class EducGraduationApiApplication {
 	
 	@Bean
 	public WebClient webClient() {
-		return WebClient.create();
+		HttpClient client = HttpClient.create();
+		client.warmup().block();
+		return WebClient.builder().build();
 	}
 	
 	@Bean
