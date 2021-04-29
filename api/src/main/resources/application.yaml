@@ -50,7 +50,7 @@ logging:
         gov:
           educ:
             api:
-              graduationapi: ${APP_LOG_LEVEL}
+              graduation: ${APP_LOG_LEVEL}
     org:
       springframework:
         web: ${SPRING_WEB_LOG_LEVEL}
