@@ -1,19 +1,23 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import org.springframework.stereotype.Component;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Component
-public class StudentDemographics {    
-    private String studentID;
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+public class GradSearchStudent {
+
+	private String studentID;
 	private String pen;
-	private String legalFirstName;//change this in report
-	private String legalMiddleNames;//change this in report
-	private String legalLastName; //change this in report
-	private String dob; //change this in report
-	private String sexCode; //change this in report
+	private String legalFirstName;
+	private String legalMiddleNames;
+	private String legalLastName;
+	private String dob;
+	private String sexCode;
 	private String genderCode;
 	private String usualFirstName;
 	private String usualMiddleNames;
@@ -22,18 +26,20 @@ public class StudentDemographics {
 	private String emailVerified;
 	private String deceasedDate;
 	private String postalCode;
-	private String mincode; //change this in report
-	private String localID; //change this in report
+	private String mincode;
+	private String localID;
 	private String gradeCode;
 	private String gradeYear;
 	private String demogCode;
 	private String statusCode;
 	private String memo;
 	private String trueStudentID;
-	private String program; //change this in report
+	private String program;
 	private String schoolOfRecord;
-	private String schoolOfRecordName; //Change this in report
+	private String schoolOfRecordName;
 	private String schoolOfRecordindependentAffiliation;
 	private String studentGrade;
 	private String studentStatus;
+	  
+	  
 }

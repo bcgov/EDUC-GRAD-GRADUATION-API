@@ -7,11 +7,12 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class GradStudentReports extends BaseModel{
+public class GradStudentCertificates extends BaseModel{
 
 	private UUID id;	
 	private String pen;	
-	private String report;
-	private String gradReportTypeCode;
+	private String certificate;
+	private String gradCertificateTypeCode;
+	private String gradCertificateTypeDesc;
 	private UUID studentID;
 }

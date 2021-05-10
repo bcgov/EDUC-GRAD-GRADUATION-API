@@ -20,5 +20,8 @@ public class ReportData {
 	private List<StudentExam> studentExam;
 	private GraduationMessages graduationMessages;
 	private List<StudentCourseAssessment> studentCourseAssessment;
+	private String studentName;
+	private String studentSchool;
+	private String studentCertificateDate;
 	
 }
