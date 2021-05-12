@@ -37,6 +37,7 @@ public class StudentCourse {
 	private boolean isCareerPrep;
 	private boolean isLocallyDeveloped;
 	private boolean isUsed;
+	private boolean isRestricted;
 
 	public Integer getCreditsUsedForGrad() {
 		if (creditsUsedForGrad == null)
