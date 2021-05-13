@@ -164,7 +164,7 @@ public class ReportService {
 		data.setStudentName(data.getDemographics().getLegalFirstName()+" "+data.getDemographics().getLegalMiddleNames()+" "+data.getDemographics().getLegalLastName());
 		
 		data.setStudentSchool(data.getSchool().getSchoolName());
-		if(graduationDataStatus.getSpecialGradStatus().size() > 0) {
+		if(!graduationDataStatus.getSpecialGradStatus().isEmpty()) {
 			data.getGraduationMessages().setHasSpecialProgram(true);
 		}
 		data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
@@ -180,7 +180,7 @@ public class ReportService {
     		certificateProgram.add(cDTO);
 		}
 		data.getGraduationMessages().setCertificateProgram(certificateProgram);
-		data.getGraduationMessages().setHasCareerProgram(certificateProgram.size() > 0 ? true:false);
+		data.getGraduationMessages().setHasCareerProgram(!certificateProgram.isEmpty());
 		return data;
 	}
 	
@@ -191,7 +191,7 @@ public class ReportService {
 			}else {
 				certificateList.add("EI");
 			}
-			if(projectedSpecialGradResponse.size() > 0) {
+			if(!projectedSpecialGradResponse.isEmpty()) {
 				for(GradStudentSpecialProgram specialPrograms : projectedSpecialGradResponse) {
 					if(specialPrograms.getSpecialProgramCode().equals("FI")) {
 						certificateList.add("F");
