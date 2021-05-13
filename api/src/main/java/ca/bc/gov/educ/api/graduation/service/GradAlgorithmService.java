@@ -21,12 +21,10 @@ public class GradAlgorithmService {
 	private String projectedStudentGraduation;
 	
 	public GraduationData runGradAlgorithm(String pen, String program,String accessToken) {
-		GraduationData graduationDataStatus = webClient.get().uri(String.format(graduateStudent,pen,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
-		return graduationDataStatus;
+		return webClient.get().uri(String.format(graduateStudent,pen,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 	}
 	
 	public GraduationData runProjectedAlgorithm(String pen, String program,String accessToken) {
-		GraduationData graduationDataStatus = webClient.get().uri(String.format(projectedStudentGraduation, pen,program, true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
-		return graduationDataStatus;
+		return webClient.get().uri(String.format(projectedStudentGraduation, pen,program, true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 	}
 }

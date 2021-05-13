@@ -60,7 +60,7 @@ public class GraduationService {
 		if(toBeSaved != null && toBeSaved.getPen() != null) {
 			GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(studentID, accessToken,toBeSaved);
 			logger.info("**** Saved Grad Status: ****");
-			List<String> certificateList = new ArrayList<String>();
+			List<String> certificateList = new ArrayList<>();
 			if(graduationDataStatus.isGraduated()) {				
 				certificateList = reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,projectedSpecialGradResponse);
 				for(String certType : certificateList) {

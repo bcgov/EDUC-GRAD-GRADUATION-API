@@ -31,7 +31,7 @@ public class SpecialProgramService {
     private String saveSpecialGradStatusForStudent;
 	
 	public List<GradStudentSpecialProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) throws JsonProcessingException {
-		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<GradStudentSpecialProgram>();
+		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<>();
 		//Run Special Program Algorithm
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			CodeDTO specialProgramCode = new CodeDTO();
@@ -51,7 +51,7 @@ public class SpecialProgramService {
 	}
 	
 	public List<GradStudentSpecialProgram> projectedSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken) throws JsonProcessingException {
-		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<GradStudentSpecialProgram>();
+		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<>();
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			GradStudentSpecialProgram specialProgramProjectedObj = new GradStudentSpecialProgram();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
