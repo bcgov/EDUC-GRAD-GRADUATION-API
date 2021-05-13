@@ -27,8 +27,7 @@ public class GradStatusService {
 	private String updateGradStatusForStudent;
 	
 	public GraduationStatus getGradStatus(String studentID, String accessToken) {
-		GraduationStatus gradResponse = webClient.get().uri(String.format(readGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
-		return gradResponse;
+		return webClient.get().uri(String.format(readGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
 	}
 	
 	public GraduationStatus prepareGraduationStatusObj(GraduationData graduationDataStatus) {
@@ -37,14 +36,13 @@ public class GradStatusService {
 		try {
 			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			e.getMessage();
 		}
 		return obj;
 	}
 	
 	public GraduationStatus saveStudentGradStatus(String studentID,String accessToken, GraduationStatus toBeSaved) {
-		GraduationStatus graduationStatusResponse = webClient.post().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
-		return graduationStatusResponse;
+		return webClient.post().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
 	}
 
 	public GraduationStatus processProjectedResults(GraduationStatus gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
