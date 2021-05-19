@@ -186,20 +186,28 @@ public class ReportService {
 	
 	public List<String> getCertificateList(List<String> certificateList, GraduationStatus gradResponse, GraduationData graduationDataStatus, List<GradStudentSpecialProgram> projectedSpecialGradResponse) {
 		if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
-			if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
-				certificateList.add("E");
-			}else {
-				certificateList.add("EI");
-			}
+			certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
 			if(!projectedSpecialGradResponse.isEmpty()) {
 				for(GradStudentSpecialProgram specialPrograms : projectedSpecialGradResponse) {
-					if(specialPrograms.getSpecialProgramCode().equals("FI")) {
+					if(specialPrograms.getSpecialProgramCode().equals("FI") && specialPrograms.getSpecialProgramCompletionDate() != null){
 						certificateList.add("F");
 					}
 				}
 			}
 		}else {
 			certificateList.add("S");
+			if(graduationDataStatus.isDualDogwood()) {
+				certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
+			}
+		}
+		return certificateList;
+	}
+	
+	public List<String> checkSchoolForCertDecision(GraduationData graduationDataStatus, List<String> certificateList) {
+		if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
+			certificateList.add("E");
+		}else {
+			certificateList.add("EI");
 		}
 		return certificateList;
 	}
