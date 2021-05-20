@@ -36,7 +36,11 @@ public class SpecialProgramService {
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			CodeDTO specialProgramCode = new CodeDTO();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
+			
 			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+			if(specialPrograms.isSpecialGraduated() && gradSpecialProgram != null && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+				graduationDataStatus.setDualDogwood(true);
+			}
 			gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
 			gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
 			
