@@ -18,6 +18,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
+import ca.bc.gov.educ.api.graduation.util.GradValidation;
 
 
 @Service
@@ -43,6 +44,9 @@ public class GraduationService {
 	@Autowired
 	ReportService reportService;
 	
+	@Autowired
+	GradValidation validation;
+	
 	public AlgorithmResponse graduateStudentByStudentID(String studentID, String accessToken) {
 		logger.info("\n************* Graduating Student START  ************");
 		long startTime = System.currentTimeMillis();
@@ -50,34 +54,40 @@ public class GraduationService {
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		List<CodeDTO> specialProgram = new ArrayList<>();
 		try {
-		logger.info("**** Getting Grad Stauts: ****" + studentID.substring(5));
-		GraduationStatus gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
-		GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), accessToken);		
-		logger.info("**** Grad Algorithm Completed: ****");
-		List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,specialProgram);
-		GraduationStatus toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-		ReportData data = reportService.prepareReportData(graduationDataStatus,accessToken,specialProgram);
-		if(toBeSaved != null && toBeSaved.getPen() != null) {
-			GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(studentID, accessToken,toBeSaved);
-			logger.info("**** Saved Grad Status: ****");
-			List<String> certificateList = new ArrayList<>();
-			if(graduationDataStatus.isGraduated()) {				
-				certificateList = reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,projectedSpecialGradResponse);
-				for(String certType : certificateList) {
-					reportService.saveStudentCertificateReport(graduationStatusResponse.getPen(),data,accessToken,certType,graduationStatusResponse.getStudentID());
+			logger.info("**** Getting Grad Stauts: ****" + studentID.substring(5));
+			GraduationStatus gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
+			if(gradResponse.getStudentStatus().equals("A") && (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP"))) {
+				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), accessToken);		
+				logger.info("**** Grad Algorithm Completed: ****");
+				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,specialProgram);
+				GraduationStatus toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+				ReportData data = reportService.prepareReportData(graduationDataStatus,accessToken,specialProgram);
+				if(toBeSaved != null && toBeSaved.getPen() != null) {
+					GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(studentID, accessToken,toBeSaved);
+					logger.info("**** Saved Grad Status: ****");
+					List<String> certificateList = new ArrayList<>();
+					if(graduationDataStatus.isGraduated() && !graduationStatusResponse.getProgram().equalsIgnoreCase("SCCP")) {				
+						certificateList = reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,projectedSpecialGradResponse);
+						for(String certType : certificateList) {
+							reportService.saveStudentCertificateReport(graduationStatusResponse.getPen(),data,accessToken,certType,graduationStatusResponse.getStudentID());
+						}
+					}
+					logger.info("**** Saved Certificates: ****");
+					data = reportService.setOtherRequiredData(data,graduationStatusResponse,graduationDataStatus,certificateList,accessToken);
+					reportService.saveStudentAchievementReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());
+					reportService.saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());			
+					logger.info("**** Saved Reports: ****");
+					algorithmResponse.setGraduationStatus(graduationStatusResponse);
+					algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
+					long endTime = System.currentTimeMillis();
+					long diff = (endTime - startTime)/1000;
+					logger.info("************* TIME Taken  ************ "+diff+" secs");
+					return algorithmResponse;
 				}
+			}else {
+				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
+				return null;
 			}
-			data = reportService.setOtherRequiredData(data,graduationStatusResponse,graduationDataStatus,certificateList,accessToken);
-			reportService.saveStudentAchievementReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());
-			reportService.saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,accessToken,graduationStatusResponse.getStudentID());			
-
-			algorithmResponse.setGraduationStatus(graduationStatusResponse);
-			algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
-			long endTime = System.currentTimeMillis();
-			long diff = (endTime - startTime)/1000;
-			logger.info("************* TIME Taken  ************ "+diff+" secs");
-			return algorithmResponse;
-		}
 		}catch(Exception e) {
 			throw new GradBusinessRuleException("Error Graduating Student. Please try again..." + e.getMessage());
 		}
@@ -94,16 +104,21 @@ public class GraduationService {
 			logger.info("**** Getting Grad Stauts: ****" + studentID.substring(5));
 			GraduationStatus gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
 			//Run Grad Algorithm
-			GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), accessToken);
-			logger.info("**** Grad Algorithm Completed: ****");
-			gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
-			List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken);
-			algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
-			algorithmResponse.setGraduationStatus(gradResponse);
-			long endTime = System.currentTimeMillis();
-			long diff = (endTime - startTime)/1000;
-			logger.info("************* TIME Taken  ************ "+diff+" secs");
-			return algorithmResponse;
+			if(gradResponse.getStudentStatus().equals("A") && (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP"))) {
+				GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), accessToken);
+				logger.info("**** Grad Algorithm Completed: ****");
+				gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
+				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken);
+				algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
+				algorithmResponse.setGraduationStatus(gradResponse);
+				long endTime = System.currentTimeMillis();
+				long diff = (endTime - startTime)/1000;
+				logger.info("************* TIME Taken  ************ "+diff+" secs");
+				return algorithmResponse;
+			}else {
+				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
+				return null;
+			}
 
 		}catch(Exception e) {
 			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again..." + e.getMessage());
