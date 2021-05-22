@@ -65,7 +65,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setReport(encodedPdfReportAchievement);
 		requestObj.setGradReportTypeCode("ACHV");
-		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class);
+		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class).block();
 	}
 	
 	public void saveStudentCertificateReport(String pen, ReportData data, String accessToken,String certificateType, UUID studentID) {
@@ -75,7 +75,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certificateType);
-		webClient.post().uri(String.format(updateGradStudentCertificateForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentCertificates.class).retrieve().bodyToMono(GradStudentCertificates.class);
+		webClient.post().uri(String.format(updateGradStudentCertificateForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentCertificates.class).retrieve().bodyToMono(GradStudentCertificates.class).block();
 	}
 
 	public void saveStudentTranscriptReport(String pen, ReportData data, String accessToken,UUID studentID) {
@@ -85,7 +85,7 @@ public class ReportService {
 		requestObj.setReport(encodedPdfReportTranscript);
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
-		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class);
+		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class).block();
 	}
 
 	private String generateStudentTranscriptReport(ReportData data, String accessToken) {
