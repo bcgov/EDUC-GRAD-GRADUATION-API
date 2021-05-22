@@ -137,6 +137,7 @@ public class ReportService {
 			graduationMessages.setGradProgram(gradProgram.getProgramName());
 			data.getDemographics().setProgram(gradProgram.getProgramCode());
 		}
+		graduationMessages.setGradMessage(graduationDataStatus.getGradMessage());
 		graduationMessages.setHonours(gradAlgorithm.getHonoursStanding());
 		graduationMessages.setGpa(gradAlgorithm.getGpa());
 		graduationMessages.setNonGradReasons(graduationDataStatus.getNonGradReasons());
