@@ -24,7 +24,7 @@ public class GraduationData {
     private StudentExams studentExams;
     private List<GradRequirement> nonGradReasons;
     private List<GradRequirement> requirementsMet;
-    //Grad Message
+    private String gradMessage;
     //Student Career Programs
     private boolean dualDogwood;
     private boolean isGraduated;
