@@ -38,14 +38,16 @@ public class SpecialProgramService {
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
 			
 			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			if(specialPrograms.isSpecialGraduated() && gradSpecialProgram != null && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
-				graduationDataStatus.setDualDogwood(true);
+			if(gradSpecialProgram != null) {
+				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+					graduationDataStatus.setDualDogwood(true);
+				}
+				gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
+				gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				
+				//Save Special Grad Status
+				webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			}
-			gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
-			gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
-			
-			//Save Special Grad Status
-			webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
 			specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
 			specialProgram.add(specialProgramCode);
