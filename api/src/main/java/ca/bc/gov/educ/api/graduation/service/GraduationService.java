@@ -56,7 +56,7 @@ public class GraduationService {
 		try {
 			logger.info("**** Getting Grad Stauts: ****" + studentID.substring(5));
 			GraduationStatus gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
-			if(gradResponse.getStudentStatus().equals("A") && (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP"))) {
+			if(!gradResponse.getStudentStatus().equals("D") && !gradResponse.getStudentStatus().equals("M") && (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP"))) {
 				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), accessToken);		
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,specialProgram);
