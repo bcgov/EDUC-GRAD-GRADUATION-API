@@ -44,12 +44,11 @@ public class SpecialProgramService {
 				}
 				gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
 				gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
-				
+				specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
+				specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
 				//Save Special Grad Status
 				webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			}
-			specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
-			specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
+			}			
 			specialProgram.add(specialProgramCode);
 			projectedSpecialGradResponse.add(gradSpecialProgram);
 		}
@@ -62,12 +61,19 @@ public class SpecialProgramService {
 			GradStudentSpecialProgram specialProgramProjectedObj = new GradStudentSpecialProgram();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
 			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			specialProgramProjectedObj.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
-			specialProgramProjectedObj.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
-			specialProgramProjectedObj.setPen(gradSpecialProgram.getPen());
-			specialProgramProjectedObj.setMainProgramCode(gradSpecialProgram.getMainProgramCode());
-			specialProgramProjectedObj.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
-			specialProgramProjectedObj.setSpecialProgramName(gradSpecialProgram.getSpecialProgramName());
+			if(gradSpecialProgram != null) {
+				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+					graduationDataStatus.setDualDogwood(true);
+				}
+				specialProgramProjectedObj.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
+				specialProgramProjectedObj.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				specialProgramProjectedObj.setPen(gradSpecialProgram.getPen());
+				specialProgramProjectedObj.setStudentID(gradSpecialProgram.getStudentID());
+				specialProgramProjectedObj.setId(gradSpecialProgram.getId());
+				specialProgramProjectedObj.setMainProgramCode(gradSpecialProgram.getMainProgramCode());
+				specialProgramProjectedObj.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
+				specialProgramProjectedObj.setSpecialProgramName(gradSpecialProgram.getSpecialProgramName());
+			}
 			projectedSpecialGradResponse.add(specialProgramProjectedObj);
 		}
 		return projectedSpecialGradResponse;
