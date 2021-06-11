@@ -24,9 +24,9 @@ import lombok.NoArgsConstructor;
 @Component
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmProcess {
+public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 	
-	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksRegistrationsProcess.class);
+	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksProcess.class);
 	
 	@Autowired
     private ProcessorData processorData;
@@ -49,7 +49,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			logger.info("************* TIME START  ************ "+startTime);
 			AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 			GraduationStatus gradResponse = processorData.getGradResponse();
-			GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), processorData.getAccessToken());
+			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), processorData.getAccessToken());
 			logger.info("**** Grad Algorithm Completed: ****");
 			gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
 			List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.projectedSpecialPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
@@ -69,7 +69,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 	@Override
     public void setInputData(ProcessorData inputData) {
 		processorData = (ProcessorData)inputData;
-        logger.info("ProjectedGradFinalMarksRegistraionProcess: ");
+        logger.info("ProjectedGradFinalMarksProcess: ");
     }
 
 }

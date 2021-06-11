@@ -55,7 +55,7 @@ public class GraduationController {
         logger.debug("Graduate Student for Student ID: " + studentID);
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
         String accessToken = auth.getTokenValue();
-
+        
         if (projected) {
             logger.info(" Running PROJECTED GRAD...");
             return response.GET(gradService.projectStudentGraduationByStudentID(studentID, accessToken));

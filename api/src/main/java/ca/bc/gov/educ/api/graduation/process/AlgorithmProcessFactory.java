@@ -1,32 +1,49 @@
 package ca.bc.gov.educ.api.graduation.process;
 
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
-
-@Component
+@Service
 public class AlgorithmProcessFactory {
 
+	@Autowired
+	ProjectedGradFinalMarksRegistrationsProcess projectedGradFinalMarksRegistrationsProcess;
+	
+	@Autowired
+	ProjectedGradFinalMarksProcess projectedGradFinalMarksProcess;
+	
+	@Autowired
+	ProjectedGradFinalMarksReportsProcess projectedGradFinalMarksReportsProcess;
+	
+	@Autowired
+	GraduateStudentProcess graduateStudentProcess;
+	
     private static final Logger logger = LoggerFactory.getLogger(AlgorithmProcessFactory.class);
-
-    @SuppressWarnings("unchecked")
-	public static AlgorithmProcess createProcess(AlgorithmProcessType processImplementation, ProcessorData data) {
-    	Class<AlgorithmProcess> clazz;
+    
+	public AlgorithmProcess createProcess(AlgorithmProcessType processImplementation) {
         AlgorithmProcess pcs = null;
-
-        try {
-            clazz = (Class<AlgorithmProcess>) Class.forName("ca.bc.gov.educ.api.graduation.process." + processImplementation.getValue());
-            pcs = clazz.getDeclaredConstructor(ProcessorData.class).newInstance(data);
-            System.out.println("Class Created: " + pcs.getClass());
-        } catch (Exception e) {
-            logger.debug("ERROR: No Such Class: " + processImplementation);
-            logger.debug("Message:" + Arrays.toString(e.getStackTrace()));
+        switch(processImplementation.name()) {        
+	        case "REGFM":
+	        	logger.info("\n************* PROJECTED (REGFM): Graduating Student START  ************");
+	        	pcs = projectedGradFinalMarksRegistrationsProcess;
+	        	break;
+	        case "FM":
+	        	logger.info("\n************* PROJECTED (FM): Graduating Student START  ************");
+	        	pcs = projectedGradFinalMarksProcess;
+	        	break;
+	        case "FMR":
+	        	logger.info("\n************* PROJECTED (FMR): Graduating Student START  ************");
+	        	pcs = projectedGradFinalMarksReportsProcess;
+	        	break;
+	        case "GS":
+	        	logger.info("\n************* Graduating Student START  ************");
+	        	pcs = graduateStudentProcess;
+	        	break;
+	        default:
+	        	break;
         }
-
         return pcs;
     }
 }
