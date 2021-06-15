@@ -2,6 +2,15 @@ package ca.bc.gov.educ.api.graduation.util;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Component
+@Getter
+@Setter
 public class EducGraduationApiConstants {
 
     //API end-point Mapping constants
@@ -13,7 +22,7 @@ public class EducGraduationApiConstants {
     public static final String STUDENT_ACHIEVEMENT_REPORT_BY_PEN = "pen/{pen}/achievementreport";
     public static final String STUDENT_TRANSCRIPT_BY_PEN = "pen/{pen}/transcript";
 
-    public static final String ENDPOINT_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.gradalgorithm}";
+    /*public static final String ENDPOINT_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.gradalgorithm}";
     public static final String ENDPOINT_PROJECTED_GRADUATION_ALGORITHM_URL = "${endpoint.gradalgorithm-api.projectedgradalgorithm}";
     public static final String ENDPOINT_GRAD_STATUS_UPDATE_URL = "${endpoint.graduation-status-api.update-grad-status}";
     public static final String ENDPOINT_GRAD_STATUS_READ_URL = "${endpoint.graduation-status-api.read-grad-status}";
@@ -27,6 +36,50 @@ public class EducGraduationApiConstants {
     public static final String ENDPOINT_SPECIAL_GRAD_STATUS_READ = "${endpoint.graduation-status-api.read-special-program-grad-status}";
     public static final String ENDPOINT_SPECIAL_GRAD_STATUS_SAVE = "${endpoint.graduation-status-api.save-special-program-grad-status}";
     public static final String ENDPOINT_SPECIAL_PROGRAM_DETAILS_URL = "${endpoint.graduation-status-api.get-special-program-details}";
+    */
+    
+    @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
+    private String gradAlgorithmEndpoint;
+    
+    @Value("${endpoint.gradalgorithm-api.projectedgradalgorithm}")
+    private String gradProjectedAlgorithmEndpoint;
+    
+    @Value("${endpoint.graduation-status-api.update-grad-status}")
+    private String updateGradStatus;
+    
+    @Value("${endpoint.graduation-status-api.read-grad-status}")
+    private String readGradStatus;
+    
+    @Value("${endpoint.grad-common-api.update-grad-student-report.url}")
+    private String updateGradStudentReport;
+    
+    @Value("${endpoint.grad-common-api.update-grad-student-certificate.url}")
+    private String updateGradStudentCertificate;
+    
+    @Value("${endpoint.report-api.achievement_report}")
+    private String achievementReport;
+    
+    @Value("${endpoint.report-api.certificate_report}")
+    private String certificateReport;
+    
+    @Value("${endpoint.report-api.transcript_report}")
+    private String transcriptReport;
+    
+    @Value("${endpoint.grad-code-api.get-certificate-name}")
+    private String certificateTypeEndpoint;
+    
+    @Value("${endpoint.grad-program-management-api.program_name_by_program_code.url}")
+    private String programNameEndpoint;
+    
+    @Value("${endpoint.graduation-status-api.read-special-program-grad-status}")
+    private String readSpecialProgramGradStatus;
+    
+    @Value("${endpoint.graduation-status-api.save-special-program-grad-status}")
+    private String saveSpecialProgramGradStatus;
+    
+    @Value("${endpoint.graduation-status-api.get-special-program-details}")
+    private String getSpecialProgramDetails;    
+    
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";

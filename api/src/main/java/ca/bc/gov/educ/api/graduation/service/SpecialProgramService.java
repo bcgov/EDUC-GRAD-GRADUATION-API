@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,11 +24,8 @@ public class SpecialProgramService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_PROGRAM_DETAILS_URL)
-    private String specialProgramDetails;
-	
-	@Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_GRAD_STATUS_SAVE)
-    private String saveSpecialGradStatusForStudent;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 	
 	public List<GradStudentSpecialProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) throws JsonProcessingException {
 		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<>();
@@ -37,7 +34,7 @@ public class SpecialProgramService {
 			CodeDTO specialProgramCode = new CodeDTO();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
 			
-			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetSpecialProgramDetails(),studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			if(gradSpecialProgram != null) {
 				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
 					graduationDataStatus.setDualDogwood(true);
@@ -47,7 +44,7 @@ public class SpecialProgramService {
 				specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
 				specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
 				//Save Special Grad Status
-				webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+				webClient.post().uri(educGraduationApiConstants.getSaveSpecialProgramGradStatus()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(gradSpecialProgram)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			}			
 			specialProgram.add(specialProgramCode);
 			projectedSpecialGradResponse.add(gradSpecialProgram);
@@ -60,7 +57,7 @@ public class SpecialProgramService {
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			GradStudentSpecialProgram specialProgramProjectedObj = new GradStudentSpecialProgram();
 			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
-			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
+			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetSpecialProgramDetails(),studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
 			if(gradSpecialProgram != null) {
 				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
 					graduationDataStatus.setDualDogwood(true);
