@@ -21,14 +21,12 @@ import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.service.SpecialProgramService;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Component
 @NoArgsConstructor
-@AllArgsConstructor
 public class GraduateStudentProcess implements AlgorithmProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(GraduateStudentProcess.class);
