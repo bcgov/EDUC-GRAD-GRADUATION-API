@@ -8,8 +8,8 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
@@ -28,7 +28,6 @@ import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
-import reactor.core.publisher.Mono;
 
 @Service
 public class ReportService {
@@ -36,26 +35,8 @@ public class ReportService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_ACHIEVEMENT_REPORT_API_URL)
-    private String reportAchievementURL;
-    
-    @Value(EducGraduationApiConstants.ENDPOINT_CERTIFICATE_REPORT_API_URL)
-    private String reportCertificateURL;
-
-    @Value(EducGraduationApiConstants.ENDPOINT_TRANSCRIPT_REPORT_API_URL)
-    private String reportTranscriptURL;
-
-    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_REPORT_UPDATE_URL)
-    private String updateGradStudentReportForStudent;
-    
-    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_STUDENT_CERTIFICATE_UPDATE_URL)
-    private String updateGradStudentCertificateForStudent;
-    
-    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_PROGRAM_NAME_URL)
-    private String getGradProgramName;
-    
-    @Value(EducGraduationApiConstants.ENDPOINT_GRAD_CERTIFICATE_TYPE_URL)
-    private String getGradCertificateType;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 
 	
 	public void saveStudentAchievementReport(String pen, ReportData data, String accessToken, UUID studentID) {
@@ -65,7 +46,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setReport(encodedPdfReportAchievement);
 		requestObj.setGradReportTypeCode("ACHV");
-		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class).block();
+		webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),pen)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 	}
 	
 	public void saveStudentCertificateReport(String pen, ReportData data, String accessToken,String certificateType, UUID studentID) {
@@ -75,7 +56,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certificateType);
-		webClient.post().uri(String.format(updateGradStudentCertificateForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentCertificates.class).retrieve().bodyToMono(GradStudentCertificates.class).block();
+		webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentCertificate(),pen)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
 	}
 
 	public void saveStudentTranscriptReport(String pen, ReportData data, String accessToken,UUID studentID) {
@@ -85,13 +66,13 @@ public class ReportService {
 		requestObj.setReport(encodedPdfReportTranscript);
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
-		webClient.post().uri(String.format(updateGradStudentReportForStudent,pen)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(requestObj), GradStudentReports.class).retrieve().bodyToMono(GradStudentReports.class).block();
+		webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),pen)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 	}
 
 	private String generateStudentTranscriptReport(ReportData data, String accessToken) {
 		GenerateReport reportParams = new GenerateReport();
 		reportParams.setData(data);
-		byte[] bytesSAR = webClient.post().uri(reportTranscriptURL).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(reportParams), GenerateReport.class).retrieve().bodyToMono(byte[].class).block();
+		byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getTranscriptReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 	}
@@ -101,7 +82,7 @@ public class ReportService {
 	private String generateStudentAchievementReport(ReportData data, String accessToken) {
 		GenerateReport reportParams = new GenerateReport();
 		reportParams.setData(data);
-		byte[] bytesSAR = webClient.post().uri(reportAchievementURL).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(reportParams), GenerateReport.class).retrieve().bodyToMono(byte[].class).block();
+		byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getAchievementReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 
@@ -110,7 +91,7 @@ public class ReportService {
 	private String generateStudentCertificateReport(ReportData data, String accessToken) {
 		GenerateReport reportParams = new GenerateReport();
 		reportParams.setData(data);
-		byte[] bytesSAR = webClient.post().uri(reportCertificateURL).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(reportParams), GenerateReport.class).retrieve().bodyToMono(byte[].class).block();
+		byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getCertificateReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 
@@ -133,7 +114,7 @@ public class ReportService {
 		data.setSchool(graduationDataStatus.getSchool());
 		GraduationMessages graduationMessages = new GraduationMessages();
 		if(gradAlgorithm.getProgram() != null) {
-			GradProgram gradProgram = webClient.get().uri(String.format(getGradProgramName,gradAlgorithm.getProgram())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradProgram.class).block();
+			GradProgram gradProgram = webClient.get().uri(String.format(educGraduationApiConstants.getProgramNameEndpoint(),gradAlgorithm.getProgram())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradProgram.class).block();
 			graduationMessages.setGradProgram(gradProgram.getProgramName());
 			data.getDemographics().setProgram(gradProgram.getProgramCode());
 		}
@@ -173,7 +154,7 @@ public class ReportService {
 		List<CodeDTO> certificateProgram = new ArrayList<>();
 		for(String certType : certificateList) {
 			CodeDTO cDTO = new CodeDTO();
-			GradCertificateTypes gradCertificateTypes = webClient.get().uri(String.format(getGradCertificateType,certType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradCertificateTypes.class).block();
+			GradCertificateTypes gradCertificateTypes = webClient.get().uri(String.format(educGraduationApiConstants.getCertificateTypeEndpoint(),certType)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradCertificateTypes.class).block();
     		if(gradCertificateTypes != null) {
     			cDTO.setCode(gradCertificateTypes.getCode());
     			cDTO.setName(gradCertificateTypes.getDescription());

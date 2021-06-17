@@ -2,8 +2,8 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import reactor.core.publisher.Mono;
 
 @Service
 public class GradStatusService {
@@ -20,14 +19,11 @@ public class GradStatusService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_READ_URL)
-    private String readGradStatusForStudent;
-	
-	@Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_UPDATE_URL)
-	private String updateGradStatusForStudent;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 	
 	public GraduationStatus getGradStatus(String studentID, String accessToken) {
-		return webClient.get().uri(String.format(readGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
+		return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
 	}
 	
 	public GraduationStatus prepareGraduationStatusObj(GraduationData graduationDataStatus) {
@@ -42,7 +38,7 @@ public class GradStatusService {
 	}
 	
 	public GraduationStatus saveStudentGradStatus(String studentID,String accessToken, GraduationStatus toBeSaved) {
-		return webClient.post().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
+		return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStatus.class).block();
 	}
 
 	public GraduationStatus processProjectedResults(GraduationStatus gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
@@ -46,28 +45,9 @@ public class GraduationController {
     @Autowired
     ResponseHelper response;
 
-    @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_STUDENT_ID)
-    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    @Operation(summary = "Graduate Student by Student ID or get projected grad by projected =true", description = "Graduate Student by Student ID or get projected grad by projected =true", tags = { "Graduation" })
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<AlgorithmResponse> graduateStudent(@PathVariable String studentID,
-                                                            @RequestParam(required = false) boolean projected) {
-        logger.debug("Graduate Student for Student ID: " + studentID);
-        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
-        String accessToken = auth.getTokenValue();
-        
-        if (projected) {
-            logger.info(" Running PROJECTED GRAD...");
-            return response.GET(gradService.projectStudentGraduationByStudentID(studentID, accessToken));
-        }
-
-        return response.GET(gradService.graduateStudentByStudentID(studentID, accessToken));
-    }
-    
-    
     @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
-    @Operation(summary = "Graduate Student by Student ID or get projected grad by projected =true", description = "Graduate Student by Student ID or get projected grad by projected =true", tags = { "Graduation" })
+    @Operation(summary = "Run different Grad Runs and Graduate Student by Student ID and projected type", description = "Run different Grad Runs and Graduate Student by Student ID and projected type", tags = { "Graduation" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID,@PathVariable String projectedType) {
         logger.debug("Graduate Student for Student ID: " + studentID);
