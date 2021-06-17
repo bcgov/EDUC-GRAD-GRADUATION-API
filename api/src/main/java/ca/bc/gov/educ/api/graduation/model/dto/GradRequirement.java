@@ -12,4 +12,5 @@ import org.springframework.stereotype.Component;
 public class GradRequirement {
     String rule;
     String description;
+    boolean projected;
 }
