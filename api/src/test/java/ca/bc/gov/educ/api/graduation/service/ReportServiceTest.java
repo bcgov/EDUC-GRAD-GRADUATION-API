@@ -76,7 +76,9 @@ public class ReportServiceTest {
     @Mock
     private WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock
-    private WebClient.ResponseSpec responseMock;
+    private WebClient.ResponseSpec responseMock;    
+    @Mock
+    private Mono<GradCertificateTypes> monoResponse;
 	
     @Before
     public void setUp() {
@@ -1035,6 +1037,287 @@ public class ReportServiceTest {
 		
 		List<String> certificateList = new ArrayList<String>();
 		certificateList.add("E");
+		
+		GradCertificateTypes cType = new GradCertificateTypes();
+		cType.setCode("E");
+		cType.setDescription("English Dogwood");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(Mono.just(cType));
+		
+		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
+	}
+	
+	@Test
+	public void testSetOtherRequiredData_emptySpecialPrograms() {
+		String accessToken = "accessToken";
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+		
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+		
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		
+		ReportData data = new ReportData();
+		data.setStudentName("ABC");
+		data.setDemographics(sD);
+		data.setSchool(schoolObj);
+		data.setGraduationMessages(gM);
+		
+		
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+		
+		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+		
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("123123123");
+		stuObj.setLegalFirstName("ABC");
+		stuObj.setLegalLastName("FDG");
+		stuObj.setLegalMiddleNames("DER");
+		stuObj.setSchoolOfRecord("12321321");
+		
+		StudentCourse sc= new StudentCourse();
+		sc.setCourseCode("FDFE");
+		List<StudentCourse> sList= new ArrayList<>();
+		sList.add(sc);
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(sList);
+		
+		StudentAssessment sA= new StudentAssessment();
+		sA.setAssessmentCode("FDFE");
+		List<StudentAssessment> aList= new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+		
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(null);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);		
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setSpecialGradStatus(new ArrayList<SpecialGradAlgorithmGraduationStatus>());
+		
+		List<String> certificateList = new ArrayList<String>();
+		certificateList.add("E");
+		
+		GradCertificateTypes cType = new GradCertificateTypes();
+		cType.setCode("E");
+		cType.setDescription("English Dogwood");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(Mono.just(cType));
+		
+		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
+	}
+	
+	@Test
+	public void testSetOtherRequiredData_certificateTypesNull() {
+		String accessToken = "accessToken";
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+		
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+		
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		
+		ReportData data = new ReportData();
+		data.setStudentName("ABC");
+		data.setDemographics(sD);
+		data.setSchool(schoolObj);
+		data.setGraduationMessages(gM);
+		
+		
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+		
+		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+		
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("123123123");
+		stuObj.setLegalFirstName("ABC");
+		stuObj.setLegalLastName("FDG");
+		stuObj.setLegalMiddleNames("DER");
+		stuObj.setSchoolOfRecord("12321321");
+		
+		StudentCourse sc= new StudentCourse();
+		sc.setCourseCode("FDFE");
+		List<StudentCourse> sList= new ArrayList<>();
+		sList.add(sc);
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(sList);
+		
+		StudentAssessment sA= new StudentAssessment();
+		sA.setAssessmentCode("FDFE");
+		List<StudentAssessment> aList= new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+		
+		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		algoSpGStatus.setPen("123090109");
+		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setSpecialGraduated(false);
+		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		listAl.add(algoSpGStatus);
+		
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(null);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);		
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setSpecialGradStatus(listAl);
+		
+		List<String> certificateList = new ArrayList<String>();
+		certificateList.add("E");
+		
+		GradCertificateTypes cType = new GradCertificateTypes();
+		cType.setCode("E");
+		cType.setDescription("English Dogwood");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(monoResponse);
+		when(this.monoResponse.block()).thenReturn(null);
+		
+		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
+	}
+	
+	@Test
+	public void testSetOtherRequiredData_emptyCertificateList() {
+		String accessToken = "accessToken";
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+		
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+		
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		
+		ReportData data = new ReportData();
+		data.setStudentName("ABC");
+		data.setDemographics(sD);
+		data.setSchool(schoolObj);
+		data.setGraduationMessages(gM);
+		
+		
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+		
+		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+		
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("123123123");
+		stuObj.setLegalFirstName("ABC");
+		stuObj.setLegalLastName("FDG");
+		stuObj.setLegalMiddleNames("DER");
+		stuObj.setSchoolOfRecord("12321321");
+		
+		StudentCourse sc= new StudentCourse();
+		sc.setCourseCode("FDFE");
+		List<StudentCourse> sList= new ArrayList<>();
+		sList.add(sc);
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(sList);
+		
+		StudentAssessment sA= new StudentAssessment();
+		sA.setAssessmentCode("FDFE");
+		List<StudentAssessment> aList= new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+		
+		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		algoSpGStatus.setPen("123090109");
+		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setSpecialGraduated(false);
+		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		listAl.add(algoSpGStatus);
+		
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(null);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);		
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setSpecialGradStatus(listAl);
+		
+		List<String> certificateList = new ArrayList<String>();
 		
 		GradCertificateTypes cType = new GradCertificateTypes();
 		cType.setCode("E");
