@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -33,18 +32,15 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
-import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
-import ca.bc.gov.educ.api.graduation.model.dto.SpecialGradAlgorithmGraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourses;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentExam;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentExams;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import reactor.core.publisher.Mono;
@@ -90,49 +86,40 @@ public class ReportServiceTest {
 
     }
 	
-	@Test
-	public void testSaveStudentAchievementReport() {
-		String studentID = new UUID(1, 1).toString();
-		String accessToken = "accessToken";
-		String pen="212321123";
-		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		
-		GradStudentReports rep = new GradStudentReports();
-		rep.setPen(pen);
-		byte[] bytesSAR = RandomUtils.nextBytes(20);		
-		
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(constants.getAchievementReport())).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
-        
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentReport(), pen))).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentAchievementReport(pen, data, accessToken, UUID.fromString(studentID));	
-       
-	}
-	
-	@Test
 	public void testSaveStudentCertificateReport() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		String pen="212321123";
 		String certificateType="E";
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
+		data.setGradMessage("ABC");
+		
+		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+		
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(true);
+		graduationDataStatus.setStudentCourses(null);
 		
 		GradStudentCertificates rep = new GradStudentCertificates();
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);		
+		
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getCertificateReport())).thenReturn(this.requestBodyUriMock);
@@ -149,7 +136,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentCertificateReport(pen, data, accessToken,certificateType, UUID.fromString(studentID));	
+		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,certificateType);	
        
 	}
 	
@@ -159,7 +146,7 @@ public class ReportServiceTest {
 		String accessToken = "accessToken";
 		String pen="212321123";
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
+		data.setGradMessage("ABC");
 		
 		GradStudentReports rep = new GradStudentReports();
 		rep.setPen(pen);
@@ -180,7 +167,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentTranscriptReport(pen, data, accessToken, UUID.fromString(studentID));	
+		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID));	
        
 	}
 	
@@ -509,7 +496,7 @@ public class ReportServiceTest {
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -563,16 +550,24 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
 		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData_nullProgramData() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -632,10 +627,18 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData_exams_notnull() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -703,10 +706,18 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData_Desig_3() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -766,10 +777,18 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+
 	public void testPrepareReportData_Desig_4() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -829,10 +848,18 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData_Desig_2() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -892,10 +919,18 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
+		GraduationStatus gradResponse = new GraduationStatus();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	@Test
+	
 	public void testPrepareReportData_schoolNull() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
@@ -952,33 +987,6 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus, accessToken, specialProgram);
-	}
-	
-	@Test
-	public void testSetOtherRequiredData() {
-		String accessToken = "accessToken";
-		StudentDemographics sD = new StudentDemographics();
-		sD.setPen("123123123");
-		sD.setLegalFirstName("ABC");
-		sD.setLegalLastName("FDG");
-		sD.setLegalMiddleNames("DER");
-		sD.setSchoolOfRecord("12321321");
-		
-		GraduationMessages gM = new GraduationMessages();
-		gM.setGradMessage("asdad");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
-		
-		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
-		
 		GraduationStatus gradResponse = new GraduationStatus();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
@@ -986,349 +994,8 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		GradSearchStudent stuObj = new GradSearchStudent();
-		stuObj.setPen("123123123");
-		stuObj.setLegalFirstName("ABC");
-		stuObj.setLegalLastName("FDG");
-		stuObj.setLegalMiddleNames("DER");
-		stuObj.setSchoolOfRecord("12321321");
-		
-		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
-		List<StudentCourse> sList= new ArrayList<>();
-		sList.add(sc);
-		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
-		
-		StudentAssessment sA= new StudentAssessment();
-		sA.setAssessmentCode("FDFE");
-		List<StudentAssessment> aList= new ArrayList<>();
-		aList.add(sA);
-		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
-		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
-		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
-		algoSpGStatus.setSpecialGraduated(false);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
-		listAl.add(algoSpGStatus);
-		
-		GraduationData graduationDataStatus = new GraduationData();
-		graduationDataStatus.setDualDogwood(false);
-		graduationDataStatus.setGradMessage("Not Graduated");
-		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
-		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setSchool(null);
-		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		
-		graduationDataStatus.setGradStudent(stuObj);
-		graduationDataStatus.setSpecialGradStatus(listAl);
-		
-		List<String> certificateList = new ArrayList<String>();
-		certificateList.add("E");
-		
-		GradCertificateTypes cType = new GradCertificateTypes();
-		cType.setCode("E");
-		cType.setDescription("English Dogwood");
-		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(Mono.just(cType));
-		
-		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
-	}
+		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
+	}		
 	
-	@Test
-	public void testSetOtherRequiredData_emptySpecialPrograms() {
-		String accessToken = "accessToken";
-		StudentDemographics sD = new StudentDemographics();
-		sD.setPen("123123123");
-		sD.setLegalFirstName("ABC");
-		sD.setLegalLastName("FDG");
-		sD.setLegalMiddleNames("DER");
-		sD.setSchoolOfRecord("12321321");
-		
-		GraduationMessages gM = new GraduationMessages();
-		gM.setGradMessage("asdad");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
-		
-		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
-		
-		GraduationStatus gradResponse = new GraduationStatus();
-		gradResponse.setPen("123090109");
-		gradResponse.setProgram("2018-EN");
-		gradResponse.setProgramCompletionDate(null);
-		gradResponse.setSchoolOfRecord("06011033");
-		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
-		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		GradSearchStudent stuObj = new GradSearchStudent();
-		stuObj.setPen("123123123");
-		stuObj.setLegalFirstName("ABC");
-		stuObj.setLegalLastName("FDG");
-		stuObj.setLegalMiddleNames("DER");
-		stuObj.setSchoolOfRecord("12321321");
-		
-		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
-		List<StudentCourse> sList= new ArrayList<>();
-		sList.add(sc);
-		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
-		
-		StudentAssessment sA= new StudentAssessment();
-		sA.setAssessmentCode("FDFE");
-		List<StudentAssessment> aList= new ArrayList<>();
-		aList.add(sA);
-		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
-		
-		GraduationData graduationDataStatus = new GraduationData();
-		graduationDataStatus.setDualDogwood(false);
-		graduationDataStatus.setGradMessage("Not Graduated");
-		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
-		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setSchool(null);
-		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		
-		graduationDataStatus.setGradStudent(stuObj);
-		graduationDataStatus.setSpecialGradStatus(new ArrayList<SpecialGradAlgorithmGraduationStatus>());
-		
-		List<String> certificateList = new ArrayList<String>();
-		certificateList.add("E");
-		
-		GradCertificateTypes cType = new GradCertificateTypes();
-		cType.setCode("E");
-		cType.setDescription("English Dogwood");
-		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(Mono.just(cType));
-		
-		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
-	}
-	
-	@Test
-	public void testSetOtherRequiredData_certificateTypesNull() {
-		String accessToken = "accessToken";
-		StudentDemographics sD = new StudentDemographics();
-		sD.setPen("123123123");
-		sD.setLegalFirstName("ABC");
-		sD.setLegalLastName("FDG");
-		sD.setLegalMiddleNames("DER");
-		sD.setSchoolOfRecord("12321321");
-		
-		GraduationMessages gM = new GraduationMessages();
-		gM.setGradMessage("asdad");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
-		
-		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
-		
-		GraduationStatus gradResponse = new GraduationStatus();
-		gradResponse.setPen("123090109");
-		gradResponse.setProgram("2018-EN");
-		gradResponse.setProgramCompletionDate(null);
-		gradResponse.setSchoolOfRecord("06011033");
-		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
-		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		GradSearchStudent stuObj = new GradSearchStudent();
-		stuObj.setPen("123123123");
-		stuObj.setLegalFirstName("ABC");
-		stuObj.setLegalLastName("FDG");
-		stuObj.setLegalMiddleNames("DER");
-		stuObj.setSchoolOfRecord("12321321");
-		
-		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
-		List<StudentCourse> sList= new ArrayList<>();
-		sList.add(sc);
-		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
-		
-		StudentAssessment sA= new StudentAssessment();
-		sA.setAssessmentCode("FDFE");
-		List<StudentAssessment> aList= new ArrayList<>();
-		aList.add(sA);
-		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
-		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
-		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
-		algoSpGStatus.setSpecialGraduated(false);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
-		listAl.add(algoSpGStatus);
-		
-		GraduationData graduationDataStatus = new GraduationData();
-		graduationDataStatus.setDualDogwood(false);
-		graduationDataStatus.setGradMessage("Not Graduated");
-		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
-		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setSchool(null);
-		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		
-		graduationDataStatus.setGradStudent(stuObj);
-		graduationDataStatus.setSpecialGradStatus(listAl);
-		
-		List<String> certificateList = new ArrayList<String>();
-		certificateList.add("E");
-		
-		GradCertificateTypes cType = new GradCertificateTypes();
-		cType.setCode("E");
-		cType.setDescription("English Dogwood");
-		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(monoResponse);
-		when(this.monoResponse.block()).thenReturn(null);
-		
-		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
-	}
-	
-	@Test
-	public void testSetOtherRequiredData_emptyCertificateList() {
-		String accessToken = "accessToken";
-		StudentDemographics sD = new StudentDemographics();
-		sD.setPen("123123123");
-		sD.setLegalFirstName("ABC");
-		sD.setLegalLastName("FDG");
-		sD.setLegalMiddleNames("DER");
-		sD.setSchoolOfRecord("12321321");
-		
-		GraduationMessages gM = new GraduationMessages();
-		gM.setGradMessage("asdad");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
-		
-		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
-		
-		GraduationStatus gradResponse = new GraduationStatus();
-		gradResponse.setPen("123090109");
-		gradResponse.setProgram("2018-EN");
-		gradResponse.setProgramCompletionDate(null);
-		gradResponse.setSchoolOfRecord("06011033");
-		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
-		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		GradSearchStudent stuObj = new GradSearchStudent();
-		stuObj.setPen("123123123");
-		stuObj.setLegalFirstName("ABC");
-		stuObj.setLegalLastName("FDG");
-		stuObj.setLegalMiddleNames("DER");
-		stuObj.setSchoolOfRecord("12321321");
-		
-		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
-		List<StudentCourse> sList= new ArrayList<>();
-		sList.add(sc);
-		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
-		
-		StudentAssessment sA= new StudentAssessment();
-		sA.setAssessmentCode("FDFE");
-		List<StudentAssessment> aList= new ArrayList<>();
-		aList.add(sA);
-		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
-		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
-		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
-		algoSpGStatus.setSpecialGraduated(false);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
-		listAl.add(algoSpGStatus);
-		
-		GraduationData graduationDataStatus = new GraduationData();
-		graduationDataStatus.setDualDogwood(false);
-		graduationDataStatus.setGradMessage("Not Graduated");
-		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
-		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setSchool(null);
-		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		
-		graduationDataStatus.setGradStudent(stuObj);
-		graduationDataStatus.setSpecialGradStatus(listAl);
-		
-		List<String> certificateList = new ArrayList<String>();
-		
-		GradCertificateTypes cType = new GradCertificateTypes();
-		cType.setCode("E");
-		cType.setDescription("English Dogwood");
-		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getCertificateTypeEndpoint(),"E"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradCertificateTypes.class)).thenReturn(Mono.just(cType));
-		
-		reportService.setOtherRequiredData(data, gradResponse, graduationDataStatus, certificateList, accessToken);
-	}
 }

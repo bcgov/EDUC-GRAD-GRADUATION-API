@@ -6,10 +6,14 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 
 public class EducGraduationApiUtils {
 
+	private static final Logger logger = LoggerFactory.getLogger(EducGraduationApiUtils.class);
+	
     public static String formatDate (Date date) {
         if (date == null)
             return null;
@@ -90,4 +94,31 @@ public class EducGraduationApiUtils {
 		return updatedTimestamp;
 		
 	}
+	
+	public static String formatDateForReportJasper(String updatedTimestamp) {
+		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return myFormat.format(fromUser.parse(updatedTimestamp));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return updatedTimestamp;
+		
+	}
+	
+	public static Date parsingTraxDate(String sessionDate) {
+   	 String actualSessionDate = sessionDate + "/01";
+   	 Date temp = new Date();
+		 Date sDate = null;
+        try {
+           temp = EducGraduationApiUtils.parseDate(actualSessionDate, "yyyy/MM/dd");
+           String sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+           sDate = EducGraduationApiUtils.parseDate(sDates, "yyyy-MM-dd");
+        } catch (ParseException pe) {
+           logger.error("ERROR: " + pe.getMessage());
+        }
+        return sDate;
+   }
 }

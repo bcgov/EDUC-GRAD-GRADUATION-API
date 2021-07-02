@@ -14,7 +14,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
-import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
@@ -66,7 +66,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
 				GraduationStatus toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-				ReportData data = reportService.prepareReportData(graduationDataStatus,processorData.getAccessToken(),specialProgram);
+				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
 				if(toBeSaved != null && toBeSaved.getPen() != null) {
 					GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
@@ -74,13 +74,11 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 					if(graduationDataStatus.isGraduated() && !graduationStatusResponse.getProgram().equalsIgnoreCase("SCCP")) {				
 						certificateList = reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,projectedSpecialGradResponse);
 						for(String certType : certificateList) {
-							reportService.saveStudentCertificateReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),certType,graduationStatusResponse.getStudentID());
+							reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
 						}
+						logger.info("**** Saved Certificates: ****");
 					}
-					logger.info("**** Saved Certificates: ****");
-					data = reportService.setOtherRequiredData(data,graduationStatusResponse,graduationDataStatus,certificateList,processorData.getAccessToken());
-					reportService.saveStudentAchievementReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
-					reportService.saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());			
+					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
 					logger.info("**** Saved Reports: ****");
 					algorithmResponse.setGraduationStatus(graduationStatusResponse);
 					algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
@@ -102,7 +100,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 
 	@Override
     public void setInputData(ProcessorData inputData) {
-		processorData = (ProcessorData)inputData;
+		processorData = inputData;
         logger.info("GraduateStudentProcess: ");
     }
 
