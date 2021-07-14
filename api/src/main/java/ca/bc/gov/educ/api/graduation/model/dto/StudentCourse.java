@@ -43,6 +43,8 @@ public class StudentCourse {
 	private boolean isLocallyDeveloped;
 	private boolean isUsed;
 	private boolean isRestricted;
+	private boolean isBoardAuthorityAuthorized;
+    private boolean isIndependentDirectedStudies;
 
 	public Integer getCreditsUsedForGrad() {
 		if (creditsUsedForGrad == null)
