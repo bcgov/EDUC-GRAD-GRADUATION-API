@@ -152,7 +152,7 @@ public class ReportService {
 	}
 	
 	private String getCourseNameLogic(StudentCourse sc) {
-		if(sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
+		if(sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
 			return "IDS "+sc.getRelatedCourseName();
 		}
 		if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK") && StringUtils.isNotBlank(sc.getCourseDescription())) {
