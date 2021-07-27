@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
@@ -59,16 +59,16 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 			logger.info("************* TIME START  ************ "+startTime);
 			
 			AlgorithmResponse algorithmResponse = new AlgorithmResponse();
-			GraduationStatus gradResponse = processorData.getGradResponse();
+			GraduationStudentRecord gradResponse = processorData.getGradResponse();
 			if(gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP")) {
 				List<CodeDTO> specialProgram = new ArrayList<>();
-				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), processorData.getAccessToken());
+				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 				logger.info("**** Grad Algorithm Completed: ****");
-				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
-				GraduationStatus toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
+				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 				ReportData data = reportService.prepareReportData(graduationDataStatus,processorData.getAccessToken(),specialProgram);
-				if(toBeSaved != null && toBeSaved.getPen() != null) {
-					GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
+				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
+					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
 					List<String> certificateList = new ArrayList<>();
 					if(graduationDataStatus.isGraduated() && !graduationStatusResponse.getProgram().equalsIgnoreCase("SCCP")) {				
@@ -82,8 +82,8 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 					reportService.saveStudentAchievementReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
 					reportService.saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());			
 					logger.info("**** Saved Reports: ****");
-					algorithmResponse.setGraduationStatus(graduationStatusResponse);
-					algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
+					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
+					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 				}
 			}else {
 				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
