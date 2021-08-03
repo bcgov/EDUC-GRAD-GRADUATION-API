@@ -47,7 +47,7 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.report-api.transcript_report}")
     private String transcriptReport;
     
-    @Value("${endpoint.grad-code-api.get-certificate-name}")
+    @Value("${endpoint.grad-graduation-report-api.get-certificate-name}")
     private String certificateTypeEndpoint;
     
     @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
