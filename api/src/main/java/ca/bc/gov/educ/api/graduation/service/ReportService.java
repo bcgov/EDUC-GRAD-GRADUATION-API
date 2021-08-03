@@ -14,18 +14,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.GenerateReport;
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 
@@ -101,7 +101,7 @@ public class ReportService {
 
 	public ReportData prepareReportData(GraduationData graduationDataStatus, String accessToken,List<CodeDTO> specialProgram) {
 		GradSearchStudent gradStudent = graduationDataStatus.getGradStudent();
-		GradAlgorithmGraduationStatus gradAlgorithm = graduationDataStatus.getGradStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithm = graduationDataStatus.getGradStatus();
 		ReportData data = new ReportData();
 		StudentDemographics studentDemo = new  StudentDemographics();
 		BeanUtils.copyProperties(gradStudent, studentDemo);
@@ -139,17 +139,17 @@ public class ReportService {
 		return data;
 	}
 
-	public ReportData setOtherRequiredData(ReportData data, GraduationStatus graduationStatusResponse, GraduationData graduationDataStatus, List<String> certificateList,String accessToken) {
+	public ReportData setOtherRequiredData(ReportData data, GraduationStudentRecord graduationStatusResponse, GraduationData graduationDataStatus, List<String> certificateList,String accessToken) {
 		data.getDemographics().setMincode(graduationStatusResponse.getSchoolOfRecord());
-		data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
-		data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
+		data.setIssueDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdateDate().toString()));
+		data.setIsaDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdateDate().toString()));
 		data.setStudentName(data.getDemographics().getLegalFirstName()+" "+data.getDemographics().getLegalMiddleNames()+" "+data.getDemographics().getLegalLastName());
 		
 		data.setStudentSchool(data.getSchool().getSchoolName());
 		if(!graduationDataStatus.getSpecialGradStatus().isEmpty()) {
 			data.getGraduationMessages().setHasSpecialProgram(true);
 		}
-		data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdatedTimestamp().toString()));
+		data.setStudentCertificateDate(EducGraduationApiUtils.formatDateForReport(graduationStatusResponse.getUpdateDate().toString()));
 		
 		List<CodeDTO> certificateProgram = new ArrayList<>();
 		for(String certType : certificateList) {
@@ -166,11 +166,11 @@ public class ReportService {
 		return data;
 	}
 	
-	public List<String> getCertificateList(List<String> certificateList, GraduationStatus gradResponse, GraduationData graduationDataStatus, List<GradStudentSpecialProgram> projectedSpecialGradResponse) {
+	public List<String> getCertificateList(List<String> certificateList, GraduationStudentRecord gradResponse, GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse) {
 		if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
 			certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
 			if(!projectedSpecialGradResponse.isEmpty()) {
-				for(GradStudentSpecialProgram specialPrograms : projectedSpecialGradResponse) {
+				for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
 					if(specialPrograms.getSpecialProgramCode().equals("FI") && specialPrograms.getSpecialProgramCompletionDate() != null){
 						certificateList.add("F");
 					}

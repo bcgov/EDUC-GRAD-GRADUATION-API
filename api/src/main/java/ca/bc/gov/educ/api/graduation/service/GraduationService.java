@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
@@ -27,9 +27,6 @@ public class GraduationService {
 
 	@Autowired
     WebClient webClient;
-	
-	@Autowired
-    RestTemplate restTemplate;
 	
 	@Autowired
 	AlgorithmProcessFactory algorithmProcessFactory;
@@ -52,7 +49,7 @@ public class GraduationService {
 	public AlgorithmResponse graduateStudent(String studentID, String accessToken,String projectedType) {
 		try {
 			AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
-			GraduationStatus gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
+			GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
 			if(!gradResponse.getStudentStatus().equals("D") && !gradResponse.getStudentStatus().equals("M")) {
 				ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID);
 		     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
