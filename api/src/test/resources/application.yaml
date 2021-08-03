@@ -53,27 +53,26 @@ springdoc:
     operationsSorter: alpha
   
 #Endpoints
-endpoint: 
+endpoint:
+ grad-student-api: 
+  update-grad-status: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s
+  read-grad-student-record: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
+  save-special-program-grad-status: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram
+  get-special-program-details: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram/%s/%s
+ grad-program-api: 
+  program_name_by_program_code: 
+   url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s   
  gradalgorithm-api: 
-  gradalgorithm: https://grad-algorithm-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?pen=%s&gradProgram=%s
-  projectedgradalgorithm: https://grad-algorithm-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?pen=%s&gradProgram=%s&projected=%b
- graduation-status-api: 
-  update-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
-  read-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s/algorithm
-  read-special-program-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/specialprogram/studentid/%s
-  save-special-program-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/specialprogram
-  get-special-program-details: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/specialprogram/%s/%s
+  gradalgorithm: https://grad-algorithm-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s
+  projectedgradalgorithm: https://grad-algorithm-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
+ grad-graduation-report-api: 
+  update-grad-student-report: 
+   url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentreport
+  update-grad-student-certificate: 
+   url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
+  get-certificate-name: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s
+   
  report-api: 
   achievement_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
   transcript_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
   certificate_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
- grad-common-api: 
-  update-grad-student-report: 
-   url: https://educ-grad-common-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/studentreport
-  update-grad-student-certificate: 
-   url: https://educ-grad-common-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/studentcertificate
- grad-code-api: 
-  get-certificate-name: https://educ-grad-code-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/code/certificatetype/%s
- grad-program-management-api: 
-  program_name_by_program_code: 
-   url: https://educ-grad-program-management-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/programmanagement/programs/%s

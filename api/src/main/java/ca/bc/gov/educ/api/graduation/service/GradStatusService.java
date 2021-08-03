@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 
 @Service
@@ -22,12 +23,12 @@ public class GradStatusService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 	
-	public GraduationStatus getGradStatus(String studentID, String accessToken) {
-		return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
+	public GraduationStudentRecord getGradStatus(String studentID, String accessToken) {
+		return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 	}
 	
-	public GraduationStatus prepareGraduationStatusObj(GraduationData graduationDataStatus) {
-		GraduationStatus obj = new GraduationStatus();
+	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus) {
+		GraduationStudentRecord obj = new GraduationStudentRecord();
 		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
 		try {
 			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
@@ -37,11 +38,11 @@ public class GradStatusService {
 		return obj;
 	}
 	
-	public GraduationStatus saveStudentGradStatus(String studentID,String accessToken, GraduationStatus toBeSaved) {
-		return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStatus.class).block();
+	public GraduationStudentRecord saveStudentGradStatus(String studentID,String accessToken, GraduationStudentRecord toBeSaved) {
+		return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 	}
 
-	public GraduationStatus processProjectedResults(GraduationStatus gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
+	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
 		gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
 		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());

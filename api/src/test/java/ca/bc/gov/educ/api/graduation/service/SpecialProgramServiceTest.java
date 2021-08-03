@@ -25,11 +25,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmOptionalStudentProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
-import ca.bc.gov.educ.api.graduation.model.dto.SpecialGradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import reactor.core.publisher.Mono;
@@ -66,7 +67,7 @@ public class SpecialProgramServiceTest {
     private Mono<GraduationStatus> monoResponse;
     
     @Mock
-    private Mono<GradStudentSpecialProgram> monoResponseGradStudentSpecialProgram;
+    private Mono<StudentOptionalProgram> monoResponseGradStudentSpecialProgram;
 	
     @Before
     public void setUp() {
@@ -83,7 +84,7 @@ public class SpecialProgramServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -91,11 +92,11 @@ public class SpecialProgramServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		GradAlgorithmOptionalStudentProgram algoSpGStatus = new GradAlgorithmOptionalStudentProgram();
 		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setOptionalProgramID(new UUID(1, 1));
 		algoSpGStatus.setSpecialGraduated(false);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		List<GradAlgorithmOptionalStudentProgram> listAl = new ArrayList<GradAlgorithmOptionalStudentProgram>();
 		listAl.add(algoSpGStatus);
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -106,7 +107,7 @@ public class SpecialProgramServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setSpecialGradStatus(listAl);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("BD");
 		spgm.setSpecialProgramName("International Bacculaurette");
@@ -116,7 +117,7 @@ public class SpecialProgramServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getGetSpecialProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
+		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
 		when(this.monoResponseGradStudentSpecialProgram.block()).thenReturn(spgm); 
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -125,9 +126,9 @@ public class SpecialProgramServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(Mono.just(spgm));
+        when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
 		
-		List<GradStudentSpecialProgram> spList;
+		List<StudentOptionalProgram> spList;
 		try {
 			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
 			assertEquals(1,spList.size());
@@ -143,7 +144,7 @@ public class SpecialProgramServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -151,11 +152,11 @@ public class SpecialProgramServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		GradAlgorithmOptionalStudentProgram algoSpGStatus = new GradAlgorithmOptionalStudentProgram();
 		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setOptionalProgramID(new UUID(1, 1));
 		algoSpGStatus.setSpecialGraduated(true);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		List<GradAlgorithmOptionalStudentProgram> listAl = new ArrayList<GradAlgorithmOptionalStudentProgram>();
 		listAl.add(algoSpGStatus);
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -166,7 +167,7 @@ public class SpecialProgramServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setSpecialGradStatus(listAl);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
@@ -176,7 +177,7 @@ public class SpecialProgramServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getGetSpecialProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
+		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
 		when(this.monoResponseGradStudentSpecialProgram.block()).thenReturn(spgm); 
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -185,9 +186,9 @@ public class SpecialProgramServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(Mono.just(spgm));
+        when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
 		
-		List<GradStudentSpecialProgram> spList;
+		List<StudentOptionalProgram> spList;
 		try {
 			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
 			assertEquals(1,spList.size());
@@ -204,7 +205,7 @@ public class SpecialProgramServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -212,11 +213,11 @@ public class SpecialProgramServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		GradAlgorithmOptionalStudentProgram algoSpGStatus = new GradAlgorithmOptionalStudentProgram();
 		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setOptionalProgramID(new UUID(1, 1));
 		algoSpGStatus.setSpecialGraduated(true);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		List<GradAlgorithmOptionalStudentProgram> listAl = new ArrayList<GradAlgorithmOptionalStudentProgram>();
 		listAl.add(algoSpGStatus);
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -227,7 +228,7 @@ public class SpecialProgramServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setSpecialGradStatus(listAl);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
@@ -237,12 +238,12 @@ public class SpecialProgramServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getGetSpecialProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
+		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
 		when(this.monoResponseGradStudentSpecialProgram.block()).thenReturn(null); 
 		
 		
 		
-		List<GradStudentSpecialProgram> spList;
+		List<StudentOptionalProgram> spList;
 		try {
 			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
 			assertEquals(1,spList.size());
@@ -258,7 +259,7 @@ public class SpecialProgramServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -266,11 +267,11 @@ public class SpecialProgramServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		GradAlgorithmOptionalStudentProgram algoSpGStatus = new GradAlgorithmOptionalStudentProgram();
 		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setOptionalProgramID(new UUID(1, 1));
 		algoSpGStatus.setSpecialGraduated(true);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		List<GradAlgorithmOptionalStudentProgram> listAl = new ArrayList<GradAlgorithmOptionalStudentProgram>();
 		listAl.add(algoSpGStatus);
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -281,23 +282,23 @@ public class SpecialProgramServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setSpecialGradStatus(listAl);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getGetSpecialProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
+		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
 		when(this.monoResponseGradStudentSpecialProgram.block()).thenReturn(spgm); 
 		
 		
 		
-		List<GradStudentSpecialProgram> spList;
+		List<StudentOptionalProgram> spList;
 		try {
 			spList = specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken);
 			assertEquals(1,spList.size());
@@ -313,7 +314,7 @@ public class SpecialProgramServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -321,11 +322,11 @@ public class SpecialProgramServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
-		SpecialGradAlgorithmGraduationStatus algoSpGStatus = new SpecialGradAlgorithmGraduationStatus();
+		GradAlgorithmOptionalStudentProgram algoSpGStatus = new GradAlgorithmOptionalStudentProgram();
 		algoSpGStatus.setPen("123090109");
-		algoSpGStatus.setSpecialProgramID(new UUID(1, 1));
+		algoSpGStatus.setOptionalProgramID(new UUID(1, 1));
 		algoSpGStatus.setSpecialGraduated(true);
-		List<SpecialGradAlgorithmGraduationStatus> listAl = new ArrayList<SpecialGradAlgorithmGraduationStatus>();
+		List<GradAlgorithmOptionalStudentProgram> listAl = new ArrayList<GradAlgorithmOptionalStudentProgram>();
 		listAl.add(algoSpGStatus);
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -336,23 +337,23 @@ public class SpecialProgramServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setSpecialGradStatus(listAl);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getGetSpecialProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradStudentSpecialProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
+		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentSpecialProgram);
 		when(this.monoResponseGradStudentSpecialProgram.block()).thenReturn(null); 
 		
 		
 		
-		List<GradStudentSpecialProgram> spList;
+		List<StudentOptionalProgram> spList;
 		try {
 			spList = specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken);
 			assertEquals(1,spList.size());
