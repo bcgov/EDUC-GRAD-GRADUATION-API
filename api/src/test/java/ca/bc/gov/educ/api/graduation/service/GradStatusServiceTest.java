@@ -24,9 +24,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import reactor.core.publisher.Mono;
@@ -66,7 +67,7 @@ public class GradStatusServiceTest {
     @Mock
     private WebClient.ResponseSpec responseMock;
     @Mock
-    private Mono<GraduationStatus> monoResponse;
+    private Mono<GraduationStudentRecord> monoResponse;
 	
     @Before
     public void setUp() {
@@ -82,7 +83,7 @@ public class GradStatusServiceTest {
 	public void testGetGradStatus() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -90,13 +91,13 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStatus(), studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(), studentID))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GraduationStatus.class)).thenReturn(monoResponse);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(monoResponse);
 		when(this.monoResponse.block()).thenReturn(gradResponse); 
 		
-		GraduationStatus res = gradStatusService.getGradStatus(studentID, accessToken);
+		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, accessToken);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
        
@@ -104,7 +105,7 @@ public class GradStatusServiceTest {
 	
 	@Test
 	public void testPrepareGraduationStatusObj() {
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -119,7 +120,7 @@ public class GradStatusServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GraduationStatus obj = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+		GraduationStudentRecord obj = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 		assertNotNull(obj.getStudentGradData());
 	}
 	
@@ -128,7 +129,7 @@ public class GradStatusServiceTest {
 	public void testSaveStudentGradStatus() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -142,16 +143,16 @@ public class GradStatusServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GraduationStatus.class)).thenReturn(Mono.just(gradResponse));
+        when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
 		
-		GraduationStatus res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse);
+		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
 	}
 	
 	@Test
 	public void testProcessProjectedResults() {
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -159,7 +160,7 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -174,7 +175,7 @@ public class GradStatusServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GraduationStatus res;
+		GraduationStudentRecord res;
 		try {
 			res = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			assertNotNull(res);

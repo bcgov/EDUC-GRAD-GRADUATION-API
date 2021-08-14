@@ -17,9 +17,9 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.Address;
 import ca.bc.gov.educ.api.graduation.model.report.Certificate;
 import ca.bc.gov.educ.api.graduation.model.report.CertificateType;
@@ -51,11 +51,11 @@ public class ReportService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 
-	public List<String> getCertificateList(List<String> certificateList, GraduationStatus gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<GradStudentSpecialProgram> projectedSpecialGradResponse) {
+	public List<String> getCertificateList(List<String> certificateList, GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse) {
 		if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
 			certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
 			if(!projectedSpecialGradResponse.isEmpty()) {
-				for(GradStudentSpecialProgram specialPrograms : projectedSpecialGradResponse) {
+				for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
 					if(specialPrograms.getSpecialProgramCode().equals("FI") && specialPrograms.getSpecialProgramCompletionDate() != null){
 						certificateList.add("F");
 					}
@@ -80,7 +80,7 @@ public class ReportService {
 	}
 
 	public ReportData prepareReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStatus gradResponse,String accessToken) {
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse,String accessToken) {
 		ReportData data = new ca.bc.gov.educ.api.graduation.model.report.ReportData();		
 		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
@@ -106,10 +106,10 @@ public class ReportService {
 		return nList;
 	}
 
-	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStatus gradResponse) {
+	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
-		transcriptData.setIssueDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdatedTimestamp().toString()));
+		transcriptData.setIssueDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		transcriptData.setResults(getTranscriptResults(graduationDataStatus));
 		return transcriptData;
 	}
@@ -257,10 +257,10 @@ public class ReportService {
 		return data;
 	}
 
-	public void saveStudentCertificateReportJasper(GraduationStatus gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
+	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
 			String certType) {
 		ReportData certData = prepareCertificateData(graduationDataStatus,accessToken);
-		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdatedTimestamp().toString()));
+		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		certData.setCertificate(getCertificateData(gradResponse));
 		if(certType.equalsIgnoreCase("E") || certType.equalsIgnoreCase("EI")) {
 			certData.getStudent().setEnglishCert(certType);
@@ -274,12 +274,12 @@ public class ReportService {
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType);
 		webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentCertificate()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
-		
+
 	}
 	
-	private Certificate getCertificateData(GraduationStatus gradResponse) {
+	private Certificate getCertificateData(GraduationStudentRecord gradResponse) {
 		Certificate cert = new Certificate();
-		cert.setIssued(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdatedTimestamp().toString()));
+		cert.setIssued(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();

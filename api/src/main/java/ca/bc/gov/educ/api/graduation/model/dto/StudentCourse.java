@@ -26,10 +26,10 @@ public class StudentCourse {
 	private Double interimPercent;
 	private String interimLetterGrade;
 	private Double bestSchoolPercent; 
-    private Double bestExamPercent;  
-    private String equivOrChallenge;
-    private String fineArtsAppliedSkills;    
-    private String metLitNumRequirement; 
+  private Double bestExamPercent;  
+  private String equivOrChallenge;
+  private String fineArtsAppliedSkills;    
+  private String metLitNumRequirement; 
 	private Integer credits;
 	private Integer creditsUsedForGrad;
 	private String relatedCourse;
@@ -47,6 +47,9 @@ public class StudentCourse {
 	private boolean isLocallyDeveloped;
 	private boolean isUsed;
 	private boolean isRestricted;
+	private boolean isNotEligibleForElective;
+	private boolean isBoardAuthorityAuthorized;
+  private boolean isIndependentDirectedStudies;
 
 	public Integer getCreditsUsedForGrad() {
 		if (creditsUsedForGrad == null)

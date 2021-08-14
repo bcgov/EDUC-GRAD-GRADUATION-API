@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
@@ -58,16 +58,16 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			long startTime = System.currentTimeMillis();
 			logger.info("************* TIME START  ************ "+startTime);
 			AlgorithmResponse algorithmResponse = new AlgorithmResponse();
-			GraduationStatus gradResponse = processorData.getGradResponse();
+			GraduationStudentRecord gradResponse = processorData.getGradResponse();
 			if(gradResponse.getProgramCompletionDate() != null) {
 				List<CodeDTO> specialProgram = new ArrayList<>();
-				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getPen(), gradResponse.getProgram(), processorData.getAccessToken());
+				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 				logger.info("**** Grad Algorithm Completed: ****");
-				List<GradStudentSpecialProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
-				GraduationStatus toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
+				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
-				if(toBeSaved != null && toBeSaved.getPen() != null) {
-					GraduationStatus graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
+				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
+					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
 					List<String> certificateList = new ArrayList<>();
 					if(graduationDataStatus.isGraduated() && !graduationStatusResponse.getProgram().equalsIgnoreCase("SCCP")) {				
@@ -80,8 +80,8 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 					
 					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
 					logger.info("**** Saved Reports: ****");
-					algorithmResponse.setGraduationStatus(graduationStatusResponse);
-					algorithmResponse.setSpecialGraduationStatus(projectedSpecialGradResponse);
+					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
+					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 				}
 			}else {
 				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
