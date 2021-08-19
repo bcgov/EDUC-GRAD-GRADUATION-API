@@ -8,16 +8,18 @@ import lombok.Data;
 
 @Data
 @Component
-public class GradAlgorithmGraduationStatus {
+public class GradAlgorithmGraduationStudentRecord {
 
-	private String pen;
+	private String studentGradData;
+    private String pen;
     private String program;
+    private String programName;
     private String programCompletionDate;
     private String gpa;
     private String honoursStanding;
-    private String recalculateGradStatus; 
+    private String recalculateGradStatus;   
     private String schoolOfRecord;
-    private String studentGrade;
+    private String studentGrade;	
     private String studentStatus;
     private UUID studentID;
     private String schoolAtGrad;

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProcessorData {
 
-	private GraduationStatus gradResponse;
+	private GraduationStudentRecord gradResponse;
 	private AlgorithmResponse algorithmResponse;
 	private String accessToken;
 	private String studentID;

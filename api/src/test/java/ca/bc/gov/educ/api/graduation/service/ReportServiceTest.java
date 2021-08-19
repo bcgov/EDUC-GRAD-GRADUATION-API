@@ -24,15 +24,14 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
@@ -40,6 +39,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourses;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentExam;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentExams;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -49,6 +49,7 @@ import reactor.core.publisher.Mono;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@SuppressWarnings({"unchecked","rawtypes"})
 public class ReportServiceTest {
 	
 	@Autowired
@@ -65,7 +66,8 @@ public class ReportServiceTest {
     
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
-    @Mock
+    
+	@Mock
     private WebClient.RequestHeadersUriSpec requestHeadersUriMock;
     @Mock
     private WebClient.RequestBodySpec requestBodyMock;
@@ -86,17 +88,20 @@ public class ReportServiceTest {
 
     }
 	
+	
 	public void testSaveStudentCertificateReport() {
-		String studentID = new UUID(1, 1).toString();
+		UUID studentID = new UUID(1, 1);
+		
 		String accessToken = "accessToken";
 		String pen="212321123";
 		String certificateType="E";
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setStudentID(studentID);
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
@@ -113,7 +118,7 @@ public class ReportServiceTest {
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);		
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -173,7 +178,7 @@ public class ReportServiceTest {
 	
 	@Test
 	public void testCheckSchoolForCertDecision() {
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -199,7 +204,7 @@ public class ReportServiceTest {
 	
 	@Test
 	public void testCheckSchoolForCertDecision_Desig_9() {
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -225,7 +230,7 @@ public class ReportServiceTest {
 	
 	@Test
 	public void testCheckSchoolForCertDecision_Desig_2() {
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -252,7 +257,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList() {
 		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -260,7 +265,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -280,13 +285,13 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
@@ -294,7 +299,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_PFProgram() {
 		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
 		gradResponse.setProgramCompletionDate(null);
@@ -302,7 +307,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -322,13 +327,13 @@ public class ReportServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setDualDogwood(true);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
@@ -336,7 +341,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_PFProgram_nodogwood() {
 		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
 		gradResponse.setProgramCompletionDate(null);
@@ -344,7 +349,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -364,29 +369,31 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("DD");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
 	
 	@Test
 	public void testGetCertificateList_emptySpecialProgram() {
-		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		UUID studentID = new UUID(1, 1);
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setStudentID(studentID);
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
+		;
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -406,14 +413,14 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
 	
 	@Test
 	public void testGetCertificateList_FrenchImmersion() {
 		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -421,7 +428,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -441,14 +448,14 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("FI");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		spgm.setSpecialProgramCompletionDate("2020-09-01");
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
@@ -456,7 +463,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_FrenchImmersion_nullProgramCompletionDate() {
 		String studentID = new UUID(1, 1).toString();
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -464,7 +471,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -484,14 +491,14 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("FI");
 		spgm.setSpecialProgramName("International Bacculaurette");
-		spgm.setMainProgramCode("2018-EN");
+		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		spgm.setSpecialProgramCompletionDate(null);
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(new ArrayList<>(), gradResponse, graduationDataStatus, list);
 	}
@@ -499,7 +506,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -550,7 +557,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -570,7 +577,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData_nullProgramData() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram(null);
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -627,7 +634,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -641,7 +648,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData_exams_notnull() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -706,7 +713,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -720,7 +727,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData_Desig_3() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -777,7 +784,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -791,7 +798,7 @@ public class ReportServiceTest {
 
 	public void testPrepareReportData_Desig_4() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -848,7 +855,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -862,7 +869,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData_Desig_2() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -919,7 +926,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -933,7 +940,7 @@ public class ReportServiceTest {
 	
 	public void testPrepareReportData_schoolNull() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStatus gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStatus();
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
@@ -987,7 +994,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		specialProgram.add(cDto);
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -995,7 +1002,6 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
-	}		
-	
+		reportService.prepareReportData(graduationDataStatus,gradResponse, accessToken);
+	}
 }

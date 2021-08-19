@@ -10,16 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
-import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.MessageHelper;
@@ -55,7 +53,7 @@ public class GraduationControllerTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType = "REGFM";
 		
-		GraduationStatus gradResponse = new GraduationStatus();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
@@ -63,12 +61,12 @@ public class GraduationControllerTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
 		
-		GradStudentSpecialProgram spgm = new GradStudentSpecialProgram();
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setSpecialProgramCode("BD");
 		spgm.setSpecialProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<GradStudentSpecialProgram> list = new ArrayList<GradStudentSpecialProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		
 		Authentication authentication = Mockito.mock(Authentication.class);
@@ -80,8 +78,8 @@ public class GraduationControllerTest {
 		SecurityContextHolder.setContext(securityContext);
 		
 		AlgorithmResponse alRes = new AlgorithmResponse();
-		alRes.setGraduationStatus(gradResponse);
-		alRes.setSpecialGraduationStatus(list);
+		alRes.setGraduationStudentRecord(gradResponse);
+		alRes.setStudentOptionalProgram(list);
 		Mockito.when(graduationService.graduateStudent(studentID,null,projectedType)).thenReturn(alRes);
 		graduationController.graduateStudentNew(studentID,projectedType);
 		Mockito.verify(graduationService).graduateStudent(studentID,null,projectedType);
