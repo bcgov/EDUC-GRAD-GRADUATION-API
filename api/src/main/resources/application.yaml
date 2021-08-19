@@ -93,5 +93,5 @@ endpoint:
    
  report-api: 
   achievement_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
-  transcript_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
-  certificate_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
+  transcript_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
+  certificate_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
