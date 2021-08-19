@@ -18,7 +18,7 @@ public class StudentCourse {
 	private String courseName;
 	private String courseLevel;
 	private String sessionDate;
-	private String courseDescription;
+	private String customizedCourseName;
 	private String gradReqMet;
 	private String gradReqMetDetail;
 	private Double completedCoursePercentage;
@@ -73,8 +73,8 @@ public class StudentCourse {
 	@Override
 	public String toString() {
 		return "StudentCourse [pen=" + pen + ", courseCode=" + courseCode + ", courseName=" + courseName
-				+ ", courseLevel=" + courseLevel + ", sessionDate=" + sessionDate + ", courseDescription="
-				+ courseDescription + ", gradReqMet=" + gradReqMet + ", gradReqMetDetail=" + gradReqMetDetail
+				+ ", courseLevel=" + courseLevel + ", sessionDate=" + sessionDate + ", customizedCourseName="
+				+ customizedCourseName + ", gradReqMet=" + gradReqMet + ", gradReqMetDetail=" + gradReqMetDetail
 				+ ", completedCoursePercentage=" + completedCoursePercentage + ", completedCourseLetterGrade="
 				+ completedCourseLetterGrade + ", interimPercent=" + interimPercent + ", interimLetterGrade="
 				+ interimLetterGrade + ", credits=" + credits + ", creditsUsedForGrad=" + creditsUsedForGrad

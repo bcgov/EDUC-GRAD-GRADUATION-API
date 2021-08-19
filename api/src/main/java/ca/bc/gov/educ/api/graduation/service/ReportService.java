@@ -155,8 +155,8 @@ public class ReportService {
 		if(sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
 			return "IDS "+sc.getRelatedCourseName();
 		}
-		if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK") && StringUtils.isNotBlank(sc.getCourseDescription())) {
-			return sc.getCourseDescription();
+		if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK") && StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
+			return sc.getCustomizedCourseName();
 		}
 		return sc.getCourseName();
 	}
