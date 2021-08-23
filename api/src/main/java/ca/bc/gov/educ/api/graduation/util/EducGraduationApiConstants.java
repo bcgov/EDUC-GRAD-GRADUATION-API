@@ -57,8 +57,10 @@ public class EducGraduationApiConstants {
     private String saveSpecialProgramGradStatus;
     
     @Value("${endpoint.grad-student-api.get-special-program-details}")
-    private String getSpecialProgramDetails;    
+    private String getSpecialProgramDetails; 
     
+    @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
+    private String certList;    
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";

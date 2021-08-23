@@ -26,10 +26,11 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRec
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 
@@ -290,17 +291,12 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
+		data.setGradMessage("ABC");
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -363,10 +359,7 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		try {
@@ -433,17 +426,13 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -506,19 +495,13 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
-		
-		
+		data.setGradMessage("ABC");		
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -581,22 +564,20 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
-		List<String> certificateList = new ArrayList<String>();
-		certificateList.add("E");
+		List<ProgramCertificate> certificateList = new ArrayList<ProgramCertificate>();
+		ProgramCertificate pc= new ProgramCertificate();
+		pc.setCertificateTypeCode("E");
+		certificateList.add(pc);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
-		Mockito.when(reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,list)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReport(gradResponse.getPen(),data,accessToken,"E",UUID.fromString(studentID));
+		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken)).thenReturn(certificateList);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -659,17 +640,13 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -739,17 +716,13 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -819,10 +792,7 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		try {
@@ -889,17 +859,13 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -962,19 +928,15 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
 		
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
@@ -1037,22 +999,20 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		
 		ReportData data = new ReportData();
-		data.setStudentName("ABC");
-		data.setDemographics(sD);
-		data.setSchool(schoolObj);
-		data.setGraduationMessages(gM);
+		data.setGradMessage("ABC");
 		
-		List<String> certificateList = new ArrayList<String>();
-		certificateList.add("E");
+		List<ProgramCertificate> certificateList = new ArrayList<ProgramCertificate>();
+		ProgramCertificate pc= new ProgramCertificate();
+		pc.setCertificateTypeCode("E");
+		certificateList.add(pc);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareReportData(graduationDataStatus,accessToken,new ArrayList<>())).thenReturn(data);
+		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse)).thenReturn(gradResponse);
-		Mockito.when(reportService.setOtherRequiredData(data,gradResponse,graduationDataStatus,new ArrayList<String>(),accessToken)).thenReturn(data);
-		Mockito.when(reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,list)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReport(gradResponse.getPen(),data,accessToken,"E",UUID.fromString(studentID));
+		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken)).thenReturn(certificateList);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		try {
 			Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		} catch (JsonProcessingException e1) {
