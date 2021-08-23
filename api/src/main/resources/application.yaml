@@ -90,8 +90,8 @@ endpoint:
   update-grad-student-certificate: 
    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
   get-certificate-name: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s
-   
+  get-cert-list: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates 
  report-api: 
   achievement_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
-  transcript_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
-  certificate_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
+  transcript_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
+  certificate_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate

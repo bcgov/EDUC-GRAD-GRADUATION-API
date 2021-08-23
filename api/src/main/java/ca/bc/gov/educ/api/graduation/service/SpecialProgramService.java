@@ -35,8 +35,11 @@ public class SpecialProgramService {
 			
 			StudentOptionalProgram gradSpecialProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetSpecialProgramDetails(),studentID,specialPrograms.getOptionalProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
 			if(gradSpecialProgram != null) {
-				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
-					graduationDataStatus.setDualDogwood(true);
+				if(specialPrograms.isSpecialGraduated()) {
+					gradSpecialProgram.setGraduated(true);
+					if(gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+						graduationDataStatus.setDualDogwood(true);
+					}
 				}
 				gradSpecialProgram.setOptionalProgramID(specialPrograms.getOptionalProgramID());
 				gradSpecialProgram.setStudentID(specialPrograms.getStudentID());

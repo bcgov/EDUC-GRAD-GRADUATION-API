@@ -20,5 +20,6 @@ public class StudentOptionalProgram extends BaseModel{
     private String specialProgramCode;
     private String programCode;
     private UUID studentID;
+    private boolean graduated;
 				
 }

@@ -13,8 +13,9 @@ import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
-import ca.bc.gov.educ.api.graduation.model.dto.ReportData;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
@@ -66,21 +67,18 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
 				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-				ReportData data = reportService.prepareReportData(graduationDataStatus,processorData.getAccessToken(),specialProgram);
+				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
 				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
-					List<String> certificateList = new ArrayList<>();
-					if(graduationDataStatus.isGraduated() && !graduationStatusResponse.getProgram().equalsIgnoreCase("SCCP")) {				
-						certificateList = reportService.getCertificateList(certificateList,gradResponse,graduationDataStatus,projectedSpecialGradResponse);
-						for(String certType : certificateList) {
-							reportService.saveStudentCertificateReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),certType,graduationStatusResponse.getStudentID());
+					if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {			
+						List<ProgramCertificate> certificateList =reportService.getCertificateList(gradResponse,graduationDataStatus,projectedSpecialGradResponse,processorData.getAccessToken());
+						for(ProgramCertificate certType : certificateList) {
+							reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
 						}
+						logger.info("**** Saved Certificates: ****");
 					}
-					logger.info("**** Saved Certificates: ****");
-					data = reportService.setOtherRequiredData(data,graduationStatusResponse,graduationDataStatus,certificateList,processorData.getAccessToken());
-					reportService.saveStudentAchievementReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
-					reportService.saveStudentTranscriptReport(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());			
+					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
 					logger.info("**** Saved Reports: ****");
 					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
@@ -102,7 +100,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 
 	@Override
     public void setInputData(ProcessorData inputData) {
-		processorData = (ProcessorData)inputData;
+		processorData = inputData;
         logger.info("GraduateStudentProcess: ");
     }
 
