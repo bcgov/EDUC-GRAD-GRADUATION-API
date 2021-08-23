@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +19,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateReq;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.Address;
@@ -51,32 +54,16 @@ public class ReportService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 
-	public List<String> getCertificateList(List<String> certificateList, GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse) {
-		if(gradResponse.getProgram().equalsIgnoreCase("2018-EN")) {				
-			certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
-			if(!projectedSpecialGradResponse.isEmpty()) {
-				for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
-					if(specialPrograms.getSpecialProgramCode().equals("FI") && specialPrograms.getSpecialProgramCompletionDate() != null){
-						certificateList.add("F");
-					}
-				}
-			}
-		}else {
-			certificateList.add("S");
-			if(graduationDataStatus.isDualDogwood()) {
-				certificateList = checkSchoolForCertDecision(graduationDataStatus,certificateList);
+	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse,String accessToken) {
+		ProgramCertificateReq req = new ProgramCertificateReq();
+		req.setProgramCode(gradResponse.getProgram());
+		for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
+			if(specialPrograms.isGraduated() && (specialPrograms.getSpecialProgramCode().equals("FI") || specialPrograms.getSpecialProgramCode().equals("DD"))){
+				req.setOptionalProgram(specialPrograms.getSpecialProgramCode());
 			}
 		}
-		return certificateList;
-	}
-	
-	public List<String> checkSchoolForCertDecision(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<String> certificateList) {
-		if(!graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("2") && !graduationDataStatus.getSchool().getIndependentDesignation().equalsIgnoreCase("9") ) {
-			certificateList.add("E");
-		}else {
-			certificateList.add("EI");
-		}
-		return certificateList;
+		req.setSchoolFundingCode(StringUtils.isBlank(graduationDataStatus.getSchool().getIndependentDesignation()) ? " ":graduationDataStatus.getSchool().getIndependentDesignation());
+		return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){}).block();
 	}
 
 	public ReportData prepareReportData(
@@ -170,8 +157,12 @@ public class ReportService {
 		GraduationData data = new GraduationData();
 		data.setDogwoodFlag(graduationDataStatus.isDualDogwood());
 		if(graduationDataStatus.isGraduated()) {
-			data.setGraduationDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
-			data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));			
+			if(!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
+				data.setGraduationDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());			
+				data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
+			}else {
+				data.setGraduationDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate()));	
+			}
 		}
 		
 		return data;
@@ -218,6 +209,8 @@ public class ReportService {
 		schObj.setMincode(school.getMinCode());
 		schObj.setName(school.getSchoolName());
 		schObj.setSignatureCode(school.getSignatureDistrict());
+		schObj.setDistno(school.getMinCode().substring(0, 3));
+		schObj.setSchlno(school.getMinCode());
 		return schObj;
 	}
 
@@ -258,38 +251,33 @@ public class ReportService {
 	}
 
 	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
-			String certType) {
+			ProgramCertificate certType) {
 		ReportData certData = prepareCertificateData(graduationDataStatus,accessToken);
 		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
-		certData.setCertificate(getCertificateData(gradResponse));
-		if(certType.equalsIgnoreCase("E") || certType.equalsIgnoreCase("EI")) {
-			certData.getStudent().setEnglishCert(certType);
-		}else if(certType.equalsIgnoreCase("F") || certType.equalsIgnoreCase("S")) {
-			certData.getStudent().setFrenchCert(certType);
+		certData.setCertificate(getCertificateData(gradResponse,certType));
+		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("EI")) {
+			certData.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S")) {
+			certData.getStudent().setFrenchCert(certType.getCertificateTypeCode());
 		}
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(gradResponse.getPen());
 		requestObj.setStudentID(gradResponse.getStudentID());
 		requestObj.setCertificate(encodedPdfReportCertificate);
-		requestObj.setGradCertificateTypeCode(certType);
+		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
 		webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentCertificate()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
 
 	}
 	
-	private Certificate getCertificateData(GraduationStudentRecord gradResponse) {
+	private Certificate getCertificateData(GraduationStudentRecord gradResponse,ProgramCertificate certData) {
 		Certificate cert = new Certificate();
 		cert.setIssued(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();
 		PaperType pType = new PaperType();
-		String code = "Regular";
-		if(gradResponse.getProgram().contains("SCCP")) {
-			code="SCCP";
-		}else if(gradResponse.getProgram().contains("1950")) {
-			code="Adult";
-		}
+		String code =certData.getMediaCode();
 		pType.setCode(code);		
 		certType.setPaperType(pType);
 		certType.setReportName("Certificate");
