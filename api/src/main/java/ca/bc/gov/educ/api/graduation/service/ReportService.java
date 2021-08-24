@@ -21,6 +21,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateReq;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.Address;
@@ -104,6 +105,7 @@ public class ReportService {
 	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
 		List<TranscriptResult> tList = new ArrayList<>();
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
+		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		for(StudentCourse sc:studentCourseList) {
 			if(!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
 				TranscriptResult result = new TranscriptResult();
@@ -135,14 +137,54 @@ public class ReportService {
 			}
 		}
 		
+		for(StudentAssessment sc:studentAssessmentList) {
+			if(!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
+				TranscriptResult result = new TranscriptResult();
+				Course crse = new Course();
+				crse.setCode(sc.getAssessmentCode());
+				crse.setCredits("NA");
+				crse.setName(sc.getAssessmentName());
+				crse.setSessionDate(sc.getSessionDate().replace("/",""));
+				result.setCourse(crse);
+				
+				Mark mrk = new Mark();
+				
+				mrk.setFinalLetterGrade("NA");
+				mrk.setFinalPercent(getAssessmentFinalPercent(sc));
+				result.setMark(mrk);
+				result.setRequirement(sc.getGradReqMet());
+				result.setRequirementName(sc.getGradReqMetDetail());
+				tList.add(result);
+			}
+		}
+		
 		return tList;
 	}
 	
+	private String getAssessmentFinalPercent(StudentAssessment sA) {
+		String finalPercent = "";
+		if(sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
+			finalPercent="RM";
+		}else {
+			if(sA.getSpecialCase() != null) {
+				if(sA.getSpecialCase().equalsIgnoreCase("A")) {
+					finalPercent="AEG";
+				}else if(sA.getSpecialCase().equalsIgnoreCase("E")) {
+					finalPercent="AEG";
+				}else {
+					finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : null;
+				}
+			}
+		}
+		return finalPercent;
+	}
+
 	private String getCourseNameLogic(StudentCourse sc) {
 		if(sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
 			return "IDS "+sc.getRelatedCourseName();
 		}
-		if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK") && StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
+		//if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK")
+		if(StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
 			return sc.getCustomizedCourseName();
 		}
 		return sc.getCourseName();
