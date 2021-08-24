@@ -564,6 +564,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
@@ -641,6 +644,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
@@ -725,6 +731,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
@@ -803,6 +812,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
@@ -882,6 +894,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
@@ -958,6 +973,9 @@ public class ReportServiceTest {
 		
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
+		sA.setAssessmentName("AASASA");
+		sA.setSessionDate("2020/12");
+		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
 		StudentAssessments sAssessments = new StudentAssessments();
