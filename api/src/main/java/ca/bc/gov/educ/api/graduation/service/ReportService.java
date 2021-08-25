@@ -21,6 +21,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateReq;
+import ca.bc.gov.educ.api.graduation.model.dto.SpecialCase;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
@@ -76,7 +77,7 @@ public class ReportService {
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
 		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
-		data.setTranscript(getTranscriptData(graduationDataStatus,gradResponse));
+		data.setTranscript(getTranscriptData(graduationDataStatus,gradResponse,accessToken));
 		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 		return data;
 	}
@@ -94,15 +95,15 @@ public class ReportService {
 		return nList;
 	}
 
-	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse) {
+	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse,String accessToken) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
 		transcriptData.setIssueDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
-		transcriptData.setResults(getTranscriptResults(graduationDataStatus));
+		transcriptData.setResults(getTranscriptResults(graduationDataStatus,accessToken));
 		return transcriptData;
 	}
 
-	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
 		List<TranscriptResult> tList = new ArrayList<>();
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
@@ -156,7 +157,7 @@ public class ReportService {
 				mrk.setInterimPercent("");
 				mrk.setSchoolPercent("");
 				mrk.setFinalLetterGrade("NA");
-				mrk.setFinalPercent(getAssessmentFinalPercent(sc));
+				mrk.setFinalPercent(getAssessmentFinalPercent(sc,accessToken));
 				result.setMark(mrk);
 				result.setRequirement(sc.getGradReqMet());
 				result.setRequirementName(sc.getGradReqMetDetail());
@@ -167,19 +168,18 @@ public class ReportService {
 		return tList;
 	}
 	
-	private String getAssessmentFinalPercent(StudentAssessment sA) {
+	private String getAssessmentFinalPercent(StudentAssessment sA,String accessToken) {
 		String finalPercent = "";
-		if(sA.getSpecialCase() != null) {
-			if(sA.getSpecialCase().equalsIgnoreCase("A")) {
-				finalPercent="AEG";
-			}else if(sA.getSpecialCase().equalsIgnoreCase("E")) {
-				finalPercent="XMT";
+		if(sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
+			finalPercent = sA.getSpecialCase();
+			if(sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E")) {
+				SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(),sA.getSpecialCase())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(SpecialCase.class).block();
+				finalPercent=spC.getLabel();
 			}
 		}else {
+			finalPercent = sA.getProficiencyScore() != null ? new DecimalFormat("#").format(sA.getProficiencyScore()) : "";
 			if(sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
 				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
-			}else {
-				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "";
 			}
 		}
 		return finalPercent;

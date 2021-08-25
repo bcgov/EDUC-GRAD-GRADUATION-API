@@ -36,6 +36,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
+import ca.bc.gov.educ.api.graduation.model.dto.SpecialCase;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
@@ -586,6 +587,16 @@ public class ReportServiceTest {
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
+		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
@@ -665,11 +676,23 @@ public class ReportServiceTest {
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
+		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		
+		
 		
 		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -753,6 +776,16 @@ public class ReportServiceTest {
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
+		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
@@ -828,6 +861,16 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
+		
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
 		
 		GradProgram gP = new GradProgram();
 		gP.setProgramCode("2018-EN");
@@ -914,6 +957,16 @@ public class ReportServiceTest {
 		GradProgram gP = new GradProgram();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
+		
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+		
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
 		
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
