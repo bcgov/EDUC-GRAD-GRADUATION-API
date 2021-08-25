@@ -95,3 +95,6 @@ endpoint:
   achievement_report: https://report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
   transcript_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
   certificate_report: https://educ-grad-report-api-main-77c02f-tools.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
+ grad-student-graduation-api:
+  get-special-cases: 
+    url: https://educ-grad-student-graduation-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/lgSc/specialcase/%s
