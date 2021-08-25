@@ -142,6 +142,7 @@ public class ReportService {
 				TranscriptResult result = new TranscriptResult();
 				Course crse = new Course();
 				crse.setCode(sc.getAssessmentCode());
+				crse.setLevel("");
 				crse.setCredits("NA");
 				crse.setName(sc.getAssessmentName());
 				crse.setSessionDate(sc.getSessionDate().replace("/",""));
@@ -149,6 +150,11 @@ public class ReportService {
 				
 				Mark mrk = new Mark();
 				
+				mrk.setExamPercent("");
+				mrk.setFinalLetterGrade("");
+				mrk.setInterimLetterGrade("");
+				mrk.setInterimPercent("");
+				mrk.setSchoolPercent("");
 				mrk.setFinalLetterGrade("NA");
 				mrk.setFinalPercent(getAssessmentFinalPercent(sc));
 				result.setMark(mrk);
@@ -163,17 +169,17 @@ public class ReportService {
 	
 	private String getAssessmentFinalPercent(StudentAssessment sA) {
 		String finalPercent = "";
-		if(sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
-			finalPercent="RM";
+		if(sA.getSpecialCase() != null) {
+			if(sA.getSpecialCase().equalsIgnoreCase("A")) {
+				finalPercent="AEG";
+			}else if(sA.getSpecialCase().equalsIgnoreCase("E")) {
+				finalPercent="XMT";
+			}
 		}else {
-			if(sA.getSpecialCase() != null) {
-				if(sA.getSpecialCase().equalsIgnoreCase("A")) {
-					finalPercent="AEG";
-				}else if(sA.getSpecialCase().equalsIgnoreCase("E")) {
-					finalPercent="AEG";
-				}else {
-					finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : null;
-				}
+			if(sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
+				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
+			}else {
+				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "";
 			}
 		}
 		return finalPercent;
