@@ -28,6 +28,10 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentCourses;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentDemographics;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -266,7 +270,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -401,7 +411,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -470,7 +486,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -539,7 +561,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -733,7 +761,7 @@ public class GraduationServiceTest {
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 		
@@ -834,7 +862,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -903,7 +937,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -974,7 +1014,14 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
-		graduationDataStatus.setStudentCourses(null);
+		
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");

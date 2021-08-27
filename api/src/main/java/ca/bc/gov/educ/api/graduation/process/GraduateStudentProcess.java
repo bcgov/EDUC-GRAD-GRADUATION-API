@@ -78,8 +78,12 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 						}
 						logger.info("**** Saved Certificates: ****");
 					}
-					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
-					logger.info("**** Saved Reports: ****");
+					if(graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
+						logger.info("**** No Transcript Generated: ****");
+					}else {
+						reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
+						logger.info("**** Saved Reports: ****");
+					}					
 					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 				}
