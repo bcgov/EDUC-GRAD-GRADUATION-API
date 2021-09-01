@@ -95,7 +95,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String formatDateForReportJasper(String updatedTimestamp) {
-		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
 		try {
 			return myFormat.format(fromUser.parse(updatedTimestamp));
