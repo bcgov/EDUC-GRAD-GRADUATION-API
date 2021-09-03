@@ -377,7 +377,7 @@ public class GraduationServiceTest {
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 		
@@ -685,7 +685,7 @@ public class GraduationServiceTest {
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 		
@@ -828,7 +828,7 @@ public class GraduationServiceTest {
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 		

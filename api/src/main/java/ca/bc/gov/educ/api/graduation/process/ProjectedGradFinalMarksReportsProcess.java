@@ -88,8 +88,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 				}
 			}else {
-				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
-				return null;
+				throw new GradBusinessRuleException("Graduation Algorithm Cannot be Run for this graduated Student");
 			}
 			long endTime = System.currentTimeMillis();
 			long diff = (endTime - startTime)/1000;
@@ -98,7 +97,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			return processorData;
 
 		}catch(Exception e) {
-			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again..." + e.getMessage());
+			throw new GradBusinessRuleException(e.getMessage());
 		}
 	}
 
