@@ -60,7 +60,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			return processorData;
 
 		}catch(Exception e) {
-			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again..." + e.getMessage());
+			throw new GradBusinessRuleException(e.getMessage());
 		}
 	}
 

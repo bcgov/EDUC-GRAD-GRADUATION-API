@@ -65,8 +65,10 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
+				logger.info("**** Saved Optional Programs: ****");
 				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
+				logger.info("**** Prepared Data for Reports: ****");
 				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
@@ -88,8 +90,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 					algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 				}
 			}else {
-				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
-				return null;
+				throw new GradBusinessRuleException("Graduation Algorithm Cannot be Run for this graduated Student");
 			}
 			long endTime = System.currentTimeMillis();
 			long diff = (endTime - startTime)/1000;
@@ -98,7 +99,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			return processorData;
 
 		}catch(Exception e) {
-			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again..." + e.getMessage());
+			throw new GradBusinessRuleException(e.getMessage());
 		}
 	}
 
