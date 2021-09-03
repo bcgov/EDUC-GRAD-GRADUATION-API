@@ -163,7 +163,7 @@ public class GraduationServiceTest {
 			graduationService.graduateStudent(studentID,accessToken,projectedType);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 	}
@@ -188,7 +188,7 @@ public class GraduationServiceTest {
 			graduationService.graduateStudent(studentID,accessToken,projectedType);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
-			assertEquals(1, errors.size());
+			assertEquals(0, errors.size());
 			return;
 		}
 	}

@@ -57,11 +57,10 @@ public class GraduationService {
 		     	data = process.fire();        
 		        return data.getAlgorithmResponse();		     	
 			}else {
-				validation.addErrorAndStop("Graduation Algorithm Cannot be Run for this Student");
+				throw new GradBusinessRuleException(String.format("Graduation Algorithm Cannot be Run for this Student because of status %s",gradResponse.getStudentStatus()));
 			}
-			return null;
 		}catch(Exception e) {
-			throw new GradBusinessRuleException("Error Projecting Student Graduation. Please try again..." + e.getMessage());
+			throw new GradBusinessRuleException(e.getMessage());
 		}
 	}
 }
