@@ -114,6 +114,10 @@ public class ReportService {
 		for(StudentCourse sc:studentCourseList) {
 			if(!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
 				TranscriptResult result = new TranscriptResult();
+				String equivOrChallenge = "";
+				if(sc.getEquivOrChallenge() != null) {
+					equivOrChallenge = sc.getEquivOrChallenge();
+				}
 				Course crse = new Course();
 				crse.setCode(sc.getCourseCode());
 				crse.setCredits(sc.getCredits().toString());
@@ -121,7 +125,7 @@ public class ReportService {
 				crse.setName(getCourseNameLogic(sc));
 				crse.setRelatedCourse(sc.getRelatedCourse());
 				crse.setRelatedLevel(sc.getRelatedLevel());
-				crse.setType(sc.getEquivOrChallenge().equals("E") ? "1":"2");
+				crse.setType(equivOrChallenge.equals("E") ? "1":"2");
 				crse.setSessionDate(sc.getSessionDate().replace("/",""));
 				result.setCourse(crse);
 				
@@ -137,7 +141,7 @@ public class ReportService {
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString():"");
 				result.setRequirementName(sc.getGradReqMetDetail());
-				result.setEquivalency(sc.getEquivOrChallenge());
+				result.setEquivalency(equivOrChallenge);
 				tList.add(result);
 			}
 		}
