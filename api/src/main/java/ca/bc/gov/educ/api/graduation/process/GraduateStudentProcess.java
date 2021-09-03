@@ -66,8 +66,10 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
+				logger.info("**** Saved Optional Programs: ****");
 				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
+				logger.info("**** Prepared Data for Reports: ****");
 				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
 					logger.info("**** Saved Grad Status: ****");
