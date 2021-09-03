@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
@@ -307,7 +311,7 @@ public class ReportService {
 		ReportData certData = prepareCertificateData(graduationDataStatus,accessToken);
 		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		certData.setCertificate(getCertificateData(gradResponse,certType));
-		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("EI")) {
+		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
 			certData.getStudent().setEnglishCert(certType.getCertificateTypeCode());
 		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S")) {
 			certData.getStudent().setFrenchCert(certType.getCertificateTypeCode());
