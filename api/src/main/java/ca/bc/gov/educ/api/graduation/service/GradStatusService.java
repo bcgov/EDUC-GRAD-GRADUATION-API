@@ -9,10 +9,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 
 @Service
 public class GradStatusService {
@@ -24,7 +26,12 @@ public class GradStatusService {
     EducGraduationApiConstants educGraduationApiConstants;
 	
 	public GraduationStudentRecord getGradStatus(String studentID, String accessToken) {
-		return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		try 
+		{
+			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		} catch (Exception e) {
+			throw new GradBusinessRuleException("GRAD-STUDENT-API IS DOWN");
+		}
 	}
 	
 	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus) {
