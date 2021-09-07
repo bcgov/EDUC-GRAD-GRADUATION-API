@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 
 @Service
 public class GradAlgorithmService {
@@ -19,7 +20,11 @@ public class GradAlgorithmService {
     EducGraduationApiConstants educGraduationApiConstants;
 	
 	public GraduationData runGradAlgorithm(UUID studentID, String program,String accessToken) {
-		return webClient.get().uri(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
+		try {
+			return webClient.get().uri(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
+		}catch(Exception e) {
+			throw new GradBusinessRuleException(e.getMessage());
+		}
 	}
 	
 	public GraduationData runProjectedAlgorithm(UUID studentID, String program,String accessToken) {
