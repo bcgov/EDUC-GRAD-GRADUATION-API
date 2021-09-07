@@ -50,6 +50,7 @@ public class GraduationService {
 		try {
 			AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
 			GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken);
+			logger.info("**** Fetched Student Information: ****");
 			if(!gradResponse.getStudentStatus().equals("D") && !gradResponse.getStudentStatus().equals("M")) {
 				ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID);
 		     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
