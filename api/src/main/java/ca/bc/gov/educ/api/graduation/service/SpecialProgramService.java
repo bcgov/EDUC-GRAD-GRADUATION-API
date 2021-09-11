@@ -26,7 +26,7 @@ public class SpecialProgramService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 	
-	public List<StudentOptionalProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) throws JsonProcessingException {
+	public List<StudentOptionalProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) {
 		List<StudentOptionalProgram> projectedSpecialGradResponse = new ArrayList<>();
 		//Run Special Program Algorithm
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
@@ -44,7 +44,12 @@ public class SpecialProgramService {
 				gradSpecialProgram.setOptionalProgramID(specialPrograms.getOptionalProgramID());
 				gradSpecialProgram.setStudentID(specialPrograms.getStudentID());
 				gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getOptionalProgramCompletionDate());
-				gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				try {
+					gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
 				specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
 				//Save Special Grad Status

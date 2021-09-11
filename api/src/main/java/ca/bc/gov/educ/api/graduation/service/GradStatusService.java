@@ -9,12 +9,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 
 @Service
 public class GradStatusService {
@@ -25,12 +23,14 @@ public class GradStatusService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 	
-	public GraduationStudentRecord getGradStatus(String studentID, String accessToken) {
+	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
 		try 
 		{
 			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		} catch (Exception e) {
-			throw new GradBusinessRuleException("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
 		}
 	}
 	
@@ -45,8 +45,14 @@ public class GradStatusService {
 		return obj;
 	}
 	
-	public GraduationStudentRecord saveStudentGradStatus(String studentID,String accessToken, GraduationStudentRecord toBeSaved) {
-		return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+	public GraduationStudentRecord saveStudentGradStatus(String studentID,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
+		try {
+			return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		}catch(Exception e) {
+			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {

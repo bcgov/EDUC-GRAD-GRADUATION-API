@@ -74,10 +74,10 @@ springdoc:
 #Endpoints
 endpoint:
  grad-student-api: 
-  update-grad-status: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s
-  read-grad-student-record: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
-  save-special-program-grad-status: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram
-  get-special-program-details: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram/%s/%s
+  update-grad-status: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s
+  read-grad-student-record: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
+  save-special-program-grad-status: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram
+  get-special-program-details: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram/%s/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s   

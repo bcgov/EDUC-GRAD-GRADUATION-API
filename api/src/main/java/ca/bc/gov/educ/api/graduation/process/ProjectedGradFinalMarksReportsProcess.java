@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
@@ -36,6 +37,9 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	
 	@Autowired
     private ProcessorData processorData;
+	
+	@Autowired
+	private ExceptionMessage exception;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -62,7 +66,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			GraduationStudentRecord gradResponse = processorData.getGradResponse();
 			if(gradResponse.getProgramCompletionDate() != null) {
 				List<CodeDTO> specialProgram = new ArrayList<>();
-				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
+				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
 				logger.info("**** Grad Algorithm Completed: ****");
 				List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
 				logger.info("**** Saved Optional Programs: ****");
@@ -70,10 +74,10 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 				ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
 				logger.info("**** Prepared Data for Reports: ****");
 				if(toBeSaved != null && toBeSaved.getStudentID() != null) {
-					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved);
+					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved,exception);
 					logger.info("**** Saved Grad Status: ****");
 					if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {				
-						List<ProgramCertificate> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedSpecialGradResponse,processorData.getAccessToken());
+						List<ProgramCertificate> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedSpecialGradResponse,processorData.getAccessToken(),exception);
 						for(ProgramCertificate certType : certificateList) {
 							reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
 						}
@@ -83,7 +87,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 					if(graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
 						logger.info("**** No Transcript Generated: ****");
 					}else {
-						reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID());
+						reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID(),exception);
 						logger.info("**** Saved Reports: ****");
 					}
 					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
