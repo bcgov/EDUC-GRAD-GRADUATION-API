@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
@@ -38,6 +39,9 @@ public class GradAlgorithmServiceTest {
 	
 	@Autowired
 	GradValidation validation;
+	
+	@Autowired
+	private ExceptionMessage exception;
 	
 	@MockBean
     WebClient webClient;
@@ -97,7 +101,7 @@ public class GradAlgorithmServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GraduationData.class)).thenReturn(Mono.just(graduationDataStatus));
         
-		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,accessToken);
+		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,accessToken,exception);
 		assertNotNull(res);
        
 	}

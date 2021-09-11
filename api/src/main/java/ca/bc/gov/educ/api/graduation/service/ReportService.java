@@ -18,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
 import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
@@ -60,7 +61,7 @@ public class ReportService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 
-	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse,String accessToken) {
+	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse,String accessToken,ExceptionMessage exception) {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
 		for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
@@ -69,7 +70,13 @@ public class ReportService {
 			}
 		}
 		req.setSchoolFundingCode(StringUtils.isBlank(graduationDataStatus.getSchool().getIndependentDesignation()) ? " ":graduationDataStatus.getSchool().getIndependentDesignation());
-		return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){}).block();
+		try {
+			return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){}).block();
+		}catch(Exception e) {
+			exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return new ArrayList<>();
+		}
 	}
 
 	public ReportData prepareReportData(
@@ -275,29 +282,42 @@ public class ReportService {
 	}
 
 	public void saveStudentTranscriptReportJasper(String pen,
-			ca.bc.gov.educ.api.graduation.model.report.ReportData sample, String accessToken, UUID studentID) {
+			ca.bc.gov.educ.api.graduation.model.report.ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception) {
 	
-		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample,accessToken);
+		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample,accessToken,exception);
 		GradStudentReports requestObj = new GradStudentReports();
 		requestObj.setPen(pen);
 		requestObj.setReport(encodedPdfReportTranscript);
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
+		try {
 		webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),pen)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
+		}catch(Exception e) {
+			if(exception.getExceptionName() == null) {
+				exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
+				exception.setExceptionDetails(e.getLocalizedMessage());
+			}
+		}
 		
 	}
 
 	private String generateStudentTranscriptReportJasper(ca.bc.gov.educ.api.graduation.model.report.ReportData sample,
-			String accessToken) {
+			String accessToken,ExceptionMessage exception) {
 		ReportOptions options = new ReportOptions();
 		options.setReportFile("transcript");
 		options.setReportName("Transcript Report.pdf");
 		ReportRequest reportParams = new ReportRequest();
 		reportParams.setOptions(options);
-		reportParams.setData(sample);		
+		reportParams.setData(sample);
+		try {
 		byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getTranscriptReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
+		}catch (Exception e) {
+			exception.setExceptionName("GRAD-REPORT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	public ReportData prepareCertificateData(

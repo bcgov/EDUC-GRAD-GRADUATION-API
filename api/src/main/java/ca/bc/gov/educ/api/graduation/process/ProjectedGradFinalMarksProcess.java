@@ -49,7 +49,7 @@ public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 			logger.info("************* TIME START  ************ "+startTime);
 			AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 			GraduationStudentRecord gradResponse = processorData.getGradResponse();
-			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
+			GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 			logger.info("**** Grad Algorithm Completed: ****");
 			gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
 			List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.projectedSpecialPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());

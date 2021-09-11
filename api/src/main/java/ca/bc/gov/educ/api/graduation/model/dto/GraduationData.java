@@ -28,5 +28,6 @@ public class GraduationData {
     //Student Career Programs
     private boolean dualDogwood;
     private boolean isGraduated;
+    private ExceptionMessage exception;
     
 }

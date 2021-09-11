@@ -129,12 +129,8 @@ public class SpecialProgramServiceTest {
         when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
 		
 		List<StudentOptionalProgram> spList;
-		try {
-			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
-			assertEquals(1,spList.size());
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
+		assertEquals(1,spList.size());
 		
        
 	}	
@@ -189,12 +185,8 @@ public class SpecialProgramServiceTest {
         when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
 		
 		List<StudentOptionalProgram> spList;
-		try {
-			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
-			assertEquals(1,spList.size());
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
+		assertEquals(1,spList.size());
 		
        
 	}
@@ -244,12 +236,8 @@ public class SpecialProgramServiceTest {
 		
 		
 		List<StudentOptionalProgram> spList;
-		try {
-			spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
-			assertEquals(1,spList.size());
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		spList = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus, studentID, accessToken, new ArrayList<>());
+		assertEquals(1,spList.size());
 		
        
 	}

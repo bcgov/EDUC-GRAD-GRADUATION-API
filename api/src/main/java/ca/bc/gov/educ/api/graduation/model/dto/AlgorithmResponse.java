@@ -11,5 +11,6 @@ import lombok.Data;
 public class AlgorithmResponse {
 
     private GraduationStudentRecord graduationStudentRecord;
-    private List<StudentOptionalProgram> studentOptionalProgram;				
+    private List<StudentOptionalProgram> studentOptionalProgram;
+    private ExceptionMessage exception;
 }
