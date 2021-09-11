@@ -26,6 +26,7 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
 import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
@@ -58,6 +59,9 @@ public class ReportServiceTest {
 	
 	@Autowired
 	private ReportService reportService;
+	
+	@Autowired
+	private ExceptionMessage exception;
 	
 	@Autowired
 	GradValidation validation;
@@ -179,7 +183,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID));	
+		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception);	
        
 	}
 	
@@ -240,7 +244,7 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
         
         
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test
@@ -298,7 +302,7 @@ public class ReportServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test
@@ -357,7 +361,7 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
         
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test
@@ -409,7 +413,7 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
 		
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test
@@ -468,7 +472,7 @@ public class ReportServiceTest {
 		spgm.setSpecialProgramCompletionDate("2020-09-01");
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test
@@ -528,7 +532,7 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
         
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken);
+		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
 	@Test

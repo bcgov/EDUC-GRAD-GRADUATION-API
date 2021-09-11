@@ -24,6 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
@@ -40,6 +41,9 @@ public class GradStatusServiceTest {
 	
 	@Autowired
 	private GradStatusService gradStatusService;
+	
+	@Autowired
+	private ExceptionMessage exception;
 	
 	@MockBean
 	private GradAlgorithmService gradAlgorithmService;
@@ -97,7 +101,7 @@ public class GradStatusServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(monoResponse);
 		when(this.monoResponse.block()).thenReturn(gradResponse); 
 		
-		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, accessToken);
+		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, accessToken,exception);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
        
@@ -145,7 +149,7 @@ public class GradStatusServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
 		
-		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse);
+		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
 	}

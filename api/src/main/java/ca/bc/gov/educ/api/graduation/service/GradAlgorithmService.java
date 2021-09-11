@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 
 @Service
 public class GradAlgorithmService {
@@ -19,11 +19,13 @@ public class GradAlgorithmService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 	
-	public GraduationData runGradAlgorithm(UUID studentID, String program,String accessToken) {
+	public GraduationData runGradAlgorithm(UUID studentID, String program,String accessToken,ExceptionMessage exception) {
 		try {
 			return webClient.get().uri(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 		}catch(Exception e) {
-			throw new GradBusinessRuleException(e.getMessage());
+			exception.setExceptionName("GRAD-ALGORITHM-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
 		}
 	}
 	
