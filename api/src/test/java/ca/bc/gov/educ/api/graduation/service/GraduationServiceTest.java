@@ -74,7 +74,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -97,7 +97,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -108,7 +114,7 @@ public class GraduationServiceTest {
 		list.add(spgm);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
 			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
@@ -124,6 +130,7 @@ public class GraduationServiceTest {
 		String projectedType="REGFM";
 		String accessToken="accessToken";
 		validation.clear();
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -146,7 +153,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -157,7 +170,7 @@ public class GraduationServiceTest {
 		list.add(spgm);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
 			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
@@ -178,6 +191,7 @@ public class GraduationServiceTest {
 		String projectedType="REGFM";
 		String accessToken="accessToken";
 		validation.clear();
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -202,7 +216,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="FM";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -225,7 +239,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -236,7 +256,7 @@ public class GraduationServiceTest {
 		list.add(spgm);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
 			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
@@ -251,7 +271,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -322,6 +342,7 @@ public class GraduationServiceTest {
 		String projectedType="GS";
 		String accessToken="accessToken";
 		validation.clear();
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -388,7 +409,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -459,7 +480,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -530,7 +551,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -703,7 +724,13 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		graduationDataStatus.setStudentCourses(sc);
+		
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -753,6 +780,7 @@ public class GraduationServiceTest {
 		String projectedType="GS";
 		String accessToken="accessToken";
 		validation.clear();
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -890,7 +918,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		exception = new ExceptionMessage();	
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));

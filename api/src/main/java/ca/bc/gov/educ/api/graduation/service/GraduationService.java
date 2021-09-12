@@ -67,7 +67,7 @@ public class GraduationService {
 		}else {
 			AlgorithmResponse aR= new AlgorithmResponse();
 			ExceptionMessage exp = new ExceptionMessage();
-			exp.setExceptionName("UNACCEPTABLE STUDENT");
+			exp.setExceptionName("STUDENT-NOT-ACCEPTABLE");
 			exp.setExceptionDetails(String.format("Graduation Algorithm Cannot be Run for this Student because of status %s",gradResponse.getStudentStatus()));
 			aR.setException(exception);
 			return aR;

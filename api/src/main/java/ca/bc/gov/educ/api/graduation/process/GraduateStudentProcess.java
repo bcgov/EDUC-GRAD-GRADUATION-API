@@ -105,8 +105,9 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
 			}
 		}else {
-			exception.setExceptionName("UNACCEPTABLE STUDENT");
+			exception.setExceptionName("STUDENT-ALREADY-GRADUATED");
 			exception.setExceptionDetails("Graduation Algorithm Cannot be Run for this graduated Student");
+			algorithmResponse.setException(exception);
 		}
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
