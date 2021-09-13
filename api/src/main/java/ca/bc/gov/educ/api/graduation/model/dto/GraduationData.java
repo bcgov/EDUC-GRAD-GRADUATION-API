@@ -16,16 +16,18 @@ import lombok.NoArgsConstructor;
 @Builder
 public class GraduationData {
     private GradSearchStudent gradStudent;
-    private GradAlgorithmGraduationStatus gradStatus;
-    private List<SpecialGradAlgorithmGraduationStatus> specialGradStatus;
+    private GradAlgorithmGraduationStudentRecord gradStatus;
+    private List<GradAlgorithmOptionalStudentProgram> specialGradStatus;
     private School school;
     private StudentCourses studentCourses;    
     private StudentAssessments studentAssessments;    
     private StudentExams studentExams;
     private List<GradRequirement> nonGradReasons;
     private List<GradRequirement> requirementsMet;
-    //Grad Message
+    private String gradMessage;
     //Student Career Programs
+    private boolean dualDogwood;
     private boolean isGraduated;
+    private ExceptionMessage exception;
     
 }

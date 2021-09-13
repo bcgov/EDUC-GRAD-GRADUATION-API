@@ -1,10 +1,12 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 
@@ -14,19 +16,20 @@ public class GradAlgorithmService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_GRADUATION_ALGORITHM_URL)
-    private String graduateStudent;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_PROJECTED_GRADUATION_ALGORITHM_URL)
-	private String projectedStudentGraduation;
-	
-	public GraduationData runGradAlgorithm(String pen, String program,String accessToken) {
-		GraduationData graduationDataStatus = webClient.get().uri(String.format(graduateStudent,pen,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
-		return graduationDataStatus;
+	public GraduationData runGradAlgorithm(UUID studentID, String program,String accessToken,ExceptionMessage exception) {
+		try {
+			return webClient.get().uri(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
+		}catch(Exception e) {
+			exception.setExceptionName("GRAD-ALGORITHM-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 	
-	public GraduationData runProjectedAlgorithm(String pen, String program,String accessToken) {
-		GraduationData graduationDataStatus = webClient.get().uri(String.format(projectedStudentGraduation, pen,program, true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
-		return graduationDataStatus;
+	public GraduationData runProjectedAlgorithm(UUID studentID, String program,String accessToken) {
+		return webClient.get().uri(String.format(educGraduationApiConstants.getGradProjectedAlgorithmEndpoint(), studentID,program, true)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationData.class).block();
 	}
 }

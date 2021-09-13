@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentSpecialProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmOptionalStudentProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.SpecialGradAlgorithmGraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import reactor.core.publisher.Mono;
 
 @Service
 public class SpecialProgramService {
@@ -24,44 +23,63 @@ public class SpecialProgramService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_PROGRAM_DETAILS_URL)
-    private String specialProgramDetails;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_SPECIAL_GRAD_STATUS_SAVE)
-    private String saveSpecialGradStatusForStudent;
-	
-	public List<GradStudentSpecialProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) throws JsonProcessingException {
-		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<GradStudentSpecialProgram>();
+	public List<StudentOptionalProgram> saveAndLogSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken, List<CodeDTO> specialProgram) {
+		List<StudentOptionalProgram> projectedSpecialGradResponse = new ArrayList<>();
 		//Run Special Program Algorithm
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
 			CodeDTO specialProgramCode = new CodeDTO();
-			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
-			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
-			gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+			GradAlgorithmOptionalStudentProgram specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
 			
-			//Save Special Grad Status
-			webClient.post().uri(saveSpecialGradStatusForStudent).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(gradSpecialProgram), GradStudentSpecialProgram.class).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
-			specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
+			StudentOptionalProgram gradSpecialProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetSpecialProgramDetails(),studentID,specialPrograms.getOptionalProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+			if(gradSpecialProgram != null) {
+				if(specialPrograms.isSpecialGraduated()) {
+					gradSpecialProgram.setGraduated(true);
+					if(gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+						graduationDataStatus.setDualDogwood(true);
+					}
+				}
+				gradSpecialProgram.setOptionalProgramID(specialPrograms.getOptionalProgramID());
+				gradSpecialProgram.setStudentID(specialPrograms.getStudentID());
+				gradSpecialProgram.setSpecialProgramCompletionDate(specialPrograms.getOptionalProgramCompletionDate());
+				try {
+					gradSpecialProgram.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				specialProgramCode.setCode(gradSpecialProgram.getSpecialProgramCode());
+				specialProgramCode.setName(gradSpecialProgram.getSpecialProgramName());
+				//Save Special Grad Status
+				webClient.post().uri(educGraduationApiConstants.getSaveSpecialProgramGradStatus()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(gradSpecialProgram)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+			}			
 			specialProgram.add(specialProgramCode);
 			projectedSpecialGradResponse.add(gradSpecialProgram);
 		}
 		return projectedSpecialGradResponse;
 	}
 	
-	public List<GradStudentSpecialProgram> projectedSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken) throws JsonProcessingException {
-		List<GradStudentSpecialProgram> projectedSpecialGradResponse = new ArrayList<GradStudentSpecialProgram>();
+	public List<StudentOptionalProgram> projectedSpecialPrograms(GraduationData graduationDataStatus, String studentID, String accessToken) throws JsonProcessingException {
+		List<StudentOptionalProgram> projectedSpecialGradResponse = new ArrayList<>();
 		for(int i=0; i<graduationDataStatus.getSpecialGradStatus().size();i++) {
-			GradStudentSpecialProgram specialProgramProjectedObj = new GradStudentSpecialProgram();
-			SpecialGradAlgorithmGraduationStatus specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
-			GradStudentSpecialProgram gradSpecialProgram = webClient.get().uri(String.format(specialProgramDetails,studentID,specialPrograms.getSpecialProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GradStudentSpecialProgram.class).block();
-			specialProgramProjectedObj.setSpecialProgramCompletionDate(specialPrograms.getSpecialProgramCompletionDate());
-			specialProgramProjectedObj.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
-			specialProgramProjectedObj.setPen(gradSpecialProgram.getPen());
-			specialProgramProjectedObj.setMainProgramCode(gradSpecialProgram.getMainProgramCode());
-			specialProgramProjectedObj.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
-			specialProgramProjectedObj.setSpecialProgramName(gradSpecialProgram.getSpecialProgramName());
+			StudentOptionalProgram specialProgramProjectedObj = new StudentOptionalProgram();
+			GradAlgorithmOptionalStudentProgram specialPrograms = graduationDataStatus.getSpecialGradStatus().get(i);
+			StudentOptionalProgram gradSpecialProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetSpecialProgramDetails(),studentID,specialPrograms.getOptionalProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+			if(gradSpecialProgram != null) {
+				if(specialPrograms.isSpecialGraduated() && gradSpecialProgram.getSpecialProgramCode().compareTo("DD") == 0) {
+					graduationDataStatus.setDualDogwood(true);
+				}
+				specialProgramProjectedObj.setSpecialProgramCompletionDate(specialPrograms.getOptionalProgramCompletionDate());
+				specialProgramProjectedObj.setStudentSpecialProgramData(new ObjectMapper().writeValueAsString(specialPrograms));
+				specialProgramProjectedObj.setOptionalProgramID(gradSpecialProgram.getOptionalProgramID());
+				specialProgramProjectedObj.setStudentID(gradSpecialProgram.getStudentID());
+				specialProgramProjectedObj.setId(gradSpecialProgram.getId());
+				specialProgramProjectedObj.setProgramCode(gradSpecialProgram.getProgramCode());
+				specialProgramProjectedObj.setSpecialProgramCode(gradSpecialProgram.getSpecialProgramCode());
+				specialProgramProjectedObj.setSpecialProgramName(gradSpecialProgram.getSpecialProgramName());
+			}
 			projectedSpecialGradResponse.add(specialProgramProjectedObj);
 		}
 		return projectedSpecialGradResponse;

@@ -2,17 +2,17 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import reactor.core.publisher.Mono;
 
 @Service
 public class GradStatusService {
@@ -20,34 +20,42 @@ public class GradStatusService {
 	@Autowired
     WebClient webClient;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_READ_URL)
-    private String readGradStatusForStudent;
+	@Autowired
+    EducGraduationApiConstants educGraduationApiConstants;
 	
-	@Value(EducGraduationApiConstants.ENDPOINT_GRAD_STATUS_UPDATE_URL)
-	private String updateGradStatusForStudent;
-	
-	public GraduationStatus getGradStatus(String studentID, String accessToken) {
-		GraduationStatus gradResponse = webClient.get().uri(String.format(readGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStatus.class).block();
-		return gradResponse;
+	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
+		try 
+		{
+			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		} catch (Exception e) {
+			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 	
-	public GraduationStatus prepareGraduationStatusObj(GraduationData graduationDataStatus) {
-		GraduationStatus obj = new GraduationStatus();
+	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus) {
+		GraduationStudentRecord obj = new GraduationStudentRecord();
 		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
 		try {
 			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			e.getMessage();
 		}
 		return obj;
 	}
 	
-	public GraduationStatus saveStudentGradStatus(String studentID,String accessToken, GraduationStatus toBeSaved) {
-		GraduationStatus graduationStatusResponse = webClient.post().uri(String.format(updateGradStatusForStudent,studentID)).headers(h -> h.setBearerAuth(accessToken)).body(Mono.just(toBeSaved), GraduationStatus.class).retrieve().bodyToMono(GraduationStatus.class).block();
-		return graduationStatusResponse;
+	public GraduationStudentRecord saveStudentGradStatus(String studentID,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
+		try {
+			return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		}catch(Exception e) {
+			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
-	public GraduationStatus processProjectedResults(GraduationStatus gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
+	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
 		gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
 		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
