@@ -35,9 +35,6 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 	
 	@Autowired
     private ProcessorData processorData;
-	
-	@Autowired
-	private ExceptionMessage exception;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -59,22 +56,25 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 	public ProcessorData fire() {				
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ "+startTime);
-		exception = new ExceptionMessage();
+		ExceptionMessage exception = processorData.getException();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		if(gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP")) {
 			List<CodeDTO> specialProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-			logger.info("**** Grad Algorithm Completed: ****");
+			
 			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
+				logger.info("**** Grad Algorithm Has Errors: ****");
 				algorithmResponse.setException(graduationDataStatus.getException());
 				processorData.setAlgorithmResponse(algorithmResponse);
 				return processorData;
 			}else if(exception.getExceptionName() != null) {
+				logger.info("**** Grad Algorithm errored out: ****");
 				algorithmResponse.setException(exception);
 				processorData.setAlgorithmResponse(algorithmResponse);
 				return processorData;
 			}
+			logger.info("**** Grad Algorithm Completed: ****");
 			List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);

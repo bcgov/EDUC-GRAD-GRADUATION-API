@@ -37,9 +37,6 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	
 	@Autowired
     private ProcessorData processorData;
-	
-	@Autowired
-	private ExceptionMessage exception;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -62,19 +59,23 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 		logger.info("************* TIME START  ************ "+startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
+		ExceptionMessage exception = processorData.getException();
 		if(gradResponse.getProgramCompletionDate() != null) {
 			List<CodeDTO> specialProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-			logger.info("**** Grad Algorithm Completed: ****");
+			
 			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
+				logger.info("**** Grad Algorithm Has Errors: ****");
 				algorithmResponse.setException(graduationDataStatus.getException());
 				processorData.setAlgorithmResponse(algorithmResponse);
 				return processorData;
 			}else if(exception.getExceptionName() != null) {
+				logger.info("**** Grad Algorithm errored out: ****");
 				algorithmResponse.setException(exception);
 				processorData.setAlgorithmResponse(algorithmResponse);
 				return processorData;
 			}
+			logger.info("**** Grad Algorithm Completed: ****");
 			List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
