@@ -27,8 +27,6 @@ pipeline{
                                             "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${REPO_NAME}-${APP_SUBDOMAIN_SUFFIX}.${APP_DOMAIN}")
                             )
                             def rollout = openshift.selector("dc", "${REPO_NAME}-dc").rollout()
-                            echo "Waiting for deployment to roll out"
-                            // Wait for deployments to roll out
                             timeout(10) {
                                 rollout.latest()
                                 rollout.status('--watch')
