@@ -63,4 +63,8 @@ public class GradStatusService {
 		gradResponse.setRecalculateGradStatus(graduationDataStatus.getGradStatus().getRecalculateGradStatus());
 		return gradResponse;
 	}
+
+	public void restoreStudentGradStatus(String studentID, String accessToken,boolean isGraduated) {		
+		webClient.get().uri(String.format(educGraduationApiConstants.getUpdateGradStatusAlgoError(),studentID,isGraduated)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(boolean.class).block();	
+	}
 }
