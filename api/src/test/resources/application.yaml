@@ -59,6 +59,7 @@ endpoint:
   read-grad-student-record: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
   save-special-program-grad-status: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram
   get-special-program-details: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/specialprogram/%s/%s
+  update-grad-status-algo-error: https://gradstudent-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/algorithmerror/%s?isGraduated=%s
  grad-program-api: 
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s   

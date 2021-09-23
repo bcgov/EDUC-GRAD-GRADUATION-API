@@ -78,6 +78,7 @@ endpoint:
   read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
   save-special-program-grad-status: ${GRAD_STUDENT_API}api/v1/student/specialprogram
   get-special-program-details: ${GRAD_STUDENT_API}api/v1/student/specialprogram/%s/%s
+  update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s   

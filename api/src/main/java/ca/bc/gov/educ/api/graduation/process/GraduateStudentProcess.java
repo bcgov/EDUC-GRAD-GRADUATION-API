@@ -99,6 +99,8 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				if(exception.getExceptionName() != null) {
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
+					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
 				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);

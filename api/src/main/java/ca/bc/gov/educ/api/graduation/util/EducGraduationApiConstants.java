@@ -29,6 +29,10 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.update-grad-status}")
     private String updateGradStatus;
     
+    @Value("${endpoint.grad-student-api.update-grad-status-algo-error}")
+    private String updateGradStatusAlgoError;
+    
+    
     @Value("${endpoint.grad-student-api.read-grad-student-record}")
     private String readGradStudentRecord;
     
