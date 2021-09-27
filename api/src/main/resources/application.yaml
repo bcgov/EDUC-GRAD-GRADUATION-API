@@ -9,21 +9,6 @@ security:
 spring:
   jmx:
     enabled: false
-  datasource:
-    hikari:
-      pool-name: educ-grad-graduation-api-cp
-      maximum-pool-size: ${MAXIMUM_POOL_SIZE}
-      connection-timeout: ${CONNECTION_TIMEOUT}
-      max-lifetime: ${MAX_LIFETIME}
-    url: ${CONNECTION_STRING}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-    driver-class: oracle.jdbc.driver.OracleDriver
-  jpa:
-    show-sql: true
-    database-platform: org.hibernate.dialect.Oracle12cDialect
-    hibernate:
-      ddl-auto: none
   mvc:
     log-request-details: ${SPRING_SHOW_REQUEST_DETAILS}
   jackson:
@@ -78,6 +63,7 @@ endpoint:
   read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
   save-special-program-grad-status: ${GRAD_STUDENT_API}api/v1/student/specialprogram
   get-special-program-details: ${GRAD_STUDENT_API}api/v1/student/specialprogram/%s/%s
+  update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s   
