@@ -291,7 +291,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
 		try {
-		webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),pen)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
+			webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 		}catch(Exception e) {
 			if(exception.getExceptionName() == null) {
 				exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
