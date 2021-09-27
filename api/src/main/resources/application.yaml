@@ -9,21 +9,6 @@ security:
 spring:
   jmx:
     enabled: false
-  datasource:
-    hikari:
-      pool-name: educ-grad-graduation-api-cp
-      maximum-pool-size: ${MAXIMUM_POOL_SIZE}
-      connection-timeout: ${CONNECTION_TIMEOUT}
-      max-lifetime: ${MAX_LIFETIME}
-    url: ${CONNECTION_STRING}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-    driver-class: oracle.jdbc.driver.OracleDriver
-  jpa:
-    show-sql: true
-    database-platform: org.hibernate.dialect.Oracle12cDialect
-    hibernate:
-      ddl-auto: none
   mvc:
     log-request-details: ${SPRING_SHOW_REQUEST_DETAILS}
   jackson:
