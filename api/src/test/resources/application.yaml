@@ -68,7 +68,7 @@ endpoint:
   projectedgradalgorithm: https://grad-algorithm-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
  grad-graduation-report-api: 
   update-grad-student-report: 
-   url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentreport
+   url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-student-certificate: 
    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
   get-certificate-name: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s

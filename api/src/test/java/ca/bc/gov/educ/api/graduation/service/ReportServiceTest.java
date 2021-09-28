@@ -161,6 +161,7 @@ public class ReportServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
 		String pen="212321123";
+		boolean isGraduated= false;
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
@@ -183,7 +184,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception);	
+		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception,isGraduated);	
        
 	}
 	
