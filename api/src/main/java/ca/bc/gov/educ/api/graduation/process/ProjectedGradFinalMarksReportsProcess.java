@@ -95,7 +95,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 				if(graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
 					logger.info("**** No Transcript Generated: ****");
 				}else {
-					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID(),exception);
+					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID(),exception,graduationDataStatus.isGraduated());
 					logger.info("**** Saved Reports: ****");
 				}
 				if(exception.getExceptionName() != null) {

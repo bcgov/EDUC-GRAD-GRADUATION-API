@@ -72,7 +72,7 @@ endpoint:
   projectedgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
  grad-graduation-report-api: 
   update-grad-student-report: 
-   url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport
+   url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-student-certificate: 
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentcertificate
   get-certificate-name: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/certificatetype/%s

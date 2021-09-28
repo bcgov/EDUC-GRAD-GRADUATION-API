@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
+import java.util.Date;
 import java.util.UUID;
 
 import lombok.Data;
@@ -13,6 +14,9 @@ public class GradStudentCertificates extends BaseModel{
 	private String pen;	
 	private String certificate;
 	private String gradCertificateTypeCode;
-	private String gradCertificateTypeDesc;
+	private String gradCertificateTypeLabel;
 	private UUID studentID;
+	private Date distributionDate;
+	private String documentStatusCode;
+	private String documentStatusLabel;
 }
