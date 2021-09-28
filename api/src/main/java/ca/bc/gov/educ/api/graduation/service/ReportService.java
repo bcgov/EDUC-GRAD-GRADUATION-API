@@ -291,6 +291,9 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
 		requestObj.setDocumentStatusCode("IP");
+		if(isGraduated)
+			requestObj.setDocumentStatusCode("COMPL");
+		
 		try {
 			webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),isGraduated)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 		}catch(Exception e) {
