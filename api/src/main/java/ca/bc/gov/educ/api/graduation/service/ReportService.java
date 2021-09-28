@@ -282,7 +282,7 @@ public class ReportService {
 	}
 
 	public void saveStudentTranscriptReportJasper(String pen,
-			ca.bc.gov.educ.api.graduation.model.report.ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception) {
+			ca.bc.gov.educ.api.graduation.model.report.ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
 	
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample,accessToken,exception);
 		GradStudentReports requestObj = new GradStudentReports();
@@ -290,8 +290,9 @@ public class ReportService {
 		requestObj.setReport(encodedPdfReportTranscript);
 		requestObj.setStudentID(studentID);
 		requestObj.setGradReportTypeCode("TRAN");
+		requestObj.setDocumentStatusCode("IP");
 		try {
-			webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentReport()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
+			webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),isGraduated)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 		}catch(Exception e) {
 			if(exception.getExceptionName() == null) {
 				exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
@@ -346,6 +347,7 @@ public class ReportService {
 		requestObj.setStudentID(gradResponse.getStudentID());
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
+		requestObj.setDocumentStatusCode("COMPL");
 		webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentCertificate()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
 
 	}
