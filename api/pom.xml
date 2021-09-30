@@ -13,7 +13,12 @@
 
     <properties>
         <sonar.language>java</sonar.language>
-        <sonar.exclusions>src/main/resources/**,src/main/java/ca/bc/gov/educ/api/program/exception/**,src/main/java/ca/bc/gov/educ/api/program/model/**
+        <sonar.exclusions>
+            src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/config/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/exception/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/model/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/util/**
         </sonar.exclusions>
         <java.version>11</java.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>
