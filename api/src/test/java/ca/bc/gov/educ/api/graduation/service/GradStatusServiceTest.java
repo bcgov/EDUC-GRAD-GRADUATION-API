@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -82,6 +82,19 @@ public class GradStatusServiceTest {
     public void tearDown() {
 
     }
+
+	@Test
+	public void testGetGradStatus_whenAPIisDown_throwsException() {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+
+		when(this.webClient.get()).thenThrow(new RuntimeException("Test - API is down"));
+		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, accessToken,exception);
+		assertNull(res);
+
+		assertNotNull(exception);
+		assertThat(exception.getExceptionName()).isEqualTo("GRAD-STUDENT-API IS DOWN");
+	}
 	
 	@Test
 	public void testGetGradStatus() {
@@ -106,7 +119,7 @@ public class GradStatusServiceTest {
 		assertEquals(res.getPen(), gradResponse.getPen());
        
 	}
-	
+
 	@Test
 	public void testPrepareGraduationStatusObj() {
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
@@ -116,18 +129,38 @@ public class GradStatusServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
-		
+
 		GraduationStudentRecord obj = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 		assertNotNull(obj.getStudentGradData());
 	}
-	
+
+	@Test
+	public void testSaveStudentGradStatus_whenAPIisDown_throwsException() {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		
+		when(this.webClient.post()).thenThrow(new RuntimeException("Test - API is down"));
+		
+		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
+		assertNull(res);
+
+		assertNotNull(exception);
+		assertThat(exception.getExceptionName()).isEqualTo("GRAD-STUDENT-API IS DOWN");
+	}
 
 	@Test
 	public void testSaveStudentGradStatus() {
@@ -140,15 +173,15 @@ public class GradStatusServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		
+
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStatus(), studentID))).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
-		
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStatus(), studentID))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
+
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());

@@ -221,10 +221,12 @@ public class ReportService {
 		data.setDogwoodFlag(graduationDataStatus.isDualDogwood());
 		if(graduationDataStatus.isGraduated()) {
 			if(!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
-				if(graduationDataStatus.getGradStatus().getProgramCompletionDate().length() > 7) {
-					data.setGraduationDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
-				}else {
-					data.setGraduationDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate()));	
+				if (graduationDataStatus.getGradStatus().getProgramCompletionDate() != null) {
+					if(graduationDataStatus.getGradStatus().getProgramCompletionDate().length() > 7) {
+						data.setGraduationDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
+					}else {
+						data.setGraduationDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+					}
 				}
 				data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
 			}else {

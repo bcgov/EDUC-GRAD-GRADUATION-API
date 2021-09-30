@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -95,8 +97,8 @@ public class ReportServiceTest {
     public void tearDown() {
 
     }
-	
-	
+
+	@Test
 	public void testSaveStudentCertificateReport() {
 		UUID studentID = new UUID(1, 1);
 		
@@ -115,6 +117,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentID(studentID);
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setHonoursStanding("Y");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
@@ -124,6 +127,21 @@ public class ReportServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
 		graduationDataStatus.setStudentCourses(null);
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("123090109");
+		stuObj.setLegalFirstName("TEST");
+		stuObj.setLegalLastName("QA");
+		stuObj.setSchoolOfRecord("06011033");
+		graduationDataStatus.setGradStudent(stuObj);
+
+		School school = new School();
+		school.setMinCode("06011033");
+		school.setSchoolName("Test School");
+		school.setCity("Vancouver");
+		school.setPostal("V6T 1T2");
+		school.setProvCode("BC");
+		graduationDataStatus.setSchool(school);
 		
 		GradStudentCertificates rep = new GradStudentCertificates();
 		rep.setPen(pen);
@@ -136,6 +154,17 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
+		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
+
+		GradProgram gP = new GradProgram();
+		gP.setProgramCode("2018-EN");
+		gP.setProgramName("2018 Graduation Program");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getCertificateReport())).thenReturn(this.requestBodyUriMock);
@@ -186,6 +215,57 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
 		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception,isGraduated);	
        
+	}
+
+	@Test
+	public void testGetCertificateList_whenAPIisDown_throwsException() {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("3");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setStudentCourses(null);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setSpecialProgramCode("DD");
+		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setProgramCode("2018-EN");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		list.add(spgm);
+
+		when(this.webClient.post()).thenThrow(new RuntimeException("Test - API is down"));
+
+		var results = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertNotNull(results);
+		assertThat(results.isEmpty()).isTrue();
+
+		assertNotNull(exception);
+		assertThat(exception.getExceptionName()).isEqualTo("GRAD-GRADUATION-REPORT-API IS DOWN");
 	}
 	
 	@Test
