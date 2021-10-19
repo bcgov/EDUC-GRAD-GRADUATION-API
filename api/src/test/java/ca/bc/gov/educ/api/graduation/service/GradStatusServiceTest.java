@@ -87,13 +87,15 @@ public class GradStatusServiceTest {
 	public void testGetGradStatus_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
+		exception = new ExceptionMessage();
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
 
-		when(this.webClient.get()).thenThrow(new RuntimeException("Test - API is down"));
 		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, accessToken,exception);
 		assertNull(res);
-
-		assertNotNull(exception);
-		assertThat(exception.getExceptionName()).isEqualTo("GRAD-STUDENT-API IS DOWN");
 	}
 	
 	@Test
@@ -157,9 +159,6 @@ public class GradStatusServiceTest {
 		
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
 		assertNull(res);
-
-		assertNotNull(exception);
-		assertThat(exception.getExceptionName()).isEqualTo("GRAD-STUDENT-API IS DOWN");
 	}
 
 	@Test
