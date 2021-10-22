@@ -19,9 +19,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
+import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
-import ca.bc.gov.educ.api.graduation.service.SpecialProgramService;
-import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,7 +42,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 	GradAlgorithmService gradAlgorithmService;
 	
 	@Autowired
-	SpecialProgramService specialProgramService;
+	OptionalProgramService optionalProgramService;
 	
 	@Autowired
 	ReportService reportService;
@@ -60,7 +59,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		if(gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP")) {
-			List<CodeDTO> specialProgram = new ArrayList<>();
+			List<CodeDTO> optionalProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
 			
 			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
@@ -75,7 +74,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				return processorData;
 			}
 			logger.info("**** Grad Algorithm Completed: ****");
-			List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),specialProgram);
+			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
@@ -84,7 +83,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved,exception);
 				logger.info("**** Saved Grad Status: ****");
 				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {			
-					List<ProgramCertificate> certificateList =reportService.getCertificateList(gradResponse,graduationDataStatus,projectedSpecialGradResponse,processorData.getAccessToken(),exception);
+					List<ProgramCertificate> certificateList =reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
 					for(ProgramCertificate certType : certificateList) {
 						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
 					}
@@ -104,7 +103,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 					return processorData;
 				}
 				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
-				algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
+				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
 		}else {
 			exception.setExceptionName("STUDENT-ALREADY-GRADUATED");

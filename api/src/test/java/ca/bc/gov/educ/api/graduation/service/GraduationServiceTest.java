@@ -58,7 +58,7 @@ public class GraduationServiceTest {
 	private GradAlgorithmService gradAlgorithmService;
 	
 	@MockBean
-	private SpecialProgramService specialProgramService;
+	private OptionalProgramService optionalProgramService;
 	
 	@MockBean
 	private ReportService reportService;
@@ -107,8 +107,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -116,7 +116,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
-			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+			Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -163,8 +163,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -172,7 +172,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
-			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+			Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -249,8 +249,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -258,7 +258,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		try {
-			Mockito.when(specialProgramService.projectedSpecialPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+			Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
@@ -304,8 +304,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -331,7 +331,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -369,8 +369,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -442,8 +442,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -470,7 +470,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -513,8 +513,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -541,7 +541,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -584,8 +584,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -619,7 +619,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
 		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -656,8 +656,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -684,7 +684,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		try {
 			AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 			assertNotNull(response);
@@ -734,8 +734,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -762,7 +762,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		try {
 			AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 			assertNotNull(response);
@@ -807,8 +807,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -880,8 +880,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -908,7 +908,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -951,8 +951,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -981,7 +981,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -1025,8 +1025,8 @@ public class GraduationServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -1060,7 +1060,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
 		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
-		Mockito.when(specialProgramService.saveAndLogSpecialPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,accessToken,projectedType);
 		assertNotNull(response);
 	}

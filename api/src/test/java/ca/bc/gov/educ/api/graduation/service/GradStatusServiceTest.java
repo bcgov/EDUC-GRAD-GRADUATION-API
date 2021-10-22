@@ -49,7 +49,7 @@ public class GradStatusServiceTest {
 	private GradAlgorithmService gradAlgorithmService;
 	
 	@MockBean
-	private SpecialProgramService specialProgramService;
+	private OptionalProgramService optionalProgramService;
 	
 	@Autowired
 	GradValidation validation;

@@ -14,7 +14,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
-import ca.bc.gov.educ.api.graduation.service.SpecialProgramService;
+import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,7 +36,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 	GradAlgorithmService gradAlgorithmService;
 	
 	@Autowired
-	SpecialProgramService specialProgramService;
+	OptionalProgramService optionalProgramService;
 
 	
 	@Override
@@ -50,8 +50,8 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 			logger.info("**** Grad Algorithm Completed: ****");
 			gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
-			List<StudentOptionalProgram> projectedSpecialGradResponse = specialProgramService.projectedSpecialPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			algorithmResponse.setStudentOptionalProgram(projectedSpecialGradResponse);
+			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
+			algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			algorithmResponse.setGraduationStudentRecord(gradResponse);
 			long endTime = System.currentTimeMillis();
 			long diff = (endTime - startTime)/1000;
