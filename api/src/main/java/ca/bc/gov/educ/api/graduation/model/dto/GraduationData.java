@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class GraduationData {
     private GradSearchStudent gradStudent;
     private GradAlgorithmGraduationStudentRecord gradStatus;
-    private List<GradAlgorithmOptionalStudentProgram> specialGradStatus;
+    private List<GradAlgorithmOptionalStudentProgram> optionalGradStatus;
     private School school;
     private StudentCourses studentCourses;    
     private StudentAssessments studentAssessments;    

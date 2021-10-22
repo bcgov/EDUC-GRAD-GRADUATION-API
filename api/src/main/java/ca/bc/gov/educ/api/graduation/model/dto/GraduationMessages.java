@@ -13,10 +13,10 @@ public class GraduationMessages {
 	private String gradMessage;
 	private String honours;
 	private String gpa;
-	private boolean hasSpecialProgram;
+	private boolean hasOptionalProgram;
 	private boolean hasCareerProgram;
 	private boolean hasCertificates;
-	private List<CodeDTO> specialProgram;
+	private List<CodeDTO> optionalProgram;
 	private List<CodeDTO> careerProgram;
 	private List<CodeDTO> certificateProgram;
 	private List<GradRequirement> nonGradReasons;

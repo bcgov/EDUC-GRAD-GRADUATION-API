@@ -1,7 +1,5 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -15,8 +13,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
@@ -61,12 +57,12 @@ public class ReportService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 
-	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedSpecialGradResponse,String accessToken,ExceptionMessage exception) {
+	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedOptionalGradResponse,String accessToken,ExceptionMessage exception) {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
-		for(StudentOptionalProgram specialPrograms : projectedSpecialGradResponse) {
-			if(specialPrograms.isGraduated() && (specialPrograms.getSpecialProgramCode().equals("FI") || specialPrograms.getSpecialProgramCode().equals("DD"))){
-				req.setOptionalProgram(specialPrograms.getSpecialProgramCode());
+		for(StudentOptionalProgram optionalPrograms : projectedOptionalGradResponse) {
+			if(optionalPrograms.isGraduated() && (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD"))){
+				req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
 			}
 		}
 		req.setSchoolFundingCode(StringUtils.isBlank(graduationDataStatus.getSchool().getIndependentDesignation()) ? " ":graduationDataStatus.getSchool().getIndependentDesignation());
