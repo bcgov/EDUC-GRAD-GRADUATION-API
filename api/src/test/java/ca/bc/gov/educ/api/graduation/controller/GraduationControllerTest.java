@@ -63,8 +63,8 @@ public class GraduationControllerTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);

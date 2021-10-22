@@ -13,11 +13,11 @@ public class GradAlgorithmOptionalStudentProgram {
 
 	private String pen;
     private UUID optionalProgramID;
-    private String studentSpecialProgramData;
+    private String studentOptionalProgramData;
     private String optionalProgramCompletionDate;
     private StudentCourses optionalStudentCourses;
     private StudentAssessments optionalStudentAssessments;
-    private boolean isSpecialGraduated;
+    private boolean isOptionalGraduated;
     private List<GradRequirement> optionalNonGradReasons;
     private List<GradRequirement> optionalRequirementsMet;
     private UUID studentID;

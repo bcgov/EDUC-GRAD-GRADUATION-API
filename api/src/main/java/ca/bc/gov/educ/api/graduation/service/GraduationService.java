@@ -39,7 +39,7 @@ public class GraduationService {
 	GradAlgorithmService gradAlgorithmService;
 	
 	@Autowired
-	SpecialProgramService specialProgramService;
+	OptionalProgramService optionalProgramService;
 	
 	@Autowired
 	ReportService reportService;

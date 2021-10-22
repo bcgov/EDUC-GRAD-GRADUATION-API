@@ -251,8 +251,8 @@ public class ReportServiceTest {
 
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("DD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("DD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
@@ -302,8 +302,8 @@ public class ReportServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("DD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("DD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
@@ -377,8 +377,8 @@ public class ReportServiceTest {
         
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("DD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("DD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
@@ -420,8 +420,8 @@ public class ReportServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("DD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("DD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
@@ -446,7 +446,7 @@ public class ReportServiceTest {
 	}
 	
 	@Test
-	public void testGetCertificateList_emptySpecialProgram() {
+	public void testGetCertificateList_emptyOptionalProgram() {
 		UUID studentID = new UUID(1, 1);
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
@@ -546,11 +546,11 @@ public class ReportServiceTest {
         
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("FI");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("FI");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		spgm.setSpecialProgramCompletionDate("2020-09-01");
+		spgm.setOptionalProgramCompletionDate("2020-09-01");
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
@@ -590,11 +590,11 @@ public class ReportServiceTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("FI");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("FI");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		spgm.setSpecialProgramCompletionDate(null);
+		spgm.setOptionalProgramCompletionDate(null);
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		
@@ -697,11 +697,11 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
@@ -779,11 +779,11 @@ public class ReportServiceTest {
 		
 		
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -877,11 +877,11 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -967,11 +967,11 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1059,11 +1059,11 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1138,11 +1138,11 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 		
-		List<CodeDTO> specialProgram = new ArrayList<CodeDTO>();
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
 		cDto.setCode("FI");
 		cDto.setName("French Immersion");
-		specialProgram.add(cDto);
+		optionalProgram.add(cDto);
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
