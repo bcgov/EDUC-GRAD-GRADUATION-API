@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import ca.bc.gov.educ.api.graduation.model.dto.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
-import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateReq;
-import ca.bc.gov.educ.api.graduation.model.dto.SpecialCase;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateTranscript;
 import ca.bc.gov.educ.api.graduation.model.report.Address;
 import ca.bc.gov.educ.api.graduation.model.report.Certificate;
 import ca.bc.gov.educ.api.graduation.model.report.CertificateType;
@@ -57,7 +47,7 @@ public class ReportService {
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 
-	public List<ProgramCertificate> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedOptionalGradResponse,String accessToken,ExceptionMessage exception) {
+	public List<ProgramCertificateTranscript> getCertificateList(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> projectedOptionalGradResponse, String accessToken, ExceptionMessage exception) {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
 		for(StudentOptionalProgram optionalPrograms : projectedOptionalGradResponse) {
@@ -65,14 +55,22 @@ public class ReportService {
 				req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
 			}
 		}
-		req.setSchoolFundingCode(StringUtils.isBlank(graduationDataStatus.getSchool().getIndependentDesignation()) ? " ":graduationDataStatus.getSchool().getIndependentDesignation());
+		req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken,graduationDataStatus.getGradStatus().getSchoolOfRecord()));
 		try {
-			return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){}).block();
+			return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){}).block();
 		}catch(Exception e) {
 			exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return new ArrayList<>();
 		}
+	}
+
+	public String getSchoolCategoryCode(String accessToken,String mincode) {
+		CommonSchool commonSchoolObj = webClient.get().uri(String.format(educGraduationApiConstants.getSchoolCategoryCode(),mincode)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(CommonSchool.class).block();
+		if(commonSchoolObj != null) {
+			return commonSchoolObj.getSchoolCategoryCode();
+		}
+		return null;
 	}
 
 	public ReportData prepareReportData(
@@ -333,7 +331,7 @@ public class ReportService {
 	}
 
 	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
-			ProgramCertificate certType) {
+			ProgramCertificateTranscript certType) {
 		ReportData certData = prepareCertificateData(graduationDataStatus,accessToken);
 		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		certData.setCertificate(getCertificateData(gradResponse,certType));
@@ -353,17 +351,16 @@ public class ReportService {
 
 	}
 	
-	private Certificate getCertificateData(GraduationStudentRecord gradResponse,ProgramCertificate certData) {
+	private Certificate getCertificateData(GraduationStudentRecord gradResponse,ProgramCertificateTranscript certData) {
 		Certificate cert = new Certificate();
 		cert.setIssued(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();
 		PaperType pType = new PaperType();
-		String code =certData.getMediaCode();
-		pType.setCode(code);		
+		pType.setCode("YEDR");
 		certType.setPaperType(pType);
-		certType.setReportName("Certificate");
+		certType.setReportName(certData.getCertificateTypeCode());
 		orTy.setCertificateType(certType);
 		cert.setOrderType(orTy);
 		return cert;

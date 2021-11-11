@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class Certificate {
     private String issued;
+    private boolean isOrigin;
     private OrderType orderType;
 
     @JsonFormat(pattern="yyyy-MM-dd")
@@ -21,5 +22,13 @@ public class Certificate {
 
     public void setOrderType(OrderType value) {
         this.orderType = value;
+    }
+
+    public boolean isOrigin() {
+        return isOrigin;
+    }
+
+    public void setOrigin(boolean origin) {
+        isOrigin = origin;
     }
 }

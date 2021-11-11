@@ -3,19 +3,12 @@ package ca.bc.gov.educ.api.graduation.process;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.bc.gov.educ.api.graduation.model.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
-import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
@@ -84,8 +77,8 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved,exception);
 				logger.info("**** Saved Grad Status: ****");
 				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {				
-					List<ProgramCertificate> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
-					for(ProgramCertificate certType : certificateList) {
+					List<ProgramCertificateTranscript> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
+					for(ProgramCertificateTranscript certType : certificateList) {
 						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
 					}
 					logger.info("**** Saved Certificates: ****");
