@@ -7,5 +7,5 @@ public class ProgramCertificateReq {
 
 	private String optionalProgram;	
 	private String programCode;	
-	private String schoolFundingCode;
+	private String schoolCategoryCode;
 }

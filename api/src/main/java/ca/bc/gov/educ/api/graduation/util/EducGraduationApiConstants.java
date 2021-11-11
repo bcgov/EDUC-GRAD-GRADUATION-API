@@ -68,6 +68,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
     private String specialCase;
+
+    @Value("${endpoint.educ-school-api.url}")
+    private String schoolCategoryCode;
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
