@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import ca.bc.gov.educ.api.graduation.model.dto.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -27,26 +28,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateTypes;
-import ca.bc.gov.educ.api.graduation.model.dto.GradProgram;
-import ca.bc.gov.educ.api.graduation.model.dto.GradSearchStudent;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentCertificates;
-import ca.bc.gov.educ.api.graduation.model.dto.GradStudentReports;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
-import ca.bc.gov.educ.api.graduation.model.dto.School;
-import ca.bc.gov.educ.api.graduation.model.dto.SpecialCase;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentCourses;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentExam;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentExams;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -104,8 +85,8 @@ public class ReportServiceTest {
 		
 		String accessToken = "accessToken";
 		String pen="212321123";
-		List<ProgramCertificate> certificateList = new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc= new ProgramCertificate();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
 		ReportData data = new ReportData();
@@ -258,6 +239,17 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		when(this.webClient.post()).thenThrow(new RuntimeException("Test - API is down"));
 
 		var results = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
@@ -309,20 +301,30 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
-		
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getCertList())).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
         
         
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
@@ -360,11 +362,10 @@ public class ReportServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		graduationDataStatus.setDualDogwood(true);
 		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -373,7 +374,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
         
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -383,6 +384,18 @@ public class ReportServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	
@@ -426,12 +439,22 @@ public class ReportServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
-		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -440,7 +463,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
         
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
@@ -457,7 +480,18 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -478,11 +512,10 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -491,7 +524,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
 		
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
@@ -529,11 +562,10 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(null);
 		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -542,8 +574,19 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
-        
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("FI");
@@ -598,11 +641,10 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		
-		List<ProgramCertificate> clist= new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc = new ProgramCertificate();
+		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
-		pc.setMediaCode("YED2");
-		pc.setSchoolFundingGroupCode(" ");
+		pc.setSchoolCategoryCode("02");
 		clist.add(pc);
 		
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -611,8 +653,19 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificate>>(){})).thenReturn(Mono.just(clist));
-        
+        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
+
+		CommonSchool comSchObj = new CommonSchool();
+		comSchObj.setDistNo("123");
+		comSchObj.setSchlNo("1123");
+		comSchObj.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
+
 		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 	}
 	

@@ -84,3 +84,5 @@ endpoint:
  grad-student-graduation-api:
   get-special-cases: 
     url: ${GRAD_STUDENT_GRADUATION_API}api/v1/lgSc/specialcase/%s
+ educ-school-api:
+   url: ${EDUC_SCHOOL_API}api/v1/schools/%s

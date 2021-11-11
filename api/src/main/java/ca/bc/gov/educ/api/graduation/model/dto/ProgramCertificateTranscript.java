@@ -7,11 +7,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ProgramCertificate extends BaseModel {
+public class ProgramCertificateTranscript extends BaseModel {
 
 	private UUID pcId;
-	private String label;
-	private String schoolFundingGroupCode;
+	private String graduationProgramCode;
+	private String schoolCategoryCode;
 	private String certificateTypeCode;
-	private String mediaCode;
+	private String transcriptTypeCode;
 }

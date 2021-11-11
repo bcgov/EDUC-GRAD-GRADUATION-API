@@ -27,7 +27,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRec
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationMessages;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificate;
+import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateTranscript;
 import ca.bc.gov.educ.api.graduation.model.dto.School;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessments;
@@ -607,8 +607,8 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificate> certificateList = new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc= new ProgramCertificate();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
 		
@@ -1048,8 +1048,8 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificate> certificateList = new ArrayList<ProgramCertificate>();
-		ProgramCertificate pc= new ProgramCertificate();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
 		
