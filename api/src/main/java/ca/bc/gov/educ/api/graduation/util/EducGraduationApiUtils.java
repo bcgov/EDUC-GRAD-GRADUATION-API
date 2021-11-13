@@ -107,6 +107,19 @@ public class EducGraduationApiUtils {
 
 	}
 
+	public static String parsingDateForCertificate(String sessionDate) {
+		String actualSessionDate = sessionDate + "/01";
+		Date temp = new Date();
+		String sDates = null;
+		try {
+			temp = parseDate(actualSessionDate, "yyyy/MM/dd");
+			sDates = formatDate(temp, "yyyy-MM-dd");
+		} catch (ParseException pe) {
+			logger.error("ERROR: " + pe.getMessage());
+		}
+		return sDates;
+	}
+
 	public static Date parsingTraxDate(String sessionDate) {
 		String actualSessionDate = sessionDate + "/01";
 		Date temp = new Date();
