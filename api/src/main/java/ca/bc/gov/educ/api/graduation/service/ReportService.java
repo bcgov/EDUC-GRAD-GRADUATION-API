@@ -127,7 +127,7 @@ public class ReportService {
 				crse.setRelatedCourse(sc.getRelatedCourse());
 				crse.setRelatedLevel(sc.getRelatedLevel());
 				crse.setType(equivOrChallenge.equals("E") ? "1":"2");
-				crse.setSessionDate(sc.getSessionDate().replace("/",""));
+				crse.setSessionDate(sc.getSessionDate() != null ?sc.getSessionDate().replace("/",""):"");
 				result.setCourse(crse);
 				
 				Mark mrk = new Mark();
@@ -155,7 +155,7 @@ public class ReportService {
 				crse.setLevel("");
 				crse.setCredits("NA");
 				crse.setName(sc.getAssessmentName());
-				crse.setSessionDate(sc.getSessionDate().replace("/",""));
+				crse.setSessionDate(sc.getSessionDate() != null ?sc.getSessionDate().replace("/",""):"");
 				result.setCourse(crse);
 				
 				Mark mrk = new Mark();
