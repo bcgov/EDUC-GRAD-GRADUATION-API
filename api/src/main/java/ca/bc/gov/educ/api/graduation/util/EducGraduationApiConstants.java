@@ -71,6 +71,10 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.educ-school-api.url}")
     private String schoolCategoryCode;
+
+    @Value("${endpoint.grad-student-api.update-grad-status-projected}")
+    private String saveStudentRecordProjectedRun;
+
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";

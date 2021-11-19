@@ -131,7 +131,7 @@ public class ReportServiceTest {
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
-		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setProgramCompletionDate("2020/02");
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");

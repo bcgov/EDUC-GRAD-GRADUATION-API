@@ -61,7 +61,7 @@ public class OptionalProgramService {
 		return projectedOptionalGradResponse;
 	}
 	
-	public List<StudentOptionalProgram> projectedOptionalPrograms(GraduationData graduationDataStatus, String studentID, String accessToken) throws JsonProcessingException {
+	public List<StudentOptionalProgram> projectedOptionalPrograms(GraduationData graduationDataStatus, String studentID, String accessToken) {
 		List<StudentOptionalProgram> projectedOptionalGradResponse = new ArrayList<>();
 		for(int i=0; i<graduationDataStatus.getOptionalGradStatus().size();i++) {
 			StudentOptionalProgram optionalProgramProjectedObj = new StudentOptionalProgram();
@@ -72,7 +72,11 @@ public class OptionalProgramService {
 					graduationDataStatus.setDualDogwood(true);
 				}
 				optionalProgramProjectedObj.setOptionalProgramCompletionDate(optionalPrograms.getOptionalProgramCompletionDate());
-				optionalProgramProjectedObj.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(optionalPrograms));
+				try {
+					optionalProgramProjectedObj.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(optionalPrograms));
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
 				optionalProgramProjectedObj.setOptionalProgramID(gradOptionalProgram.getOptionalProgramID());
 				optionalProgramProjectedObj.setStudentID(gradOptionalProgram.getStudentID());
 				optionalProgramProjectedObj.setId(gradOptionalProgram.getId());

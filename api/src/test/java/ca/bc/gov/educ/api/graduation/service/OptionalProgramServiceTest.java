@@ -287,12 +287,9 @@ public class OptionalProgramServiceTest {
 		
 		
 		List<StudentOptionalProgram> spList;
-		try {
-			spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken);
-			assertEquals(1,spList.size());
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken);
+		assertEquals(1,spList.size());
+
 		
        
 	}
@@ -342,12 +339,9 @@ public class OptionalProgramServiceTest {
 		
 		
 		List<StudentOptionalProgram> spList;
-		try {
-			spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken);
-			assertEquals(1,spList.size());
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken);
+		assertEquals(1,spList.size());
+
 		
        
 	}

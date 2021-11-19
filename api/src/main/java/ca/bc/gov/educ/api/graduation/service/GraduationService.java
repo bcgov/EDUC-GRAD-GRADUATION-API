@@ -47,7 +47,7 @@ public class GraduationService {
 	@Autowired
 	GradValidation validation;
 	
-	public AlgorithmResponse graduateStudent(String studentID, String accessToken,String projectedType) {
+	public AlgorithmResponse graduateStudent(String studentID, Long batchId,String accessToken,String projectedType) {
 		
 		exception = new ExceptionMessage();
 		AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
@@ -59,7 +59,7 @@ public class GraduationService {
 			return aR;
 		}
 		if(gradResponse != null && !gradResponse.getStudentStatus().equals("DEC") && !gradResponse.getStudentStatus().equals("MER")) {
-			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,exception);
+			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,batchId,exception);
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
 	     	process.setInputData(data);
 	     	data = process.fire();

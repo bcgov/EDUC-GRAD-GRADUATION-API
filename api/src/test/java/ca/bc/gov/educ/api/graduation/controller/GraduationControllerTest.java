@@ -80,9 +80,9 @@ public class GraduationControllerTest {
 		AlgorithmResponse alRes = new AlgorithmResponse();
 		alRes.setGraduationStudentRecord(gradResponse);
 		alRes.setStudentOptionalProgram(list);
-		Mockito.when(graduationService.graduateStudent(studentID,null,projectedType)).thenReturn(alRes);
-		graduationController.graduateStudentNew(studentID,projectedType);
-		Mockito.verify(graduationService).graduateStudent(studentID,null,projectedType);
+		Mockito.when(graduationService.graduateStudent(studentID,null,null,projectedType)).thenReturn(alRes);
+		graduationController.graduateStudentNew(studentID,projectedType,null);
+		Mockito.verify(graduationService).graduateStudent(studentID,null,null,projectedType);
 	}
 	
 	
