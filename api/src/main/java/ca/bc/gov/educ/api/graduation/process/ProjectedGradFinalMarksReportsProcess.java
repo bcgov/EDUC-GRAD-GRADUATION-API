@@ -74,7 +74,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
 			logger.info("**** Prepared Data for Reports: ****");
 			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
-				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),toBeSaved,exception);
+				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
 				logger.info("**** Saved Grad Status: ****");
 				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {				
 					List<ProgramCertificateTranscript> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);

@@ -8,11 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
@@ -49,11 +45,11 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "Run different Grad Runs and Graduate Student by Student ID and projected type", description = "Run different Grad Runs and Graduate Student by Student ID and projected type", tags = { "Graduation" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID,@PathVariable String projectedType) {
+    public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID, @PathVariable String projectedType, @RequestParam(required = false) Long batchId) {
         logger.debug("Graduate Student for Student ID: " + studentID);
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
         String accessToken = auth.getTokenValue();
-        return response.GET(gradService.graduateStudent(studentID, accessToken,projectedType));
+        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken,projectedType));
     }
 
 }
