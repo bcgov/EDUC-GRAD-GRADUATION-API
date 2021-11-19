@@ -17,5 +17,6 @@ public class ProcessorData {
 	private AlgorithmResponse algorithmResponse;
 	private String accessToken;
 	private String studentID;
+	private Long batchId;
 	private ExceptionMessage exception;
 }

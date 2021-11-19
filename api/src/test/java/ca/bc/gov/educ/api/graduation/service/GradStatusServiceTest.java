@@ -157,7 +157,7 @@ public class GradStatusServiceTest {
 		
 		when(this.webClient.post()).thenThrow(new RuntimeException("Test - API is down"));
 		
-		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
+		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, null,accessToken,gradResponse,exception);
 		assertNull(res);
 	}
 
@@ -181,7 +181,7 @@ public class GradStatusServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
 
-		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, accessToken,gradResponse,exception);
+		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
 	}
@@ -212,14 +212,10 @@ public class GradStatusServiceTest {
 		graduationDataStatus.setStudentCourses(null);
 		
 		GraduationStudentRecord res;
-		try {
-			res = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
-			assertNotNull(res);
-			assertEquals(res.getPen(), gradResponse.getPen());
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		res = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
+		assertNotNull(res);
+		assertEquals(res.getPen(), gradResponse.getPen());
+
 		
 		
 	}
