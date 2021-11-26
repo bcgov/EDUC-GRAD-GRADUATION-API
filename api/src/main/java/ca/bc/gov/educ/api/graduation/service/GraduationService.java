@@ -58,7 +58,7 @@ public class GraduationService {
 			aR.setException(exception);
 			return aR;
 		}
-		if(gradResponse != null && !gradResponse.getStudentStatus().equals("DEC") && !gradResponse.getStudentStatus().equals("MER")) {
+		if(gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
 			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,batchId,exception);
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
 	     	process.setInputData(data);

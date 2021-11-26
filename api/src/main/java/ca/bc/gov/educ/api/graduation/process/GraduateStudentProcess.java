@@ -79,7 +79,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {			
 					List<ProgramCertificateTranscript> certificateList =reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
 					for(ProgramCertificateTranscript certType : certificateList) {
-						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType);
+						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType,exception);
 					}
 					logger.info("**** Saved Certificates: ****");
 				}
