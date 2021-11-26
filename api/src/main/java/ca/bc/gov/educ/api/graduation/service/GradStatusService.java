@@ -78,15 +78,17 @@ public class GradStatusService {
 	}
 
 	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus)  {
-		try {
-			gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+		if(gradResponse != null) {
+			try {
+				gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
+			gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
+			gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursStanding());
+			gradResponse.setRecalculateGradStatus(graduationDataStatus.getGradStatus().getRecalculateGradStatus());
 		}
-		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
-		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
-		gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursStanding());
-		gradResponse.setRecalculateGradStatus(graduationDataStatus.getGradStatus().getRecalculateGradStatus());
 		return gradResponse;
 	}
 
