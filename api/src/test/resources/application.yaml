@@ -55,11 +55,12 @@ springdoc:
 #Endpoints
 endpoint:
  grad-student-api: 
-  update-grad-status: https://gradstudent-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s
-  read-grad-student-record: https://gradstudent-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
-  save-optional-program-grad-status: https://gradstudent-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram
-  get-optional-program-details: https://gradstudent-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram/%s/%s
-  update-grad-status-algo-error: https://gradstudent-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/algorithmerror/%s?isGraduated=%s
+  update-grad-status: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s
+  read-grad-student-record: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
+  save-optional-program-grad-status: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram
+  get-optional-program-details: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram/%s/%s
+  update-grad-status-algo-error: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/algorithmerror/%s?isGraduated=%s
+  update-grad-status-projected: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/projected/studentid/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s
