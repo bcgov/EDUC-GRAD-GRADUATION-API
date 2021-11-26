@@ -79,7 +79,7 @@ endpoint:
   get-certificate-name: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/certificatetype/%s
   get-cert-list: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programcertificates 
  report-api: 
-  achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
+  achievement_report: ${GRAD_REPORT_API}api/v1/reports/achvreport
   transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
   certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
  grad-student-graduation-api:
