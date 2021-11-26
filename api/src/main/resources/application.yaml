@@ -64,7 +64,7 @@ endpoint:
   save-optional-program-grad-status: ${GRAD_STUDENT_API}api/v1/student/optionalprogram
   get-optional-program-details: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/%s/%s
   update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
-  update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/projected/student/studentid/%s
+  update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s   
