@@ -1,12 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import ca.bc.gov.educ.api.graduation.model.achvreport.*;
@@ -50,6 +46,9 @@ import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 @Service
 public class ReportService {
 
+	private static final String GRAD_REPORT_API_DOWN = "GRAD-REPORT-API IS DOWN";
+	private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
+	private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
 	@Autowired
 	WebClient webClient;
 
@@ -69,7 +68,7 @@ public class ReportService {
 			return webClient.post().uri(educGraduationApiConstants.getCertList()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
 			}).block();
 		} catch (Exception e) {
-			exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
+			exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return new ArrayList<>();
 		}
@@ -208,7 +207,6 @@ public class ReportService {
 		if (sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
 			return "IDS " + sc.getRelatedCourseName();
 		}
-		//if (StringUtils.equalsAnyIgnoreCase(sc.getCourseCode(), "FNA", "ASK", "FNASK")
 		if (StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
 			return sc.getCustomizedCourseName();
 		}
@@ -404,6 +402,20 @@ public class ReportService {
 			crse.setMetLitNumRequirement(sc.getMetLitNumRequirement());
 			sExamList.add(crse);
 		}
+		if (!sCourseList.isEmpty()) {
+			Collections.sort(sCourseList, Comparator.comparing(StudCourse::getCourseCode)
+					.thenComparing(StudCourse::getCourseLevel)
+					.thenComparing(StudCourse::getSessionDate));
+		}
+		if (!sExamList.isEmpty()) {
+			Collections.sort(sExamList, Comparator.comparing(StudExam::getCourseCode)
+					.thenComparing(StudExam::getCourseLevel)
+					.thenComparing(StudExam::getSessionDate));
+		}
+		if (!sAssessmentList.isEmpty()) {
+			Collections.sort(sAssessmentList, Comparator.comparing(StudAssessment::getAssessmentCode)
+					.thenComparing(StudAssessment::getSessionDate));
+		}
 		data.setStudentAssessments(sAssessmentList);
 		data.setStudentCourses(sCourseList);
 		data.setStudentExams(sExamList);
@@ -420,13 +432,13 @@ public class ReportService {
 		requestObj.setGradReportTypeCode("TRAN");
 		requestObj.setDocumentStatusCode("IP");
 		if(isGraduated)
-			requestObj.setDocumentStatusCode("COMPL");
+			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 		
 		try {
 			webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),isGraduated)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 		}catch(Exception e) {
 			if(exception.getExceptionName() == null) {
-				exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
+				exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
 				exception.setExceptionDetails(e.getLocalizedMessage());
 			}
 		}
@@ -446,7 +458,7 @@ public class ReportService {
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 		}catch (Exception e) {
-			exception.setExceptionName("GRAD-REPORT-API IS DOWN");
+			exception.setExceptionName(GRAD_REPORT_API_DOWN);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -478,7 +490,7 @@ public class ReportService {
 		requestObj.setStudentID(gradResponse.getStudentID());
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
-		requestObj.setDocumentStatusCode("COMPL");
+		requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 		webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentCertificate()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
 
 	}
@@ -511,7 +523,7 @@ public class ReportService {
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 		}catch (Exception e) {
-			exception.setExceptionName("GRAD-REPORT-API IS DOWN");
+			exception.setExceptionName(GRAD_REPORT_API_DOWN);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -529,7 +541,7 @@ public class ReportService {
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 	    return new String(encoded,StandardCharsets.US_ASCII);
 		}catch (Exception e) {
-			exception.setExceptionName("GRAD-REPORT-API IS DOWN");
+			exception.setExceptionName(GRAD_REPORT_API_DOWN);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -611,13 +623,13 @@ public class ReportService {
 		requestObj.setGradReportTypeCode("ACHV");
 		requestObj.setDocumentStatusCode("IP");
 		if(isGraduated)
-			requestObj.setDocumentStatusCode("COMPL");
+			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
 		try {
 			webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(),isGraduated)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
 		}catch(Exception e) {
 			if(exception.getExceptionName() == null) {
-				exception.setExceptionName("GRAD-GRADUATION-REPORT-API IS DOWN");
+				exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
 				exception.setExceptionDetails(e.getLocalizedMessage());
 			}
 		}
