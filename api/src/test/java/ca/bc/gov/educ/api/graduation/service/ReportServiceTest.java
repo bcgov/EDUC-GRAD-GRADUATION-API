@@ -6,13 +6,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import ca.bc.gov.educ.api.graduation.model.achvreport.AchvReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -42,6 +50,9 @@ public class ReportServiceTest {
 	
 	@Autowired
 	private ReportService reportService;
+
+	@Autowired
+	JsonTransformer jsonTransformer;
 	
 	@Autowired
 	private ExceptionMessage exception;
@@ -1130,7 +1141,7 @@ public class ReportServiceTest {
 		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
 	}
 	
-	
+
 	public void testPrepareReportData_Desig_2() {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
@@ -1207,5 +1218,37 @@ public class ReportServiceTest {
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
 		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken);
+	}
+
+	@Test
+	public void testStudentAchievementReport() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
+		AchvReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram);
+		assertNotNull(data);
+	}
+
+	protected GraduationData createGraduationData(String jsonPath) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(jsonPath);
+		String json = readInputStream(inputStream);
+		return (GraduationData)jsonTransformer.unmarshall(json, GraduationData.class);
+	}
+
+	protected List<StudentOptionalProgram> createStudentOptionalProgramData(String jsonPath) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(jsonPath);
+		String json = readInputStream(inputStream);
+		return new ObjectMapper().readValue(json, new TypeReference<List<StudentOptionalProgram>>(){});
+	}
+	private String readInputStream(InputStream is) throws Exception {
+		StringBuffer sb = new StringBuffer();
+		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+		BufferedReader reader = new BufferedReader(streamReader);
+		String line;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
+		return sb.toString();
 	}
 }
