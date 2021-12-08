@@ -335,6 +335,8 @@ public class ReportService {
 		if (!otherProgramParticipation.isEmpty()) {
 			studObj.setOtherProgramParticipation(otherProgramParticipation);
 			studObj.setHasOtherProgram("Other Program Participation");
+		}else {
+			studObj.setHasOtherProgram(" ");
 		}
 		return studObj;
 	}
