@@ -52,56 +52,62 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 		ExceptionMessage exception = processorData.getException();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
-		if(gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP")) {
-			List<CodeDTO> optionalProgram = new ArrayList<>();
-			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-			
-			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
-				logger.info("**** Grad Algorithm Has Errors: ****");
-				algorithmResponse.setException(graduationDataStatus.getException());
-				processorData.setAlgorithmResponse(algorithmResponse);
-				return processorData;
-			}else if(exception.getExceptionName() != null) {
-				logger.info("**** Grad Algorithm errored out: ****");
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
-				return processorData;
-			}
-			logger.info("**** Grad Algorithm Completed: ****");
-			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),optionalProgram);
-			logger.info("**** Saved Optional Programs: ****");
-			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-			ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken());
-			logger.info("**** Prepared Data for Reports: ****");
-			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
-				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
-				logger.info("**** Saved Grad Status: ****");
-				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {			
-					List<ProgramCertificateTranscript> certificateList =reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
-					for(ProgramCertificateTranscript certType : certificateList) {
-						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType,exception);
-					}
-					logger.info("**** Saved Certificates: ****");
-				}
-				if(graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
-					logger.info("**** No Transcript Generated: ****");
-				}else {
-					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID(),exception,graduationDataStatus.isGraduated());
-					logger.info("**** Saved Reports: ****");
-				}
-				if(exception.getExceptionName() != null) {
+		if(!gradResponse.getProgram().equalsIgnoreCase("NOPROG")) {
+			if (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP")) {
+				List<CodeDTO> optionalProgram = new ArrayList<>();
+				GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(), exception);
+
+				if (graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
+					logger.info("**** Grad Algorithm Has Errors: ****");
+					algorithmResponse.setException(graduationDataStatus.getException());
+					processorData.setAlgorithmResponse(algorithmResponse);
+					return processorData;
+				} else if (exception.getExceptionName() != null) {
+					logger.info("**** Grad Algorithm errored out: ****");
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
-					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
-				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
-				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
+				logger.info("**** Grad Algorithm Completed: ****");
+				List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
+				logger.info("**** Saved Optional Programs: ****");
+				GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+				ReportData data = reportService.prepareReportData(graduationDataStatus, gradResponse, processorData.getAccessToken());
+				logger.info("**** Prepared Data for Reports: ****");
+				if (toBeSaved != null && toBeSaved.getStudentID() != null) {
+					GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
+					logger.info("**** Saved Grad Status: ****");
+					if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {
+						List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
+						for (ProgramCertificateTranscript certType : certificateList) {
+							reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
+						}
+						logger.info("**** Saved Certificates: ****");
+					}
+					if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
+						logger.info("**** No Transcript Generated: ****");
+					} else {
+						reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(), data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+						logger.info("**** Saved Reports: ****");
+					}
+					if (exception.getExceptionName() != null) {
+						algorithmResponse.setException(exception);
+						processorData.setAlgorithmResponse(algorithmResponse);
+						gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
+						logger.info("**** Record Restored Due to Error: ****");
+						return processorData;
+					}
+					algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
+					algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
+				}
+			} else {
+				exception.setExceptionName("STUDENT-ALREADY-GRADUATED");
+				exception.setExceptionDetails("Graduation Algorithm Cannot be Run for this graduated Student");
+				algorithmResponse.setException(exception);
 			}
 		}else {
-			exception.setExceptionName("STUDENT-ALREADY-GRADUATED");
-			exception.setExceptionDetails("Graduation Algorithm Cannot be Run for this graduated Student");
+			exception.setExceptionName("STUDENT-NOT-ALLOWED");
+			exception.setExceptionDetails("Graduation Algorithm Cannot be Run for this Student");
 			algorithmResponse.setException(exception);
 		}
 		long endTime = System.currentTimeMillis();
