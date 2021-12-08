@@ -1,10 +1,13 @@
 package ca.bc.gov.educ.api.graduation.process;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import ca.bc.gov.educ.api.graduation.model.achvreport.AchvReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +68,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentRecordProjectedRun(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
 			logger.info("**** graduationStatusResponse "+graduationStatusResponse);
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
-			logger.info("gradResponse "+gradResponse);
+			logger.info("gradResponse {}",gradResponse);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
 			AchvReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse);
 			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
@@ -73,7 +76,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			algorithmResponse.setGraduationStudentRecord(gradResponse);
 		}else {
 			exception.setExceptionName("PROJECTED_RUN_NOT_ALLOWED");
-			exception.setExceptionDetails("Graduation Projected Algorithm Cannot be Run for this graduated Student");
+			exception.setExceptionDetails("Graduation Projected Algorithm Cannot be Run for this Student");
 			algorithmResponse.setException(exception);
 		}
 		long endTime = System.currentTimeMillis();
