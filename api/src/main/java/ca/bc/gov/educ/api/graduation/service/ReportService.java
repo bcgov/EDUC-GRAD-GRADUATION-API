@@ -580,9 +580,9 @@ public class ReportService {
 			if(existingData != null && existingData.getOptionalNonGradReasons() != null) {
 				op.setNonGradReasons(getNonGradReasonsAchvReport(existingData.getOptionalNonGradReasons()));
 			}
-			op.setHasRequirementMet("false");
+			op.setHasRequirementMet(" Check with School");
 			if(existingData != null && existingData.getOptionalRequirementsMet() != null) {
-				op.setHasRequirementMet("true");
+				op.setHasRequirementMet(null);
 				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses()));
 			}
 			opList.add(op);
