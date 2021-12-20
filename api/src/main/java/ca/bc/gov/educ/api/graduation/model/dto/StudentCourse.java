@@ -51,6 +51,7 @@ public class StudentCourse {
 	private boolean isNotEligibleForElective;
 	private boolean isBoardAuthorityAuthorized;
   private boolean isIndependentDirectedStudies;
+	private boolean isLessCreditCourse;
 
 	public Integer getCreditsUsedForGrad() {
 		if (creditsUsedForGrad == null)
