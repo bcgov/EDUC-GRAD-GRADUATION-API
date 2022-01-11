@@ -1,6 +1,3 @@
-# EDUC-GRAD-GRADUATION-API
-API for Algorithm and report control for GRAD Team
-
 [![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) &nbsp;
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bcgov/educ-grad-graduation-api/Build) &nbsp; 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-GRADUATION-API&metric=bugs)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-GRADUATION-API) &nbsp;
@@ -15,3 +12,7 @@ API for Algorithm and report control for GRAD Team
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-GRADUATION-API&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-GRADUATION-API) &nbsp;
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-GRADUATION-API&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-GRADUATION-API) &nbsp;
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-GRADUATION-API&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-GRADUATION-API) &nbsp;
+
+# EDUC-GRAD-GRADUATION-API
+API for Algorithm and report control for GRAD Team
+
