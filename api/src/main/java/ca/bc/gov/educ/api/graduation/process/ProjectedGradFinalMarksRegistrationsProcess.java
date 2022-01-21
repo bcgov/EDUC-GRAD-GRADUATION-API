@@ -1,24 +1,19 @@
 package ca.bc.gov.educ.api.graduation.process;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-
-import ca.bc.gov.educ.api.graduation.model.achvreport.AchvReportData;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
+import ca.bc.gov.educ.api.graduation.service.GradStatusService;
+import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
-import ca.bc.gov.educ.api.graduation.service.GradStatusService;
-import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
-import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @Component
@@ -70,7 +65,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			logger.info("gradResponse {}",gradResponse);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			AchvReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse);
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse);
 			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 			algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			algorithmResponse.setGraduationStudentRecord(gradResponse);

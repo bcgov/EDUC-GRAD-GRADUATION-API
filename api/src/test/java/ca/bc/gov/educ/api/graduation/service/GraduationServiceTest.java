@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.graduation.model.achvreport.AchvReportData;
-import ca.bc.gov.educ.api.graduation.model.achvreport.Student;
+import ca.bc.gov.educ.api.graduation.model.report.Student;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -20,9 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
@@ -116,7 +112,7 @@ public class GraduationServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
-		AchvReportData data = new AchvReportData();
+		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
@@ -177,7 +173,7 @@ public class GraduationServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
-		AchvReportData data = new AchvReportData();
+		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
@@ -215,7 +211,7 @@ public class GraduationServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("MER");
 
-		AchvReportData data = new AchvReportData();
+		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");

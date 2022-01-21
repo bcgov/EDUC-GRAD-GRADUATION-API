@@ -1,10 +1,14 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class Student {
+
     private Pen pen;
     private String firstName;
     private String lastName;
@@ -12,12 +16,18 @@ public class Student {
     private Date birthdate;
     private Address address;
     private String grade;
+    private String gradProgram;
     private String studStatus;
     private String sccDate;
     private String mincodeGrad;
     private String englishCert;
     private String frenchCert;
 
+    private String localId;
+    private String hasOtherProgram;
+    private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
+
+    @JsonDeserialize(as = Pen.class)
     public Pen getPen() {
         return pen;
     }
@@ -59,6 +69,7 @@ public class Student {
         this.birthdate = value;
     }
 
+    @JsonDeserialize(as = Address.class)
     public Address getAddress() {
         return address;
     }
@@ -113,5 +124,37 @@ public class Student {
 
     public void setFrenchCert(String value) {
         this.frenchCert = value;
+    }
+
+    public String getGradProgram() {
+        return gradProgram;
+    }
+
+    public void setGradProgram(String gradProgram) {
+        this.gradProgram = gradProgram;
+    }
+
+    public String getLocalId() {
+        return localId;
+    }
+
+    public void setLocalId(String localId) {
+        this.localId = localId;
+    }
+
+    public String getHasOtherProgram() {
+        return hasOtherProgram;
+    }
+
+    public void setHasOtherProgram(String hasOtherProgram) {
+        this.hasOtherProgram = hasOtherProgram;
+    }
+
+    public List<OtherProgram> getOtherProgramParticipation() {
+        return otherProgramParticipation;
+    }
+
+    public void setOtherProgramParticipation(List<OtherProgram> otherProgramParticipation) {
+        this.otherProgramParticipation = otherProgramParticipation;
     }
 }
