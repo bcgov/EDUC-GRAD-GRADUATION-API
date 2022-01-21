@@ -19,12 +19,13 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
 
 @Data
-public class AchievementCourse {
+public class AchievementCourse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

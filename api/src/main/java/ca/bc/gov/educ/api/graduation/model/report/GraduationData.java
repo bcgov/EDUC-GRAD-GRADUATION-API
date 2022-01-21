@@ -2,10 +2,13 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class GraduationData {
+public class GraduationData implements Serializable {
+    private static final long serialVersionUID = 2L;
+
     private Date graduationDate;
     private boolean honorsFlag;
     private boolean dogwoodFlag;

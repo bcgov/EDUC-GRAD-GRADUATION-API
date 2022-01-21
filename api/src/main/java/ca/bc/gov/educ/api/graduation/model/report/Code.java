@@ -1,6 +1,11 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-public class Code {
+import java.io.Serializable;
+
+public class Code implements Serializable {
+
+    private static final long serialVersionUID = 2L;
+
     private String code;
     private String description;
     private int credits;

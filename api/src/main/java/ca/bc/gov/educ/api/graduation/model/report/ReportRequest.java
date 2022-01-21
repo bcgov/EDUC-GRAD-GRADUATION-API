@@ -10,6 +10,8 @@ import java.io.Serializable;
 @JsonPropertyOrder({ "options", "data"})
 public class ReportRequest implements Serializable {
 
+	private static final long serialVersionUID = 2L;
+
 	private ReportData data;
 	private ReportOptions options;
 

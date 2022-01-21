@@ -48,6 +48,8 @@ import java.util.Map;
 })
 public class ReportData implements Serializable {
 
+	private static final long serialVersionUID = 2L;
+
 	@JsonDeserialize(as = Student.class)
 	private Student student;
 	@JsonDeserialize(as = School.class)

@@ -109,7 +109,7 @@ public class ReportService {
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		for (StudentCourse sc : studentCourseList) {
-			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected() && !sc.isLessCreditCourse()) {
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected() && !sc.isLessCreditCourse() && !sc.isValidationCourse() && !sc.isGrade10Course() && !sc.isCutOffCourse()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
 				if (sc.getEquivOrChallenge() != null) {
@@ -289,19 +289,6 @@ public class ReportService {
 		return gradStatus;
 	}
 
-	private List<NonGradReason> getNonGradReasonsAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
-		List<NonGradReason> nList = new ArrayList<>();
-		if (nonGradReasons != null) {
-			for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
-				NonGradReason obj = new NonGradReason();
-				obj.setCode(gR.getRule());
-				obj.setDescription(gR.getDescription());
-				nList.add(obj);
-			}
-		}
-		return nList;
-	}
-
 	private Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
 		Student studObj = new Student();
 		studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
@@ -338,7 +325,6 @@ public class ReportService {
 				.collect(Collectors.toList());
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		List<AchievementCourse> sCourseList = new ArrayList<>();
-		List<Assessment> sAssessmentList = new ArrayList<>();
 		List<Exam> sExamList = new ArrayList<>();
 		for (StudentCourse sc : studentCourseList) {
 			AchievementCourse crse = new AchievementCourse();
@@ -557,7 +543,7 @@ public class ReportService {
 		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
 		data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
 		getStudentCoursesAssessmentsNExams(data,graduationDataStatus);
-		data.setNonGradReasons(getNonGradReasonsAchvReport(graduationDataStatus.getNonGradReasons()));
+		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 		data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
 		return data;
 	}
@@ -577,7 +563,7 @@ public class ReportService {
 				e.printStackTrace();
 			}
 			if(existingData != null && existingData.getOptionalNonGradReasons() != null) {
-				op.setNonGradReasons(getNonGradReasonsAchvReport(existingData.getOptionalNonGradReasons()));
+				op.setNonGradReasons(getNonGradReasons(existingData.getOptionalNonGradReasons()));
 			}
 			op.setHasRequirementMet(" Check with School");
 			if(existingData != null && existingData.getOptionalRequirementsMet() != null) {

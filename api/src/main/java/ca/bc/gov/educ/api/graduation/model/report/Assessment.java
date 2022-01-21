@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Data
-public class Assessment {
+public class Assessment implements Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     private Date issueDate;
     private List<AssessmentResult> results;

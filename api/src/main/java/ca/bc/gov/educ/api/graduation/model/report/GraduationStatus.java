@@ -1,6 +1,10 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-public class GraduationStatus {
+import java.io.Serializable;
+
+public class GraduationStatus implements Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     private String programCompletionDate = "";
     private String honours = "";

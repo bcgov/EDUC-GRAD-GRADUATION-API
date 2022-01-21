@@ -1,8 +1,11 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class GradRequirement {
+public class GradRequirement implements Serializable {
+    private static final long serialVersionUID = 2L;
+
     private String code;
     private String description;
     private List<AchievementCourse> courseDetails;

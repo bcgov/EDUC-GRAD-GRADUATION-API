@@ -9,6 +9,8 @@ import java.io.Serializable;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class ReportOptions implements Serializable {
 
+	private static final long serialVersionUID = 2L;
+
 	private boolean cacheReport;
 	private String convertTo;
 	private boolean overwrite;
