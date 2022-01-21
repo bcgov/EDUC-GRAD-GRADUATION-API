@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 public class OrderType {
+
     private String name;
     private CertificateType certificateType;
 
@@ -12,6 +15,7 @@ public class OrderType {
         this.name = value;
     }
 
+    @JsonDeserialize(as = CertificateType.class)
     public CertificateType getCertificateType() {
         return certificateType;
     }

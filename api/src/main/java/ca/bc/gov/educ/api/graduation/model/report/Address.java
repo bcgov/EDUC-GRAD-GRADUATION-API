@@ -1,8 +1,5 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class Address {
     private String streetLine1;
     private String streetLine2;

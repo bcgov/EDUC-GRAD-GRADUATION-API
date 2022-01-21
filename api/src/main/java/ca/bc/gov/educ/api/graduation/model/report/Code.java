@@ -1,12 +1,9 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class Code {
     private String code;
     private String description;
-    private String credits;
+    private int credits;
     private String name;
 
     public String getCode() {
@@ -25,11 +22,11 @@ public class Code {
         this.description = value;
     }
 
-    public String getCredits() {
+    public int getCredits() {
         return credits;
     }
 
-    public void setCredits(String value) {
+    public void setCredits(int value) {
         this.credits = value;
     }
 

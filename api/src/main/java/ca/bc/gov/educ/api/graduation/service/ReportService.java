@@ -2,15 +2,20 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import ca.bc.gov.educ.api.graduation.model.achvreport.*;
-import ca.bc.gov.educ.api.graduation.model.achvreport.StudExam;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
+import ca.bc.gov.educ.api.graduation.model.report.*;
+import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
+import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
+import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
+import ca.bc.gov.educ.api.graduation.model.report.School;
+import ca.bc.gov.educ.api.graduation.model.report.Student;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -22,24 +27,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateTranscript;
-import ca.bc.gov.educ.api.graduation.model.report.Address;
-import ca.bc.gov.educ.api.graduation.model.report.Certificate;
-import ca.bc.gov.educ.api.graduation.model.report.CertificateType;
-import ca.bc.gov.educ.api.graduation.model.report.Code;
-import ca.bc.gov.educ.api.graduation.model.report.Course;
-import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
-import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.report.Mark;
-import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
-import ca.bc.gov.educ.api.graduation.model.report.OrderType;
-import ca.bc.gov.educ.api.graduation.model.report.PaperType;
-import ca.bc.gov.educ.api.graduation.model.report.Pen;
-import ca.bc.gov.educ.api.graduation.model.report.ReportData;
-import ca.bc.gov.educ.api.graduation.model.report.ReportOptions;
-import ca.bc.gov.educ.api.graduation.model.report.ReportRequest;
-import ca.bc.gov.educ.api.graduation.model.report.Student;
-import ca.bc.gov.educ.api.graduation.model.report.Transcript;
-import ca.bc.gov.educ.api.graduation.model.report.TranscriptResult;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 
@@ -84,7 +71,7 @@ public class ReportService {
 
 	public ReportData prepareReportData(
 			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken) {
-		ReportData data = new ca.bc.gov.educ.api.graduation.model.report.ReportData();
+		ReportData data = new ReportData();
 		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradMessage(graduationDataStatus.getGradMessage());
@@ -96,10 +83,10 @@ public class ReportService {
 		return data;
 	}
 
-	private List<NonGradReason> getNonGradReasons(List<GradRequirement> nonGradReasons) {
+	private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
 		List<NonGradReason> nList = new ArrayList<>();
 		if (nonGradReasons != null) {
-			for (GradRequirement gR : nonGradReasons) {
+			for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
 				NonGradReason obj = new NonGradReason();
 				obj.setCode(gR.getRule());
 				obj.setDescription(gR.getDescription());
@@ -112,7 +99,7 @@ public class ReportService {
 	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
-		transcriptData.setIssueDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
+		transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(gradResponse.getUpdateDate().toString()));
 		transcriptData.setResults(getTranscriptResults(graduationDataStatus, accessToken));
 		return transcriptData;
 	}
@@ -128,11 +115,12 @@ public class ReportService {
 				if (sc.getEquivOrChallenge() != null) {
 					equivOrChallenge = sc.getEquivOrChallenge();
 				}
-				Course crse = new Course();
+				TranscriptCourse crse = new TranscriptCourse();
 				crse.setCode(sc.getCourseCode());
 				crse.setCredits(sc.getCredits().toString());
 				crse.setLevel(sc.getCourseLevel());
 				crse.setName(getCourseNameLogic(sc));
+
 				crse.setRelatedCourse(sc.getRelatedCourse());
 				crse.setRelatedLevel(sc.getRelatedLevel());
 				crse.setType(equivOrChallenge.equals("E") ? "1" : "2");
@@ -159,7 +147,7 @@ public class ReportService {
 		for (StudentAssessment sc : studentAssessmentList) {
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
 				TranscriptResult result = new TranscriptResult();
-				Course crse = new Course();
+				TranscriptCourse crse = new TranscriptCourse();
 				crse.setCode(sc.getAssessmentCode());
 				crse.setLevel("");
 				crse.setCredits("NA");
@@ -217,7 +205,7 @@ public class ReportService {
 		return value != null && value != 0.0 ? new DecimalFormat("#").format(value) : "";
 	}
 
-	private GraduationData getGraduationData(
+	private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
 			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
 		GraduationData data = new GraduationData();
 		data.setDogwoodFlag(graduationDataStatus.isDualDogwood());
@@ -225,14 +213,14 @@ public class ReportService {
 			if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
 				if (graduationDataStatus.getGradStatus().getProgramCompletionDate() != null) {
 					if (graduationDataStatus.getGradStatus().getProgramCompletionDate().length() > 7) {
-						data.setGraduationDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
+						data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
 					} else {
-						data.setGraduationDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+						data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
 					}
 				}
 				data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
 			} else {
-				data.setGraduationDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+				data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
 			}
 		}
 
@@ -269,8 +257,8 @@ public class ReportService {
 	}
 
 
-	private ca.bc.gov.educ.api.graduation.model.report.School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.School school) {
-		ca.bc.gov.educ.api.graduation.model.report.School schObj = new ca.bc.gov.educ.api.graduation.model.report.School();
+	private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.School school) {
+		School schObj = new School();
 		Address addRess = new Address();
 		addRess.setCity(school.getCity());
 		addRess.setCode(school.getPostal());
@@ -288,25 +276,25 @@ public class ReportService {
 		return schObj;
 	}
 
-	private ca.bc.gov.educ.api.graduation.model.achvreport.School getSchoolDataAchvReport(ca.bc.gov.educ.api.graduation.model.dto.School school) {
-		ca.bc.gov.educ.api.graduation.model.achvreport.School schObj = new ca.bc.gov.educ.api.graduation.model.achvreport.School();
+	private School getSchoolDataAchvReport(ca.bc.gov.educ.api.graduation.model.dto.School school) {
+		School schObj = new School();
 		schObj.setMincode(school.getMinCode());
-		schObj.setSchoolName(school.getSchoolName());
+		schObj.setName(school.getSchoolName());
 		return schObj;
 	}
 
-	private GradStatus getGraduationStatus(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData) {
-		GradStatus gradStatus = new GradStatus();
+	private GraduationStatus getGraduationStatus(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData) {
+		GraduationStatus gradStatus = new GraduationStatus();
 		gradStatus.setGraduationMessage(graduationData.getGradMessage());
 		return gradStatus;
 	}
 
-	private List<NonGraduationReason> getNonGradReasonsAchvReport(List<GradRequirement> nonGradReasons) {
-		List<NonGraduationReason> nList = new ArrayList<>();
+	private List<NonGradReason> getNonGradReasonsAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
+		List<NonGradReason> nList = new ArrayList<>();
 		if (nonGradReasons != null) {
-			for (GradRequirement gR : nonGradReasons) {
-				NonGraduationReason obj = new NonGraduationReason();
-				obj.setRule(gR.getRule());
+			for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
+				NonGradReason obj = new NonGradReason();
+				obj.setCode(gR.getRule());
 				obj.setDescription(gR.getDescription());
 				nList.add(obj);
 			}
@@ -314,17 +302,18 @@ public class ReportService {
 		return nList;
 	}
 
-	private ca.bc.gov.educ.api.graduation.model.achvreport.Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
-		ca.bc.gov.educ.api.graduation.model.achvreport.Student studObj = new ca.bc.gov.educ.api.graduation.model.achvreport.Student();
+	private Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
+		Student studObj = new Student();
 		studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
 		studObj.setFirstName(studentObj.getLegalFirstName());
-		studObj.setMiddleName(studentObj.getLegalMiddleNames() != null ?studentObj.getLegalMiddleNames():"");
 		studObj.setLastName(studentObj.getLegalLastName());
 		studObj.setGrade(studentObj.getStudentGrade());
-		studObj.setPen(studentObj.getPen());
+		Pen pen = new Pen();
+		pen.setPen(studentObj.getPen());
+		studObj.setPen(pen);
 		studObj.setLocalId(studentObj.getLocalID());
-		studObj.setProgram(studentObj.getProgram());
-		studObj.setBirthdate(studentObj.getDob());
+		studObj.setGradProgram(studentObj.getProgram());
+		studObj.setBirthdate(EducGraduationApiUtils.formatIssueDateForReportJasper(studentObj.getDob()));
 		List<OtherProgram> otherProgramParticipation = new ArrayList<>();
 		for (StudentOptionalProgram sp : optionalStudentProgram) {
 			OtherProgram op = new OtherProgram();
@@ -341,22 +330,23 @@ public class ReportService {
 		return studObj;
 	}
 
-	private void getStudentCoursesAssessmentsNExams(AchvReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+	private void getStudentCoursesAssessmentsNExams(ReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
 		List<StudentCourse> studentExamList = studentCourseList
 				.stream()
 				.filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
 				.collect(Collectors.toList());
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
-		List<StudCourse> sCourseList = new ArrayList<>();
-		List<StudAssessment> sAssessmentList = new ArrayList<>();
-		List<StudExam> sExamList = new ArrayList<>();
+		List<AchievementCourse> sCourseList = new ArrayList<>();
+		List<Assessment> sAssessmentList = new ArrayList<>();
+		List<Exam> sExamList = new ArrayList<>();
 		for (StudentCourse sc : studentCourseList) {
-			StudCourse crse = new StudCourse();
+			AchievementCourse crse = new AchievementCourse();
 			String equivOrChallenge = "";
 			if (sc.getEquivOrChallenge() != null) {
 				equivOrChallenge = sc.getEquivOrChallenge();
 			}
+
 			crse.setCourseCode(sc.getCourseCode());
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
@@ -365,26 +355,26 @@ public class ReportService {
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
 			crse.setGradReqMet(sc.getGradReqMet());
-			crse.setCreditsUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad() : 0);
+			crse.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "0");
 			crse.setEquivOrChallenge(equivOrChallenge);
 			sCourseList.add(crse);
 		}
-
-		for(StudentAssessment sA:studentAssessmentList)	{
-
-			StudAssessment achv = new StudAssessment();
-			achv.setAssessmentCode(sA.getAssessmentCode());
-			achv.setAssessmentName(sA.getAssessmentName());
-			achv.setGradReqMet(sA.getGradReqMet());
-			achv.setSessionDate(sA.getSessionDate() != null ? sA.getSessionDate(): "");
-			achv.setProficiencyScore(sA.getProficiencyScore());
-			achv.setSpecialCase(sA.getSpecialCase());
-			achv.setExceededWriteFlag(sA.getExceededWriteFlag());
-			sAssessmentList.add(achv);
+		if (!sCourseList.isEmpty()) {
+			Collections.sort(sCourseList, Comparator.comparing(AchievementCourse::getCourseCode)
+					.thenComparing(AchievementCourse::getCourseLevel)
+					.thenComparing(AchievementCourse::getSessionDate));
 		}
+		data.setStudentCourses(sCourseList);
+
+		Assessment achv = new Assessment();
+		Date date = new Date();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(formatter.format(date)));
+		achv.setResults(getAssessmentResults(studentAssessmentList));
+		data.setAssessment(achv);
 
 		for (StudentCourse sc : studentExamList) {
-			StudExam crse = new StudExam();
+			Exam crse = new Exam();
 			String equivOrChallenge = "";
 			if (sc.getEquivOrChallenge() != null) {
 				equivOrChallenge = sc.getEquivOrChallenge();
@@ -401,30 +391,38 @@ public class ReportService {
 			crse.setEquivOrChallenge(equivOrChallenge);
 			crse.setBestSchoolPercent(getValue(sc.getBestSchoolPercent()));
 			crse.setBestExamPercent(getValue(sc.getBestExamPercent()));
-			crse.setMetLitNumRequirement(sc.getMetLitNumRequirement());
+			crse.setMetLitNumRequirement(sc.getMetLitNumRequirement() != null?sc.getMetLitNumRequirement():"");
 			sExamList.add(crse);
 		}
-		if (!sCourseList.isEmpty()) {
-			Collections.sort(sCourseList, Comparator.comparing(StudCourse::getCourseCode)
-					.thenComparing(StudCourse::getCourseLevel)
-					.thenComparing(StudCourse::getSessionDate));
-		}
+
 		if (!sExamList.isEmpty()) {
-			Collections.sort(sExamList, Comparator.comparing(StudExam::getCourseCode)
-					.thenComparing(StudExam::getCourseLevel)
-					.thenComparing(StudExam::getSessionDate));
+			Collections.sort(sExamList, Comparator.comparing(Exam::getCourseCode)
+					.thenComparing(Exam::getCourseLevel)
+					.thenComparing(Exam::getSessionDate));
 		}
-		if (!sAssessmentList.isEmpty()) {
-			Collections.sort(sAssessmentList, Comparator.comparing(StudAssessment::getAssessmentCode)
-					.thenComparing(StudAssessment::getSessionDate));
-		}
-		data.setStudentAssessments(sAssessmentList);
-		data.setStudentCourses(sCourseList);
 		data.setStudentExams(sExamList);
 	}
-
+	private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList) {
+		List<AssessmentResult> tList = new ArrayList<>();
+		for (StudentAssessment sA : studentAssessmentList) {
+			AssessmentResult result = new AssessmentResult();
+			result.setAssessmentCode(sA.getAssessmentCode());
+			result.setAssessmentName(sA.getAssessmentName());
+			result.setGradReqMet(sA.getGradReqMet());
+			result.setSessionDate(sA.getSessionDate() != null ? sA.getSessionDate(): "");
+			result.setProficiencyScore(sA.getProficiencyScore() != null? sA.getProficiencyScore():null);
+			result.setSpecialCase(sA.getSpecialCase());
+			result.setExceededWriteFlag(sA.getExceededWriteFlag());
+			tList.add(result);
+		}
+		if (!tList.isEmpty()) {
+			Collections.sort(tList, Comparator.comparing(AssessmentResult::getAssessmentCode)
+					.thenComparing(AssessmentResult::getSessionDate));
+		}
+		return tList;
+	}
 	public void saveStudentTranscriptReportJasper(String pen,
-			ca.bc.gov.educ.api.graduation.model.report.ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
+			ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
 	
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample,accessToken,exception);
 		GradStudentReports requestObj = new GradStudentReports();
@@ -447,7 +445,7 @@ public class ReportService {
 		
 	}
 
-	private String generateStudentTranscriptReportJasper(ca.bc.gov.educ.api.graduation.model.report.ReportData sample,
+	private String generateStudentTranscriptReportJasper(ReportData sample,
 			String accessToken,ExceptionMessage exception) {
 		ReportOptions options = new ReportOptions();
 		options.setReportFile("transcript");
@@ -468,7 +466,7 @@ public class ReportService {
 
 	public ReportData prepareCertificateData(
 			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
-		ca.bc.gov.educ.api.graduation.model.report.ReportData data = new ca.bc.gov.educ.api.graduation.model.report.ReportData();
+		ReportData data = new ReportData();
 		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
@@ -499,7 +497,7 @@ public class ReportService {
 	
 	private Certificate getCertificateData(GraduationStudentRecord gradResponse,ProgramCertificateTranscript certData) {
 		Certificate cert = new Certificate();
-		cert.setIssued(EducGraduationApiUtils.formatDateForReportJasper(EducGraduationApiUtils.parsingDateForCertificate(gradResponse.getProgramCompletionDate())));
+		cert.setIssued(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingDateForCertificate(gradResponse.getProgramCompletionDate())));
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();
@@ -509,10 +507,11 @@ public class ReportService {
 		certType.setReportName(certData.getCertificateTypeCode());
 		orTy.setCertificateType(certType);
 		cert.setOrderType(orTy);
+		cert.setCertStyle("Original");
 		return cert;
 	}
 
-	private String generateStudentCertificateReportJasper(ca.bc.gov.educ.api.graduation.model.report.ReportData sample,
+	private String generateStudentCertificateReportJasper(ReportData sample,
 			String accessToken,ExceptionMessage exception) {
 		ReportOptions options = new ReportOptions();
 		options.setReportFile("certificate");
@@ -531,11 +530,11 @@ public class ReportService {
 		}
 	}
 	
-	private String generateStudentAchievementReportJasper(AchvReportData data, String accessToken,ExceptionMessage exception) {
-		AchvReportOptions options = new AchvReportOptions();
+	private String generateStudentAchievementReportJasper(ReportData data, String accessToken,ExceptionMessage exception) {
+		ReportOptions options = new ReportOptions();
 		options.setReportFile("achievement");
 		options.setReportName("Student Achievement Report.pdf");
-		GenerateReportData reportParams = new GenerateReportData();
+		ReportRequest reportParams = new ReportRequest();
 		reportParams.setOptions(options);
 		reportParams.setData(data);
 		try {
@@ -550,9 +549,9 @@ public class ReportService {
 
 	}
 
-	public AchvReportData prepareAchievementReportData(
+	public ReportData prepareAchievementReportData(
 			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList) {
-		AchvReportData data = new AchvReportData();
+		ReportData data = new ReportData();
 		data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(),optionalProgramList));
 		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
@@ -582,7 +581,7 @@ public class ReportService {
 			}
 			op.setHasRequirementMet(" Check with School");
 			if(existingData != null && existingData.getOptionalRequirementsMet() != null) {
-				op.setHasRequirementMet(null);
+				op.setHasRequirementMet("The Following Requirements Are Met");
 				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses()));
 			}
 			opList.add(op);
@@ -590,20 +589,20 @@ public class ReportService {
 		return opList;
 	}
 
-	private List<GraduationRequirement> getRequirementsMetAchvReport(List<GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses) {
-		List<GraduationRequirement> grList = new ArrayList<>();
-		for(GradRequirement gr:optionalRequirementsMet) {
-			GraduationRequirement gRAchv = new GraduationRequirement();
-			gRAchv.setRule(gr.getRule());
+	private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses) {
+		List<GradRequirement> grList = new ArrayList<>();
+		for(ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr:optionalRequirementsMet) {
+			GradRequirement gRAchv = new GradRequirement();
+			gRAchv.setCode(gr.getRule());
 			gRAchv.setDescription(gr.getDescription());
 
 			List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
 					.stream()
 					.filter(sc -> sc.getGradReqMet().contains(gr.getRule()))
 					.collect(Collectors.toList());
-			List<CourseDetails> cdList = new ArrayList<>();
+			List<AchievementCourse> cdList = new ArrayList<>();
 			scList.forEach(sc->{
-				CourseDetails cD = new CourseDetails();
+				AchievementCourse cD = new AchievementCourse();
 				cD.setCourseCode(sc.getCourseCode());
 				cD.setCourseLevel(sc.getCourseLevel());
 				cD.setSessionDate(sc.getSessionDate());
@@ -616,7 +615,7 @@ public class ReportService {
 		return  grList;
 	}
 
-	public void saveStudentAchivementReportJasper(String pen,AchvReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
+	public void saveStudentAchivementReportJasper(String pen,ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
 		String encodedPdfReportTranscript = generateStudentAchievementReportJasper(sample,accessToken,exception);
 		GradStudentReports requestObj = new GradStudentReports();
 		requestObj.setPen(pen);

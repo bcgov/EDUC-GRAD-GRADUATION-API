@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 public class CertificateType {
+
     private String reportName;
     private PaperType paperType;
 
@@ -12,6 +15,7 @@ public class CertificateType {
         this.reportName = value;
     }
 
+    @JsonDeserialize(as = PaperType.class)
     public PaperType getPaperType() {
         return paperType;
     }
