@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import java.io.Serializable;
-
-public class Course implements Serializable {
-    private static final long serialVersionUID = 2L;
+public class TranscriptCourse {
 
     private String name;
     private String code;

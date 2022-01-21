@@ -1,52 +1,47 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import lombok.Data;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 
+import java.io.Serializable;
+
+@Data
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-public class ReportOptions {
-    private boolean cacheReport;
-    private String convertTo;
-    private boolean overwrite;
-    private String reportName;
-    private String reportFile;
+public class ReportOptions implements Serializable {
 
-    public boolean getCacheReport() {
-        return cacheReport;
-    }
+	private static final long serialVersionUID = 2L;
 
-    public void setCacheReport(boolean value) {
-        this.cacheReport = value;
-    }
+	private boolean cacheReport;
+	private String convertTo;
+	private boolean overwrite;
+	private String reportName;
+	private String reportFile;
 
-    public String getConvertTo() {
-        return convertTo;
-    }
+	public ReportOptions() {
+	}
 
-    public void setConvertTo(String value) {
-        this.convertTo = value;
-    }
-
-    public boolean getOverwrite() {
-        return overwrite;
-    }
-
-    public void setOverwrite(boolean value) {
-        this.overwrite = value;
-    }
-
-    public String getReportName() {
-        return reportName;
-    }
-
-    public void setReportName(String value) {
-        this.reportName = value;
-    }
-
-    public String getReportFile() {
-        return reportFile;
-    }
-
-    public void setReportFile(String value) {
-        this.reportFile = value;
-    }
+	public ReportOptions(String reportName) {
+		switch(reportName) {
+			case "achievement":
+				this.cacheReport = false;
+				this.convertTo = "pdf";
+				this.overwrite = true;
+				this.reportFile = "studentAchievementReport.pdf";
+				break;
+			case "transcript":
+				this.cacheReport = false;
+				this.convertTo = "pdf";
+				this.overwrite = true;
+				this.reportFile = "studentTranscriptReport.pdf";
+				break;
+			case "certificate":
+				this.cacheReport = false;
+				this.convertTo = "pdf";
+				this.overwrite = true;
+				this.reportFile = "studentCertificate.pdf";
+				break;
+			default:
+				throw new RuntimeException("Unknown Report");
+		}
+	}
 }

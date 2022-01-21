@@ -2,17 +2,23 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class Certificate {
-    private String issued;
-    private boolean isOrigin;
+import java.io.Serializable;
+import java.util.Date;
+
+public class Certificate implements Serializable {
+    private static final long serialVersionUID = 2L;
+
+    private Date issued;
+    private String certStyle;
     private OrderType orderType;
+    private boolean isOrigin;
 
     @JsonFormat(pattern="yyyy-MM-dd")
-    public String getIssued() {
+    public Date getIssued() {
         return issued;
     }
 
-    public void setIssued(String value) {
+    public void setIssued(Date value) {
         this.issued = value;
     }
 
@@ -24,11 +30,19 @@ public class Certificate {
         this.orderType = value;
     }
 
-    public boolean isOrigin() {
+    public boolean getIsOrigin() {
         return isOrigin;
     }
 
-    public void setOrigin(boolean origin) {
+    public void setIsOrigin(boolean origin) {
         isOrigin = origin;
+    }
+
+    public String getCertStyle() {
+        return certStyle;
+    }
+
+    public void setCertStyle(String certStyle) {
+        this.certStyle = certStyle;
     }
 }

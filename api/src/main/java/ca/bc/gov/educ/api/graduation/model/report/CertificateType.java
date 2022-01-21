@@ -1,6 +1,13 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-public class CertificateType {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.io.Serializable;
+
+public class CertificateType implements Serializable {
+
+    private static final long serialVersionUID = 2L;
+
     private String reportName;
     private PaperType paperType;
 
@@ -12,6 +19,7 @@ public class CertificateType {
         this.reportName = value;
     }
 
+    @JsonDeserialize(as = PaperType.class)
     public PaperType getPaperType() {
         return paperType;
     }
