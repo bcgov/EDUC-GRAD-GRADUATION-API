@@ -159,4 +159,9 @@ public class EducGraduationApiUtils {
 		}
 		return sDates;
 	}
+
+	public static String getSimpleDateFormat(Date date) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		return formatter.format(date);
+	}
 }

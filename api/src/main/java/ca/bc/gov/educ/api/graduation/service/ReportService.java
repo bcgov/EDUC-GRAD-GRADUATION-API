@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -353,9 +352,7 @@ public class ReportService {
 		data.setStudentCourses(sCourseList);
 
 		Assessment achv = new Assessment();
-		Date date = new Date();
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(formatter.format(date)));
+		achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
 		achv.setResults(getAssessmentResults(studentAssessmentList));
 		data.setAssessment(achv);
 
