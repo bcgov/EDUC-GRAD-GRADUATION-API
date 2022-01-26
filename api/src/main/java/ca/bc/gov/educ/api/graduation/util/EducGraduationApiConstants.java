@@ -38,6 +38,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-graduation-report-api.update-grad-student-report.url}")
     private String updateGradStudentReport;
+
+    @Value("${endpoint.grad-graduation-report-api.update-grad-student-transcript.url}")
+    private String updateGradStudentTranscript;
     
     @Value("${endpoint.grad-graduation-report-api.update-grad-student-certificate.url}")
     private String updateGradStudentCertificate;
@@ -65,6 +68,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
     private String certList;
+
+    @Value("${endpoint.grad-graduation-report-api.get-transcript}")
+    private String transcript;
     
     @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
     private String specialCase;
