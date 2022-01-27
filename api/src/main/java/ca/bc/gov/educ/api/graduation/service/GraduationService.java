@@ -39,7 +39,7 @@ public class GraduationService {
 	GradAlgorithmService gradAlgorithmService;
 	
 	@Autowired
-	SpecialProgramService specialProgramService;
+	OptionalProgramService optionalProgramService;
 	
 	@Autowired
 	ReportService reportService;
@@ -47,7 +47,7 @@ public class GraduationService {
 	@Autowired
 	GradValidation validation;
 	
-	public AlgorithmResponse graduateStudent(String studentID, String accessToken,String projectedType) {
+	public AlgorithmResponse graduateStudent(String studentID, Long batchId,String accessToken,String projectedType) {
 		
 		exception = new ExceptionMessage();
 		AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
@@ -58,8 +58,8 @@ public class GraduationService {
 			aR.setException(exception);
 			return aR;
 		}
-		if(gradResponse != null && !gradResponse.getStudentStatus().equals("D") && !gradResponse.getStudentStatus().equals("M")) {
-			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,exception);
+		if(gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
+			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,batchId,exception);
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
 	     	process.setInputData(data);
 	     	data = process.fire();
@@ -69,7 +69,7 @@ public class GraduationService {
 			ExceptionMessage exp = new ExceptionMessage();
 			exp.setExceptionName("STUDENT-NOT-ACCEPTABLE");
 			exp.setExceptionDetails(String.format("Graduation Algorithm Cannot be Run for this Student because of status %s",gradResponse.getStudentStatus()));
-			aR.setException(exception);
+			aR.setException(exp);
 			return aR;
 		}
 	}

@@ -1,9 +1,10 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.io.Serializable;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-public class Address {
+public class Address implements Serializable {
+    private static final long serialVersionUID = 2L;
+
     private String streetLine1;
     private String streetLine2;
     private String city;

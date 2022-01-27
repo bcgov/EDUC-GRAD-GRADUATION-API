@@ -10,15 +10,15 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class GradStudentSpecialProgram extends BaseModel{
+public class GradStudentOptionalProgram extends BaseModel{
 
 	private UUID id;
     private String pen;
-    private UUID specialProgramID;
-    private String studentSpecialProgramData;
-    private String specialProgramCompletionDate;
-    private String specialProgramName;
-    private String specialProgramCode;
+    private UUID optionalProgramID;
+    private String studentOptionalProgramData;
+    private String optionalProgramCompletionDate;
+    private String optionalProgramName;
+    private String optionalProgramCode;
     private String mainProgramCode;
     private UUID studentID;
 				

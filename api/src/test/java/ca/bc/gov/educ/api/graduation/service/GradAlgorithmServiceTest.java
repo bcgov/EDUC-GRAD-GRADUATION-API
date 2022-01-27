@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -71,6 +73,20 @@ public class GradAlgorithmServiceTest {
     public void tearDown() {
 
     }
+
+    @Test
+	public void testRunGradAlgorithm_whenAPIisDown_throwsException() {
+		UUID studentID = new UUID(1, 1);
+		String programCode="2018-EN";
+		String accessToken = "accessToken";
+
+		when(this.webClient.get()).thenThrow(new RuntimeException("Test - API is down"));
+		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,accessToken,exception);
+		assertNull(res);
+
+		assertNotNull(exception);
+		assertThat(exception.getExceptionName()).isEqualTo("GRAD-ALGORITHM-API IS DOWN");
+	}
 	
 	@Test
 	public void testRunGradAlgorithm() {

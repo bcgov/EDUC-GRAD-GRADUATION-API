@@ -38,6 +38,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-graduation-report-api.update-grad-student-report.url}")
     private String updateGradStudentReport;
+
+    @Value("${endpoint.grad-graduation-report-api.update-grad-student-transcript.url}")
+    private String updateGradStudentTranscript;
     
     @Value("${endpoint.grad-graduation-report-api.update-grad-student-certificate.url}")
     private String updateGradStudentCertificate;
@@ -57,17 +60,27 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
     private String programNameEndpoint;
     
-    @Value("${endpoint.grad-student-api.save-special-program-grad-status}")
-    private String saveSpecialProgramGradStatus;
+    @Value("${endpoint.grad-student-api.save-optional-program-grad-status}")
+    private String saveOptionalProgramGradStatus;
     
-    @Value("${endpoint.grad-student-api.get-special-program-details}")
-    private String getSpecialProgramDetails; 
+    @Value("${endpoint.grad-student-api.get-optional-program-details}")
+    private String getOptionalProgramDetails; 
     
     @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
     private String certList;
+
+    @Value("${endpoint.grad-graduation-report-api.get-transcript}")
+    private String transcript;
     
     @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
     private String specialCase;
+
+    @Value("${endpoint.educ-school-api.url}")
+    private String schoolCategoryCode;
+
+    @Value("${endpoint.grad-student-api.update-grad-status-projected}")
+    private String saveStudentRecordProjectedRun;
+
     
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";

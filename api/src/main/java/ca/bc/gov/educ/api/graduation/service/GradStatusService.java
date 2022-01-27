@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ public class GradStatusService {
     EducGraduationApiConstants educGraduationApiConstants;
 	
 	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
-		try 
+		exception = new ExceptionMessage();
+		try
 		{
 			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		} catch (Exception e) {
@@ -45,9 +47,14 @@ public class GradStatusService {
 		return obj;
 	}
 	
-	public GraduationStudentRecord saveStudentGradStatus(String studentID,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
+	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
+		exception = new ExceptionMessage();
 		try {
-			return webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStatus(),studentID)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+			String url = educGraduationApiConstants.getUpdateGradStatus();
+			if(batchId != null) {
+				url = url + "?batchId=%s";
+			}
+			return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
 			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
@@ -55,12 +62,33 @@ public class GradStatusService {
 		}
 	}
 
-	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus) throws JsonProcessingException {
-		gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+	public GraduationStudentRecord saveStudentRecordProjectedRun(String studentID,Long batchId,String accessToken, ExceptionMessage exception) {
+		exception = new ExceptionMessage();
+		try {
+			String url = educGraduationApiConstants.getSaveStudentRecordProjectedRun();
+			if(batchId != null) {
+				url = url + "?batchId=%s";
+			}
+			return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		}catch(Exception e) {
+			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
+	}
+
+	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus)  {
+
+		try {
+			gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
 		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
 		gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursStanding());
 		gradResponse.setRecalculateGradStatus(graduationDataStatus.getGradStatus().getRecalculateGradStatus());
+
 		return gradResponse;
 	}
 

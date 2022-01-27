@@ -63,8 +63,8 @@ public class GraduationControllerTest {
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
-		spgm.setSpecialProgramCode("BD");
-		spgm.setSpecialProgramName("International Bacculaurette");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
@@ -80,9 +80,9 @@ public class GraduationControllerTest {
 		AlgorithmResponse alRes = new AlgorithmResponse();
 		alRes.setGraduationStudentRecord(gradResponse);
 		alRes.setStudentOptionalProgram(list);
-		Mockito.when(graduationService.graduateStudent(studentID,null,projectedType)).thenReturn(alRes);
-		graduationController.graduateStudentNew(studentID,projectedType);
-		Mockito.verify(graduationService).graduateStudent(studentID,null,projectedType);
+		Mockito.when(graduationService.graduateStudent(studentID,null,null,projectedType)).thenReturn(alRes);
+		graduationController.graduateStudentNew(studentID,projectedType,null);
+		Mockito.verify(graduationService).graduateStudent(studentID,null,null,projectedType);
 	}
 	
 	

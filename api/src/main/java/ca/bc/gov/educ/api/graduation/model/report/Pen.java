@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.io.Serializable;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-public class Pen {
+public class Pen implements Serializable {
+
+    private static final long serialVersionUID = 2L;
+
     private String pen;
     private Object entityID;
 

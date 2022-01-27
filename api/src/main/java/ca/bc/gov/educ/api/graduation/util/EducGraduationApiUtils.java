@@ -107,6 +107,32 @@ public class EducGraduationApiUtils {
 
 	}
 
+	public static Date formatIssueDateForReportJasper(String updatedTimestamp) {
+		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			return new SimpleDateFormat("yyyy-MM-dd").parse(myFormat.format(fromUser.parse(updatedTimestamp)));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	public static String parsingDateForCertificate(String sessionDate) {
+		String actualSessionDate = sessionDate + "/01";
+		Date temp = new Date();
+		String sDates = null;
+		try {
+			temp = parseDate(actualSessionDate, "yyyy/MM/dd");
+			sDates = formatDate(temp, "yyyy-MM-dd");
+		} catch (ParseException pe) {
+			logger.error("ERROR: " + pe.getMessage());
+		}
+		return sDates;
+	}
+
 	public static Date parsingTraxDate(String sessionDate) {
 		String actualSessionDate = sessionDate + "/01";
 		Date temp = new Date();
@@ -132,5 +158,10 @@ public class EducGraduationApiUtils {
 			logger.error("ERROR: " + pe.getMessage());
 		}
 		return sDates;
+	}
+
+	public static String getSimpleDateFormat(Date date) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		return formatter.format(date);
 	}
 }
