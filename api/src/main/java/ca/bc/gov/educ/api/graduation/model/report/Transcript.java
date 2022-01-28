@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 
@@ -26,6 +27,16 @@ public class Transcript implements Serializable {
 
     public void setInterim(String value) {
         this.interim = value;
+    }
+
+    @JsonProperty("code")
+    @JsonDeserialize(as = Code.class)
+    public Code getTranscriptTypeCode() {
+        return transcriptTypeCode;
+    }
+
+    public void setTranscriptTypeCode(Code code) {
+        this.transcriptTypeCode = code;
     }
 
     @JsonFormat(pattern="yyyy-MM-dd")
