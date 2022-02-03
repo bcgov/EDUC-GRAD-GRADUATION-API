@@ -228,17 +228,13 @@ public class ReportService {
 	}
 
 	private String getAssessmentFinalPercent(StudentAssessment sA, String accessToken) {
-		String finalPercent;
-		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
-			finalPercent = sA.getSpecialCase();
-			if (sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E")) {
+		String finalPercent=sA.getProficiencyScore() != null ? new DecimalFormat("#").format(sA.getProficiencyScore()) : "";
+		if (sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
+			finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
+		}else {
+			if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim()) && (sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E"))) {
 				SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(SpecialCase.class).block();
 				finalPercent = spC != null ? spC.getLabel():"";
-			}
-		} else {
-			finalPercent = sA.getProficiencyScore() != null ? new DecimalFormat("#").format(sA.getProficiencyScore()) : "";
-			if (sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
-				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
 			}
 		}
 		return finalPercent;
@@ -521,10 +517,8 @@ public class ReportService {
 		certData.setCertificate(getCertificateData(gradResponse,certType));
 		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
 			certData.getStudent().setEnglishCert(certType.getCertificateTypeCode());
-			certData.getStudent().setFrenchCert(null);
 		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S")) {
 			certData.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-			certData.getStudent().setEnglishCert(null);
 		}
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken,exception);
 		GradStudentCertificates requestObj = new GradStudentCertificates();

@@ -1295,6 +1295,47 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testSaveStudentAchievementReport() throws Exception {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+		String pen = "212321123";
+		boolean isGraduated = false;
+		ReportData data = createReportData("json/reportdataAchv.json");
+		GradStudentReports rep = new GradStudentReports();
+		rep.setPen(pen);
+		byte[] bytesSAR = RandomUtils.nextBytes(20);
+
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("1231123");
+		commSch.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getAchievementReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentReport(),isGraduated))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));
+
+		reportService.saveStudentAchivementReportJasper(pen, data, accessToken, UUID.fromString(studentID), exception, isGraduated);
+
+	}
+
+	@Test
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
@@ -1308,6 +1349,14 @@ public class ReportServiceTest {
 		String json = readInputStream(inputStream);
 		return (GraduationData)jsonTransformer.unmarshall(json, GraduationData.class);
 	}
+
+	protected ReportData createReportData(String jsonPath) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(jsonPath);
+		String json = readInputStream(inputStream);
+		return (ReportData)jsonTransformer.unmarshall(json, ReportData.class);
+	}
+
 
 	protected List<StudentOptionalProgram> createStudentOptionalProgramData(String jsonPath) throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();
