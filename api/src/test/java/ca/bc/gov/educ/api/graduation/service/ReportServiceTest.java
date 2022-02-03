@@ -93,7 +93,7 @@ public class ReportServiceTest {
 	@Test
 	public void testSaveStudentCertificateReport() {
 		UUID studentID = new UUID(1, 1);
-		
+		ExceptionMessage exception = new ExceptionMessage();
 		String accessToken = "accessToken";
 		String pen="212321123";
 		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
@@ -174,7 +174,7 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));		
 		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc,exception);
-       
+        assertThat(exception.getExceptionName()).isNull();
 	}
 	
 	@Test
@@ -190,7 +190,7 @@ public class ReportServiceTest {
 		code.setCode("BC1996-PUB");
 		transcript.setTranscriptTypeCode(code);
 		data.setTranscript(transcript);
-		
+		ExceptionMessage exception = new ExceptionMessage();
 		GradStudentReports rep = new GradStudentReports();
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
@@ -214,14 +214,15 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
         
         when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentReport(), pen))).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentTranscript(),isGraduated))).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception,isGraduated);	
-       
+
+		reportService.saveStudentTranscriptReportJasper(pen, data, accessToken, UUID.fromString(studentID),exception,isGraduated);
+		assertThat(exception.getExceptionName()).isNull();
 	}
 
 	@Test
@@ -352,8 +353,8 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
         
-        
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+        List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -422,7 +423,8 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
 
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -490,8 +492,9 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
-        
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+
+		List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -553,7 +556,8 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
 		
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -622,7 +626,8 @@ public class ReportServiceTest {
 		spgm.setOptionalProgramCompletionDate("2020-09-01");
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -692,7 +697,8 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
 
-		reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
+		assertThat(listCC.size()).isEqualTo(1);
 	}
 	
 	@Test
@@ -718,10 +724,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
+		sc.setCourseName("DERQ WEW");
+		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -792,7 +801,8 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		optionalProgram.add(cDto);
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
 	}
 	
 	@Test
@@ -800,7 +810,7 @@ public class ReportServiceTest {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram(null);
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
@@ -818,10 +828,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
+		sc.setCourseName("FEREE FREE");
 		sc.setCredits(4);
+		sc.setCreditsUsedForGrad(2);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -891,7 +904,8 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
 	}
 	
 	@Test
@@ -920,11 +934,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
 		sc.setCredits(4);
+		sc.setCreditsUsedForGrad(2);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1001,7 +1017,8 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
 	}
 	
 	@Test
@@ -1027,8 +1044,8 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
+		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
@@ -1102,7 +1119,8 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
 	}
 	
 	@Test
@@ -1128,13 +1146,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
+		sc.setCreditsUsedForGrad(2);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1204,7 +1222,8 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
 	}
 	
 
@@ -1283,14 +1302,56 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
+	}
+
+	@Test
+	public void testSaveStudentAchievementReport() throws Exception {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+		String pen = "212321123";
+		boolean isGraduated = false;
+		ReportData data = createReportData("json/reportdataAchv.json");
+		GradStudentReports rep = new GradStudentReports();
+		rep.setPen(pen);
+		byte[] bytesSAR = RandomUtils.nextBytes(20);
+		ExceptionMessage exception = new ExceptionMessage();
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("1231123");
+		commSch.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getAchievementReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentReport(),isGraduated))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));
+
+		reportService.saveStudentAchivementReportJasper(pen, data, accessToken, UUID.fromString(studentID), exception, isGraduated);
+		assertThat(exception.getExceptionName()).isNull();
 	}
 
 	@Test
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
-		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram);
+		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null);
 		assertNotNull(data);
 	}
 
@@ -1300,6 +1361,14 @@ public class ReportServiceTest {
 		String json = readInputStream(inputStream);
 		return (GraduationData)jsonTransformer.unmarshall(json, GraduationData.class);
 	}
+
+	protected ReportData createReportData(String jsonPath) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(jsonPath);
+		String json = readInputStream(inputStream);
+		return (ReportData)jsonTransformer.unmarshall(json, ReportData.class);
+	}
+
 
 	protected List<StudentOptionalProgram> createStudentOptionalProgramData(String jsonPath) throws Exception {
 		ClassLoader classLoader = getClass().getClassLoader();

@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,9 @@ public class ReportService {
 	private static final String GRAD_REPORT_API_DOWN = "GRAD-REPORT-API IS DOWN";
 	private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
 	private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
+
+	private static Logger logger = LoggerFactory.getLogger(ReportService.class);
+
 	@Autowired
 	WebClient webClient;
 
@@ -134,7 +140,7 @@ public class ReportService {
 				}
 				TranscriptCourse crse = new TranscriptCourse();
 				crse.setCode(sc.getCourseCode());
-				crse.setCredits(sc.getCredits().toString());
+				crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseName(),sc.getOriginalCredits() != null ? sc.getOriginalCredits():null,sc.getCredits(),sc.getFineArtsAppliedSkills()));
 				crse.setLevel(sc.getCourseLevel());
 				crse.setName(getCourseNameLogic(sc));
 
@@ -146,9 +152,9 @@ public class ReportService {
 
 				Mark mrk = new Mark();
 
-				mrk.setExamPercent(getValue(sc.getBestExamPercent()));
+				mrk.setExamPercent(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("A")==0 ?"AEG":getValue(sc.getBestExamPercent()));
 				mrk.setFinalLetterGrade(sc.getCompletedCourseLetterGrade());
-				mrk.setFinalPercent(getValue(sc.getCompletedCoursePercentage()));
+				mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate()));
 				mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
 				mrk.setInterimPercent(getValue(sc.getInterimPercent()));
 				mrk.setSchoolPercent(getValue(sc.getBestSchoolPercent()));
@@ -156,13 +162,16 @@ public class ReportService {
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
 				result.setRequirementName(sc.getGradReqMetDetail());
-				result.setEquivalency(equivOrChallenge);
+				result.setEquivalency(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("C")==0 ?"C":equivOrChallenge);
 				tList.add(result);
 			}
 		}
 
 		for (StudentAssessment sc : studentAssessmentList) {
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
+				if((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0){
+					continue;
+				}
 				TranscriptResult result = new TranscriptResult();
 				TranscriptCourse crse = new TranscriptCourse();
 				crse.setCode(sc.getAssessmentCode());
@@ -191,18 +200,41 @@ public class ReportService {
 		return tList;
 	}
 
+	private String getCredits(String program,String courseName, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills) {
+		if ((program.contains("2004") || program.contains("2018")) && (courseName.startsWith("X") || courseName.startsWith("CP"))) {
+			return String.format("(%s)",totalCredits);
+		}else if(program.contains("1996") && !courseName.startsWith("X") && !courseName.startsWith("CP") && !courseName.startsWith("IDS") && fineArtsAppliedSkills != null && fineArtsAppliedSkills.compareTo("F") != 0 && fineArtsAppliedSkills.compareTo("A") != 0 && totalCredits < originalCredits) {
+			return String.format("%sp",totalCredits);
+		}
+		return String.valueOf(totalCredits);
+	}
+	private String getFinalPercent(String finalCompletedPercentage,String sDate) {
+		String cutoffDate = "1994-09-01";
+		String sessionDate = sDate + "/01";
+		try {
+			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		} catch (ParseException pe) {
+			logger.error("ERROR: {}",pe.getMessage());
+		}
+
+		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
+
+		if (diff >= 0) {
+			return "---";
+		}else {
+			return finalCompletedPercentage;
+		}
+	}
+
 	private String getAssessmentFinalPercent(StudentAssessment sA, String accessToken) {
-		String finalPercent;
-		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
-			finalPercent = sA.getSpecialCase();
-			if (sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E")) {
+		String finalPercent=sA.getProficiencyScore() != null ? new DecimalFormat("#").format(sA.getProficiencyScore()) : "";
+		if (sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
+			finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
+		}else {
+			if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim()) && (sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E"))) {
 				SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(SpecialCase.class).block();
 				finalPercent = spC != null ? spC.getLabel():"";
-			}
-		} else {
-			finalPercent = sA.getProficiencyScore() != null ? new DecimalFormat("#").format(sA.getProficiencyScore()) : "";
-			if (sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) {
-				finalPercent = sA.getProficiencyScore() != null ? sA.getProficiencyScore().toString() : "RM";
 			}
 		}
 		return finalPercent;
@@ -334,7 +366,7 @@ public class ReportService {
 		return studObj;
 	}
 
-	private void getStudentCoursesAssessmentsNExams(ReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+	private void getStudentCoursesAssessmentsNExams(ReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
 		List<StudentCourse> studentExamList = studentCourseList
 				.stream()
@@ -343,37 +375,14 @@ public class ReportService {
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		List<AchievementCourse> sCourseList = new ArrayList<>();
 		List<Exam> sExamList = new ArrayList<>();
-		for (StudentCourse sc : studentCourseList) {
-			AchievementCourse crse = new AchievementCourse();
-			String equivOrChallenge = "";
-			if (sc.getEquivOrChallenge() != null) {
-				equivOrChallenge = sc.getEquivOrChallenge();
-			}
-
-			crse.setCourseCode(sc.getCourseCode());
-			crse.setCredits(sc.getCredits().toString());
-			crse.setCourseLevel(sc.getCourseLevel());
-			crse.setCourseName(getCourseNameLogic(sc));
-			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
-			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
-			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
-			crse.setGradReqMet(sc.getGradReqMet());
-			crse.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "0");
-			crse.setEquivOrChallenge(equivOrChallenge);
-			sCourseList.add(crse);
-		}
-		if (!sCourseList.isEmpty()) {
-			Collections.sort(sCourseList, Comparator.comparing(AchievementCourse::getCourseCode)
-					.thenComparing(AchievementCourse::getCourseLevel)
-					.thenComparing(AchievementCourse::getSessionDate));
-		}
-		data.setStudentCourses(sCourseList);
-
+		data.setStudentCourses(processStudentCourses(sCourseList,studentCourseList));
 		Assessment achv = new Assessment();
 		achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
-		achv.setResults(getAssessmentResults(studentAssessmentList));
+		achv.setResults(getAssessmentResults(studentAssessmentList,accessToken));
 		data.setAssessment(achv);
-
+		data.setStudentExams(processStudentExams(sExamList,studentExamList));
+	}
+	private List<Exam> processStudentExams(List<Exam> sExamList,List<StudentCourse> studentExamList) {
 		for (StudentCourse sc : studentExamList) {
 			Exam crse = new Exam();
 			String equivOrChallenge = "";
@@ -401,9 +410,36 @@ public class ReportService {
 					.thenComparing(Exam::getCourseLevel)
 					.thenComparing(Exam::getSessionDate));
 		}
-		data.setStudentExams(sExamList);
+		return sExamList;
 	}
-	private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList) {
+	private List<AchievementCourse> processStudentCourses(List<AchievementCourse> sCourseList, List<StudentCourse> studentCourseList) {
+		for (StudentCourse sc : studentCourseList) {
+			AchievementCourse crse = new AchievementCourse();
+			String equivOrChallenge = "";
+			if (sc.getEquivOrChallenge() != null) {
+				equivOrChallenge = sc.getEquivOrChallenge();
+			}
+
+			crse.setCourseCode(sc.getCourseCode());
+			crse.setCredits(sc.getCredits().toString());
+			crse.setCourseLevel(sc.getCourseLevel());
+			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
+			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
+			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
+			crse.setGradReqMet(sc.getGradReqMet());
+			crse.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "0");
+			crse.setEquivOrChallenge(equivOrChallenge);
+			sCourseList.add(crse);
+		}
+		if (!sCourseList.isEmpty()) {
+			Collections.sort(sCourseList, Comparator.comparing(AchievementCourse::getCourseCode)
+					.thenComparing(AchievementCourse::getCourseLevel)
+					.thenComparing(AchievementCourse::getSessionDate));
+		}
+		return sCourseList;
+	}
+	private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList,String accessToken) {
 		List<AssessmentResult> tList = new ArrayList<>();
 		for (StudentAssessment sA : studentAssessmentList) {
 			AssessmentResult result = new AssessmentResult();
@@ -411,7 +447,7 @@ public class ReportService {
 			result.setAssessmentName(sA.getAssessmentName());
 			result.setGradReqMet(sA.getGradReqMet());
 			result.setSessionDate(sA.getSessionDate() != null ? sA.getSessionDate(): "");
-			result.setProficiencyScore(sA.getProficiencyScore() != null? sA.getProficiencyScore():null);
+			result.setProficiencyScore(getAssessmentFinalPercent(sA, accessToken));
 			result.setSpecialCase(sA.getSpecialCase());
 			result.setExceededWriteFlag(sA.getExceededWriteFlag());
 			tList.add(result);
@@ -550,13 +586,13 @@ public class ReportService {
 	}
 
 	public ReportData prepareAchievementReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList) {
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList,String accessToken) {
 		ReportData data = new ReportData();
 		data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(),optionalProgramList));
 		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
 		data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
-		getStudentCoursesAssessmentsNExams(data,graduationDataStatus);
+		getStudentCoursesAssessmentsNExams(data,graduationDataStatus,accessToken);
 		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 		data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
 		return data;
