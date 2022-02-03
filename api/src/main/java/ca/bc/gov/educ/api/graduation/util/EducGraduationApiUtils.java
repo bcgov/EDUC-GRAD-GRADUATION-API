@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -163,5 +164,17 @@ public class EducGraduationApiUtils {
 	public static String getSimpleDateFormat(Date date) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.format(date);
+	}
+
+	public static int getDifferenceInMonths(String date1, String date2) {
+		Period diff = Period.between(
+				LocalDate.parse(date1).withDayOfMonth(1),
+				LocalDate.parse(date2).withDayOfMonth(1));
+		int monthsYear = diff.getYears() * 12;
+		int months = diff.getMonths();
+
+
+
+		return monthsYear + months;
 	}
 }

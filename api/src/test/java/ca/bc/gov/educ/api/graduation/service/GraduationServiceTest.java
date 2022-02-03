@@ -118,7 +118,7 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list)).thenReturn(data);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null)).thenReturn(data);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
@@ -179,7 +179,7 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list)).thenReturn(data);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null)).thenReturn(data);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);

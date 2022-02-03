@@ -718,10 +718,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
+		sc.setCourseName("DERQ WEW");
+		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -800,7 +803,7 @@ public class ReportServiceTest {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram(null);
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
@@ -818,10 +821,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
+		sc.setCourseName("FEREE FREE");
 		sc.setCredits(4);
+		sc.setCreditsUsedForGrad(2);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -920,11 +926,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
 		sc.setCredits(4);
+		sc.setCreditsUsedForGrad(2);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1027,8 +1035,8 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
+		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
@@ -1128,13 +1136,13 @@ public class ReportServiceTest {
 		
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
-		sc.setCourseCode("FDFE");
+		sc.setCourseName("FDFE FREE");
+		sc.setCreditsUsedForGrad(2);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1290,7 +1298,7 @@ public class ReportServiceTest {
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
-		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram);
+		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null);
 		assertNotNull(data);
 	}
 

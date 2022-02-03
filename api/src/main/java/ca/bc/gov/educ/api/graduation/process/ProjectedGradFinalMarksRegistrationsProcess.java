@@ -65,7 +65,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			logger.info("gradResponse {}",gradResponse);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse);
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, getProcessorData().getAccessToken());
 			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 			algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			algorithmResponse.setGraduationStudentRecord(gradResponse);
