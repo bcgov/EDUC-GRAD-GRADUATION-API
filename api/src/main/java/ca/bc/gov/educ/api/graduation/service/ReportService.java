@@ -203,10 +203,8 @@ public class ReportService {
 	private String getCredits(String program,String courseName, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills) {
 		if ((program.contains("2004") || program.contains("2018")) && (courseName.startsWith("X") || courseName.startsWith("CP"))) {
 			return String.format("(%s)",totalCredits);
-		}else if(program.contains("1996") && !courseName.startsWith("X") && !courseName.startsWith("CP") && !courseName.startsWith("IDS") && fineArtsAppliedSkills != null && fineArtsAppliedSkills.compareTo("F") != 0 && fineArtsAppliedSkills.compareTo("A") != 0 ) {
-			if(totalCredits < originalCredits) {
-				return String.format("%sp",totalCredits);
-			}
+		}else if(program.contains("1996") && !courseName.startsWith("X") && !courseName.startsWith("CP") && !courseName.startsWith("IDS") && fineArtsAppliedSkills != null && fineArtsAppliedSkills.compareTo("F") != 0 && fineArtsAppliedSkills.compareTo("A") != 0 && totalCredits < originalCredits) {
+			return String.format("%sp",totalCredits);
 		}
 		return String.valueOf(totalCredits);
 	}
@@ -381,37 +379,14 @@ public class ReportService {
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		List<AchievementCourse> sCourseList = new ArrayList<>();
 		List<Exam> sExamList = new ArrayList<>();
-		for (StudentCourse sc : studentCourseList) {
-			AchievementCourse crse = new AchievementCourse();
-			String equivOrChallenge = "";
-			if (sc.getEquivOrChallenge() != null) {
-				equivOrChallenge = sc.getEquivOrChallenge();
-			}
-
-			crse.setCourseCode(sc.getCourseCode());
-			crse.setCredits(sc.getCredits().toString());
-			crse.setCourseLevel(sc.getCourseLevel());
-			crse.setCourseName(getCourseNameLogic(sc));
-			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
-			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
-			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
-			crse.setGradReqMet(sc.getGradReqMet());
-			crse.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "0");
-			crse.setEquivOrChallenge(equivOrChallenge);
-			sCourseList.add(crse);
-		}
-		if (!sCourseList.isEmpty()) {
-			Collections.sort(sCourseList, Comparator.comparing(AchievementCourse::getCourseCode)
-					.thenComparing(AchievementCourse::getCourseLevel)
-					.thenComparing(AchievementCourse::getSessionDate));
-		}
-		data.setStudentCourses(sCourseList);
-
+		data.setStudentCourses(processStudentCourses(sCourseList,studentCourseList));
 		Assessment achv = new Assessment();
 		achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
 		achv.setResults(getAssessmentResults(studentAssessmentList,accessToken));
 		data.setAssessment(achv);
-
+		data.setStudentExams(processStudentExams(sExamList,studentExamList));
+	}
+	private List<Exam> processStudentExams(List<Exam> sExamList,List<StudentCourse> studentExamList) {
 		for (StudentCourse sc : studentExamList) {
 			Exam crse = new Exam();
 			String equivOrChallenge = "";
@@ -439,7 +414,34 @@ public class ReportService {
 					.thenComparing(Exam::getCourseLevel)
 					.thenComparing(Exam::getSessionDate));
 		}
-		data.setStudentExams(sExamList);
+		return sExamList;
+	}
+	private List<AchievementCourse> processStudentCourses(List<AchievementCourse> sCourseList, List<StudentCourse> studentCourseList) {
+		for (StudentCourse sc : studentCourseList) {
+			AchievementCourse crse = new AchievementCourse();
+			String equivOrChallenge = "";
+			if (sc.getEquivOrChallenge() != null) {
+				equivOrChallenge = sc.getEquivOrChallenge();
+			}
+
+			crse.setCourseCode(sc.getCourseCode());
+			crse.setCredits(sc.getCredits().toString());
+			crse.setCourseLevel(sc.getCourseLevel());
+			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
+			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
+			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
+			crse.setGradReqMet(sc.getGradReqMet());
+			crse.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "0");
+			crse.setEquivOrChallenge(equivOrChallenge);
+			sCourseList.add(crse);
+		}
+		if (!sCourseList.isEmpty()) {
+			Collections.sort(sCourseList, Comparator.comparing(AchievementCourse::getCourseCode)
+					.thenComparing(AchievementCourse::getCourseLevel)
+					.thenComparing(AchievementCourse::getSessionDate));
+		}
+		return sCourseList;
 	}
 	private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList,String accessToken) {
 		List<AssessmentResult> tList = new ArrayList<>();
