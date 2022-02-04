@@ -354,7 +354,7 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
         
         List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
@@ -424,7 +424,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
@@ -494,7 +494,7 @@ public class ReportServiceTest {
         when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
 
 		List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
@@ -557,7 +557,7 @@ public class ReportServiceTest {
 		
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
@@ -627,7 +627,7 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 		List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
@@ -698,7 +698,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(comSchObj));
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
-		assertThat(listCC.size()).isEqualTo(1);
+		assertThat(listCC).hasSize(1);
 	}
 	
 	@Test
