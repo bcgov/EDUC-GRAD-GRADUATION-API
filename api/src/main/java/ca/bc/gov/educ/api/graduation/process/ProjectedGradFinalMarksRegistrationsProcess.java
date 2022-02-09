@@ -66,6 +66,12 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
 		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, getProcessorData().getAccessToken());
 		reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+		if(exception.getExceptionName() != null) {
+			algorithmResponse.setException(exception);
+			processorData.setAlgorithmResponse(algorithmResponse);
+			logger.info("**** Problem Generating TVR: ****");
+			return processorData;
+		}
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 		algorithmResponse.setGraduationStudentRecord(gradResponse);
 		long endTime = System.currentTimeMillis();
