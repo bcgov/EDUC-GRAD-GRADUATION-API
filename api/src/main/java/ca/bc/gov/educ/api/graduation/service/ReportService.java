@@ -319,7 +319,7 @@ public class ReportService {
 		schObj.setAddress(addRess);
 		schObj.setMincode(school.getMinCode());
 		schObj.setName(school.getSchoolName());
-		schObj.setSignatureCode(school.getSignatureDistrict());
+		schObj.setSignatureCode(school.getMinCode().substring(0, 3));
 		schObj.setDistno(school.getMinCode().substring(0, 3));
 		schObj.setSchlno(school.getMinCode());
 		return schObj;
