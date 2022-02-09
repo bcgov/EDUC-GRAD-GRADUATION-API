@@ -25,7 +25,6 @@ public class GradStatusService {
     EducGraduationApiConstants educGraduationApiConstants;
 	
 	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
-		exception = new ExceptionMessage();
 		try
 		{
 			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
@@ -48,7 +47,6 @@ public class GradStatusService {
 	}
 	
 	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
-		exception = new ExceptionMessage();
 		try {
 			String url = educGraduationApiConstants.getUpdateGradStatus();
 			if(batchId != null) {
@@ -63,7 +61,6 @@ public class GradStatusService {
 	}
 
 	public GraduationStudentRecord saveStudentRecordProjectedRun(String studentID,Long batchId,String accessToken, ExceptionMessage exception) {
-		exception = new ExceptionMessage();
 		try {
 			String url = educGraduationApiConstants.getSaveStudentRecordProjectedRun();
 			if(batchId != null) {
