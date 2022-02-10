@@ -44,6 +44,9 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	
 	@Autowired
 	GradValidation validation;
+
+	@Autowired
+	AlgorithmSupport algorithmSupport;
 	
 	@Override
 	public ProcessorData fire() {
@@ -55,16 +58,8 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 		if(gradResponse.getProgramCompletionDate() != null) {
 			List<CodeDTO> optionalProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-			
-			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
-				logger.info("**** Grad Algorithm Has Errors: ****");
-				algorithmResponse.setException(graduationDataStatus.getException());
-				processorData.setAlgorithmResponse(algorithmResponse);
-				return processorData;
-			}else if(exception.getExceptionName() != null) {
-				logger.info("**** Grad Algorithm errored out: ****");
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
+
+			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
 			logger.info("**** Grad Algorithm Completed: ****");
@@ -76,7 +71,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
 				logger.info("**** Saved Grad Status: ****");
-				createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data);
+				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
 				if(exception.getExceptionName() != null) {
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
@@ -99,24 +94,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 		return processorData;
 	}
 
-	private void createReportNCert(GraduationData graduationDataStatus, GraduationStudentRecord graduationStatusResponse, GraduationStudentRecord gradResponse, List<StudentOptionalProgram> projectedOptionalGradResponse, ExceptionMessage exception, ReportData data) {
-		if(graduationDataStatus != null) {
-			if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {
-				List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
-				for (ProgramCertificateTranscript certType : certificateList) {
-					reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
-				}
-				logger.info("**** Saved Certificates: ****");
-			}
 
-			if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
-				logger.info("**** No Transcript Generated: ****");
-			} else {
-				reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
-				logger.info("**** Saved Reports: ****");
-			}
-		}
-	}
 	@Override
     public void setInputData(ProcessorData inputData) {
 		processorData = inputData;
