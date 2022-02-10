@@ -48,7 +48,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
-		if(algorithmSupport.checkForErrors(graduationDataStatus,exception,algorithmResponse,processorData)){
+		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
 		logger.info("**** Grad Algorithm Completed: ****");

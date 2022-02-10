@@ -18,15 +18,10 @@ public class AlgorithmSupport {
     @Autowired
     ReportService reportService;
 
-    public boolean checkForErrors(GraduationData graduationDataStatus, ExceptionMessage exception, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
+    public boolean checkForErrors(GraduationData graduationDataStatus, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
         if (graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
             logger.info("**** Grad Algorithm Has Errors: ****");
             algorithmResponse.setException(graduationDataStatus.getException());
-            processorData.setAlgorithmResponse(algorithmResponse);
-            return true;
-        } else if (exception.getExceptionName() != null) {
-            logger.info("**** Grad Algorithm errored out: ****");
-            algorithmResponse.setException(exception);
             processorData.setAlgorithmResponse(algorithmResponse);
             return true;
         }

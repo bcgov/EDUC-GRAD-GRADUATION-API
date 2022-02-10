@@ -37,14 +37,12 @@ public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 	
 	@Override
 	public ProcessorData fire() {
-		ExceptionMessage exception = new ExceptionMessage();
-
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
-		if(algorithmSupport.checkForErrors(graduationDataStatus,exception,algorithmResponse,processorData)){
+		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
 		logger.info("**** Grad Algorithm Completed: ****");

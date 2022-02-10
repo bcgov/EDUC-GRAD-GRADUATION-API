@@ -59,7 +59,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			List<CodeDTO> optionalProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
 
-			if(algorithmSupport.checkForErrors(graduationDataStatus,exception,algorithmResponse,processorData)){
+			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
 			logger.info("**** Grad Algorithm Completed: ****");
