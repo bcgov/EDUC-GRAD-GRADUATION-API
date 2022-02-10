@@ -40,9 +40,9 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 	
 	@Override
 	public ProcessorData fire() {
-		ExceptionMessage exception = processorData.getException();
+		ExceptionMessage exception = new ExceptionMessage();
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ "+startTime);
+		logger.info("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
@@ -59,24 +59,27 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		}
 		logger.info("**** Grad Algorithm Completed: ****");
 		//Code to prepare achievement report
-		GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentRecordProjectedRun(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
-		logger.info("**** graduationStatusResponse "+graduationStatusResponse);
-		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
-		logger.info("gradResponse {}",gradResponse);
-		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, getProcessorData().getAccessToken());
-		reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
-		if(exception.getExceptionName() != null) {
-			algorithmResponse.setException(exception);
-			processorData.setAlgorithmResponse(algorithmResponse);
-			logger.info("**** Problem Generating TVR: ****");
-			return processorData;
+		gradStatusService.saveStudentRecordProjectedRun(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
+		if(graduationDataStatus != null) {
+			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
+			logger.info("gradResponse {}", gradResponse);
+			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, getProcessorData().getAccessToken());
+			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+
+			if (exception.getExceptionName() != null) {
+				algorithmResponse.setException(exception);
+				processorData.setAlgorithmResponse(algorithmResponse);
+				logger.info("**** Problem Generating TVR: ****");
+				return processorData;
+			}
+
+			algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
+			algorithmResponse.setGraduationStudentRecord(gradResponse);
 		}
-		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
-		algorithmResponse.setGraduationStudentRecord(gradResponse);
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ "+diff+" secs");
+		logger.info("************* TIME Taken  ************ {}",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 
@@ -84,7 +87,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 
 	@Override
     public void setInputData(ProcessorData inputData) {
-		processorData = (ProcessorData)inputData;
+		processorData = inputData;
         logger.info("ProjectedGradFinalMarksRegistraionProcess: ");
     }
 
