@@ -48,8 +48,8 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 	@Override
 	public ProcessorData fire() {				
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ "+startTime);
-		ExceptionMessage exception = processorData.getException();
+		logger.info("************* TIME START  ************ {}",startTime);
+		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		if (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP") || gradResponse.getProgram().equalsIgnoreCase("NOPROG")) {
@@ -76,23 +76,11 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
 				logger.info("**** Saved Grad Status: ****");
-				if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {
-					List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
-					for (ProgramCertificateTranscript certType : certificateList) {
-						reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
-					}
-					logger.info("**** Saved Certificates: ****");
-				}
-				if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
-					logger.info("**** No Transcript Generated: ****");
-				} else {
-					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(), data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
-					logger.info("**** Saved Reports: ****");
-				}
+				createReportsNCerts(graduationStatusResponse,exception,gradResponse,graduationDataStatus,projectedOptionalGradResponse,data);
 				if (exception.getExceptionName() != null) {
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus != null && graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
@@ -106,9 +94,27 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 		}
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ "+diff+" secs");
+		logger.info("************* TIME Taken  ************ {} secs",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
+	}
+
+	private void createReportsNCerts(GraduationStudentRecord graduationStatusResponse, ExceptionMessage exception, GraduationStudentRecord gradResponse, GraduationData graduationDataStatus,List<StudentOptionalProgram> projectedOptionalGradResponse, ReportData data) {
+		if(graduationDataStatus != null) {
+			if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {
+				List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
+				for (ProgramCertificateTranscript certType : certificateList) {
+					reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
+				}
+				logger.info("**** Saved Certificates: ****");
+			}
+			if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
+				logger.info("**** No Transcript Generated: ****");
+			} else {
+				reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+				logger.info("**** Saved Reports: ****");
+			}
+		}
 	}
 
 	@Override
