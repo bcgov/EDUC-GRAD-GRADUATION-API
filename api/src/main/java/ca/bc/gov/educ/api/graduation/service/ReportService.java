@@ -149,7 +149,7 @@ public class ReportService {
 	private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String equivOrChallenge) {
 		TranscriptCourse crse = new TranscriptCourse();
 		crse.setCode(sc.getCourseCode());
-		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseName(),sc.getOriginalCredits() != null ? sc.getOriginalCredits():null,sc.getCredits(),sc.getFineArtsAppliedSkills()));
+		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseName(),sc.getOriginalCredits() != null ? sc.getOriginalCredits():null,sc.getCredits(),sc.getFineArtsAppliedSkills(),sc.isRestricted()));
 		crse.setLevel(sc.getCourseLevel());
 		crse.setName(getCourseNameLogic(sc));
 
@@ -210,11 +210,13 @@ public class ReportService {
 		return tList;
 	}
 
-	private String getCredits(String program,String courseName, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills) {
+	private String getCredits(String program,String courseName, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills,boolean isRestricted) {
 		if ((program.contains("2004") || program.contains("2018")) && (courseName.startsWith("X") || courseName.startsWith("CP"))) {
 			return String.format("(%s)",totalCredits);
 		}else if(program.contains("1996") && !courseName.startsWith("X") && !courseName.startsWith("CP") && !courseName.startsWith("IDS") && fineArtsAppliedSkills != null && fineArtsAppliedSkills.compareTo("F") != 0 && fineArtsAppliedSkills.compareTo("A") != 0 && totalCredits < originalCredits) {
 			return String.format("%sp",totalCredits);
+		}else if(isRestricted) {
+			return String.format("(%s)",totalCredits);
 		}
 		return String.valueOf(totalCredits);
 	}
