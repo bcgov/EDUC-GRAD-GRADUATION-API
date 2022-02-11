@@ -804,42 +804,59 @@ public class ReportServiceTest {
 		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
-	
-	@Test
-	public void testPrepareReportData_nullProgramData() {
-		String accessToken = "accessToken";
+
+	private GradAlgorithmGraduationStudentRecord getGradAlgorithmGraduationStatus(String program) {
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgram(program);
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("1");
-		
+		return gradAlgorithmGraduationStatus;
+	}
+
+	private GradSearchStudent getStudentObj () {
 		GradSearchStudent stuObj = new GradSearchStudent();
 		stuObj.setPen("123123123");
 		stuObj.setLegalFirstName("ABC");
 		stuObj.setLegalLastName("FDG");
 		stuObj.setSchoolOfRecord("12321321");
-		
+		return stuObj;
+	}
+
+	private List<StudentCourse> getStudentCourses(int totalCredits,int originalCredits) {
 		StudentCourse sc= new StudentCourse();
 		sc.setCourseCode("FDFE");
 		sc.setCourseName("FEREE FREE");
-		sc.setCredits(4);
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
 		sc.setCreditsUsedForGrad(2);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
 		sc.setEquivOrChallenge("E");
 		sc.setSpecialCase("F");
+		sc.setRestricted(true);
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
-		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
-		
+		sc= new StudentCourse();
+		sc.setCourseCode("CPUY");
+		sc.setCourseName("CP FEREE FREE");
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
+		sc.setCreditsUsedForGrad(2);
+		sc.setCustomizedCourseName("SREE");
+		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
+		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
+		sc.setRestricted(true);
+		sList.add(sc);
+		return sList;
+	}
+
+	private List<StudentAssessment> getStudentAssessments() {
 		StudentAssessment sA= new StudentAssessment();
 		sA.setAssessmentCode("FDFE");
 		sA.setAssessmentName("AASASA");
@@ -847,8 +864,25 @@ public class ReportServiceTest {
 		sA.setSpecialCase("A");
 		List<StudentAssessment> aList= new ArrayList<>();
 		aList.add(sA);
+		return aList;
+	}
+
+	@Test
+	public void testPrepareReportData_nullProgramData() {
+		String accessToken = "accessToken";
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("2018-EN");
+		
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("1");
+
+		GradSearchStudent stuObj = getStudentObj();
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(getStudentCourses(4,4));
+		
+
 		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
+		sAssessments.setStudentAssessmentList(getStudentAssessments());
 		
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -857,7 +891,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradStudent(stuObj);
 		
 		GradProgram gP = new GradProgram();
 		gP.setProgramCode("2018-EN");
@@ -911,57 +946,26 @@ public class ReportServiceTest {
 	@Test
 	public void testPrepareReportData_exams_notnull() {
 		String accessToken = "accessToken";
-		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("1996-EN");
 		
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("1");
-
-
-
 		
-		GradSearchStudent stuObj = new GradSearchStudent();
-		stuObj.setPen("123123123");
-		stuObj.setLegalFirstName("ABC");
-		stuObj.setLegalLastName("FDG");
-		stuObj.setSchoolOfRecord("12321321");
-		
-		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
-		sc.setCourseName("FDFE FREE");
-		sc.setCredits(4);
-		sc.setCreditsUsedForGrad(2);
-		sc.setCustomizedCourseName("SREE");
-		sc.setSessionDate("2020/12");
-		sc.setEquivOrChallenge("E");
-		sc.setSpecialCase("A");
-		List<StudentCourse> sList= new ArrayList<>();
-		sList.add(sc);
+		GradSearchStudent stuObj = getStudentObj();
+
 		StudentCourses sCourses = new StudentCourses();
-		sCourses.setStudentCourseList(sList);
+		sCourses.setStudentCourseList(getStudentCourses(2,4));
 		
 		StudentExam se= new StudentExam();
-		sc.setCourseCode("FDFE");
+		se.setCourseCode("FDFE");
 		List<StudentExam> eList= new ArrayList<>();
 		eList.add(se);
 		StudentExams eCourses = new StudentExams();
 		eCourses.setStudentExamList(eList);
-		
-		StudentAssessment sA= new StudentAssessment();
-		sA.setAssessmentCode("FDFE");
-		sA.setAssessmentName("AASASA");
-		sA.setSessionDate("2020/12");
-		sA.setSpecialCase("A");
-		List<StudentAssessment> aList= new ArrayList<>();
-		aList.add(sA);
+
 		StudentAssessments sAssessments = new StudentAssessments();
-		sAssessments.setStudentAssessmentList(aList);
+		sAssessments.setStudentAssessmentList(getStudentAssessments());
 		
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -971,7 +975,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);
-		graduationDataStatus.setStudentExams(eCourses);		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentExams(eCourses);
+		graduationDataStatus.setGradStudent(stuObj);
 		
 		GradProgram gP = new GradProgram();
 		gP.setProgramCode("2018-EN");
@@ -1011,7 +1016,90 @@ public class ReportServiceTest {
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
-		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgram("1996-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
+	}
+
+	@Test
+	public void testPrepareReportData_exams_notnull_2004() {
+		String accessToken = "accessToken";
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("2004-EN");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("1");
+
+		GradSearchStudent stuObj = getStudentObj();
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(getStudentCourses(2,4));
+
+		StudentExam se= new StudentExam();
+		se.setCourseCode("FDFE");
+		List<StudentExam> eList= new ArrayList<>();
+		eList.add(se);
+		StudentExams eCourses = new StudentExams();
+		eCourses.setStudentExamList(eList);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(getStudentAssessments());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setStudentExams(eCourses);
+		graduationDataStatus.setGradStudent(stuObj);
+
+		GradProgram gP = new GradProgram();
+		gP.setProgramCode("2018-EN");
+		gP.setProgramName("2018 Graduation Program");
+
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("06011033");
+		commSch.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
+		CodeDTO cDto = new CodeDTO();
+		cDto.setCode("FI");
+		cDto.setName("French Immersion");
+		optionalProgram.add(cDto);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2004-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
