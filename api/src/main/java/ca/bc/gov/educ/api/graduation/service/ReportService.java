@@ -201,10 +201,36 @@ public class ReportService {
 			}
 		}
 	}
-	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken) {
+	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
 		List<TranscriptResult> tList = new ArrayList<>();
+		String program = graduationDataStatus.getGradStatus().getProgram();
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
+		if (!studentCourseList.isEmpty()) {
+			if(program.contains("1950") || program.contains("1986")) {
+				List<StudentCourse> newList= new ArrayList<>();
+				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
+				if(!provinciallyExaminable.isEmpty()) {
+					provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
+					newList.addAll(provinciallyExaminable);
+				}
+
+				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
+				if(!nonExaminable.isEmpty()) {
+					nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
+					newList.addAll(nonExaminable);
+				}
+				if(!newList.isEmpty()) {
+					studentCourseList = new ArrayList<>();
+					studentCourseList.addAll(newList);
+				}
+			}else {
+				studentCourseList.sort(Comparator.comparing(StudentCourse::getCourseLevel,Comparator.nullsLast(String::compareTo)).thenComparing(StudentCourse::getCourseName));
+			}
+		}
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
+		if (!studentAssessmentList.isEmpty()) {
+			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
+		}
 		createCourseListForTranscript(studentCourseList,graduationDataStatus,tList);
 		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,accessToken);
 		return tList;
@@ -257,7 +283,7 @@ public class ReportService {
 		if ((sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) && (sA.getSpecialCase() == null || StringUtils.isBlank(sA.getSpecialCase().trim()))) {
 			finalPercent = "RM";
 		}
-		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim()) && (sA.getSpecialCase().equalsIgnoreCase("A") || sA.getSpecialCase().equalsIgnoreCase("E"))) {
+		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim()) && !sA.getSpecialCase().equalsIgnoreCase("X") && !sA.getSpecialCase().equalsIgnoreCase("Q")) {
 			SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(SpecialCase.class).block();
 			finalPercent = spC != null ? spC.getLabel():"";
 		}

@@ -838,6 +838,7 @@ public class ReportServiceTest {
 		sc.setEquivOrChallenge("E");
 		sc.setSpecialCase("F");
 		sc.setRestricted(true);
+		sc.setProvExamCourse("N");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		sc= new StudentCourse();
@@ -851,6 +852,7 @@ public class ReportServiceTest {
 		sc.setFineArtsAppliedSkills("B");
 		sc.setEquivOrChallenge("E");
 		sc.setSpecialCase("F");
+		sc.setProvExamCourse("Y");
 		sc.setRestricted(true);
 		sList.add(sc);
 		return sList;
@@ -1017,6 +1019,89 @@ public class ReportServiceTest {
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("1996-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
+		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		assertThat(dta).isNotNull();
+	}
+
+	@Test
+	public void testPrepareReportData_exams_notnull_1950() {
+		String accessToken = "accessToken";
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("1950");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("1");
+
+		GradSearchStudent stuObj = getStudentObj();
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(getStudentCourses(2,4));
+
+		StudentExam se= new StudentExam();
+		se.setCourseCode("FDFE");
+		List<StudentExam> eList= new ArrayList<>();
+		eList.add(se);
+		StudentExams eCourses = new StudentExams();
+		eCourses.setStudentExamList(eList);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(getStudentAssessments());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setStudentExams(eCourses);
+		graduationDataStatus.setGradStudent(stuObj);
+
+		GradProgram gP = new GradProgram();
+		gP.setProgramCode("1950");
+		gP.setProgramName("2018 Graduation Program");
+
+		SpecialCase sp = new SpecialCase();
+		sp.setSpCase("A");
+		sp.setLabel("AEG");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("06011033");
+		commSch.setSchoolCategoryCode("02");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
+		CodeDTO cDto = new CodeDTO();
+		cDto.setCode("FI");
+		cDto.setName("French Immersion");
+		optionalProgram.add(cDto);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("1950");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
