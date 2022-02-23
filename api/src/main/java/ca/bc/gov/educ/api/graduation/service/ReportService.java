@@ -135,7 +135,7 @@ public class ReportService {
 				if (sc.getEquivOrChallenge() != null) {
 					equivOrChallenge = sc.getEquivOrChallenge();
 				}
-				result.setCourse(setCourseObjForTranscript(sc,graduationDataStatus,equivOrChallenge));
+				result.setCourse(setCourseObjForTranscript(sc,graduationDataStatus));
 				result.setMark(setMarkObjForTranscript(sc));
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
@@ -146,7 +146,7 @@ public class ReportService {
 		}
 	}
 
-	private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String equivOrChallenge) {
+	private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
 		TranscriptCourse crse = new TranscriptCourse();
 		crse.setCode(sc.getCourseCode());
 		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseCode(),sc.getOriginalCredits() != null ? sc.getOriginalCredits():null,sc.getCredits(),sc.getFineArtsAppliedSkills(),sc.isRestricted()));
@@ -155,7 +155,7 @@ public class ReportService {
 
 		crse.setRelatedCourse(sc.getRelatedCourse());
 		crse.setRelatedLevel(sc.getRelatedLevel());
-		crse.setType(equivOrChallenge.equals("E") ? "1" : "2");
+		crse.setType(sc.getProvExamCourse().equals("Y") ? "1" : "2");
 		crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 		return  crse;
 	}
