@@ -730,6 +730,7 @@ public class ReportServiceTest {
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setProvExamCourse("Y");
 		sc.setSpecialCase("A");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
@@ -1220,6 +1221,7 @@ public class ReportServiceTest {
 		sc.setCourseName("FDFE FREE");
 		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
+		sc.setProvExamCourse("Y");
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
@@ -1326,6 +1328,7 @@ public class ReportServiceTest {
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
 		sc.setSpecialCase("A");
+		sc.setProvExamCourse("N");
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
