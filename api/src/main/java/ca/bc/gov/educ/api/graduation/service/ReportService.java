@@ -161,6 +161,7 @@ public class ReportService {
 	}
 	private Mark setMarkObjForTranscript(StudentCourse sc) {
 		Mark mrk = new Mark();
+		boolean useSchoolPercent = useSchoolExamPercent(sc.getSessionDate());
 		mrk.setExamPercent(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("A")==0 ?"AEG":getValue(sc.getBestExamPercent()));
 		mrk.setFinalLetterGrade(sc.getCompletedCourseLetterGrade());
 		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate()));
@@ -263,6 +264,24 @@ public class ReportService {
 		}else {
 			return finalCompletedPercentage;
 		}
+	}
+
+	private boolean useSchoolExamPercent(String sDate) {
+		String cutoffDate = "1991-11-01";
+		String sessionDate = sDate + "/01";
+		try {
+			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		} catch (ParseException pe) {
+			logger.error("ERROR: {}",pe.getMessage());
+		}
+
+		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
+
+		if (diff >= 0) {
+			return true;
+		}
+		return  false;
 	}
 
 	private String getAssessmentFinalPercentAchievement(StudentAssessment sA, String accessToken) {
@@ -474,6 +493,7 @@ public class ReportService {
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
 			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setInterimPercent(getValue(sc.getInterimPercent()));
 			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
