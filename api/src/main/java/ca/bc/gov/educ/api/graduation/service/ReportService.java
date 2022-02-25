@@ -136,7 +136,7 @@ public class ReportService {
 					equivOrChallenge = sc.getEquivOrChallenge();
 				}
 				result.setCourse(setCourseObjForTranscript(sc,graduationDataStatus));
-				result.setMark(setMarkObjForTranscript(sc));
+				result.setMark(setMarkObjForTranscript(sc,graduationDataStatus.getGradStatus().getProgram()));
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
 				result.setRequirementName(sc.getGradReqMetDetail());
@@ -159,15 +159,35 @@ public class ReportService {
 		crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 		return  crse;
 	}
-	private Mark setMarkObjForTranscript(StudentCourse sc) {
+	private Mark setMarkObjForTranscript(StudentCourse sc,String program) {
 		Mark mrk = new Mark();
-		mrk.setExamPercent(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("A")==0 ?"AEG":getValue(sc.getBestExamPercent()));
+		mrk.setExamPercent(getExamPercent(sc.getBestExamPercent(),program,sc.getCourseLevel(),sc.getSpecialCase()));
 		mrk.setFinalLetterGrade(sc.getCompletedCourseLetterGrade());
 		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate()));
 		mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
 		mrk.setInterimPercent(getValue(sc.getInterimPercent()));
-		mrk.setSchoolPercent(getValue(sc.getBestSchoolPercent()));
+		mrk.setSchoolPercent(getSchoolPercent(sc.getBestSchoolPercent(),program,sc.getCourseLevel()));
 		return mrk;
+	}
+
+	private String getExamPercent(Double bestExamPercent,String program,String courseLevel,String specialCase) {
+		String bExam = getValue(bestExamPercent);
+		if(specialCase != null && specialCase.compareTo("A")==0) {
+			return "AEG";
+		}else if((program.contains("2004") || program.contains("2018")) && !courseLevel.contains("12")) {
+			return "";
+		}else {
+			return bExam;
+		}
+	}
+
+	private String getSchoolPercent(Double bestSchoolPercent,String program,String courseLevel) {
+		String sExam = getValue(bestSchoolPercent);
+		if((program.contains("2004") || program.contains("2018")) && !courseLevel.contains("12")) {
+			return "";
+		}else {
+			return sExam;
+		}
 	}
 
 	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
@@ -264,7 +284,6 @@ public class ReportService {
 			return finalCompletedPercentage;
 		}
 	}
-
 	private String getAssessmentFinalPercentAchievement(StudentAssessment sA, String accessToken) {
 		String finalPercent=getValue(sA.getProficiencyScore());
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
@@ -474,6 +493,7 @@ public class ReportService {
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
 			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setInterimPercent(getValue(sc.getInterimPercent()));
 			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
