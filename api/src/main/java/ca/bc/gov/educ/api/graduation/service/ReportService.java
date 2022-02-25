@@ -667,35 +667,42 @@ public class ReportService {
 			op.setHasRequirementMet(" Check with School");
 			if(existingData != null && existingData.getOptionalRequirementsMet() != null) {
 				op.setHasRequirementMet("The Following Requirements Are Met");
-				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses()));
+				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses(),op.getNonGradReasons()));
 			}
 			opList.add(op);
 		}
 		return opList;
 	}
 
-	private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses) {
+	private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses, List<NonGradReason> nonGradReasons) {
 		List<GradRequirement> grList = new ArrayList<>();
 		for(ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr:optionalRequirementsMet) {
-			GradRequirement gRAchv = new GradRequirement();
-			gRAchv.setCode(gr.getRule());
-			gRAchv.setDescription(gr.getDescription());
+			if(!gr.isProjected()) {
+				GradRequirement gRAchv = new GradRequirement();
+				gRAchv.setCode(gr.getRule());
+				gRAchv.setDescription(gr.getDescription());
 
-			List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
-					.stream()
-					.filter(sc -> sc.getGradReqMet().contains(gr.getRule()))
-					.collect(Collectors.toList());
-			List<AchievementCourse> cdList = new ArrayList<>();
-			scList.forEach(sc->{
-				AchievementCourse cD = new AchievementCourse();
-				cD.setCourseCode(sc.getCourseCode());
-				cD.setCourseLevel(sc.getCourseLevel());
-				cD.setSessionDate(sc.getSessionDate());
-				cdList.add(cD);
-			});
+				List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
+						.stream()
+						.filter(sc -> sc.getGradReqMet().contains(gr.getRule()))
+						.collect(Collectors.toList());
+				List<AchievementCourse> cdList = new ArrayList<>();
+				scList.forEach(sc -> {
+					AchievementCourse cD = new AchievementCourse();
+					cD.setCourseCode(sc.getCourseCode());
+					cD.setCourseLevel(sc.getCourseLevel());
+					cD.setSessionDate(sc.getSessionDate());
+					cdList.add(cD);
+				});
 
-			gRAchv.setCourseDetails(cdList);
-			grList.add(gRAchv);
+				gRAchv.setCourseDetails(cdList);
+				grList.add(gRAchv);
+			}else {
+				NonGradReason obj = new NonGradReason();
+				obj.setCode(gr.getRule());
+				obj.setDescription(gr.getDescription());
+				nonGradReasons.add(obj);
+			}
 		}
 		return  grList;
 	}
