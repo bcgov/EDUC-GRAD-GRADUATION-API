@@ -27,9 +27,6 @@ public class GraduationService {
     WebClient webClient;
 	
 	@Autowired
-	private ExceptionMessage exception;
-	
-	@Autowired
 	AlgorithmProcessFactory algorithmProcessFactory;
 	
 	@Autowired
@@ -48,16 +45,17 @@ public class GraduationService {
 	GradValidation validation;
 	
 	public AlgorithmResponse graduateStudent(String studentID, Long batchId,String accessToken,String projectedType) {
-		
-		exception = new ExceptionMessage();
+
+		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
+		logger.info("\n************* NEW STUDENT:***********************");
 		GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken,exception);
-		logger.info("**** Fetched Student Information: ****");
 		if(exception.getExceptionName() != null) {
 			AlgorithmResponse aR= new AlgorithmResponse();
 			aR.setException(exception);
 			return aR;
 		}
+		logger.info("**** Fetched Student Information: ****");
 		if(gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
 			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,batchId,exception);
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);

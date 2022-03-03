@@ -8,7 +8,7 @@ public class AssessmentResult implements Serializable {
 
     private String assessmentName;
     private String assessmentCode;
-    private Double proficiencyScore;
+    private String proficiencyScore;
     private String sessionDate;
     private String gradReqMet;
     private String specialCase;
@@ -30,11 +30,11 @@ public class AssessmentResult implements Serializable {
         this.assessmentCode = assessmentCode;
     }
 
-    public Double getProficiencyScore() {
+    public String getProficiencyScore() {
         return proficiencyScore;
     }
 
-    public void setProficiencyScore(Double proficiencyScore) {
+    public void setProficiencyScore(String proficiencyScore) {
         this.proficiencyScore = proficiencyScore;
     }
 

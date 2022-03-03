@@ -44,27 +44,22 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	
 	@Autowired
 	GradValidation validation;
+
+	@Autowired
+	AlgorithmSupport algorithmSupport;
 	
 	@Override
 	public ProcessorData fire() {
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ "+startTime);
+		logger.info("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
-		ExceptionMessage exception = processorData.getException();
+		ExceptionMessage exception = new ExceptionMessage();
 		if(gradResponse.getProgramCompletionDate() != null) {
 			List<CodeDTO> optionalProgram = new ArrayList<>();
 			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-			
-			if(graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
-				logger.info("**** Grad Algorithm Has Errors: ****");
-				algorithmResponse.setException(graduationDataStatus.getException());
-				processorData.setAlgorithmResponse(algorithmResponse);
-				return processorData;
-			}else if(exception.getExceptionName() != null) {
-				logger.info("**** Grad Algorithm errored out: ****");
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
+
+			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
 			logger.info("**** Grad Algorithm Completed: ****");
@@ -76,24 +71,11 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
 				logger.info("**** Saved Grad Status: ****");
-				if(graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null) {				
-					List<ProgramCertificateTranscript> certificateList =  reportService.getCertificateList(gradResponse,graduationDataStatus,projectedOptionalGradResponse,processorData.getAccessToken(),exception);
-					for(ProgramCertificateTranscript certType : certificateList) {
-						reportService.saveStudentCertificateReportJasper(graduationStatusResponse,graduationDataStatus,processorData.getAccessToken(),certType,exception);
-					}
-					logger.info("**** Saved Certificates: ****");
-				}
-				
-				if(graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
-					logger.info("**** No Transcript Generated: ****");
-				}else {
-					reportService.saveStudentTranscriptReportJasper(graduationStatusResponse.getPen(),data,processorData.getAccessToken(),graduationStatusResponse.getStudentID(),exception,graduationDataStatus.isGraduated());
-					logger.info("**** Saved Reports: ****");
-				}
+				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
 				if(exception.getExceptionName() != null) {
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus != null && graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
@@ -107,10 +89,11 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 		}
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ "+diff+" secs");
+		logger.info("************* TIME Taken  ************ {} secs",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
+
 
 	@Override
     public void setInputData(ProcessorData inputData) {
