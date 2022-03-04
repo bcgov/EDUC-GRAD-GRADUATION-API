@@ -436,10 +436,14 @@ public class ReportService {
 	}
 
 	private void getStudentCoursesAssessmentsNExams(ReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
-		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
-		List<StudentCourse> studentExamList = studentCourseList
+		List<StudentCourse> sCList = graduationDataStatus.getStudentCourses().getStudentCourseList();
+		List<StudentCourse> studentExamList = sCList
 				.stream()
 				.filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
+				.collect(Collectors.toList());
+		List<StudentCourse> studentCourseList = sCList
+				.stream()
+				.filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
 				.collect(Collectors.toList());
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		List<AchievementCourse> sCourseList = new ArrayList<>();
