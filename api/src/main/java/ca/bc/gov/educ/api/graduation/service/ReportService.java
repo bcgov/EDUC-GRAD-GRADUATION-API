@@ -202,6 +202,7 @@ public class ReportService {
 				crse.setLevel("");
 				crse.setCredits("NA");
 				crse.setName(sc.getAssessmentName());
+				crse.setType("3");
 				crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 				result.setCourse(crse);
 
