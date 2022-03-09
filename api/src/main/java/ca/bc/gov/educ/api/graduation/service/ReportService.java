@@ -63,7 +63,7 @@ public class ReportService {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
 		for (StudentOptionalProgram optionalPrograms : projectedOptionalGradResponse) {
-			if (optionalPrograms.isGraduated() && (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD"))) {
+			if (optionalPrograms.isGraduated() && (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR"))) {
 				req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
 			}
 		}
