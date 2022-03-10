@@ -591,7 +591,7 @@ public class ReportService {
 		certData.setCertificate(getCertificateData(gradResponse,certType));
 		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
 			certData.getStudent().setEnglishCert(certType.getCertificateTypeCode());
-		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S")) {
+		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S") || certType.getCertificateTypeCode().equalsIgnoreCase("SCF")) {
 			certData.getStudent().setFrenchCert(certType.getCertificateTypeCode());
 		}
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken,exception);
