@@ -86,18 +86,23 @@ public class ReportService {
 		return null;
 	}
 
-	public ReportData prepareReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
-		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
-		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
-		data.setGradMessage(graduationDataStatus.getGradMessage());
-		data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-		data.setGraduationData(getGraduationData(graduationDataStatus));
-		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken,exception));
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
-		return data;
+	public ReportData prepareReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
+		try {
+			ReportData data = new ReportData();
+			data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+			data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+			data.setGradMessage(graduationDataStatus.getGradMessage());
+			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
+			data.setGraduationData(getGraduationData(graduationDataStatus));
+			data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken, exception));
+			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+			return data;
+		}catch (Exception e) {
+			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {

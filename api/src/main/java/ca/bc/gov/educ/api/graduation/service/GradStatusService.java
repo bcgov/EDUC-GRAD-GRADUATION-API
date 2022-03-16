@@ -1,9 +1,17 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.process.GraduateStudentProcess;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -18,8 +26,13 @@ import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 @Service
 public class GradStatusService {
 
+	private static Logger logger = LoggerFactory.getLogger(GradStatusService.class);
+
 	@Autowired
     WebClient webClient;
+
+	@Autowired
+	RestTemplate restTemplate;
 	
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
@@ -52,10 +65,15 @@ public class GradStatusService {
 			if(batchId != null) {
 				url = url + "?batchId=%s";
 			}
-			return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+			HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
+			logger.info("**** Before Saved Grad Status: call ****");
+			return restTemplate.exchange(String.format(url,studentID,batchId), HttpMethod.POST,
+					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStudentRecord.class).getBody();
+			//return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
 			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
+			logger.info("**** error Saved Grad Status: call ****");
 			return null;
 		}
 	}

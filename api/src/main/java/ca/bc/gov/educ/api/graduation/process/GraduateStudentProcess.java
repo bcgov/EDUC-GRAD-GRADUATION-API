@@ -58,11 +58,16 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
-			logger.info("**** Grad Algorithm Completed: ****");
+			logger.info("**** Grad Algorithm Completed:{} **** ",gradResponse.getStudentID());
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareReportData(graduationDataStatus, gradResponse, processorData.getAccessToken(),exception);
+			if (exception.getExceptionName() != null) {
+				algorithmResponse.setException(exception);
+				processorData.setAlgorithmResponse(algorithmResponse);
+				return processorData;
+			}
 			logger.info("**** Prepared Data for Reports: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
