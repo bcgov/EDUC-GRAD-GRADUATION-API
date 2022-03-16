@@ -65,15 +65,10 @@ public class GradStatusService {
 			if(batchId != null) {
 				url = url + "?batchId=%s";
 			}
-			HttpHeaders httpHeaders = EducGraduationApiUtils.getHeaders(accessToken);
-			logger.info("**** Before Saved Grad Status: call ****");
-			return restTemplate.exchange(String.format(url,studentID,batchId), HttpMethod.POST,
-					new HttpEntity<>(toBeSaved,httpHeaders), GraduationStudentRecord.class).getBody();
-			//return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+			return webClient.post().uri(String.format(url,studentID,batchId)).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
 			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
-			logger.info("**** error Saved Grad Status: call ****");
 			return null;
 		}
 	}

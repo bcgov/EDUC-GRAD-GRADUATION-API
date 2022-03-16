@@ -23,9 +23,6 @@ import java.util.List;
 public class GraduateStudentProcess implements AlgorithmProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(GraduateStudentProcess.class);
-	
-	@Autowired
-    private ProcessorData processorData;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -46,7 +43,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 	AlgorithmSupport algorithmSupport;
 	
 	@Override
-	public ProcessorData fire() {				
+	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
 		ExceptionMessage exception = new ExceptionMessage();
@@ -71,6 +68,11 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 			logger.info("**** Prepared Data for Reports: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
+				if (exception.getExceptionName() != null) {
+					algorithmResponse.setException(exception);
+					processorData.setAlgorithmResponse(algorithmResponse);
+					return processorData;
+				}
 				logger.info("**** Saved Grad Status: ****");
 				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
 				if (exception.getExceptionName() != null) {
@@ -94,11 +96,4 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
-
-	@Override
-    public void setInputData(ProcessorData inputData) {
-		processorData = inputData;
-        logger.info("GraduateStudentProcess: ");
-    }
-
 }
