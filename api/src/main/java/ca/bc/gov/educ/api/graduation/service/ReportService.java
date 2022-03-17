@@ -86,18 +86,23 @@ public class ReportService {
 		return null;
 	}
 
-	public ReportData prepareReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
-		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
-		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
-		data.setGradMessage(graduationDataStatus.getGradMessage());
-		data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-		data.setGraduationData(getGraduationData(graduationDataStatus));
-		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken,exception));
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
-		return data;
+	public ReportData prepareReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
+		try {
+			ReportData data = new ReportData();
+			data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+			data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+			data.setGradMessage(graduationDataStatus.getGradMessage());
+			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
+			data.setGraduationData(getGraduationData(graduationDataStatus));
+			data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken, exception));
+			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+			return data;
+		}catch (Exception e) {
+			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
@@ -471,6 +476,7 @@ public class ReportService {
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
 			crse.setGradReqMet(sc.getGradReqMet());
+			crse.setProjected(sc.isProjected());
 			crse.setCreditsUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad() : 0);
 			crse.setEquivOrChallenge(equivOrChallenge);
 			crse.setBestSchoolPercent(getValue(sc.getBestSchoolPercent()));
@@ -498,6 +504,7 @@ public class ReportService {
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
 			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setProjected(sc.isProjected());
 			crse.setInterimPercent(getValue(sc.getInterimPercent()));
 			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());

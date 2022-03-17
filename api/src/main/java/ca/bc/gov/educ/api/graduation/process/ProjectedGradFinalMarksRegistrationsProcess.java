@@ -21,10 +21,7 @@ import java.util.List;
 public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksRegistrationsProcess.class);
-	
-	@Autowired
-    private ProcessorData processorData;
-    
+
 	@Autowired
 	GradStatusService gradStatusService;
 	
@@ -41,7 +38,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 	AlgorithmSupport algorithmSupport;
 
 	@Override
-	public ProcessorData fire() {
+	public ProcessorData fire(ProcessorData processorData) {
 		ExceptionMessage exception = new ExceptionMessage();
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
@@ -57,7 +54,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		if(graduationDataStatus != null) {
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, getProcessorData().getAccessToken());
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken());
 			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 
 			if (exception.getExceptionName() != null) {
@@ -77,11 +74,4 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		return processorData;
 
 	}
-
-	@Override
-    public void setInputData(ProcessorData inputData) {
-		processorData = inputData;
-        logger.info("ProjectedGradFinalMarksRegistraionProcess: ");
-    }
-
 }

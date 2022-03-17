@@ -55,7 +55,7 @@ public class GraduationServiceTest {
 	@Autowired
 	GradValidation validation;
 	
-	@Mock
+	@MockBean
 	WebClient webClient;
 	
 	@Test

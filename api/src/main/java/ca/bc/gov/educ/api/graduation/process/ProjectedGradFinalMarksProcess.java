@@ -19,9 +19,6 @@ import java.util.List;
 public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksProcess.class);
-	
-	@Autowired
-    private ProcessorData processorData;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -36,7 +33,7 @@ public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 	AlgorithmSupport algorithmSupport;
 	
 	@Override
-	public ProcessorData fire() {
+	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
@@ -57,11 +54,4 @@ public class ProjectedGradFinalMarksProcess implements AlgorithmProcess {
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
-
-	@Override
-    public void setInputData(ProcessorData inputData) {
-		processorData = inputData;
-        logger.info("ProjectedGradFinalMarksProcess: ");
-    }
-
 }
