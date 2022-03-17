@@ -503,6 +503,7 @@ public class ReportService {
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
 			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setProjected(sc.isProjected());
 			crse.setInterimPercent(getValue(sc.getInterimPercent()));
 			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
