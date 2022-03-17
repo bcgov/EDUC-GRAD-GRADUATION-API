@@ -476,6 +476,7 @@ public class ReportService {
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
 			crse.setGradReqMet(sc.getGradReqMet());
+			crse.setProjected(sc.isProjected());
 			crse.setCreditsUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad() : 0);
 			crse.setEquivOrChallenge(equivOrChallenge);
 			crse.setBestSchoolPercent(getValue(sc.getBestSchoolPercent()));
