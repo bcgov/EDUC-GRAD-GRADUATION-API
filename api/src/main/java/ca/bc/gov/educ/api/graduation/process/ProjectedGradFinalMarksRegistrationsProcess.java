@@ -54,7 +54,14 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		if(graduationDataStatus != null) {
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken());
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
+			if (exception.getExceptionName() != null) {
+				algorithmResponse.setException(exception);
+				processorData.setAlgorithmResponse(algorithmResponse);
+				gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus != null && graduationDataStatus.isGraduated());
+				logger.info("**** Record Restored Due to Error: ****");
+				return processorData;
+			}
 			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 
 			if (exception.getExceptionName() != null) {

@@ -13,7 +13,6 @@ import ca.bc.gov.educ.api.graduation.model.report.Student;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -109,7 +108,7 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null)).thenReturn(data);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
@@ -170,7 +169,7 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null)).thenReturn(data);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
