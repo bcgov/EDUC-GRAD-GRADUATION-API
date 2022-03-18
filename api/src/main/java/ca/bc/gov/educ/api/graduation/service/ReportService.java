@@ -667,16 +667,22 @@ public class ReportService {
 	}
 
 	public ReportData prepareAchievementReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList,String accessToken) {
-		ReportData data = new ReportData();
-		data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
-		data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(),optionalProgramList));
-		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
-		data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
-		getStudentCoursesAssessmentsNExams(data,graduationDataStatus,accessToken);
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
-		data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
-		return data;
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
+		try {
+			ReportData data = new ReportData();
+			data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
+			data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(), optionalProgramList));
+			data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+			data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
+			getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
+			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+			data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
+			return data;
+		}catch (Exception e) {
+			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	private List<OptionalProgram> getOptionalProgramAchvReport(List<StudentOptionalProgram> optionalProgramList) {

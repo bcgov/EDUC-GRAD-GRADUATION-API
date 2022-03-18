@@ -1540,7 +1540,7 @@ public class ReportServiceTest {
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
-		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null);
+		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null, exception);
 		assertNotNull(data);
 	}
 
