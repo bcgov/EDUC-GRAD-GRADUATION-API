@@ -532,6 +532,7 @@ public class ReportService {
 			result.setProficiencyScore(getAssessmentFinalPercentAchievement(sA, accessToken));
 			result.setSpecialCase(sA.getSpecialCase());
 			result.setExceededWriteFlag(sA.getExceededWriteFlag());
+			result.setProjected(sA.isProjected());
 			tList.add(result);
 		}
 		if (!tList.isEmpty()) {
