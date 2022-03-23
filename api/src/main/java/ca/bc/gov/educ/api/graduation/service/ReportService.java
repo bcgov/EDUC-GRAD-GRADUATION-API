@@ -132,7 +132,7 @@ public class ReportService {
 		return transcriptData;
 	}
 
-	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList){
+	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially){
 		for (StudentCourse sc : studentCourseList) {
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected() && !sc.isLessCreditCourse() && !sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
@@ -141,7 +141,7 @@ public class ReportService {
 					equivOrChallenge = sc.getEquivOrChallenge();
 				}
 				result.setCourse(setCourseObjForTranscript(sc,graduationDataStatus));
-				result.setMark(setMarkObjForTranscript(sc,graduationDataStatus.getGradStatus().getProgram()));
+				result.setMark(setMarkObjForTranscript(sc,graduationDataStatus.getGradStatus().getProgram(),provincially));
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
 				result.setRequirementName(sc.getGradReqMetDetail());
@@ -164,11 +164,11 @@ public class ReportService {
 		crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 		return  crse;
 	}
-	private Mark setMarkObjForTranscript(StudentCourse sc,String program) {
+	private Mark setMarkObjForTranscript(StudentCourse sc, String program, String provincially) {
 		Mark mrk = new Mark();
 		mrk.setExamPercent(getExamPercent(sc.getBestExamPercent(),program,sc.getCourseLevel(),sc.getSpecialCase()));
 		mrk.setFinalLetterGrade(sc.getCompletedCourseLetterGrade());
-		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate()));
+		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate(),provincially));
 		mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
 		mrk.setInterimPercent(getValue(sc.getInterimPercent()));
 		mrk.setSchoolPercent(getSchoolPercent(sc.getBestSchoolPercent(),program,sc.getCourseLevel()));
@@ -236,28 +236,25 @@ public class ReportService {
 				List<StudentCourse> newList= new ArrayList<>();
 				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
 				if(!provinciallyExaminable.isEmpty()) {
-					provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
-					newList.addAll(provinciallyExaminable);
+					provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially");
 				}
 
 				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
 				if(!nonExaminable.isEmpty()) {
-					nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
-					newList.addAll(nonExaminable);
-				}
-				if(!newList.isEmpty()) {
-					studentCourseList = new ArrayList<>();
-					studentCourseList.addAll(newList);
+					nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable");
 				}
 			}else {
 				studentCourseList.sort(Comparator.comparing(StudentCourse::getCourseLevel,Comparator.nullsLast(String::compareTo)).thenComparing(StudentCourse::getCourseName));
+				createCourseListForTranscript(studentCourseList,graduationDataStatus,tList, "regular");
 			}
 		}
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		if (!studentAssessmentList.isEmpty()) {
 			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
 		}
-		createCourseListForTranscript(studentCourseList,graduationDataStatus,tList);
+
 		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,accessToken);
 		return tList;
 	}
@@ -272,9 +269,12 @@ public class ReportService {
 		}
 		return String.valueOf(totalCredits);
 	}
-	private String getFinalPercent(String finalCompletedPercentage,String sDate) {
+	private String getFinalPercent(String finalCompletedPercentage, String sDate,String provincially) {
 		String cutoffDate = "1994-09-01";
 		String sessionDate = sDate + "/01";
+		if(provincially.equalsIgnoreCase("provincially")) {
+			return finalCompletedPercentage;
+		}
 		try {
 			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
 			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
