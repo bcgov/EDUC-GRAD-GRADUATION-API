@@ -16,6 +16,7 @@ import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.model.report.Student;
+import ca.bc.gov.educ.api.graduation.util.BestSchoolPercentageComparator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -236,13 +237,22 @@ public class ReportService {
 				List<StudentCourse> newList= new ArrayList<>();
 				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
 				if(!provinciallyExaminable.isEmpty()) {
-					provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					if(program.contains("1950")) {
+						provinciallyExaminable.sort(Comparator.nullsLast(new BestSchoolPercentageComparator()).reversed().thenComparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					}else {
+						provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					}
 					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially");
 				}
 
 				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
 				if(!nonExaminable.isEmpty()) {
-					nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					if(program.contains("1950")) {
+						nonExaminable.sort(Comparator.nullsLast(new BestSchoolPercentageComparator()).reversed().thenComparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					}else {
+						nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
+					}
+
 					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable");
 				}
 			}else {

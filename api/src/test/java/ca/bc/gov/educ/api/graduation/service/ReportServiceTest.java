@@ -831,7 +831,7 @@ public class ReportServiceTest {
 
 	private List<StudentCourse> getStudentCourses(int totalCredits,int originalCredits) {
 		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
+		sc.setCourseCode("FDFE FE");
 		sc.setCourseName("FEREE FREE");
 		sc.setCourseLevel("11");
 		sc.setCredits(totalCredits);
@@ -855,6 +855,38 @@ public class ReportServiceTest {
 		sc.setCredits(totalCredits);
 		sc.setOriginalCredits(originalCredits);
 		sc.setCreditsUsedForGrad(2);
+		sc.setCustomizedCourseName("SREE");
+		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
+		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
+		sc.setProvExamCourse("Y");
+		sc.setRestricted(true);
+		sList.add(sc);
+		sc= new StudentCourse();
+		sc.setCourseCode("CPUY FR");
+		sc.setCourseName("CP FEREE FREE");
+		sc.setCourseLevel("12A");
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
+		sc.setCreditsUsedForGrad(2);
+		sc.setBestSchoolPercent(89D);
+		sc.setCustomizedCourseName("SREE");
+		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
+		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
+		sc.setProvExamCourse("Y");
+		sc.setRestricted(true);
+		sList.add(sc);
+		sc= new StudentCourse();
+		sc.setCourseCode("CPUY ZS");
+		sc.setCourseName("CP FEREE FREE");
+		sc.setCourseLevel("12C");
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
+		sc.setCreditsUsedForGrad(2);
+		sc.setBestSchoolPercent(89D);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setFineArtsAppliedSkills("B");
