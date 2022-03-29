@@ -237,22 +237,13 @@ public class ReportService {
 				List<StudentCourse> newList= new ArrayList<>();
 				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
 				if(!provinciallyExaminable.isEmpty()) {
-					if(program.contains("1950")) {
-						provinciallyExaminable.sort(Comparator.nullsLast(new BestSchoolPercentageComparator()).reversed().thenComparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
-					}else {
-						provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
-					}
+					sortOnCourseCode(provinciallyExaminable);
 					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially");
 				}
 
 				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
 				if(!nonExaminable.isEmpty()) {
-					if(program.contains("1950")) {
-						nonExaminable.sort(Comparator.nullsLast(new BestSchoolPercentageComparator()).reversed().thenComparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
-					}else {
-						nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode).thenComparing(StudentCourse::getCourseLevel));
-					}
-
+					sortOnCourseCode(nonExaminable);
 					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable");
 				}
 			}else {
@@ -267,6 +258,10 @@ public class ReportService {
 
 		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,accessToken);
 		return tList;
+	}
+
+	private void sortOnCourseCode(List<StudentCourse> cList) {
+		cList.sort(Comparator.comparing(StudentCourse::getCourseCode));
 	}
 
 	private String getCredits(String program,String courseCode, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills,boolean isRestricted) {
