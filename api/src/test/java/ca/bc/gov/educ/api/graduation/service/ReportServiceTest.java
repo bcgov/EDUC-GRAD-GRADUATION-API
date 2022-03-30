@@ -732,6 +732,9 @@ public class ReportServiceTest {
 		sc.setEquivOrChallenge("E");
 		sc.setProvExamCourse("Y");
 		sc.setSpecialCase("A");
+		sc.setCourseLevel("11");
+		sc.setBestExamPercent(60.8D);
+		sc.setBestSchoolPercent(90.3D);
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -828,8 +831,9 @@ public class ReportServiceTest {
 
 	private List<StudentCourse> getStudentCourses(int totalCredits,int originalCredits) {
 		StudentCourse sc= new StudentCourse();
-		sc.setCourseCode("FDFE");
+		sc.setCourseCode("FDFE FE");
 		sc.setCourseName("FEREE FREE");
+		sc.setCourseLevel("11");
 		sc.setCredits(totalCredits);
 		sc.setOriginalCredits(originalCredits);
 		sc.setCreditsUsedForGrad(2);
@@ -840,14 +844,49 @@ public class ReportServiceTest {
 		sc.setSpecialCase("F");
 		sc.setRestricted(true);
 		sc.setProvExamCourse("N");
+		sc.setBestExamPercent(50.0D);
+		sc.setBestSchoolPercent(50.0D);
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		sc= new StudentCourse();
 		sc.setCourseCode("CPUY");
 		sc.setCourseName("CP FEREE FREE");
+		sc.setCourseLevel("12A");
 		sc.setCredits(totalCredits);
 		sc.setOriginalCredits(originalCredits);
 		sc.setCreditsUsedForGrad(2);
+		sc.setCustomizedCourseName("SREE");
+		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
+		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
+		sc.setProvExamCourse("Y");
+		sc.setRestricted(true);
+		sList.add(sc);
+		sc= new StudentCourse();
+		sc.setCourseCode("CPUY FR");
+		sc.setCourseName("CP FEREE FREE");
+		sc.setCourseLevel("12A");
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
+		sc.setCreditsUsedForGrad(2);
+		sc.setBestSchoolPercent(89D);
+		sc.setCustomizedCourseName("SREE");
+		sc.setSessionDate("2020/12");
+		sc.setFineArtsAppliedSkills("B");
+		sc.setEquivOrChallenge("E");
+		sc.setSpecialCase("F");
+		sc.setProvExamCourse("Y");
+		sc.setRestricted(true);
+		sList.add(sc);
+		sc= new StudentCourse();
+		sc.setCourseCode("CPUY ZS");
+		sc.setCourseName("CP FEREE FREE");
+		sc.setCourseLevel("12C");
+		sc.setCredits(totalCredits);
+		sc.setOriginalCredits(originalCredits);
+		sc.setCreditsUsedForGrad(2);
+		sc.setBestSchoolPercent(89D);
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setFineArtsAppliedSkills("B");
@@ -1225,6 +1264,9 @@ public class ReportServiceTest {
 		sc.setCustomizedCourseName("SREE");
 		sc.setSessionDate("2020/12");
 		sc.setEquivOrChallenge("E");
+		sc.setCourseLevel("11");
+		sc.setBestExamPercent(60.8D);
+		sc.setBestSchoolPercent(90.3D);
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1329,6 +1371,9 @@ public class ReportServiceTest {
 		sc.setEquivOrChallenge("E");
 		sc.setSpecialCase("A");
 		sc.setProvExamCourse("N");
+		sc.setCourseLevel("11");
+		sc.setBestExamPercent(60.8D);
+		sc.setBestSchoolPercent(90.3D);
 		List<StudentCourse> sList= new ArrayList<>();
 		sList.add(sc);
 		StudentCourses sCourses = new StudentCourses();
@@ -1527,7 +1572,7 @@ public class ReportServiceTest {
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
-		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null);
+		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null, exception);
 		assertNotNull(data);
 	}
 

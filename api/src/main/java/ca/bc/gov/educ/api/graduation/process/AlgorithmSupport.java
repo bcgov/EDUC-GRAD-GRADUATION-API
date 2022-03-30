@@ -34,8 +34,8 @@ public class AlgorithmSupport {
                 List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
                 for (ProgramCertificateTranscript certType : certificateList) {
                     reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
+                    logger.info("**** Saved Certificates: {} ****",certType.getCertificateTypeCode());
                 }
-                logger.info("**** Saved Certificates: ****");
             }
 
             if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {

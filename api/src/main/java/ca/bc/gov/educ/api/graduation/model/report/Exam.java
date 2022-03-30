@@ -20,6 +20,7 @@ public class Exam implements Serializable {
     private String metLitNumRequirement;
     private String credits;
     private Integer creditsUsedForGrad;
+    private boolean projected;
 
     public String getCourseCode() {
         return courseCode;
@@ -115,6 +116,14 @@ public class Exam implements Serializable {
 
     public void setMetLitNumRequirement(String metLitNumRequirement) {
         this.metLitNumRequirement = metLitNumRequirement;
+    }
+
+    public boolean getProjected() {
+        return projected;
+    }
+
+    public void setProjected(boolean projected) {
+        this.projected = projected;
     }
 
     public String getCredits() {

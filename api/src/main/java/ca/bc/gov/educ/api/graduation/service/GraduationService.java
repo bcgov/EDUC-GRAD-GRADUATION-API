@@ -1,13 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
@@ -16,6 +9,12 @@ import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 @Service
@@ -43,7 +42,7 @@ public class GraduationService {
 	
 	@Autowired
 	GradValidation validation;
-	
+
 	public AlgorithmResponse graduateStudent(String studentID, Long batchId,String accessToken,String projectedType) {
 
 		ExceptionMessage exception = new ExceptionMessage();
@@ -59,8 +58,7 @@ public class GraduationService {
 		if(gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
 			ProcessorData data = new ProcessorData(gradResponse,null,accessToken,studentID,batchId,exception);
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
-	     	process.setInputData(data);
-	     	data = process.fire();
+	     	data = process.fire(data);
 	        return data.getAlgorithmResponse();		     	
 		}else {
 			AlgorithmResponse aR= new AlgorithmResponse();

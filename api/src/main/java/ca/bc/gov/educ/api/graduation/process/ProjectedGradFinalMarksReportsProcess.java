@@ -1,14 +1,6 @@
 package ca.bc.gov.educ.api.graduation.process;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
@@ -18,6 +10,13 @@ import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Component
@@ -26,9 +25,6 @@ import lombok.NoArgsConstructor;
 public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksReportsProcess.class);
-	
-	@Autowired
-    private ProcessorData processorData;
     
 	@Autowired
 	GradStatusService gradStatusService;
@@ -49,7 +45,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 	AlgorithmSupport algorithmSupport;
 	
 	@Override
-	public ProcessorData fire() {
+	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
@@ -67,9 +63,19 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareReportData(graduationDataStatus,gradResponse,processorData.getAccessToken(),exception);
+			if (exception.getExceptionName() != null) {
+				algorithmResponse.setException(exception);
+				processorData.setAlgorithmResponse(algorithmResponse);
+				return processorData;
+			}
 			logger.info("**** Prepared Data for Reports: ****");
 			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
-				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
+				GraduationStudentRecord graduationStatusResponse =  gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
+				if(exception.getExceptionName() != null) {
+					algorithmResponse.setException(exception);
+					processorData.setAlgorithmResponse(algorithmResponse);
+					return processorData;
+				}
 				logger.info("**** Saved Grad Status: ****");
 				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
 				if(exception.getExceptionName() != null) {
@@ -93,12 +99,4 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
-
-
-	@Override
-    public void setInputData(ProcessorData inputData) {
-		processorData = inputData;
-        logger.info("ProjectedGradFinalMarksReportsProcess: ");
-    }
-
 }

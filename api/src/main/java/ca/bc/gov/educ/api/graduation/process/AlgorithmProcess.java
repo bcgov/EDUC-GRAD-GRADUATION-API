@@ -1,13 +1,9 @@
 package ca.bc.gov.educ.api.graduation.process;
 
-import org.springframework.stereotype.Component;
-
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
+import org.springframework.stereotype.Component;
 
 @Component
 public interface AlgorithmProcess {
-
-	ProcessorData fire();
-
-    public void setInputData(ProcessorData inputData);
+	ProcessorData fire(ProcessorData processorData);
 }
