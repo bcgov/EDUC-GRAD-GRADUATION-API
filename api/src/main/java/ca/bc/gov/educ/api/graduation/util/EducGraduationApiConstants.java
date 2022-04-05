@@ -18,7 +18,8 @@ public class EducGraduationApiConstants {
     public static final String API_VERSION = "v1";
     public static final String GRADUATION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/graduate";
     public static final String GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE = "/studentid/{studentID}/run/{projectedType}";
-
+    public static final String GRADUATE_REPORT_DATA_BY_PEN = "/report/data/{pen}";
+    public static final String GRADUATE_REPORT_DATA = "/report/data";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;
@@ -81,7 +82,9 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.update-grad-status-projected}")
     private String saveStudentRecordProjectedRun;
 
-    
+    @Value("${endpoint.pen-student-api.by-pen.url}")
+    private String penStudentApiByPenUrl;
+
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
     public static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
