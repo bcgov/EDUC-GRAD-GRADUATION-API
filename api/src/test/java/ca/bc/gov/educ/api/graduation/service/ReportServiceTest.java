@@ -728,7 +728,7 @@ public class ReportServiceTest {
 		sc.setCreditsUsedForGrad(4);
 		sc.setCredits(4);
 		sc.setCustomizedCourseName("SREE");
-		sc.setSessionDate("2020/12");
+		sc.setSessionDate("1990/12");
 		sc.setEquivOrChallenge("E");
 		sc.setProvExamCourse("Y");
 		sc.setSpecialCase("A");
@@ -868,6 +868,7 @@ public class ReportServiceTest {
 		sc.setCourseName("CP FEREE FREE");
 		sc.setCourseLevel("12A");
 		sc.setCredits(totalCredits);
+		sc.setSessionDate("1990/11");
 		sc.setOriginalCredits(originalCredits);
 		sc.setCreditsUsedForGrad(2);
 		sc.setBestSchoolPercent(89D);
