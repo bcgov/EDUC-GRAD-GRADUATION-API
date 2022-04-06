@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
@@ -80,5 +81,6 @@ public class ReportData implements Serializable {
 	private List<Exam> studentExams;
 	private List<OptionalProgram> optionalPrograms;
 
+	@JsonIgnore
 	private Map<String, String> parameters = new HashMap<>();
 }

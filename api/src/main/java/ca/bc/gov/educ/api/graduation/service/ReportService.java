@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -39,6 +40,9 @@ public class ReportService {
 
 	@Autowired
 	WebClient webClient;
+
+	@Autowired
+	JsonTransformer jsonTransformer;
 
 	@Autowired
 	EducGraduationApiConstants educGraduationApiConstants;
@@ -147,7 +151,7 @@ public class ReportService {
 						ReportService.class,
 						"Student with PEN " + pen + " doesn't have graduation data in GRAD Student system");
 			}
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = new ObjectMapper().readValue(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData)jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
 			return prepareReportData(graduationData, graduationStudentRecord, accessToken, exception);
 		} catch (Exception e) {
 			exception.setExceptionName("PREPARE REPORT DATA FROM PEN");
