@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,5 +80,5 @@ public class ReportData implements Serializable {
 	private List<Exam> studentExams;
 	private List<OptionalProgram> optionalPrograms;
 
-	private Map<String, String> parameters;
+	private Map<String, String> parameters = new HashMap<>();
 }

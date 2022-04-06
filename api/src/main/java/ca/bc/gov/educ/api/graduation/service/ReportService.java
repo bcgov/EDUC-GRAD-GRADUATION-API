@@ -51,7 +51,7 @@ public class ReportService {
 			return webClient.post().uri(educGraduationApiConstants.getTranscript()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
 		} catch (Exception e) {
 			exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 			return null;
 		}
 	}
@@ -69,7 +69,7 @@ public class ReportService {
 			}).block();
 		} catch (Exception e) {
 			exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 			return new ArrayList<>();
 		}
 	}
@@ -94,11 +94,13 @@ public class ReportService {
 			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken, exception));
 			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 			return data;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
-			exception.setExceptionDetails(e.getLocalizedMessage());
-			return null;
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
 	}
 
 	public ReportData prepareReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
@@ -119,7 +121,7 @@ public class ReportService {
 			return prepareReportData(graduationDataStatus, graduationStudentRecord, accessToken, exception);
 		} catch (Exception e) {
 			exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
 		ReportData errorData = new ReportData();
 		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
@@ -149,7 +151,7 @@ public class ReportService {
 			return prepareReportData(graduationData, graduationStudentRecord, accessToken, exception);
 		} catch (Exception e) {
 			exception.setExceptionName("PREPARE REPORT DATA FROM PEN");
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
 		ReportData errorData = new ReportData();
 		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
@@ -164,7 +166,7 @@ public class ReportService {
 			}
 		} catch (Exception e) {
 			exception.setExceptionName("STUDENT BY PEN FROM PEN API");
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
 		return null;
 	}
@@ -175,7 +177,7 @@ public class ReportService {
 			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		} catch (Exception e) {
 			exception.setExceptionName("GRAD STATUS FROM GRAD STUDENT API");
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
 		return null;
 	}
