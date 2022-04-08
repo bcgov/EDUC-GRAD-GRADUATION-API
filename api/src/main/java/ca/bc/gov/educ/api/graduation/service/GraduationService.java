@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 
-import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
+import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
@@ -68,5 +66,13 @@ public class GraduationService {
 			aR.setException(exp);
 			return aR;
 		}
+	}
+
+	public ReportData prepareReportData(String pen, String accessToken) {
+		return reportService.prepareReportData(pen, accessToken, new ExceptionMessage());
+	}
+
+	public ReportData prepareReportData(GraduationData graduationData, String accessToken) {
+		return reportService.prepareReportData(graduationData, accessToken, new ExceptionMessage());
 	}
 }

@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.graduation.controller;
 
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.service.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +53,28 @@ public class GraduationController {
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
         String accessToken = auth.getTokenValue();
         return response.GET(gradService.graduateStudent(studentID,batchId,accessToken,projectedType));
+    }
+
+    @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
+    @PreAuthorize(PermissionsContants.GRADUATE_DATA)
+    @Operation(summary = "Get Report data from graduation by student pen", description = "Get Report data from graduation by student pen", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<ReportData> reportDataByPen(@PathVariable String pen) {
+        logger.debug("Report Data By Student Pen: " + pen);
+        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        String accessToken = auth.getTokenValue();
+        return response.GET(gradService.prepareReportData(pen, accessToken));
+    }
+
+    @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
+    @PreAuthorize(PermissionsContants.GRADUATE_DATA)
+    @Operation(summary = "Adapt graduation data for reporting", description = "Adapt graduation data for reporting", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody GraduationData graduationData) {
+        logger.debug("Report Data from graduation for student: " + graduationData.getGradStudent().getStudentID());
+        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        String accessToken = auth.getTokenValue();
+        return response.GET(gradService.prepareReportData(graduationData, accessToken));
     }
 
 }

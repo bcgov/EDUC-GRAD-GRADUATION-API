@@ -86,3 +86,10 @@ endpoint:
  grad-student-graduation-api:
   get-special-cases: 
     url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/lgSc/specialcase/%s
+ pen-student-api:
+  by-studentid:
+    url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student/%s
+  search:
+    url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student/paginated
+  by-pen:
+    url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
