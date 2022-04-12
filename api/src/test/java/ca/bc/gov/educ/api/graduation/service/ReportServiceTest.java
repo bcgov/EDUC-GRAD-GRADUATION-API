@@ -1597,6 +1597,7 @@ public class ReportServiceTest {
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
 
@@ -1634,6 +1635,7 @@ public class ReportServiceTest {
 		programCertificateTranscript.setPcId(UUID.randomUUID());
 		programCertificateTranscript.setGraduationProgramCode(gradProgram.getProgramCode());
 		programCertificateTranscript.setSchoolCategoryCode(commSch.getSchoolCategoryCode());
+		programCertificateTranscript.setCertificateTypeCode("E");
 
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradProgram.getProgramCode());
@@ -1647,10 +1649,15 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
-		ReportData data = reportService.prepareTranscriptData(pen, "accessToken", exception);
-		assertNotNull(data);
-		assertNotNull(data.getStudent());
-		assertNotNull(data.getTranscript());
+		ReportData transcriptData = reportService.prepareTranscriptData(pen, "accessToken", exception);
+		assertNotNull(transcriptData);
+		assertNotNull(transcriptData.getStudent());
+		assertNotNull(transcriptData.getTranscript());
+
+		ReportData certificateData = reportService.prepareCertificateData(pen, "accessToken", exception);
+		assertNotNull(certificateData);
+		assertNotNull(certificateData.getStudent());
+		assertNotNull(certificateData.getCertificate());
 
 	}
 
@@ -1662,6 +1669,7 @@ public class ReportServiceTest {
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
 
@@ -1699,6 +1707,7 @@ public class ReportServiceTest {
 		programCertificateTranscript.setPcId(UUID.randomUUID());
 		programCertificateTranscript.setGraduationProgramCode(gradProgram.getProgramCode());
 		programCertificateTranscript.setSchoolCategoryCode("02");
+		programCertificateTranscript.setCertificateTypeCode("E");
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(constants.getTranscript())).thenReturn(this.requestBodyUriMock);
