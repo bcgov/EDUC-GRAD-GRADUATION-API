@@ -751,7 +751,19 @@ public class ReportService {
 
 	public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
 											 ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken) {
-		ProgramCertificateTranscript certType = getTranscript(gradResponse, graduationDataStatus, accessToken, new ExceptionMessage());
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
+		ProgramCertificateTranscript certType = getTranscript(gradResponse, graduationDataStatus, accessToken, exceptionMessage);
+		if(StringUtils.trimToNull(exceptionMessage.getExceptionName()) != null) {
+			ReportData errorData = new ReportData();
+			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
+			return errorData;
+		}
+//		List<ProgramCertificateTranscript> certTypes = getCertificateList(gradResponse, graduationDataStatus, new ArrayList<StudentOptionalProgram>(), accessToken, exceptionMessage);
+//		if(certTypes == null || certTypes.isEmpty()) {
+//			ReportData errorData = new ReportData();
+//			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
+//			return errorData;
+//		}
 		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
 	}
 
