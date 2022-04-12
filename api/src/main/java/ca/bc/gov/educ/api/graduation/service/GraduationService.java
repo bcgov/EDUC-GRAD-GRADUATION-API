@@ -68,11 +68,29 @@ public class GraduationService {
 		}
 	}
 
-	public ReportData prepareReportData(String pen, String accessToken) {
-		return reportService.prepareReportData(pen, accessToken, new ExceptionMessage());
+	public ReportData prepareReportData(String pen, String type, String accessToken) {
+		switch (type.toUpperCase()) {
+			case "CERT":
+				return reportService.prepareCertificateData(pen, accessToken, new ExceptionMessage());
+			case "ACHV":
+				ReportData reportData = new ReportData();
+				reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
+				return reportData;
+			default:
+				return reportService.prepareTranscriptData(pen, accessToken, new ExceptionMessage());
+		}
 	}
 
-	public ReportData prepareReportData(GraduationData graduationData, String accessToken) {
-		return reportService.prepareReportData(graduationData, accessToken, new ExceptionMessage());
+	public ReportData prepareReportData(GraduationData graduationData, String type, String accessToken) {
+		switch(type.toUpperCase()) {
+			case "CERT":
+				return reportService.prepareCertificateData(graduationData, accessToken, new ExceptionMessage());
+			case "ACHV":
+				ReportData reportData = new ReportData();
+				reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
+				return reportData;
+			default:
+				return reportService.prepareTranscriptData(graduationData, accessToken, new ExceptionMessage());
+		}
 	}
 }

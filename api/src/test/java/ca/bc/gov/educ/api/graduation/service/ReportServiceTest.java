@@ -22,7 +22,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -806,7 +805,7 @@ public class ReportServiceTest {
 		cDto.setName("French Immersion");
 		optionalProgram.add(cDto);
 		
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 
@@ -983,7 +982,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 	
@@ -1066,7 +1065,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 
@@ -1149,7 +1148,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 
@@ -1232,7 +1231,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 	
@@ -1338,7 +1337,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 	
@@ -1445,7 +1444,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 	
@@ -1525,7 +1524,7 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("D");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		
-		ReportData dta = reportService.prepareReportData(graduationDataStatus,gradResponse,accessToken,exception);
+		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
 
@@ -1648,7 +1647,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
-		ReportData data = reportService.prepareReportData(pen, "accessToken", exception);
+		ReportData data = reportService.prepareTranscriptData(pen, "accessToken", exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudent());
 		assertNotNull(data.getTranscript());
@@ -1709,7 +1708,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
-		ReportData data = reportService.prepareReportData(gradStatus, "accessToken", exception);
+		ReportData data = reportService.prepareTranscriptData(gradStatus, "accessToken", exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudent());
 		assertNotNull(data.getTranscript());
