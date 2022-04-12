@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Optional;
+
 
 @Service
 public class GraduationService {
@@ -69,6 +71,7 @@ public class GraduationService {
 	}
 
 	public ReportData prepareReportData(String pen, String type, String accessToken) {
+		type = Optional.ofNullable(type).orElse("");
 		switch (type.toUpperCase()) {
 			case "CERT":
 				return reportService.prepareCertificateData(pen, accessToken, new ExceptionMessage());
@@ -82,6 +85,7 @@ public class GraduationService {
 	}
 
 	public ReportData prepareReportData(GraduationData graduationData, String type, String accessToken) {
+		type = Optional.ofNullable(type).orElse("");
 		switch(type.toUpperCase()) {
 			case "CERT":
 				return reportService.prepareCertificateData(graduationData, accessToken, new ExceptionMessage());
