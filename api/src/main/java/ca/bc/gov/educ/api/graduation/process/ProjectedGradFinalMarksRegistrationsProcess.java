@@ -54,7 +54,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		if(graduationDataStatus != null) {
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			ReportData data = reportService.prepareAchievementReportData(gradResponse,graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
+			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
 			if (exception.getExceptionName() != null) {
 				algorithmResponse.setException(exception);
 				processorData.setAlgorithmResponse(algorithmResponse);

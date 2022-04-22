@@ -1572,16 +1572,8 @@ public class ReportServiceTest {
 	@Test
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
-		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
-		gradResponse.setPen("123090109");
-		gradResponse.setProgram("2018-EN");
-		gradResponse.setProgramCompletionDate("2020/02");
-		gradResponse.setSchoolOfRecord("06011033");
-		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("A");
-		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
-		ReportData data = reportService.prepareAchievementReportData(gradResponse,gradStatus,optionalProgram,null, exception);
+		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null, exception);
 		assertNotNull(data);
 	}
 
