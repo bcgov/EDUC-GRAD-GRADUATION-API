@@ -860,6 +860,7 @@ public class ReportService {
 			data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(), optionalProgramList));
 			data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
 			data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
+			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
 			getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
 			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 			data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
