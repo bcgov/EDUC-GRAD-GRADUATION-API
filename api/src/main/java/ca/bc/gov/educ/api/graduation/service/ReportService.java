@@ -852,8 +852,7 @@ public class ReportService {
 
 	}
 
-	public ReportData prepareAchievementReportData(
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
+	public ReportData prepareAchievementReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
 		try {
 			ReportData data = new ReportData();
 			data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
@@ -864,6 +863,7 @@ public class ReportService {
 			getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
 			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 			data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
+			data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
 			return data;
 		}catch (Exception e) {
 			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
