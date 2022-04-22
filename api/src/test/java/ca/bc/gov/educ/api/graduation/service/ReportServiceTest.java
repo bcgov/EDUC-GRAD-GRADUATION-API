@@ -1573,6 +1573,17 @@ public class ReportServiceTest {
 	public void testStudentAchievementReport() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
+
+		GradProgram gradProgram = new GradProgram();
+		gradProgram.setProgramCode("2018-EN");
+		gradProgram.setProgramName("2018 Graduation Program");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+
 		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null, exception);
 		assertNotNull(data);
 	}
