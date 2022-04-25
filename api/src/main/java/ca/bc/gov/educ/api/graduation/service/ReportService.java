@@ -222,7 +222,7 @@ public class ReportService {
 					!sc.isLessCreditCourse() &&
 					!sc.isValidationCourse() &&
 					!sc.isGrade10Course()) {
-				if(xml && Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA).before(sc.getSessionDate())) {
+				if(xml && Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA).after(sc.getSessionDate())) {
 					continue;
 				}
 				TranscriptResult result = new TranscriptResult();
