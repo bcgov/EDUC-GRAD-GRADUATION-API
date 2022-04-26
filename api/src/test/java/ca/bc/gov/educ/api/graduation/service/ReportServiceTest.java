@@ -1660,7 +1660,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
-		ReportData transcriptData = reportService.prepareTranscriptData(pen, false, "accessToken", exception);
+		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
@@ -1728,7 +1728,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
-		ReportData data = reportService.prepareTranscriptData(gradStatus, false, "accessToken", exception);
+		ReportData data = reportService.prepareTranscriptData(gradStatus, true, "accessToken", exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudent());
 		assertNotNull(data.getTranscript());
