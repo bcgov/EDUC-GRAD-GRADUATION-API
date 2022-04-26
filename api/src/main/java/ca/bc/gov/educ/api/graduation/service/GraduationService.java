@@ -79,8 +79,10 @@ public class GraduationService {
 				ReportData reportData = new ReportData();
 				reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
 				return reportData;
+			case "XML":
+				return reportService.prepareTranscriptData(pen, true, accessToken, new ExceptionMessage());
 			default:
-				return reportService.prepareTranscriptData(pen, accessToken, new ExceptionMessage());
+				return reportService.prepareTranscriptData(pen, false, accessToken, new ExceptionMessage());
 		}
 	}
 
@@ -93,8 +95,10 @@ public class GraduationService {
 				ReportData reportData = new ReportData();
 				reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
 				return reportData;
+			case "XML":
+				return reportService.prepareTranscriptData(graduationData, true, accessToken, new ExceptionMessage());
 			default:
-				return reportService.prepareTranscriptData(graduationData, accessToken, new ExceptionMessage());
+				return reportService.prepareTranscriptData(graduationData, false, accessToken, new ExceptionMessage());
 		}
 	}
 }

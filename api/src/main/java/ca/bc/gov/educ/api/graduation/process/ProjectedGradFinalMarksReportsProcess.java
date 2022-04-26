@@ -62,7 +62,7 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-			ReportData data = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,processorData.getAccessToken(),exception);
+			ReportData data = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,processorData.getAccessToken(),exception);
 			if (exception.getExceptionName() != null) {
 				algorithmResponse.setException(exception);
 				processorData.setAlgorithmResponse(algorithmResponse);

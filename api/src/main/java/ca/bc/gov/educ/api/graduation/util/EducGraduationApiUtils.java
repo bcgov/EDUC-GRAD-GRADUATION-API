@@ -1,15 +1,15 @@
 package ca.bc.gov.educ.api.graduation.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 
 public class EducGraduationApiUtils {
 
@@ -44,7 +44,7 @@ public class EducGraduationApiUtils {
 		return date;
 	}
 
-	public static Date parseDate(String dateString, String dateFormat) throws ParseException {
+	public static Date parseDate(String dateString, String dateFormat) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
 		Date date = new Date();
 
@@ -125,12 +125,8 @@ public class EducGraduationApiUtils {
 		String actualSessionDate = sessionDate + "/01";
 		Date temp = new Date();
 		String sDates = null;
-		try {
-			temp = parseDate(actualSessionDate, "yyyy/MM/dd");
-			sDates = formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: " + pe.getMessage());
-		}
+		temp = parseDate(actualSessionDate, "yyyy/MM/dd");
+		sDates = formatDate(temp, "yyyy-MM-dd");
 		return sDates;
 	}
 
@@ -138,13 +134,9 @@ public class EducGraduationApiUtils {
 		String actualSessionDate = sessionDate + "/01";
 		Date temp = new Date();
 		Date sDate = null;
-		try {
-			temp = EducGraduationApiUtils.parseDate(actualSessionDate, "yyyy/MM/dd");
-			String sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-			sDate = EducGraduationApiUtils.parseDate(sDates, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: " + pe.getMessage());
-		}
+		temp = EducGraduationApiUtils.parseDate(actualSessionDate, "yyyy/MM/dd");
+		String sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		sDate = EducGraduationApiUtils.parseDate(sDates, "yyyy-MM-dd");
 		return sDate;
 	}
 
@@ -152,12 +144,8 @@ public class EducGraduationApiUtils {
 		String actualDate = inDate + "/01";
 		Date temp = new Date();
 		String sDates = null;
-		try {
-			temp = EducGraduationApiUtils.parseDate(actualDate, "yyyy/MM/dd");
-			sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: " + pe.getMessage());
-		}
+		temp = EducGraduationApiUtils.parseDate(actualDate, "yyyy/MM/dd");
+		sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 		return sDates;
 	}
 

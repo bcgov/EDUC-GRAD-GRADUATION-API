@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,7 +85,7 @@ public class ReportService {
 		return null;
 	}
 
-	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken, ExceptionMessage exception) {
+	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
 		try {
 			ReportData data = new ReportData();
 			data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
@@ -95,7 +94,7 @@ public class ReportService {
 			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
 			data.setGraduationData(getGraduationData(graduationDataStatus));
 			data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken, exception));
+			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
 			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 			return data;
 		} catch (Exception e) {
@@ -107,7 +106,7 @@ public class ReportService {
 		return errorData;
 	}
 
-	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
+	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken, ExceptionMessage exception) {
 		try {
 			String studentID = graduationDataStatus.getGradStudent().getStudentID();
 			if(studentID == null) {
@@ -122,7 +121,7 @@ public class ReportService {
 						ReportService.class,
 						"Student with ID " + studentID + " value not exists in GRAD Student system");
 			}
-			return prepareTranscriptData(graduationDataStatus, graduationStudentRecord, accessToken, exception);
+			return prepareTranscriptData(graduationDataStatus, graduationStudentRecord, xml, accessToken, exception);
 		} catch (Exception e) {
 			exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
 			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -132,7 +131,7 @@ public class ReportService {
 		return errorData;
 	}
 
-	public ReportData prepareTranscriptData(String pen, String accessToken, ExceptionMessage exception) {
+	public ReportData prepareTranscriptData(String pen, boolean xml, String accessToken, ExceptionMessage exception) {
 		try {
 			GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken, exception);
 			if (student == null) {
@@ -152,7 +151,7 @@ public class ReportService {
 						"Student with PEN " + pen + " doesn't have graduation data in GRAD Student system");
 			}
 			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData)jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
-			return prepareTranscriptData(graduationData, graduationStudentRecord, accessToken, exception);
+			return prepareTranscriptData(graduationData, graduationStudentRecord, xml, accessToken, exception);
 		} catch (Exception e) {
 			exception.setExceptionName("PREPARE REPORT DATA FROM PEN");
 			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -199,7 +198,7 @@ public class ReportService {
 		return nList;
 	}
 
-	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
+	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken,ExceptionMessage exception) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
 		ProgramCertificateTranscript pcObj = getTranscript(gradResponse,graduationDataStatus,accessToken,exception);
@@ -209,13 +208,16 @@ public class ReportService {
 			transcriptData.setTranscriptTypeCode(code);
 		}
 		transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(gradResponse.getUpdateDate().toString()));
-		transcriptData.setResults(getTranscriptResults(graduationDataStatus, accessToken));
+		transcriptData.setResults(getTranscriptResults(graduationDataStatus, xml, accessToken));
 		return transcriptData;
 	}
 
-	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially){
+	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
-			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected() && !sc.isLessCreditCourse() && !sc.isValidationCourse() && !sc.isGrade10Course()) {
+			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
+			boolean notCompletedCourse = xml && cal.before(sessionDate);
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
 				if (sc.getEquivOrChallenge() != null) {
@@ -274,12 +276,8 @@ public class ReportService {
 	private String checkCutOffCourseDate(String sDate,Double value) {
 		String cutoffDate = "1991-11-01";
 		String sessionDate = sDate + "/01";
-		try {
-			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: {}",pe.getMessage());
-		}
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
@@ -335,7 +333,7 @@ public class ReportService {
 			}
 		}
 	}
-	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
+	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,boolean xml,String accessToken) {
 		List<TranscriptResult> tList = new ArrayList<>();
 		String program = graduationDataStatus.getGradStatus().getProgram();
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
@@ -345,17 +343,17 @@ public class ReportService {
 				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
 				if(!provinciallyExaminable.isEmpty()) {
 					sortOnCourseCode(provinciallyExaminable);
-					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially");
+					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially", xml);
 				}
 
 				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
 				if(!nonExaminable.isEmpty()) {
 					sortOnCourseCode(nonExaminable);
-					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable");
+					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable", xml);
 				}
 			}else {
 				studentCourseList.sort(Comparator.comparing(StudentCourse::getCourseLevel,Comparator.nullsLast(String::compareTo)).thenComparing(StudentCourse::getCourseName));
-				createCourseListForTranscript(studentCourseList,graduationDataStatus,tList, "regular");
+				createCourseListForTranscript(studentCourseList,graduationDataStatus,tList, "regular", xml);
 			}
 		}
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
@@ -387,12 +385,8 @@ public class ReportService {
 		if(provincially.equalsIgnoreCase("provincially")) {
 			return finalCompletedPercentage;
 		}
-		try {
-			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: {}",pe.getMessage());
-		}
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
