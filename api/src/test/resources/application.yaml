@@ -93,3 +93,8 @@ endpoint:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/paginated
   by-pen:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: false
