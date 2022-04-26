@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -214,17 +213,11 @@ public class ReportService {
 	}
 
 	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
-			if (!sc.isDuplicate() &&
-					!sc.isFailed() &&
-					!sc.isNotCompleted() &&
-					!sc.isProjected() &&
-					!sc.isLessCreditCourse() &&
-					!sc.isValidationCourse() &&
-					!sc.isGrade10Course()) {
-				if(xml && Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA).after(sc.getSessionDate())) {
-					continue;
-				}
+			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
+			boolean notCompletedCourse = xml && cal.before(sessionDate);
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
 				if (sc.getEquivOrChallenge() != null) {
@@ -283,12 +276,8 @@ public class ReportService {
 	private String checkCutOffCourseDate(String sDate,Double value) {
 		String cutoffDate = "1991-11-01";
 		String sessionDate = sDate + "/01";
-		try {
-			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: {}",pe.getMessage());
-		}
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
@@ -396,12 +385,8 @@ public class ReportService {
 		if(provincially.equalsIgnoreCase("provincially")) {
 			return finalCompletedPercentage;
 		}
-		try {
-			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: {}",pe.getMessage());
-		}
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
