@@ -33,7 +33,7 @@ import javax.validation.constraints.NotNull;
 @OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
-    private static Logger logger = LoggerFactory.getLogger(GraduationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GraduationController.class);
 
     @Autowired
     GraduationService gradService;

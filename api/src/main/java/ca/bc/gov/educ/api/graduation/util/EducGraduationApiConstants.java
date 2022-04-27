@@ -13,8 +13,10 @@ import lombok.Setter;
 @Setter
 public class EducGraduationApiConstants {
 
+    public static final String CORRELATION_ID = "correlationID";
+
     //API end-point Mapping constants
-	public static final String API_ROOT_MAPPING = "";
+	  public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRADUATION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/graduate";
     public static final String GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE = "/studentid/{studentID}/run/{projectedType}";
@@ -84,6 +86,10 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
+
+    // Splunk LogHelper Enabled
+    @Value("${splunk.log-helper.enabled}")
+    private boolean splunkLogHelperEnabled;
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
