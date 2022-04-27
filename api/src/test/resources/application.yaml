@@ -78,7 +78,7 @@ endpoint:
   get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
   get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
  educ-school-api:
-   url: https://school-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
+   url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
  report-api: 
   achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
   transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
@@ -86,3 +86,15 @@ endpoint:
  grad-student-graduation-api:
   get-special-cases: 
     url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/lgSc/specialcase/%s
+ pen-student-api:
+  by-studentid:
+    url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/%s
+  search:
+    url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/paginated
+  by-pen:
+    url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: false

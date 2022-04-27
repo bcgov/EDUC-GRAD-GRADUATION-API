@@ -1,16 +1,8 @@
 package ca.bc.gov.educ.api.graduation.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.web.bind.annotation.*;
-
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -22,6 +14,17 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
 
 @CrossOrigin
 @RestController
@@ -30,7 +33,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
-    private static Logger logger = LoggerFactory.getLogger(GraduationController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GraduationController.class);
 
     @Autowired
     GraduationService gradService;
@@ -50,6 +53,28 @@ public class GraduationController {
         OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
         String accessToken = auth.getTokenValue();
         return response.GET(gradService.graduateStudent(studentID,batchId,accessToken,projectedType));
+    }
+
+    @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
+    @PreAuthorize(PermissionsContants.GRADUATE_DATA)
+    @Operation(summary = "Get Report data from graduation by student pen", description = "Get Report data from graduation by student pen", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type) {
+        logger.debug("Report Data By Student Pen: " + pen);
+        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        String accessToken = auth.getTokenValue();
+        return response.GET(gradService.prepareReportData(pen, type, accessToken));
+    }
+
+    @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
+    @PreAuthorize(PermissionsContants.GRADUATE_DATA)
+    @Operation(summary = "Adapt graduation data for reporting", description = "Adapt graduation data for reporting", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody @NotNull GraduationData graduationData, @RequestParam(required = false) String type) {
+        logger.debug("Report Data from graduation for student: " + graduationData.getGradStudent().getStudentID());
+        OAuth2AuthenticationDetails auth = (OAuth2AuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        String accessToken = auth.getTokenValue();
+        return response.GET(gradService.prepareReportData(graduationData, type, accessToken));
     }
 
 }

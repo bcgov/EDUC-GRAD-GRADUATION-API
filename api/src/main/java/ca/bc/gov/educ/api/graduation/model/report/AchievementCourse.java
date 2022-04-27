@@ -53,6 +53,7 @@ public class AchievementCourse implements Serializable {
     private String completedCourseLetterGrade;
     private String interimPercent = "";
     private String equivOrChallenge;
+    private boolean projected;
 
     /**
      * Constructor method.

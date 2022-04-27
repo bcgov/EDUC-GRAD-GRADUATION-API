@@ -1,21 +1,16 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentAssessment;
-import ca.bc.gov.educ.api.graduation.model.dto.StudentCourse;
-import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.report.School;
-import ca.bc.gov.educ.api.graduation.model.report.Student;
+import ca.bc.gov.educ.api.graduation.model.report.*;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -28,9 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import ca.bc.gov.educ.api.graduation.model.dto.ProgramCertificateTranscript;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportService {
@@ -45,6 +41,9 @@ public class ReportService {
 	WebClient webClient;
 
 	@Autowired
+	JsonTransformer jsonTransformer;
+
+	@Autowired
 	EducGraduationApiConstants educGraduationApiConstants;
 
 	public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
@@ -55,7 +54,7 @@ public class ReportService {
 			return webClient.post().uri(educGraduationApiConstants.getTranscript()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
 		} catch (Exception e) {
 			exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 			return null;
 		}
 	}
@@ -63,7 +62,7 @@ public class ReportService {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
 		for (StudentOptionalProgram optionalPrograms : projectedOptionalGradResponse) {
-			if (optionalPrograms.isGraduated() && (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD"))) {
+			if (optionalPrograms.isGraduated() && (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR"))) {
 				req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
 			}
 		}
@@ -73,7 +72,7 @@ public class ReportService {
 			}).block();
 		} catch (Exception e) {
 			exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-			exception.setExceptionDetails(e.getLocalizedMessage());
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 			return new ArrayList<>();
 		}
 	}
@@ -86,18 +85,104 @@ public class ReportService {
 		return null;
 	}
 
-	public ReportData prepareReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
-		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
-		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
-		data.setGradMessage(graduationDataStatus.getGradMessage());
-		data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-		data.setGraduationData(getGraduationData(graduationDataStatus));
-		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, accessToken,exception));
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
-		return data;
+	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
+		try {
+			ReportData data = new ReportData();
+			data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+			data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+			data.setGradMessage(graduationDataStatus.getGradMessage());
+			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
+			data.setGraduationData(getGraduationData(graduationDataStatus));
+			data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+			data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
+			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+			return data;
+		} catch (Exception e) {
+			exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
+	}
+
+	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken, ExceptionMessage exception) {
+		try {
+			String studentID = graduationDataStatus.getGradStudent().getStudentID();
+			if(studentID == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student ID can't be NULL");
+			}
+
+			GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken, exception);
+			if (graduationStudentRecord == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with ID " + studentID + " value not exists in GRAD Student system");
+			}
+			return prepareTranscriptData(graduationDataStatus, graduationStudentRecord, xml, accessToken, exception);
+		} catch (Exception e) {
+			exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
+	}
+
+	public ReportData prepareTranscriptData(String pen, boolean xml, String accessToken, ExceptionMessage exception) {
+		try {
+			GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken, exception);
+			if (student == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " value not exists in PEN system");
+			}
+			GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken, exception);
+			if (graduationStudentRecord == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " value not exists in GRAD Student system");
+			}
+			if (graduationStudentRecord.getStudentGradData() == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " doesn't have graduation data in GRAD Student system");
+			}
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData)jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
+			return prepareTranscriptData(graduationData, graduationStudentRecord, xml, accessToken, exception);
+		} catch (Exception e) {
+			exception.setExceptionName("PREPARE REPORT DATA FROM PEN");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
+	}
+
+	private GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken, ExceptionMessage exception) {
+		try {
+			List<GradSearchStudent> stuDataList = webClient.get().uri(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(),pen)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(new ParameterizedTypeReference<List<GradSearchStudent>>() {}).block();
+			if(stuDataList != null && !stuDataList.isEmpty()) {
+				return stuDataList.get(0);
+			}
+		} catch (Exception e) {
+			exception.setExceptionName("STUDENT BY PEN FROM PEN API");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		return null;
+	}
+
+	private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID, String accessToken, ExceptionMessage exception) {
+		try
+		{
+			return webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+		} catch (Exception e) {
+			exception.setExceptionName("GRAD STATUS FROM GRAD STUDENT API");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		return null;
 	}
 
 	private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
@@ -113,9 +198,9 @@ public class ReportService {
 		return nList;
 	}
 
-	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, String accessToken,ExceptionMessage exception) {
+	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken,ExceptionMessage exception) {
 		Transcript transcriptData = new Transcript();
-		transcriptData.setInterim("false");
+		transcriptData.setInterim(xml ? "true" : "false");
 		ProgramCertificateTranscript pcObj = getTranscript(gradResponse,graduationDataStatus,accessToken,exception);
 		if(pcObj != null) {
 			Code code = new Code();
@@ -123,20 +208,23 @@ public class ReportService {
 			transcriptData.setTranscriptTypeCode(code);
 		}
 		transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(gradResponse.getUpdateDate().toString()));
-		transcriptData.setResults(getTranscriptResults(graduationDataStatus, accessToken));
+		transcriptData.setResults(getTranscriptResults(graduationDataStatus, xml, accessToken));
 		return transcriptData;
 	}
 
-	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList){
+	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml){
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
-			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected() && !sc.isLessCreditCourse() && !sc.isValidationCourse() && !sc.isGrade10Course() && !sc.isCutOffCourse()) {
+			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
+			boolean notCompletedCourse = xml && cal.before(sessionDate);
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
 				if (sc.getEquivOrChallenge() != null) {
 					equivOrChallenge = sc.getEquivOrChallenge();
 				}
 				result.setCourse(setCourseObjForTranscript(sc,graduationDataStatus));
-				result.setMark(setMarkObjForTranscript(sc));
+				result.setMark(setMarkObjForTranscript(sc,graduationDataStatus.getGradStatus().getProgram(),provincially));
 				result.setRequirement(sc.getGradReqMet());
 				result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
 				result.setRequirementName(sc.getGradReqMetDetail());
@@ -159,15 +247,58 @@ public class ReportService {
 		crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 		return  crse;
 	}
-	private Mark setMarkObjForTranscript(StudentCourse sc) {
+	private Mark setMarkObjForTranscript(StudentCourse sc, String program, String provincially) {
 		Mark mrk = new Mark();
-		mrk.setExamPercent(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("A")==0 ?"AEG":getValue(sc.getBestExamPercent()));
+		mrk.setExamPercent(getExamPercent(sc.getBestExamPercent(),program,sc.getCourseLevel(),sc.getSpecialCase(),sc.getSessionDate(),sc.getExamPercent()));
 		mrk.setFinalLetterGrade(sc.getCompletedCourseLetterGrade());
-		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate()));
+		mrk.setFinalPercent(getFinalPercent(getValue(sc.getCompletedCoursePercentage()),sc.getSessionDate(),provincially));
 		mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
 		mrk.setInterimPercent(getValue(sc.getInterimPercent()));
-		mrk.setSchoolPercent(getValue(sc.getBestSchoolPercent()));
+		mrk.setSchoolPercent(getSchoolPercent(sc.getBestSchoolPercent(),program,sc.getCourseLevel(),sc.getSessionDate(),sc.getSchoolPercent()));
 		return mrk;
+	}
+
+	private String getExamPercent(Double bestExamPercent, String program, String courseLevel, String specialCase, String sDate,Double examPercent) {
+		String res = checkCutOffCourseDate(sDate,examPercent);
+		if(res == null) {
+			String bExam = getValue(bestExamPercent);
+			if (specialCase != null && specialCase.compareTo("A") == 0) {
+				return "AEG";
+			} else if ((program.contains("2004") || program.contains("2018")) && !courseLevel.contains("12")) {
+				return "";
+			} else {
+				return bExam;
+			}
+		}
+		return res;
+	}
+
+	private String checkCutOffCourseDate(String sDate,Double value) {
+		String cutoffDate = "1991-11-01";
+		String sessionDate = sDate + "/01";
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+
+		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
+
+		if (diff > 0) {
+			return getValue(value);
+		}else {
+			return null;
+		}
+	}
+	private String getSchoolPercent(Double bestSchoolPercent,String program,String courseLevel,String sDate,Double schoolPercent) {
+
+		String res = checkCutOffCourseDate(sDate,schoolPercent);
+		if(res == null) {
+			String sExam = getValue(bestSchoolPercent);
+			if ((program.contains("2004") || program.contains("2018")) && !courseLevel.contains("12")) {
+				return "";
+			} else {
+				return sExam;
+			}
+		}
+		return res;
 	}
 
 	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
@@ -182,6 +313,7 @@ public class ReportService {
 				crse.setLevel("");
 				crse.setCredits("NA");
 				crse.setName(sc.getAssessmentName());
+				crse.setType("3");
 				crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
 				result.setCourse(crse);
 
@@ -201,7 +333,7 @@ public class ReportService {
 			}
 		}
 	}
-	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
+	private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,boolean xml,String accessToken) {
 		List<TranscriptResult> tList = new ArrayList<>();
 		String program = graduationDataStatus.getGradStatus().getProgram();
 		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
@@ -210,30 +342,31 @@ public class ReportService {
 				List<StudentCourse> newList= new ArrayList<>();
 				List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y")==0).collect(Collectors.toList());
 				if(!provinciallyExaminable.isEmpty()) {
-					provinciallyExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
-					newList.addAll(provinciallyExaminable);
+					sortOnCourseCode(provinciallyExaminable);
+					createCourseListForTranscript(provinciallyExaminable,graduationDataStatus,tList,"provincially", xml);
 				}
 
 				List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N")==0).collect(Collectors.toList());
 				if(!nonExaminable.isEmpty()) {
-					nonExaminable.sort(Comparator.comparing(StudentCourse::getCourseCode));
-					newList.addAll(nonExaminable);
-				}
-				if(!newList.isEmpty()) {
-					studentCourseList = new ArrayList<>();
-					studentCourseList.addAll(newList);
+					sortOnCourseCode(nonExaminable);
+					createCourseListForTranscript(nonExaminable,graduationDataStatus,tList, "non-examinable", xml);
 				}
 			}else {
 				studentCourseList.sort(Comparator.comparing(StudentCourse::getCourseLevel,Comparator.nullsLast(String::compareTo)).thenComparing(StudentCourse::getCourseName));
+				createCourseListForTranscript(studentCourseList,graduationDataStatus,tList, "regular", xml);
 			}
 		}
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		if (!studentAssessmentList.isEmpty()) {
 			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
 		}
-		createCourseListForTranscript(studentCourseList,graduationDataStatus,tList);
+
 		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,accessToken);
 		return tList;
+	}
+
+	private void sortOnCourseCode(List<StudentCourse> cList) {
+		cList.sort(Comparator.comparing(StudentCourse::getCourseCode));
 	}
 
 	private String getCredits(String program,String courseCode, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills,boolean isRestricted) {
@@ -246,15 +379,14 @@ public class ReportService {
 		}
 		return String.valueOf(totalCredits);
 	}
-	private String getFinalPercent(String finalCompletedPercentage,String sDate) {
+	private String getFinalPercent(String finalCompletedPercentage, String sDate,String provincially) {
 		String cutoffDate = "1994-09-01";
 		String sessionDate = sDate + "/01";
-		try {
-			Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-			sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		} catch (ParseException pe) {
-			logger.error("ERROR: {}",pe.getMessage());
+		if(provincially.equalsIgnoreCase("provincially")) {
+			return finalCompletedPercentage;
 		}
+		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
@@ -264,7 +396,6 @@ public class ReportService {
 			return finalCompletedPercentage;
 		}
 	}
-
 	private String getAssessmentFinalPercentAchievement(StudentAssessment sA, String accessToken) {
 		String finalPercent=getValue(sA.getProficiencyScore());
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
@@ -417,10 +548,14 @@ public class ReportService {
 	}
 
 	private void getStudentCoursesAssessmentsNExams(ReportData data, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
-		List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
-		List<StudentCourse> studentExamList = studentCourseList
+		List<StudentCourse> sCList = graduationDataStatus.getStudentCourses().getStudentCourseList();
+		List<StudentCourse> studentExamList = sCList
 				.stream()
 				.filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
+				.collect(Collectors.toList());
+		List<StudentCourse> studentCourseList = sCList
+				.stream()
+				.filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
 				.collect(Collectors.toList());
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
 		List<AchievementCourse> sCourseList = new ArrayList<>();
@@ -447,6 +582,7 @@ public class ReportService {
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
 			crse.setGradReqMet(sc.getGradReqMet());
+			crse.setProjected(sc.isProjected());
 			crse.setCreditsUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad() : 0);
 			crse.setEquivOrChallenge(equivOrChallenge);
 			crse.setBestSchoolPercent(getValue(sc.getBestSchoolPercent()));
@@ -474,6 +610,8 @@ public class ReportService {
 			crse.setCredits(sc.getCredits().toString());
 			crse.setCourseLevel(sc.getCourseLevel());
 			crse.setCourseName(getCourseNameLogic(sc));
+			crse.setProjected(sc.isProjected());
+			crse.setInterimPercent(getValue(sc.getInterimPercent()));
 			crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate(): "");
 			crse.setCompletedCourseLetterGrade(sc.getCompletedCourseLetterGrade());
 			crse.setCompletedCoursePercentage(getValue(sc.getCompletedCoursePercentage()));
@@ -500,6 +638,7 @@ public class ReportService {
 			result.setProficiencyScore(getAssessmentFinalPercentAchievement(sA, accessToken));
 			result.setSpecialCase(sA.getSpecialCase());
 			result.setExceededWriteFlag(sA.getExceededWriteFlag());
+			result.setProjected(sA.isProjected());
 			tList.add(result);
 		}
 		if (!tList.isEmpty()) {
@@ -549,26 +688,99 @@ public class ReportService {
 		}
 	}
 
-	public ReportData prepareCertificateData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,String accessToken) {
+	public ReportData prepareCertificateData(String pen, String accessToken, ExceptionMessage exception) {
+		try {
+			GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken, exception);
+			if (student == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " value not exists in PEN system");
+			}
+			GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken, exception);
+			if (graduationStudentRecord == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " value not exists in GRAD Student system");
+			}
+			if (graduationStudentRecord.getStudentGradData() == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with PEN " + pen + " doesn't have graduation data in GRAD Student system");
+			}
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData)jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
+			return prepareCertificateData(graduationStudentRecord, graduationData, accessToken);
+		} catch (Exception e) {
+			exception.setExceptionName("PREPARE REPORT DATA FROM PEN");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
+	}
+
+	public ReportData prepareCertificateData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
+		try {
+			String studentID = graduationDataStatus.getGradStudent().getStudentID();
+			if(studentID == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student ID can't be NULL");
+			}
+
+			GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken, exception);
+			if (graduationStudentRecord == null) {
+				throw new EntityNotFoundException(
+						ReportService.class,
+						"Student with ID " + studentID + " value not exists in GRAD Student system");
+			}
+			return prepareCertificateData(graduationStudentRecord, graduationDataStatus, accessToken);
+		} catch (Exception e) {
+			exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
+			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
+		}
+		ReportData errorData = new ReportData();
+		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
+		return errorData;
+	}
+
+	public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
+											 ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken) {
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
+		ProgramCertificateTranscript certType = getTranscript(gradResponse, graduationDataStatus, accessToken, exceptionMessage);
+		if(StringUtils.trimToNull(exceptionMessage.getExceptionName()) != null) {
+			ReportData errorData = new ReportData();
+			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
+			return errorData;
+		}
+//		List<ProgramCertificateTranscript> certTypes = getCertificateList(gradResponse, graduationDataStatus, new ArrayList<StudentOptionalProgram>(), accessToken, exceptionMessage);
+//		if(certTypes == null || certTypes.isEmpty()) {
+//			ReportData errorData = new ReportData();
+//			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
+//			return errorData;
+//		}
+		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
+	}
+
+	public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
 		ReportData data = new ReportData();
 		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
+		data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
+		data.setCertificate(getCertificateData(gradResponse,certType));
+		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
+			data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+		} else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S") || certType.getCertificateTypeCode().equalsIgnoreCase("SCF")) {
+			data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+		}
 		return data;
 	}
 
 	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
 			ProgramCertificateTranscript certType,ExceptionMessage exception) {
-		ReportData certData = prepareCertificateData(graduationDataStatus,accessToken);
-		certData.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
-		certData.setCertificate(getCertificateData(gradResponse,certType));
-		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
-			certData.getStudent().setEnglishCert(certType.getCertificateTypeCode());
-		}else if(certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S")) {
-			certData.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-		}
+		ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken,exception);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(gradResponse.getPen());
@@ -634,17 +846,24 @@ public class ReportService {
 
 	}
 
-	public ReportData prepareAchievementReportData(
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList,String accessToken) {
-		ReportData data = new ReportData();
-		data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
-		data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(),optionalProgramList));
-		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU":"BC");
-		data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
-		getStudentCoursesAssessmentsNExams(data,graduationDataStatus,accessToken);
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
-		data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
-		return data;
+	public ReportData prepareAchievementReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
+		try {
+			ReportData data = new ReportData();
+			data.setSchool(getSchoolDataAchvReport(graduationDataStatus.getSchool()));
+			data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(), optionalProgramList));
+			data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+			data.setGraduationStatus(getGraduationStatus(graduationDataStatus));
+			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
+			getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
+			data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+			data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
+			data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+			return data;
+		}catch (Exception e) {
+			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+			return null;
+		}
 	}
 
 	private List<OptionalProgram> getOptionalProgramAchvReport(List<StudentOptionalProgram> optionalProgramList) {
@@ -667,35 +886,42 @@ public class ReportService {
 			op.setHasRequirementMet(" Check with School");
 			if(existingData != null && existingData.getOptionalRequirementsMet() != null) {
 				op.setHasRequirementMet("The Following Requirements Are Met");
-				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses()));
+				op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(),existingData.getOptionalStudentCourses(),op.getNonGradReasons()));
 			}
 			opList.add(op);
 		}
 		return opList;
 	}
 
-	private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses) {
+	private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses, List<NonGradReason> nonGradReasons) {
 		List<GradRequirement> grList = new ArrayList<>();
 		for(ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr:optionalRequirementsMet) {
-			GradRequirement gRAchv = new GradRequirement();
-			gRAchv.setCode(gr.getRule());
-			gRAchv.setDescription(gr.getDescription());
+			if(!gr.isProjected()) {
+				GradRequirement gRAchv = new GradRequirement();
+				gRAchv.setCode(gr.getRule());
+				gRAchv.setDescription(gr.getDescription());
 
-			List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
-					.stream()
-					.filter(sc -> sc.getGradReqMet().contains(gr.getRule()))
-					.collect(Collectors.toList());
-			List<AchievementCourse> cdList = new ArrayList<>();
-			scList.forEach(sc->{
-				AchievementCourse cD = new AchievementCourse();
-				cD.setCourseCode(sc.getCourseCode());
-				cD.setCourseLevel(sc.getCourseLevel());
-				cD.setSessionDate(sc.getSessionDate());
-				cdList.add(cD);
-			});
+				List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
+						.stream()
+						.filter(sc -> sc.getGradReqMet().contains(gr.getRule()))
+						.collect(Collectors.toList());
+				List<AchievementCourse> cdList = new ArrayList<>();
+				scList.forEach(sc -> {
+					AchievementCourse cD = new AchievementCourse();
+					cD.setCourseCode(sc.getCourseCode());
+					cD.setCourseLevel(sc.getCourseLevel());
+					cD.setSessionDate(sc.getSessionDate());
+					cdList.add(cD);
+				});
 
-			gRAchv.setCourseDetails(cdList);
-			grList.add(gRAchv);
+				gRAchv.setCourseDetails(cdList);
+				grList.add(gRAchv);
+			}else {
+				NonGradReason obj = new NonGradReason();
+				obj.setCode(gr.getRule());
+				obj.setDescription(gr.getDescription());
+				nonGradReasons.add(obj);
+			}
 		}
 		return  grList;
 	}

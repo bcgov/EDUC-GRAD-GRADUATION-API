@@ -13,6 +13,7 @@ public class AssessmentResult implements Serializable {
     private String gradReqMet;
     private String specialCase;
     private String exceededWriteFlag;
+    private boolean projected;
 
     public String getAssessmentName() {
         return assessmentName;
@@ -68,5 +69,13 @@ public class AssessmentResult implements Serializable {
 
     public void setExceededWriteFlag(String exceededWriteFlag) {
         this.exceededWriteFlag = exceededWriteFlag;
+    }
+
+    public boolean getProjected() {
+        return projected;
+    }
+
+    public void setProjected(boolean projected) {
+        this.projected = projected;
     }
 }
