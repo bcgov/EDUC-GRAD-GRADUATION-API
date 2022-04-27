@@ -200,7 +200,7 @@ public class ReportService {
 
 	private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken,ExceptionMessage exception) {
 		Transcript transcriptData = new Transcript();
-		transcriptData.setInterim("false");
+		transcriptData.setInterim(xml ? "true" : "false");
 		ProgramCertificateTranscript pcObj = getTranscript(gradResponse,graduationDataStatus,accessToken,exception);
 		if(pcObj != null) {
 			Code code = new Code();
