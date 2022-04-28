@@ -20,4 +20,8 @@ public class ThreadLocalStateUtil {
     public static String getCorrelationID() {
         return transaction.get();
     }
+
+    public static void clear() {
+        transaction.remove();
+    }
 }
