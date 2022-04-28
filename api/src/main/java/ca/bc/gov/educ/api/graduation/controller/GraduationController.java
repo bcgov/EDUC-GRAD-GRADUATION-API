@@ -48,7 +48,7 @@ public class GraduationController {
                                                                 @RequestParam(required = false) Long batchId,
                                                                 @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Graduate Student for Student ID: " + studentID);
-        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken,projectedType));
+        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replaceAll("Bearer ", ""),projectedType));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
@@ -58,7 +58,7 @@ public class GraduationController {
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type,
                                                       @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Report Data By Student Pen: " + pen);
-        return response.GET(gradService.prepareReportData(pen, type, accessToken));
+        return response.GET(gradService.prepareReportData(pen, type, accessToken.replaceAll("Bearer ", "")));
     }
 
     @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
@@ -69,7 +69,7 @@ public class GraduationController {
                                                                @RequestParam(required = false) String type,
                                                                @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Report Data from graduation for student: " + graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type, accessToken));
+        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replaceAll("Bearer ", "")));
     }
 
 }
