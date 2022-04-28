@@ -61,8 +61,6 @@ objects:
                     name: educ-grad-graduation-api-config-map
                 - secretRef:
                     name: api-student-graduation-db-secret
-                - secretRef:
-                    name: grad-keycloak-pk-secret
               resources: {}
             - image: docker-remote.artifacts.developer.gov.bc.ca/fluent/fluent-bit:1.5.7
               name: "${REPO_NAME}-fluent-bit-sidecar"
