@@ -213,10 +213,12 @@ public class ReportService {
 	}
 
 	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml){
-		Date cal = new Date();
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
 			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
-			boolean notCompletedCourse = xml && cal.before(sessionDate);
+			Calendar calSessionDate = Calendar.getInstance();
+			calSessionDate.setTime(sessionDate);
+			boolean notCompletedCourse = xml && cal.before(calSessionDate);
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
