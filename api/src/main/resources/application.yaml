@@ -97,6 +97,8 @@ endpoint:
  pen-student-api:
    by-studentid:
      url: ${PEN_API}api/v1/student/%s
+   search:
+     url: ${PEN_API}api/v1/student/paginated
    by-pen:
      url: ${PEN_API}api/v1/student?pen=%s
 
