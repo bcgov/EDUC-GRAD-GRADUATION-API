@@ -5,16 +5,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.LogHelper;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 
 @Component
-public class RequestInterceptor extends HandlerInterceptorAdapter {
+public class RequestInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	GradValidation validation;
@@ -25,6 +26,10 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		validation.clear();
+		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
+		if (correlationID != null) {
+			ThreadLocalStateUtil.setCorrelationID(correlationID);
+		}
 		return true;
 	}
 
@@ -42,6 +47,7 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
 		if (correlationID != null) {
 			response.setHeader(EducGraduationApiConstants.CORRELATION_ID, request.getHeader(EducGraduationApiConstants.CORRELATION_ID));
+			ThreadLocalStateUtil.clear();
 		}
 	}
 }
