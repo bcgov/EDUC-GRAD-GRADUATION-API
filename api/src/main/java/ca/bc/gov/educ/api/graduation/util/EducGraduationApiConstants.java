@@ -1,12 +1,11 @@
 package ca.bc.gov.educ.api.graduation.util;
 
-import java.util.Date;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Date;
 
 @Component
 @Getter
@@ -22,6 +21,9 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE = "/studentid/{studentID}/run/{projectedType}";
     public static final String GRADUATE_REPORT_DATA_BY_PEN = "/report/data/{pen}";
     public static final String GRADUATE_REPORT_DATA = "/report/data";
+    public static final String GRADUATE_TRANSCRIPT_REPORT = "/report/transcript/{pen}";
+    public static final String GRADUATE_CERTIFICATE_REPORT = "/report/certificate/{pen}";
+    public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;

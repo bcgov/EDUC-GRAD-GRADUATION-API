@@ -17,6 +17,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +64,17 @@ public class GraduationController {
         return response.GET(gradService.prepareReportData(pen, type, accessToken.replaceAll("Bearer ", "")));
     }
 
+    @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
+    @PreAuthorize(PermissionsContants.GRADUATE_TRANSCRIPT)
+    @Operation(summary = "Get Transcript binary from graduation by student pen", description = "Get Transcript binary from graduation by student pen", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String interim,
+                                                      @RequestHeader(name="Authorization") String accessToken) {
+        logger.debug("Report Data By Student Pen: " + pen);
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replaceAll("Bearer ", ""));
+        return handleBinaryResponse(resultBinary, String.format("%s Transcript Report %s.pdf", pen, interim));
+    }
+
     @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
     @PreAuthorize(PermissionsContants.GRADUATE_DATA)
     @Operation(summary = "Adapt graduation data for reporting", description = "Adapt graduation data for reporting", tags = { "Graduation Data" })
@@ -72,4 +86,24 @@ public class GraduationController {
         return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replaceAll("Bearer ", "")));
     }
 
+    private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {
+        return handleBinaryResponse(resultBinary, reportFile, MediaType.APPLICATION_PDF);
+    }
+
+    private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
+        ResponseEntity<byte[]> response = null;
+
+        if(resultBinary.length > 0) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "inline; filename=" + reportFile);
+            response = ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentType(contentType)
+                    .body(resultBinary);
+        } else {
+            response = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return response;
+    }
 }
