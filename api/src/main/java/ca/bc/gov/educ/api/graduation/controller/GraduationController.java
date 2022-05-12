@@ -33,6 +33,7 @@ import javax.validation.constraints.NotNull;
 public class GraduationController {
 
     private static final Logger logger = LoggerFactory.getLogger(GraduationController.class);
+    private static final String bearer = "Bearer ";
 
     @Autowired
     GraduationService gradService;
@@ -51,7 +52,7 @@ public class GraduationController {
                                                                 @RequestParam(required = false) Long batchId,
                                                                 @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Graduate Student for Student ID: {}", studentID);
-        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace("Bearer ", ""),projectedType));
+        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace(bearer, ""),projectedType));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
@@ -61,7 +62,7 @@ public class GraduationController {
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type,
                                                       @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Report Data By Student Pen: {}", pen);
-        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace("Bearer ", "")));
+        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace(bearer, "")));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
@@ -71,7 +72,7 @@ public class GraduationController {
     public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String interim,
                                                       @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Report Data By Student Pen: {}", pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace("Bearer ", ""));
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace(bearer, ""));
         return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim));
     }
 
@@ -83,7 +84,7 @@ public class GraduationController {
                                                                @RequestParam(required = false) String type,
                                                                @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace("Bearer ", "")));
+        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace(bearer, "")));
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {
