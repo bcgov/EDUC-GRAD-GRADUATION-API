@@ -32,8 +32,8 @@ import javax.validation.constraints.NotNull;
 @OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(GraduationController.class);
-    private static final String bearer = "Bearer ";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraduationController.class);
+    private static final String BEARER = "Bearer ";
 
     @Autowired
     GraduationService gradService;
@@ -51,8 +51,8 @@ public class GraduationController {
     public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID, @PathVariable String projectedType,
                                                                 @RequestParam(required = false) Long batchId,
                                                                 @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Graduate Student for Student ID: {}", studentID);
-        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace(bearer, ""),projectedType));
+        LOGGER.debug("Graduate Student for Student ID: {}", studentID);
+        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace(BEARER, ""),projectedType));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
@@ -61,8 +61,8 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type,
                                                       @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data By Student Pen: {}", pen);
-        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace(bearer, "")));
+        LOGGER.debug("Report Data By Student Pen: {}", pen);
+        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
@@ -71,8 +71,8 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String interim,
                                                       @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data By Student Pen: {}", pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace(bearer, ""));
+        LOGGER.debug("Report Data By Student Pen: {}", pen);
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace(BEARER, ""));
         return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim));
     }
 
@@ -83,8 +83,8 @@ public class GraduationController {
     public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody @NotNull GraduationData graduationData,
                                                                @RequestParam(required = false) String type,
                                                                @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace(bearer, "")));
+        LOGGER.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
+        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace(BEARER, "")));
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {
