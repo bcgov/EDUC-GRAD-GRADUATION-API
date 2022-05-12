@@ -50,8 +50,8 @@ public class GraduationController {
     public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID, @PathVariable String projectedType,
                                                                 @RequestParam(required = false) Long batchId,
                                                                 @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Graduate Student for Student ID: " + studentID);
-        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replaceAll("Bearer ", ""),projectedType));
+        logger.debug("Graduate Student for Student ID: {}", studentID);
+        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace("Bearer ", ""),projectedType));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
@@ -60,8 +60,8 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type,
                                                       @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data By Student Pen: " + pen);
-        return response.GET(gradService.prepareReportData(pen, type, accessToken.replaceAll("Bearer ", "")));
+        logger.debug("Report Data By Student Pen: {}", pen);
+        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace("Bearer ", "")));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
@@ -70,9 +70,9 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String interim,
                                                       @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data By Student Pen: " + pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replaceAll("Bearer ", ""));
-        return handleBinaryResponse(resultBinary, String.format("%s Transcript Report %s.pdf", pen, interim));
+        logger.debug("Report Data By Student Pen: {}", pen);
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace("Bearer ", ""));
+        return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim));
     }
 
     @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
@@ -82,8 +82,8 @@ public class GraduationController {
     public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody @NotNull GraduationData graduationData,
                                                                @RequestParam(required = false) String type,
                                                                @RequestHeader(name="Authorization") String accessToken) {
-        logger.debug("Report Data from graduation for student: " + graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replaceAll("Bearer ", "")));
+        logger.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
+        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace("Bearer ", "")));
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {
@@ -91,19 +91,19 @@ public class GraduationController {
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
-        ResponseEntity<byte[]> response = null;
+        ResponseEntity<byte[]> responseEntity = null;
 
         if(resultBinary.length > 0) {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Disposition", "inline; filename=" + reportFile);
-            response = ResponseEntity
+            responseEntity = ResponseEntity
                     .ok()
                     .headers(headers)
                     .contentType(contentType)
                     .body(resultBinary);
         } else {
-            response = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            responseEntity = ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        return response;
+        return responseEntity;
     }
 }
