@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -33,7 +34,11 @@ public class OptionalProgramService {
 			CodeDTO optionalProgramCode = new CodeDTO();
 			GradAlgorithmOptionalStudentProgram optionalPrograms = graduationDataStatus.getOptionalGradStatus().get(i);
 			
-			StudentOptionalProgram gradOptionalProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetOptionalProgramDetails(),studentID,optionalPrograms.getOptionalProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+			StudentOptionalProgram gradOptionalProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetOptionalProgramDetails(),studentID,optionalPrograms.getOptionalProgramID()))
+							.headers(h -> {
+								h.setBearerAuth(accessToken);
+								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+							}).retrieve().bodyToMono(StudentOptionalProgram.class).block();
 			if(gradOptionalProgram != null) {
 				if(optionalPrograms.isOptionalGraduated()) {
 					gradOptionalProgram.setGraduated(true);
@@ -53,7 +58,11 @@ public class OptionalProgramService {
 				optionalProgramCode.setCode(gradOptionalProgram.getOptionalProgramCode());
 				optionalProgramCode.setName(gradOptionalProgram.getOptionalProgramName());
 				//Save Optional Grad Status
-				webClient.post().uri(educGraduationApiConstants.getSaveOptionalProgramGradStatus()).headers(h -> h.setBearerAuth(accessToken)).body(BodyInserters.fromValue(gradOptionalProgram)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+				webClient.post().uri(educGraduationApiConstants.getSaveOptionalProgramGradStatus())
+								.headers(h -> {
+									h.setBearerAuth(accessToken);
+									h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+								}).body(BodyInserters.fromValue(gradOptionalProgram)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
 			}			
 			optionalProgram.add(optionalProgramCode);
 			projectedOptionalGradResponse.add(gradOptionalProgram);
@@ -66,7 +75,11 @@ public class OptionalProgramService {
 		for(int i=0; i<graduationDataStatus.getOptionalGradStatus().size();i++) {
 			StudentOptionalProgram optionalProgramProjectedObj = new StudentOptionalProgram();
 			GradAlgorithmOptionalStudentProgram optionalPrograms = graduationDataStatus.getOptionalGradStatus().get(i);
-			StudentOptionalProgram gradOptionalProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetOptionalProgramDetails(),studentID,optionalPrograms.getOptionalProgramID())).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+			StudentOptionalProgram gradOptionalProgram = webClient.get().uri(String.format(educGraduationApiConstants.getGetOptionalProgramDetails(),studentID,optionalPrograms.getOptionalProgramID()))
+							.headers(h -> {
+								h.setBearerAuth(accessToken);
+								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+							}).retrieve().bodyToMono(StudentOptionalProgram.class).block();
 			if(gradOptionalProgram != null) {
 				if(optionalPrograms.isOptionalGraduated() && gradOptionalProgram.getOptionalProgramCode().compareTo("DD") == 0) {
 					graduationDataStatus.setDualDogwood(true);

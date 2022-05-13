@@ -3,15 +3,20 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.model.report.ReportOptions;
+import ca.bc.gov.educ.api.graduation.model.report.ReportRequest;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
@@ -42,6 +47,9 @@ public class GraduationService {
 	
 	@Autowired
 	GradValidation validation;
+
+	@Autowired
+	EducGraduationApiConstants educGraduationApiConstants;
 
 	public AlgorithmResponse graduateStudent(String studentID, Long batchId,String accessToken,String projectedType) {
 
@@ -100,5 +108,24 @@ public class GraduationService {
 			default:
 				return reportService.prepareTranscriptData(graduationData, false, accessToken, new ExceptionMessage());
 		}
+	}
+
+	public byte[] prepareTranscriptReport(String pen, String interim, String accessToken) {
+		boolean isInterim = StringUtils.trimToNull(Optional.ofNullable(interim).orElse("")) != null;
+		ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, accessToken, new ExceptionMessage());
+
+		ReportOptions options = new ReportOptions();
+		options.setReportFile("transcript");
+		options.setReportName("Transcript Report.pdf");
+		ReportRequest reportParams = new ReportRequest();
+		reportParams.setOptions(options);
+		reportParams.setData(reportData);
+
+		return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+				.headers(h -> {
+					h.setBearerAuth(accessToken);
+					h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+				}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+
 	}
 }
