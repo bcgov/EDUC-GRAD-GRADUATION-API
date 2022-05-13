@@ -359,6 +359,9 @@ public class ReportService {
 			}
 		}
 		List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
+		if(studentAssessmentList == null) {
+			studentAssessmentList = new ArrayList<>();
+		}
 		if (!studentAssessmentList.isEmpty()) {
 			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
 		}
