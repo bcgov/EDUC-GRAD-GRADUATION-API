@@ -19,9 +19,18 @@ public class AlgorithmSupport {
     ReportService reportService;
 
     public boolean checkForErrors(GraduationData graduationDataStatus, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
-        if (graduationDataStatus != null && graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
+        if(graduationDataStatus != null) {
+            if (graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
+                logger.info("**** Grad Algorithm Has Errors: ****");
+                algorithmResponse.setException(graduationDataStatus.getException());
+                processorData.setAlgorithmResponse(algorithmResponse);
+                return true;
+            }
+        }else {
             logger.info("**** Grad Algorithm Has Errors: ****");
-            algorithmResponse.setException(graduationDataStatus.getException());
+            ExceptionMessage exceptionMessage = new ExceptionMessage();
+            exceptionMessage.setExceptionName("GRAD-ALGORITHM-API FAILED");
+            algorithmResponse.setException(exceptionMessage);
             processorData.setAlgorithmResponse(algorithmResponse);
             return true;
         }
@@ -38,7 +47,7 @@ public class AlgorithmSupport {
                 }
             }
 
-            if (graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty() && graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty()) {
+            if ((graduationDataStatus.getStudentCourses().getStudentCourseList() == null || graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty()) && (graduationDataStatus.getStudentAssessments().getStudentAssessmentList() == null || graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty())) {
                 logger.info("**** No Transcript Generated: ****");
             } else {
                 reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
