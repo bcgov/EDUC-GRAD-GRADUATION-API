@@ -102,12 +102,14 @@ public class GraduationServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
@@ -162,13 +164,14 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
@@ -201,12 +204,28 @@ public class GraduationServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("MER");
 
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		try {
 			graduationService.graduateStudent(studentID,null,accessToken,projectedType);

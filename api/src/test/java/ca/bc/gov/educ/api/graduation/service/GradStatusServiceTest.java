@@ -6,9 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import ca.bc.gov.educ.api.graduation.model.dto.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,10 +26,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -219,6 +217,31 @@ public class GradStatusServiceTest {
 		
 		
 	}
-	
+
+	@Test
+	public void testSaveProjectedGradStatus() {
+		String studentID = new UUID(1, 1).toString();
+		String accessToken = "accessToken";
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).gradMessage("asdsada").nonGradReasons(new ArrayList<>()).requirementsMet(new ArrayList<>()).dualDogwood(false).build();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSaveStudentRecordProjectedRun(), studentID))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(gradResponse));
+
+		GraduationStudentRecord res = gradStatusService.saveStudentRecordProjectedRun(projectedRunClob,studentID,null, accessToken,exception);
+		assertNotNull(res);
+		assertEquals(res.getPen(), gradResponse.getPen());
+	}
 		
 }
