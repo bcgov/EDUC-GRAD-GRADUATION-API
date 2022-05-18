@@ -52,27 +52,24 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		//Code to prepare achievement report
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
 		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
-		if(graduationDataStatus != null) {
-			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
-			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-			ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
-			if (exception.getExceptionName() != null) {
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
-				return processorData;
-			}
-			reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
-
-			if (exception.getExceptionName() != null) {
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
-				logger.info("**** Problem Generating TVR: ****");
-				return processorData;
-			}
-
-			algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
-			algorithmResponse.setGraduationStudentRecord(gradResponse);
+		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
+		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
+		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
+		if (exception.getExceptionName() != null) {
+			algorithmResponse.setException(exception);
+			processorData.setAlgorithmResponse(algorithmResponse);
+			return processorData;
 		}
+		reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+
+		if (exception.getExceptionName() != null) {
+			algorithmResponse.setException(exception);
+			processorData.setAlgorithmResponse(algorithmResponse);
+			logger.info("**** Problem Generating TVR: ****");
+			return processorData;
+		}
+		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
+		algorithmResponse.setGraduationStudentRecord(gradResponse);
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
 		logger.info("************* TIME Taken  ************ {}",diff);
