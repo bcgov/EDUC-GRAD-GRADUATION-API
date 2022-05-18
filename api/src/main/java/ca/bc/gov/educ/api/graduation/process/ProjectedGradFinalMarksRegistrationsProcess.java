@@ -50,7 +50,8 @@ public class ProjectedGradFinalMarksRegistrationsProcess implements AlgorithmPro
 		}
 		logger.info("**** Grad Algorithm Completed: ****");
 		//Code to prepare achievement report
-		gradStatusService.saveStudentRecordProjectedRun(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
 		if(graduationDataStatus != null) {
 			gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
