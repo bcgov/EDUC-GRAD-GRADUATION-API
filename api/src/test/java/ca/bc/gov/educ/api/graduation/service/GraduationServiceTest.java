@@ -62,7 +62,6 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
-		String pen="4334";
 		exception = new ExceptionMessage();		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -87,11 +86,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -99,10 +98,10 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
-		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
@@ -150,11 +149,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -162,9 +161,9 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
@@ -184,7 +183,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 	}
 	
@@ -218,7 +216,7 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 
-		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).gradMessage(graduationDataStatus.getGradMessage()).nonGradReasons(graduationDataStatus.getNonGradReasons()).requirementsMet(graduationDataStatus.getRequirementsMet()).dualDogwood(graduationDataStatus.isDualDogwood()).build();
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
@@ -232,7 +230,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 	}
 	
@@ -265,11 +262,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -277,7 +274,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
@@ -317,11 +314,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -329,7 +326,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -394,7 +391,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -421,7 +418,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -455,11 +451,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -467,7 +463,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -487,7 +483,7 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
@@ -539,7 +535,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -571,7 +567,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -605,11 +600,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -617,7 +612,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -649,7 +644,7 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
+
 		}
 		
 	}
@@ -690,7 +685,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -717,7 +712,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -751,11 +745,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -763,7 +757,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -823,11 +817,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGraduated(true);
 		
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -835,7 +829,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -855,7 +849,7 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
@@ -901,11 +895,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -918,7 +912,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -972,11 +966,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -989,7 +983,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -1017,8 +1011,6 @@ public class GraduationServiceTest {
 	@Test
 	public void testcreateReportNCert() {
 		String studentID = new UUID(1, 1).toString();
-		String projectedType="FMR";
-		String accessToken="accessToken";
 		exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1043,11 +1035,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -1060,7 +1052,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -1096,8 +1088,6 @@ public class GraduationServiceTest {
 	@Test
 	public void testcreateReportNCert2() {
 		String studentID = new UUID(1, 1).toString();
-		String projectedType="FMR";
-		String accessToken="accessToken";
 		exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1130,7 +1120,7 @@ public class GraduationServiceTest {
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -1143,7 +1133,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
