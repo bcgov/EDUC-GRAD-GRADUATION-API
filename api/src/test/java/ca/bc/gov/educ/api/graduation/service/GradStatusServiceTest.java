@@ -229,7 +229,7 @@ public class GradStatusServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).gradMessage("asdsada").nonGradReasons(new ArrayList<>()).requirementsMet(new ArrayList<>()).dualDogwood(false).build();
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).nonGradReasons(new ArrayList<>()).build();
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getSaveStudentRecordProjectedRun(), studentID))).thenReturn(this.requestBodyUriMock);
