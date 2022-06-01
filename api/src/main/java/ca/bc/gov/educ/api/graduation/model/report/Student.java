@@ -12,6 +12,7 @@ public class Student {
     private Pen pen;
     private String firstName;
     private String lastName;
+    private String middleName;
     private String gender;
     private Date birthdate;
     private Address address;
@@ -26,6 +27,8 @@ public class Student {
     private String localId;
     private String hasOtherProgram;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
+    private List<NonGradReason> nonGradReasons = new ArrayList<>();
+    private GraduationData graduationData;
 
     @JsonDeserialize(as = Pen.class)
     public Pen getPen() {
@@ -50,6 +53,14 @@ public class Student {
 
     public void setLastName(String value) {
         this.lastName = value;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
     }
 
     public String getGender() {
@@ -156,5 +167,21 @@ public class Student {
 
     public void setOtherProgramParticipation(List<OtherProgram> otherProgramParticipation) {
         this.otherProgramParticipation = otherProgramParticipation;
+    }
+
+    public List<NonGradReason> getNonGradReasons() {
+        return nonGradReasons;
+    }
+
+    public void setNonGradReasons(List<NonGradReason> nonGradReasons) {
+        this.nonGradReasons = nonGradReasons;
+    }
+
+    public GraduationData getGraduationData() {
+        return graduationData;
+    }
+
+    public void setGraduationData(GraduationData graduationData) {
+        this.graduationData = graduationData;
     }
 }
