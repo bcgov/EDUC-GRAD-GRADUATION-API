@@ -12,6 +12,7 @@ import java.util.UUID;
 public class GraduationStudentRecord extends BaseModel{
 
     private String studentGradData;
+    private String studentProjectedGradData;
     private String pen;
     private String program;
     private String programName;
@@ -27,5 +28,8 @@ public class GraduationStudentRecord extends BaseModel{
     private UUID studentID;
     private String schoolAtGrad;
     private String schoolAtGradName;
+    private String legalFirstName;
+    private String legalMiddleNames;
+    private String legalLastName;
 				
 }

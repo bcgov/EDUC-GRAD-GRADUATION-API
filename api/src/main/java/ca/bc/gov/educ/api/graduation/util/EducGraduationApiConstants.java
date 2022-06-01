@@ -24,6 +24,7 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_TRANSCRIPT_REPORT = "/report/transcript/{pen}";
     public static final String GRADUATE_CERTIFICATE_REPORT = "/report/certificate/{pen}";
     public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
+    public static final String SCHOOL_REPORTS = "/report/school";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;
@@ -52,6 +53,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.report-api.achievement_report}")
     private String achievementReport;
+
+    @Value("${endpoint.report-api.student_non_grad}")
+    private String nonGradProjected;
     
     @Value("${endpoint.report-api.certificate_report}")
     private String certificateReport;
@@ -88,6 +92,12 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.school-by-min-code.url}")
+    private String schoolDetails;
+
+    @Value("${endpoint.grad-graduation-report-api.update-grad-school-report.url}")
+    private String updateSchoolReport;
 
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")

@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.graduation.controller;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.dto.SchoolReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
@@ -25,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @CrossOrigin
 @RestController
@@ -85,6 +87,14 @@ public class GraduationController {
                                                                @RequestHeader(name="Authorization") String accessToken) {
         LOGGER.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
         return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace(BEARER, "")));
+    }
+
+    @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody Map<String, SchoolReportRequest> mapDist, @RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(gradService.createAndStoreSchoolReports(mapDist,accessToken.replace(BEARER, "")));
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {

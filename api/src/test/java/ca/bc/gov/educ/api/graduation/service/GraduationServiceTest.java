@@ -1,28 +1,36 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Student;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
@@ -50,12 +58,31 @@ public class GraduationServiceTest {
 
 	@Autowired
 	private AlgorithmSupport algorithmSupport;
+
+	@MockBean
+	private SchoolService schoolService;
 	
 	@Autowired
 	GradValidation validation;
 	
 	@MockBean
 	WebClient webClient;
+
+	@Mock
+	private WebClient.RequestHeadersSpec requestHeadersMock;
+	@Mock
+	private WebClient.RequestHeadersUriSpec requestHeadersUriMock;
+	@Mock
+	private WebClient.RequestBodySpec requestBodyMock;
+	@Mock
+	private WebClient.RequestBodyUriSpec requestBodyUriMock;
+	@Mock
+	private WebClient.ResponseSpec responseMock;
+	@Mock
+	private Mono<GraduationStudentRecord> monoResponse;
+
+	@Autowired
+	private EducGraduationApiConstants constants;
 	
 	@Test
 	public void testGraduateStudent() {
@@ -1164,5 +1191,66 @@ public class GraduationServiceTest {
 
 		algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
 		assertNotNull(data);
+	}
+
+	@Test
+	public void testCreateAndStoreSchoolReports() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		Map<String,SchoolReportRequest> mapDist = new HashMap<>();
+		SchoolReportRequest scr = new SchoolReportRequest();
+		List<GraduationStudentRecord> sList = new ArrayList<>();
+
+		List<GradRequirement> nonList = new ArrayList<>();
+		GradRequirement non = new GradRequirement();
+		non.setRule("1");
+		non.setDescription("ree");
+		nonList.add(non);
+		ProjectedRunClob pr = new ProjectedRunClob();
+		pr.setGraduated(false);
+		pr.setNonGradReasons(nonList);
+		GraduationStudentRecord gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("ada");
+		gsr.setLegalMiddleNames("qwe");
+		gsr.setLegalLastName("asda");
+		gsr.setStudentGrade("12");
+		gsr.setStudentStatus("CUR");
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+		scr.setStudentList(sList);
+		mapDist.put(mincode,scr);
+
+		SchoolTrax sTrax = new SchoolTrax();
+		sTrax.setAddress1("!23123");
+		sTrax.setMinCode("1231231231");
+
+		byte[] bytesSAR = "Any String you want".getBytes();
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
+
+
+
+		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(mapDist,"accessToken");
+		assertEquals(numberOfRecord,1);
 	}
 }
