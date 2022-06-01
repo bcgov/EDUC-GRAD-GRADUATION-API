@@ -1251,6 +1251,6 @@ public class GraduationServiceTest {
 
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(mapDist,"accessToken");
-		assertEquals(numberOfRecord,1);
+		assertEquals(1,numberOfRecord);
 	}
 }
