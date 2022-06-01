@@ -125,20 +125,24 @@ public class GraduationService {
 
 	public byte[] prepareTranscriptReport(String pen, String interim, String accessToken) {
 		boolean isInterim = StringUtils.trimToNull(Optional.ofNullable(interim).orElse("")) != null;
-		ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, accessToken, new ExceptionMessage());
+		try {
+			ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, accessToken, new ExceptionMessage());
 
-		ReportOptions options = new ReportOptions();
-		options.setReportFile("transcript");
-		options.setReportName("Transcript Report.pdf");
-		ReportRequest reportParams = new ReportRequest();
-		reportParams.setOptions(options);
-		reportParams.setData(reportData);
+			ReportOptions options = new ReportOptions();
+			options.setReportFile("transcript");
+			options.setReportName("Transcript Report.pdf");
+			ReportRequest reportParams = new ReportRequest();
+			reportParams.setOptions(options);
+			reportParams.setData(reportData);
 
-		return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+			return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+		}catch (Exception e) {
+			return null;
+		}
 
 	}
 

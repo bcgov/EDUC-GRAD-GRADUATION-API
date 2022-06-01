@@ -75,6 +75,9 @@ public class GraduationController {
                                                       @RequestHeader(name="Authorization") String accessToken) {
         LOGGER.debug("Report Data By Student Pen: {}", pen);
         byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace(BEARER, ""));
+        if(resultBinary == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim));
     }
 
