@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,8 @@ public class GraduationController {
         if(resultBinary == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim));
+        byte[] encoded = Base64.encodeBase64(resultBinary);
+        return handleBinaryResponse(encoded, String.format("%sTranscript%sReport.pdfencoded", pen, interim), MediaType.TEXT_PLAIN);
     }
 
     @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
