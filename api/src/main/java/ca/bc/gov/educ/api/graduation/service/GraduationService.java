@@ -225,7 +225,7 @@ public class GraduationService {
 	}
 
 	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
-		data.setReportNumber("TRAX241B_%s");
+		data.setReportNumber("TRAX241B");
 		data.setReportTitle("Grade 12 Examinations and Transcripts");
 		data.setReportSubTitle("Grade 12 and Adult Students Not Able to Graduate on Grad Requirements");
 		ReportOptions options = new ReportOptions();

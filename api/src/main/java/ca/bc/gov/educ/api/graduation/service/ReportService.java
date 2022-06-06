@@ -237,9 +237,10 @@ public class ReportService {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
 			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
-			Calendar calSessionDate = Calendar.getInstance();
-			calSessionDate.setTime(sessionDate);
-			boolean notCompletedCourse = xml && cal.before(calSessionDate);
+			String sDate = EducGraduationApiUtils.formatDate(sessionDate, "yyyy-MM-dd");
+			String today = EducGraduationApiUtils.formatDate(cal.getTime(),"yyyy-MM-dd");
+			int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate,today);
+			boolean notCompletedCourse = xml && diff >= 0;
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
