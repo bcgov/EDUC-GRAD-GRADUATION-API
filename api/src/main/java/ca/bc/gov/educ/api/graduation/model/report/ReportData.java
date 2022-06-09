@@ -76,6 +76,10 @@ public class ReportData implements Serializable {
 	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date issueDate;
 
+	private String reportNumber;
+	private String reportTitle;
+	private String reportSubTitle;
+
 	private List<NonGradReason> nonGradReasons;
 	private List<AchievementCourse> studentCourses;
 	private List<Exam> studentExams;

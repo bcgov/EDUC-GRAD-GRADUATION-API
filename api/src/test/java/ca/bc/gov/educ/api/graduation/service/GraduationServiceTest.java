@@ -1,28 +1,36 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Student;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(SpringRunner.class)
@@ -50,19 +58,37 @@ public class GraduationServiceTest {
 
 	@Autowired
 	private AlgorithmSupport algorithmSupport;
+
+	@MockBean
+	private SchoolService schoolService;
 	
 	@Autowired
 	GradValidation validation;
 	
 	@MockBean
 	WebClient webClient;
+
+	@Mock
+	private WebClient.RequestHeadersSpec requestHeadersMock;
+	@Mock
+	private WebClient.RequestHeadersUriSpec requestHeadersUriMock;
+	@Mock
+	private WebClient.RequestBodySpec requestBodyMock;
+	@Mock
+	private WebClient.RequestBodyUriSpec requestBodyUriMock;
+	@Mock
+	private WebClient.ResponseSpec responseMock;
+	@Mock
+	private Mono<GraduationStudentRecord> monoResponse;
+
+	@Autowired
+	private EducGraduationApiConstants constants;
 	
 	@Test
 	public void testGraduateStudent() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
-		String pen="4334";
 		exception = new ExceptionMessage();		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -87,11 +113,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -99,15 +125,17 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
+
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
@@ -148,11 +176,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -160,15 +188,16 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
 
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
@@ -181,7 +210,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 	}
 	
@@ -201,19 +229,34 @@ public class GraduationServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("MER");
 
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
+
 		ReportData data = new ReportData();
 		data.setOrgCode("BC");
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		try {
 			graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 	}
 	
@@ -246,11 +289,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -258,7 +301,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
@@ -298,11 +341,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -310,7 +353,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -375,7 +418,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -402,7 +445,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -436,11 +478,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -448,7 +490,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -468,7 +510,7 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
@@ -520,7 +562,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -552,7 +594,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -586,11 +627,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -598,7 +639,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -630,7 +671,7 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
+
 		}
 		
 	}
@@ -671,7 +712,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -698,7 +739,6 @@ public class GraduationServiceTest {
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
-			return;
 		}
 		
 	}
@@ -732,11 +772,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -744,7 +784,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -804,11 +844,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGraduated(true);
 		
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 		
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 		
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
@@ -816,7 +856,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 		
 		StudentDemographics sD = new StudentDemographics();
@@ -836,7 +876,7 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		
-		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
+		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
@@ -882,11 +922,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -899,7 +939,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -953,11 +993,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -970,7 +1010,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -998,8 +1038,6 @@ public class GraduationServiceTest {
 	@Test
 	public void testcreateReportNCert() {
 		String studentID = new UUID(1, 1).toString();
-		String projectedType="FMR";
-		String accessToken="accessToken";
 		exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1024,11 +1062,11 @@ public class GraduationServiceTest {
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
 		StudentCourses sc = new StudentCourses();
-		sc.setStudentCourseList(new ArrayList<StudentCourse>());
+		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -1041,7 +1079,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -1077,8 +1115,6 @@ public class GraduationServiceTest {
 	@Test
 	public void testcreateReportNCert2() {
 		String studentID = new UUID(1, 1).toString();
-		String projectedType="FMR";
-		String accessToken="accessToken";
 		exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -1111,7 +1147,7 @@ public class GraduationServiceTest {
 		graduationDataStatus.setStudentCourses(sc);
 
 		StudentAssessments sA = new StudentAssessments();
-		sA.setStudentAssessmentList(new ArrayList<StudentAssessment>());;
+		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
 		ExceptionMessage ex = new ExceptionMessage();
@@ -1124,7 +1160,7 @@ public class GraduationServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
+		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
 		StudentDemographics sD = new StudentDemographics();
@@ -1155,5 +1191,66 @@ public class GraduationServiceTest {
 
 		algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
 		assertNotNull(data);
+	}
+
+	@Test
+	public void testCreateAndStoreSchoolReports() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		Map<String,SchoolReportRequest> mapDist = new HashMap<>();
+		SchoolReportRequest scr = new SchoolReportRequest();
+		List<GraduationStudentRecord> sList = new ArrayList<>();
+
+		List<GradRequirement> nonList = new ArrayList<>();
+		GradRequirement non = new GradRequirement();
+		non.setRule("1");
+		non.setDescription("ree");
+		nonList.add(non);
+		ProjectedRunClob pr = new ProjectedRunClob();
+		pr.setGraduated(false);
+		pr.setNonGradReasons(nonList);
+		GraduationStudentRecord gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("ada");
+		gsr.setLegalMiddleNames("qwe");
+		gsr.setLegalLastName("asda");
+		gsr.setStudentGrade("12");
+		gsr.setStudentStatus("CUR");
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+		scr.setStudentList(sList);
+		mapDist.put(mincode,scr);
+
+		SchoolTrax sTrax = new SchoolTrax();
+		sTrax.setAddress1("!23123");
+		sTrax.setMinCode("1231231231");
+
+		byte[] bytesSAR = "Any String you want".getBytes();
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
+
+
+
+		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(mapDist,"accessToken");
+		assertEquals(1,numberOfRecord);
 	}
 }
