@@ -95,7 +95,7 @@ endpoint:
   student_non_grad: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/studentnongrad
  grad-student-graduation-api:
   get-special-cases: 
-    url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/lgSc/specialcase/%s
+    url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase/%s
  pen-student-api:
   by-studentid:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/%s
@@ -105,7 +105,7 @@ endpoint:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
  grad-trax-api:
   school-by-min-code:
-    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/school/%s
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/%s
 
 #Splunk LogHelper
 splunk:
