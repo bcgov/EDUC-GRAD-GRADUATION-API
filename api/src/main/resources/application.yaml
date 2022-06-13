@@ -94,7 +94,7 @@ endpoint:
   student_non_grad: ${GRAD_REPORT_API}api/v1/reports/studentnongrad
  grad-student-graduation-api:
   get-special-cases: 
-    url: ${GRAD_STUDENT_GRADUATION_API}api/v1/lgSc/specialcase/%s
+    url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
  educ-school-api:
    url: ${EDUC_SCHOOL_API}api/v1/schools/%s
  pen-student-api:
@@ -106,7 +106,7 @@ endpoint:
      url: ${PEN_API}api/v1/student?pen=%s
  grad-trax-api:
    school-by-min-code:
-     url: ${GRAD_TRAX_API}api/v1/school/%s
+     url: ${GRAD_TRAX_API}api/v1/trax/school/%s
 
 #Splunk LogHelper
 splunk:

@@ -237,9 +237,10 @@ public class ReportService {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
 		for (StudentCourse sc : studentCourseList) {
 			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", "yyyy/MM/dd");
-			Calendar calSessionDate = Calendar.getInstance();
-			calSessionDate.setTime(sessionDate);
-			boolean notCompletedCourse = xml && cal.before(calSessionDate);
+			String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+			String today = EducGraduationApiUtils.formatDate(cal.getTime(),EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+			int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate,today);
+			boolean notCompletedCourse = xml && diff >= 0;
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
@@ -300,7 +301,7 @@ public class ReportService {
 		String cutoffDate = "1991-11-01";
 		String sessionDate = sDate + "/01";
 		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
@@ -412,7 +413,7 @@ public class ReportService {
 			return finalCompletedPercentage;
 		}
 		Date temp = EducGraduationApiUtils.parseDate(sessionDate, "yyyy/MM/dd");
-		sessionDate = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
