@@ -195,6 +195,7 @@ public class GraduationService {
 				pen.setPen(gsr.getPen());
 				std.setPen(pen);
 				std.setGrade(gsr.getStudentGrade());
+				std.setGradProgram(gsr.getProgram());
 				std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
 				try {
 					if (gsr.getStudentProjectedGradData() != null) {
