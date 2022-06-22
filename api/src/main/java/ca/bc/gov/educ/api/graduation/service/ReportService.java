@@ -332,7 +332,7 @@ public class ReportService {
 
 				int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
-				if (diff <= 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
+				if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
 					continue;
 				}
 				TranscriptResult result = new TranscriptResult();
@@ -435,7 +435,7 @@ public class ReportService {
 
 		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
 
-		if (diff <= 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
+		if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
 			return "RP";
 		}
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
