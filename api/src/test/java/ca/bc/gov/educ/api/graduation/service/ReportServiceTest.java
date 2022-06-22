@@ -26,12 +26,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -1618,7 +1620,7 @@ public class ReportServiceTest {
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
-		graduationStudentRecord.setStudentGradData(studentGradData);
+		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
 		GradProgram gradProgram = new GradProgram();
 		gradProgram.setProgramCode("2018-EN");
@@ -1700,9 +1702,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
 
-		String studentGradData = readFile("json/gradstatus.json");
-		assertNotNull(studentGradData);
-		graduationStudentRecord.setStudentGradData(studentGradData);
+		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
 		GradProgram gradProgram = new GradProgram();
 		gradProgram.setProgramCode("2018-EN");
@@ -1833,8 +1833,9 @@ public class ReportServiceTest {
 	}
 
 	protected GraduationData createGraduationData(String jsonPath) throws Exception {
-		String json = readFile(jsonPath);
-		return (GraduationData)jsonTransformer.unmarshall(json, GraduationData.class);
+		File file = new File(Objects.requireNonNull(ReportServiceTest.class.getClassLoader().getResource(jsonPath)).getFile());
+		return new ObjectMapper().readValue(file, GraduationData.class);
+
 	}
 
 	protected ReportData createReportData(String jsonPath) throws Exception {

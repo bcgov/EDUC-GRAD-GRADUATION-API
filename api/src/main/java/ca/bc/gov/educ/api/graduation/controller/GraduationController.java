@@ -102,10 +102,6 @@ public class GraduationController {
         return response.GET(gradService.createAndStoreSchoolReports(mapDist,accessToken.replace(BEARER, "")));
     }
 
-    private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile) {
-        return handleBinaryResponse(resultBinary, reportFile, MediaType.APPLICATION_PDF);
-    }
-
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
         ResponseEntity<byte[]> responseEntity = null;
 
