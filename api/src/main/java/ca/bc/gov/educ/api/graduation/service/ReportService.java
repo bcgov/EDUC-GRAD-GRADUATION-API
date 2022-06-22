@@ -320,44 +320,49 @@ public class ReportService {
 
 	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
 		for (StudentAssessment sc : studentAssessmentList) {
+			boolean skipProcessing = false;
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
-				if((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0){
-					continue;
+				if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0) {
+					skipProcessing=true;
 				}
-				String finalPercent=getValue(sc.getProficiencyScore());
-				String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-				String sessionDate = sc.getSessionDate() + "/01";
-				Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-				sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+				if(!skipProcessing){
+					String finalPercent = getValue(sc.getProficiencyScore());
+					String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+					if(sc.getSessionDate() != null) {
+						String sessionDate = sc.getSessionDate() + "/01";
+						Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+						sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
-				int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
+						int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
 
-				if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-					continue;
+						if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
+							continue;
+						}
+					}
+					TranscriptResult result = new TranscriptResult();
+					TranscriptCourse crse = new TranscriptCourse();
+					crse.setCode(sc.getAssessmentCode());
+					crse.setLevel("");
+					crse.setCredits("NA");
+					crse.setName(sc.getAssessmentName());
+					crse.setType("3");
+					crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
+					result.setCourse(crse);
+
+					Mark mrk = new Mark();
+
+					mrk.setExamPercent("");
+					mrk.setFinalLetterGrade("");
+					mrk.setInterimLetterGrade("");
+					mrk.setInterimPercent("");
+					mrk.setSchoolPercent("");
+					mrk.setFinalLetterGrade("NA");
+					mrk.setFinalPercent(getAssessmentFinalPercentTranscript(sc, accessToken));
+					result.setMark(mrk);
+					result.setRequirement(sc.getGradReqMet());
+					result.setRequirementName(sc.getGradReqMetDetail());
+					tList.add(result);
 				}
-				TranscriptResult result = new TranscriptResult();
-				TranscriptCourse crse = new TranscriptCourse();
-				crse.setCode(sc.getAssessmentCode());
-				crse.setLevel("");
-				crse.setCredits("NA");
-				crse.setName(sc.getAssessmentName());
-				crse.setType("3");
-				crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
-				result.setCourse(crse);
-
-				Mark mrk = new Mark();
-
-				mrk.setExamPercent("");
-				mrk.setFinalLetterGrade("");
-				mrk.setInterimLetterGrade("");
-				mrk.setInterimPercent("");
-				mrk.setSchoolPercent("");
-				mrk.setFinalLetterGrade("NA");
-				mrk.setFinalPercent(getAssessmentFinalPercentTranscript(sc, accessToken));
-				result.setMark(mrk);
-				result.setRequirement(sc.getGradReqMet());
-				result.setRequirementName(sc.getGradReqMetDetail());
-				tList.add(result);
 			}
 		}
 	}
@@ -427,16 +432,18 @@ public class ReportService {
 		}
 	}
 	private String getAssessmentFinalPercentAchievement(StudentAssessment sA,Date assessmentReleaseDate, String accessToken) {
-		String finalPercent=getValue(sA.getProficiencyScore());
-		String cutoffDate = EducGraduationApiUtils.formatDate(assessmentReleaseDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-		String sessionDate = sA.getSessionDate() + "/01";
-		Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-		sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+		String finalPercent = getValue(sA.getProficiencyScore());
+		if(sA.getSessionDate() != null) {
+			String cutoffDate = EducGraduationApiUtils.formatDate(assessmentReleaseDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+			String sessionDate = sA.getSessionDate() + "/01";
+			Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+			sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
-		int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate,cutoffDate);
+			int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
 
-		if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-			return "RP";
+			if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
+				return "RP";
+			}
 		}
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
 			SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase()))
