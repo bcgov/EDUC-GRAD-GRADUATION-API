@@ -228,10 +228,10 @@ public class ReportService {
 
 	private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml){
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
+		String today = EducGraduationApiUtils.formatDate(cal.getTime(),EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		for (StudentCourse sc : studentCourseList) {
 			Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
 			String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-			String today = EducGraduationApiUtils.formatDate(cal.getTime(),EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 			int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate,today);
 			boolean notCompletedCourse = xml && diff >= 0;
 			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
@@ -318,10 +318,19 @@ public class ReportService {
 		return res;
 	}
 
-	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
+	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml, String accessToken) {
+		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
+		String today = EducGraduationApiUtils.formatDate(cal.getTime(),EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		for (StudentAssessment sc : studentAssessmentList) {
 			boolean skipProcessing = false;
-			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isProjected()) {
+			boolean notCompletedCourse = false;
+			if(sc.getSessionDate() != null) {
+				Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+				String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+				int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
+				notCompletedCourse = xml && diff <= 0;
+			}
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected())) {
 				if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0) {
 					skipProcessing=true;
 				}
@@ -396,7 +405,7 @@ public class ReportService {
 			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
 		}
 
-		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,accessToken);
+		createAssessmentListForTranscript(studentAssessmentList,graduationDataStatus,tList,xml,accessToken);
 		return tList;
 	}
 
