@@ -51,27 +51,27 @@ jobs:
       with:
         oc: 4
 
-        # https://github.com/redhat-actions/oc-login#readme
-      - uses: actions/checkout@v2
-      - name: Deploy
-        run: |
-          set -eux
-          # Login to OpenShift and select project
-          oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
-          oc project ${{ env.OPENSHIFT_NAMESPACE }}
-          # Cancel any rollouts in progress
-          oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
-          || true && echo "No rollout in progress"
-          
-          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }}
-          
-          # Process and apply deployment template
-          oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ steps.get-latest-tag.outputs.tag }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
-          | oc apply -f -
-          
-          # Start rollout (if necessary) and follow it
-          oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
-          || true && echo "Rollout in progress"
-          oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
-          # Get status, returns 0 if rollout is successful
-          oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+      # https://github.com/redhat-actions/oc-login#readme
+    - uses: actions/checkout@v2
+    - name: Deploy
+      run: |
+        set -eux
+        # Login to OpenShift and select project
+        oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
+        oc project ${{ env.OPENSHIFT_NAMESPACE }}
+        # Cancel any rollouts in progress
+        oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+        || true && echo "No rollout in progress"
+
+        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }}
+
+        # Process and apply deployment template
+        oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ steps.get-latest-tag.outputs.tag }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
+        | oc apply -f -
+
+        # Start rollout (if necessary) and follow it
+        oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+        || true && echo "Rollout in progress"
+        oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+        # Get status, returns 0 if rollout is successful
+        oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
