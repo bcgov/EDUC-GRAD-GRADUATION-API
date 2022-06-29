@@ -10,7 +10,7 @@ env:
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-graduation-api-dc
 
-  REPO_NAME: "educ-grad-graduation-api-api"
+  REPO_NAME: "educ-grad-graduation-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   NAMESPACE: ${{ secrets.GRAD_BUSINESS_NAMESPACE }}
   TAG: "latest"
