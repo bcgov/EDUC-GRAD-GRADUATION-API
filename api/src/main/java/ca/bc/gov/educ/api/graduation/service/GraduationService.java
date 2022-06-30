@@ -147,9 +147,16 @@ public class GraduationService {
 
 	public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList,String accessToken) {
 		int numberOfReports = 0;
+		int counter = 1;
 		try {
 			ExceptionMessage exception = new ExceptionMessage();
 			for(String usl:uniqueSchoolList) {
+				counter++;
+				ResponseObj obj = null;
+				if(counter%50 == 0) {
+					obj = reportService.getTokenResponseObject();
+					accessToken = obj.getAccess_token();
+				}
 				List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl,accessToken);
 				SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
 				if (schoolDetails != null) {

@@ -101,6 +101,15 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-graduation-report-api.update-grad-school-report.url}")
     private String updateSchoolReport;
 
+    @Value("${authorization.user}")
+    private String userName;
+
+    @Value("${authorization.password}")
+    private String password;
+
+    @Value("${endpoint.keycloak.getToken}")
+    private String tokenUrl;
+
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;

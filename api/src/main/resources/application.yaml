@@ -52,6 +52,10 @@ server:
       io: 16
   #port: ${HTTP_PORT}
 
+authorization:
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
+
 #API Documentation
 springdoc:
   api-docs:
@@ -62,6 +66,8 @@ springdoc:
 
 #Endpoints
 endpoint:
+ keycloak:
+  getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
  grad-student-api: 
   update-grad-status: ${GRAD_STUDENT_API}api/v1/student/studentid/%s
   read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
