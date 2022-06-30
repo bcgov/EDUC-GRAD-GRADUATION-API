@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 public class GradStatusService {
 
-	private static String STUDENT_API_DOWN = "GRAD-STUDENT-API IS DOWN";
+	private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
 	@Autowired
     WebClient webClient;
 
@@ -41,7 +41,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		} catch (Exception e) {
-			exception.setExceptionName(STUDENT_API_DOWN);
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -70,7 +70,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
-			exception.setExceptionName(STUDENT_API_DOWN);
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -88,7 +88,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).body(BodyInserters.fromValue(projectedRunClob)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
-			exception.setExceptionName(STUDENT_API_DOWN);
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
