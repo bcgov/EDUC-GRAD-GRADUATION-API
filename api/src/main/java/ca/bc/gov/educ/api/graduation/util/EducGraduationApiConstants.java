@@ -58,6 +58,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.report-api.student_non_grad}")
     private String nonGradProjected;
+
+    @Value("${endpoint.report-api.school_graduation}")
+    private String schoolgraduation;
     
     @Value("${endpoint.report-api.certificate_report}")
     private String certificateReport;
