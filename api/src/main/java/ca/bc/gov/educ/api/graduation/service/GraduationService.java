@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 
@@ -85,7 +84,7 @@ public class GraduationService {
 			AlgorithmResponse aR= new AlgorithmResponse();
 			ExceptionMessage exp = new ExceptionMessage();
 			exp.setExceptionName("STUDENT-NOT-ACCEPTABLE");
-			exp.setExceptionDetails(String.format("Graduation Algorithm Cannot be Run for this Student because of status %s",gradResponse.getStudentStatus()));
+			exp.setExceptionDetails(String.format("Graduation Algorithm Cannot be Run for this Student because of status %s",gradResponse != null ?gradResponse.getStudentStatus():"UNKNOWN"));
 			aR.setException(exp);
 			return aR;
 		}
@@ -141,29 +140,34 @@ public class GraduationService {
 						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 					}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 		}catch (Exception e) {
-			return null;
+			return new byte[0];
 		}
 
 	}
 
-	public Integer createAndStoreSchoolReports(Map<String,SchoolReportRequest> mapDist,String accessToken) {
+	public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList,String accessToken) {
 		int numberOfReports = 0;
+		int counter = 1;
 		try {
 			ExceptionMessage exception = new ExceptionMessage();
-			for (Map.Entry<String, SchoolReportRequest> entry : mapDist.entrySet()) {
-				String mincode = entry.getKey();
-				SchoolTrax schoolDetails = schoolService.getSchoolDetails(mincode, accessToken, exception);
+			for(String usl:uniqueSchoolList) {
+				counter++;
+				ResponseObj obj = null;
+				if(counter%50 == 0) {
+					obj = reportService.getTokenResponseObject();
+					accessToken = obj.getAccess_token();
+				}
+				List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl,accessToken);
+				SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
 				if (schoolDetails != null) {
 					logger.info("*** School Details Acquired {}", schoolDetails.getSchoolName());
-					SchoolReportRequest obj = entry.getValue();
-					if (obj.getStudentList() != null && !obj.getStudentList().isEmpty()) {
-
+					if (stdList != null && !stdList.isEmpty()) {
 						ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
 						schoolObj.setMincode(schoolDetails.getMinCode());
 						schoolObj.setName(schoolDetails.getSchoolName());
-						List<Student> processedList = processStudentList(obj.getStudentList());
+						List<Student> processedList = processStudentList(stdList);
 						if(!processedList.isEmpty())
-							numberOfReports = processProjectedNonGradReport(schoolObj,processedList,mincode,exception,accessToken,numberOfReports);
+							numberOfReports = processProjectedNonGradReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
 					}
 				}
 			}

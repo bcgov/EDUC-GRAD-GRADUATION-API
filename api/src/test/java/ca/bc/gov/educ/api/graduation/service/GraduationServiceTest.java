@@ -1197,10 +1197,10 @@ public class GraduationServiceTest {
 	public void testCreateAndStoreSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
 		String mincode = "1231231231";
-		Map<String,SchoolReportRequest> mapDist = new HashMap<>();
-		SchoolReportRequest scr = new SchoolReportRequest();
-		List<GraduationStudentRecord> sList = new ArrayList<>();
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
 
+		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
 		GradRequirement non = new GradRequirement();
 		non.setRule("1");
@@ -1223,9 +1223,6 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
-		scr.setStudentList(sList);
-		mapDist.put(mincode,scr);
-
 		SchoolTrax sTrax = new SchoolTrax();
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
@@ -1248,9 +1245,9 @@ public class GraduationServiceTest {
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
 
-
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
-		int numberOfRecord = graduationService.createAndStoreSchoolReports(mapDist,"accessToken");
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"accessToken");
 		assertEquals(1,numberOfRecord);
 	}
 }

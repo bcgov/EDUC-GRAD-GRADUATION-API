@@ -37,7 +37,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-student-api.update-grad-status-algo-error}")
     private String updateGradStatusAlgoError;
-    
+
+    @Value("${endpoint.grad-student-api.student-for-school-report}")
+    private String gradStudentListSchoolReport;
     
     @Value("${endpoint.grad-student-api.read-grad-student-record}")
     private String readGradStudentRecord;
@@ -99,15 +101,24 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-graduation-report-api.update-grad-school-report.url}")
     private String updateSchoolReport;
 
+    @Value("${authorization.user}")
+    private String userName;
+
+    @Value("${authorization.password}")
+    private String password;
+
+    @Value("${endpoint.keycloak.getToken}")
+    private String tokenUrl;
+
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;
 
     //Default Attribute value constants
     public static final String DEFAULT_CREATED_BY = "GraduationAPI";
-    public static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
+    protected static final Date DEFAULT_CREATED_TIMESTAMP = new Date();
     public static final String DEFAULT_UPDATED_BY = "GraduationAPI";
-    public static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
+    protected static final Date DEFAULT_UPDATED_TIMESTAMP = new Date();
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
