@@ -29,6 +29,7 @@ public class Student {
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
     private GraduationData graduationData;
+    private Date lastUpdateDate;
 
     @JsonDeserialize(as = Pen.class)
     public Pen getPen() {
@@ -183,5 +184,14 @@ public class Student {
 
     public void setGraduationData(GraduationData graduationData) {
         this.graduationData = graduationData;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

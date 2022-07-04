@@ -145,16 +145,15 @@ public class GraduationService {
 
 	}
 
-	public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList,String accessToken) {
+	public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList,String type,String accessToken) {
 		int numberOfReports = 0;
 		int counter = 1;
 		try {
 			ExceptionMessage exception = new ExceptionMessage();
 			for(String usl:uniqueSchoolList) {
 				counter++;
-				ResponseObj obj = null;
 				if(counter%50 == 0) {
-					obj = reportService.getTokenResponseObject();
+					ResponseObj obj = reportService.getTokenResponseObject();
 					accessToken = obj.getAccess_token();
 				}
 				List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl,accessToken);
@@ -165,9 +164,13 @@ public class GraduationService {
 						ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
 						schoolObj.setMincode(schoolDetails.getMinCode());
 						schoolObj.setName(schoolDetails.getSchoolName());
-						List<Student> processedList = processStudentList(stdList);
-						if(!processedList.isEmpty())
-							numberOfReports = processProjectedNonGradReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
+						List<Student> processedList = processStudentList(stdList,type);
+						if(!processedList.isEmpty() && type.equalsIgnoreCase("TVRRUN")) {
+							numberOfReports = processProjectedNonGradReport(schoolObj, processedList, usl, exception, accessToken, numberOfReports);
+						}else {
+							numberOfReports = processGradReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
+						}
+
 					}
 				}
 			}
@@ -177,17 +180,28 @@ public class GraduationService {
 		return numberOfReports;
 	}
 
-	private int processProjectedNonGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
-		ReportData nongradProjected = new ReportData();
+
+	private int processGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
+		ReportData gradReport = getReportDataObj(schoolObj,stdList);
+		createAndSaveSchoolReportGradReport(gradReport, mincode, exception, accessToken,"GRADREG");
+		numberOfReports++;
+		return numberOfReports;
+	}
+	private ReportData getReportDataObj(School schoolObj, List<Student> stdList) {
+		ReportData data = new ReportData();
 		schoolObj.setStudents(stdList);
-		nongradProjected.setSchool(schoolObj);
-		nongradProjected.setOrgCode(StringUtils.startsWith(nongradProjected.getSchool().getMincode(), "098") ? "YU" : "BC");
-		nongradProjected.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+		data.setSchool(schoolObj);
+		data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
+		data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+		return data;
+	}
+	private int processProjectedNonGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
+		ReportData nongradProjected = getReportDataObj(schoolObj,stdList);
 		createAndSaveSchoolReportNonGradReport(nongradProjected, mincode, exception, accessToken,"NONGRADPRJ");
 		numberOfReports++;
 		return numberOfReports;
 	}
-	private List<Student> processStudentList(List<GraduationStudentRecord> gradStudList) {
+	private List<Student> processStudentList(List<GraduationStudentRecord> gradStudList, String type) {
 		List<Student> stdPrjList = new ArrayList<>();
 		for (GraduationStudentRecord gsr : gradStudList) {
 			if(gsr.getStudentStatus().equals("CUR") && (gsr.getStudentGrade().equalsIgnoreCase("AD") || gsr.getStudentGrade().equalsIgnoreCase("12"))) {
@@ -200,16 +214,26 @@ public class GraduationService {
 				std.setPen(pen);
 				std.setGrade(gsr.getStudentGrade());
 				std.setGradProgram(gsr.getProgram());
-				std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
-				try {
-					if (gsr.getStudentProjectedGradData() != null) {
-						ProjectedRunClob projectedClob = new ObjectMapper().readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
-						std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
-						if (!projectedClob.isGraduated())
-							stdPrjList.add(std);
+				std.setLastUpdateDate(gsr.getUpdateDate());
+				if(type.equalsIgnoreCase("REGALG")) {
+					ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
+					gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()):null);
+					gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
+					std.setGraduationData(gradData);
+					if(gsr.getProgramCompletionDate() != null)
+						stdPrjList.add(std);
+				}else {
+					std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
+					try {
+						if (gsr.getStudentProjectedGradData() != null) {
+							ProjectedRunClob projectedClob = new ObjectMapper().readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
+							std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
+							if (!projectedClob.isGraduated())
+								stdPrjList.add(std);
+						}
+					} catch (JsonProcessingException e) {
+						logger.debug("JSON processing Error {}", e.getMessage());
 					}
-				} catch (JsonProcessingException e) {
-					logger.debug("JSON processing Error {}", e.getMessage());
 				}
 			}
 
@@ -229,10 +253,51 @@ public class GraduationService {
 		return nList;
 	}
 
+	private void createAndSaveSchoolReportGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
+		ReportOptions options = new ReportOptions();
+		options.setReportFile(String.format("%s_%s00_GRADREG",mincode, LocalDate.now().getYear()));
+		options.setReportName(String.format("%s_%s00_GRADREG.pdf",mincode, LocalDate.now().getYear()));
+		ReportRequest reportParams = new ReportRequest();
+		reportParams.setOptions(options);
+		reportParams.setData(data);
+
+		String encodedPdf = null;
+		try {
+			byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getSchoolgraduation())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+			byte[] encoded = Base64.encodeBase64(bytesSAR);
+			encodedPdf= new String(encoded, StandardCharsets.US_ASCII);
+		}catch (Exception e) {
+			exception.setExceptionName("GRAD_REPORT_API_DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+		}
+
+		SchoolReports requestObj = new SchoolReports();
+		requestObj.setReport(encodedPdf);
+		requestObj.setSchoolOfRecord(mincode);
+		requestObj.setReportTypeCode(reportType);
+
+		try {
+			webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					}).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+		}catch(Exception e) {
+			if(exception.getExceptionName() == null) {
+				exception.setExceptionName("GRAD_GRADUATION_REPORT_API_DOWN");
+				exception.setExceptionDetails(e.getLocalizedMessage());
+			}
+		}
+	}
+
 	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
 		data.setReportNumber("TRAX241B");
-		data.setReportTitle("Grade 12 Examinations and Transcripts");
-		data.setReportSubTitle("Grade 12 and Adult Students Not Able to Graduate on Grad Requirements");
+		data.setReportTitle("Grade 12 Examinations and TranscriptsGraduation Records and Achievement Data");
+		data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
 		ReportOptions options = new ReportOptions();
 		options.setReportFile(String.format("%s_%s00_NONGRADPRJ",mincode, LocalDate.now().getYear()));
 		options.setReportName(String.format("%s_%s00_NONGRADPRJ.pdf",mincode, LocalDate.now().getYear()));
@@ -260,7 +325,7 @@ public class GraduationService {
 		requestObj.setReportTypeCode(reportType);
 
 		try {
-			webClient.post().uri(String.format(educGraduationApiConstants.getUpdateSchoolReport()))
+			webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
 					.headers(h -> {
 						h.setBearerAuth(accessToken);
 						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
