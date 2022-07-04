@@ -14,7 +14,10 @@ import java.util.Date;
 
 public class EducGraduationApiUtils {
 
+	private EducGraduationApiUtils() {}
+
 	private static final Logger logger = LoggerFactory.getLogger(EducGraduationApiUtils.class);
+	private static final String ERROR_MSG  = "Error {}";
 
 	public static String formatDate(Date date) {
 		if (date == null)
@@ -92,36 +95,36 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String formatDateForReport(String updatedTimestamp) {
-		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat fromUser = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
 		try {
 			return myFormat.format(fromUser.parse(updatedTimestamp));
 		} catch (ParseException e) {
-			logger.debug("Error {}",e.getLocalizedMessage());
+			logger.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return updatedTimestamp;
 
 	}
 
 	public static String formatDateForReportJasper(String updatedTimestamp) {
-		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat fromUser = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+		SimpleDateFormat myFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		try {
 			return myFormat.format(fromUser.parse(updatedTimestamp));
 		} catch (ParseException e) {
-			logger.debug("Error {}",e.getLocalizedMessage());
+			logger.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return updatedTimestamp;
 
 	}
 
 	public static Date formatIssueDateForReportJasper(String updatedTimestamp) {
-		SimpleDateFormat fromUser = new SimpleDateFormat("yyyy-MM-dd");
-		SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat fromUser = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+		SimpleDateFormat myFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		try {
-			return new SimpleDateFormat("yyyy-MM-dd").parse(myFormat.format(fromUser.parse(updatedTimestamp)));
+			return new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT).parse(myFormat.format(fromUser.parse(updatedTimestamp)));
 		} catch (ParseException e) {
-			logger.debug("Error {}",e.getLocalizedMessage());
+			logger.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return null;
 
@@ -130,30 +133,30 @@ public class EducGraduationApiUtils {
 	public static String parsingDateForCertificate(String sessionDate) {
 		String actualSessionDate = sessionDate + "/01";
 		String sDates = null;
-		Date temp = parseDate(actualSessionDate, "yyyy/MM/dd");
-		sDates = formatDate(temp, "yyyy-MM-dd");
+		Date temp = parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+		sDates = formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return sDates;
 	}
 
 	public static Date parsingTraxDate(String sessionDate) {
 		String actualSessionDate = sessionDate + "/01";
 		Date sDate = null;
-		Date temp = EducGraduationApiUtils.parseDate(actualSessionDate, "yyyy/MM/dd");
-		String sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
-		sDate = EducGraduationApiUtils.parseDate(sDates, "yyyy-MM-dd");
+		Date temp = EducGraduationApiUtils.parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+		String sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+		sDate = EducGraduationApiUtils.parseDate(sDates, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return sDate;
 	}
 
 	public static String parsingNFormating(String inDate) {
 		String actualDate = inDate + "/01";
 		String sDates = null;
-		Date temp = EducGraduationApiUtils.parseDate(actualDate, "yyyy/MM/dd");
-		sDates = EducGraduationApiUtils.formatDate(temp, "yyyy-MM-dd");
+		Date temp = EducGraduationApiUtils.parseDate(actualDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+		sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return sDates;
 	}
 
 	public static String getSimpleDateFormat(Date date) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return formatter.format(date);
 	}
 
