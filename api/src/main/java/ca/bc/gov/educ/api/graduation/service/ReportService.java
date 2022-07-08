@@ -582,6 +582,7 @@ public class ReportService {
 		School schObj = new School();
 		schObj.setMincode(school.getMinCode());
 		schObj.setName(school.getSchoolName());
+		schObj.setStudents(new ArrayList<>());
 		return schObj;
 	}
 
