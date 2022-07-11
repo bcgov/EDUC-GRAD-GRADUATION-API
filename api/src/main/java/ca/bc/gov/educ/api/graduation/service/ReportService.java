@@ -575,6 +575,7 @@ public class ReportService {
 		schObj.setSignatureCode(school.getMinCode().substring(0, 3));
 		schObj.setDistno(school.getMinCode().substring(0, 3));
 		schObj.setSchlno(school.getMinCode());
+		schObj.setStudents(new ArrayList<>());
 		return schObj;
 	}
 
