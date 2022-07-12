@@ -218,7 +218,7 @@
                 <plugin>
                     <groupId>org.hibernate.orm.tooling</groupId>
                     <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                    <version>5.4.10.Final</version>
+                    <version>6.1.1.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -302,7 +302,7 @@
                     <plugin>
                         <groupId>org.hibernate.orm.tooling</groupId>
                         <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                        <version>5.4.10.Final</version>
+                        <version>6.1.1.Final</version>
                         <executions>
                             <execution>
                                 <configuration>
