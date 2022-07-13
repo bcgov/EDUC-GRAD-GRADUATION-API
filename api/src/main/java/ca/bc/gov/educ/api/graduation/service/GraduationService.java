@@ -11,7 +11,6 @@ import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,31 +33,13 @@ import java.util.Optional;
 @Service
 public class GraduationService {
 
-	private static Logger logger = LoggerFactory.getLogger(GraduationService.class);
+	private static final Logger logger = LoggerFactory.getLogger(GraduationService.class);
 
-	@Autowired
-    WebClient webClient;
-	
-	@Autowired
-	AlgorithmProcessFactory algorithmProcessFactory;
-	
-	@Autowired
-	GradStatusService gradStatusService;
-
-	@Autowired
-	SchoolService schoolService;
-	
-	@Autowired
-	GradAlgorithmService gradAlgorithmService;
-	
-	@Autowired
-	OptionalProgramService optionalProgramService;
-	
-	@Autowired
-	ReportService reportService;
-	
-	@Autowired
-	GradValidation validation;
+	@Autowired WebClient webClient;
+	@Autowired AlgorithmProcessFactory algorithmProcessFactory;
+	@Autowired GradStatusService gradStatusService;
+	@Autowired SchoolService schoolService;
+	@Autowired ReportService reportService;
 
 	@Autowired
 	EducGraduationApiConstants educGraduationApiConstants;
@@ -183,7 +164,7 @@ public class GraduationService {
 
 	private int processGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
 		ReportData gradReport = getReportDataObj(schoolObj,stdList);
-		createAndSaveSchoolReportGradReport(gradReport, mincode, exception, accessToken,"GRADREG");
+		createAndSaveSchoolReportGradReport(gradReport, mincode, exception, accessToken);
 		numberOfReports++;
 		return numberOfReports;
 	}
@@ -197,7 +178,7 @@ public class GraduationService {
 	}
 	private int processProjectedNonGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
 		ReportData nongradProjected = getReportDataObj(schoolObj,stdList);
-		createAndSaveSchoolReportNonGradReport(nongradProjected, mincode, exception, accessToken,"NONGRADPRJ");
+		createAndSaveSchoolReportNonGradReport(nongradProjected, mincode, exception, accessToken);
 		numberOfReports++;
 		return numberOfReports;
 	}
@@ -253,7 +234,7 @@ public class GraduationService {
 		return nList;
 	}
 
-	private void createAndSaveSchoolReportGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
+	private void createAndSaveSchoolReportGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken) {
 		ReportOptions options = new ReportOptions();
 		options.setReportFile(String.format("%s_%s00_GRADREG",mincode, LocalDate.now().getYear()));
 		options.setReportName(String.format("%s_%s00_GRADREG.pdf",mincode, LocalDate.now().getYear()));
@@ -278,7 +259,7 @@ public class GraduationService {
 		SchoolReports requestObj = new SchoolReports();
 		requestObj.setReport(encodedPdf);
 		requestObj.setSchoolOfRecord(mincode);
-		requestObj.setReportTypeCode(reportType);
+		requestObj.setReportTypeCode("GRADREG");
 
 		try {
 			webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
@@ -294,7 +275,7 @@ public class GraduationService {
 		}
 	}
 
-	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
+	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken) {
 		data.setReportTitle("Graduation Records and Achievement Data");
 		data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
 		ReportOptions options = new ReportOptions();
@@ -321,7 +302,7 @@ public class GraduationService {
 		SchoolReports requestObj = new SchoolReports();
 		requestObj.setReport(encodedPdf);
 		requestObj.setSchoolOfRecord(mincode);
-		requestObj.setReportTypeCode(reportType);
+		requestObj.setReportTypeCode("NONGRADPRJ");
 
 		try {
 			webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
