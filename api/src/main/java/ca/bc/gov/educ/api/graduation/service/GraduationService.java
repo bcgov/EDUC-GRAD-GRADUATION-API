@@ -295,8 +295,7 @@ public class GraduationService {
 	}
 
 	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken,String reportType) {
-		data.setReportNumber("TRAX241B");
-		data.setReportTitle("Grade 12 Examinations and TranscriptsGraduation Records and Achievement Data");
+		data.setReportTitle("Graduation Records and Achievement Data");
 		data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
 		ReportOptions options = new ReportOptions();
 		options.setReportFile(String.format("%s_%s00_NONGRADPRJ",mincode, LocalDate.now().getYear()));
