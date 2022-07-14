@@ -52,6 +52,10 @@ server:
       io: 16
   #port: ${HTTP_PORT}
 
+authorization:
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
+
 #API Documentation
 springdoc:
   api-docs:
@@ -62,6 +66,8 @@ springdoc:
 
 #Endpoints
 endpoint:
+ keycloak:
+  getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
  grad-student-api: 
   update-grad-status: ${GRAD_STUDENT_API}api/v1/student/studentid/%s
   read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
@@ -69,6 +75,7 @@ endpoint:
   get-optional-program-details: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/%s/%s
   update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
   update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
+  student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s   
@@ -92,9 +99,10 @@ endpoint:
   transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
   certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
   student_non_grad: ${GRAD_REPORT_API}api/v1/reports/studentnongrad
+  school_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolgraduation
  grad-student-graduation-api:
   get-special-cases: 
-    url: ${GRAD_STUDENT_GRADUATION_API}api/v1/lgSc/specialcase/%s
+    url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
  educ-school-api:
    url: ${EDUC_SCHOOL_API}api/v1/schools/%s
  pen-student-api:
@@ -106,7 +114,7 @@ endpoint:
      url: ${PEN_API}api/v1/student?pen=%s
  grad-trax-api:
    school-by-min-code:
-     url: ${GRAD_TRAX_API}api/v1/school/%s
+     url: ${GRAD_TRAX_API}api/v1/trax/school/%s
 
 #Splunk LogHelper
 splunk:

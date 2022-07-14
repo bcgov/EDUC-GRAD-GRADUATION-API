@@ -1,29 +1,28 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProjectedRunClob;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GradStatusService {
 
-	private static Logger logger = LoggerFactory.getLogger(GradStatusService.class);
-
+	private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
 	@Autowired
     WebClient webClient;
 
@@ -42,7 +41,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		} catch (Exception e) {
-			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -71,7 +70,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
-			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -89,7 +88,7 @@ public class GradStatusService {
 								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 							}).body(BodyInserters.fromValue(projectedRunClob)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
 		}catch(Exception e) {
-			exception.setExceptionName("GRAD-STUDENT-API IS DOWN");
+			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 			return null;
 		}
@@ -116,5 +115,18 @@ public class GradStatusService {
 							h.setBearerAuth(accessToken);
 							h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 						}).retrieve().bodyToMono(boolean.class).block();
+	}
+
+	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord, String accessToken) {
+		UUID correlationID = UUID.randomUUID();
+		final ParameterizedTypeReference<List<GraduationStudentRecord>> responseType = new ParameterizedTypeReference<>() {
+		};
+		return this.webClient.get()
+				.uri(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord))
+				.headers(h -> {
+					h.setBearerAuth(accessToken);
+					h.set(EducGraduationApiConstants.CORRELATION_ID, correlationID.toString());
+				})
+				.retrieve().bodyToMono(responseType).block();
 	}
 }

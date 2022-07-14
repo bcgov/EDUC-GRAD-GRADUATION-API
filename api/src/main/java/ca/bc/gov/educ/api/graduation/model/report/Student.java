@@ -3,32 +3,37 @@ package ca.bc.gov.educ.api.graduation.model.report;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
-public class Student {
+public class Student implements Comparable<Student>, Serializable {
 
-    private Pen pen;
-    private String firstName;
-    private String lastName;
-    private String middleName;
-    private String gender;
+    private Pen pen = new Pen();
+    private String firstName = "";
+    private String middleName = "";
+    private String lastName = "";
+    private String gender = "";
     private Date birthdate;
-    private Address address;
-    private String grade;
-    private String gradProgram;
-    private String studStatus;
-    private String sccDate;
-    private String mincodeGrad;
-    private String englishCert;
-    private String frenchCert;
+    private Address address = new Address();
+    private String grade = "";
+    private String gradProgram = "";
+    private String studStatus = "";
+    private String sccDate = "";
+    private String mincodeGrad = "";
+    private String englishCert = "";
+    private String frenchCert = "";
 
-    private String localId;
-    private String hasOtherProgram;
+    private String localId = "";
+    private String hasOtherProgram = "";
+    private Date lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
-    private GraduationData graduationData;
+
+    @JsonDeserialize(as = GraduationData.class)
+    private GraduationData graduationData = new GraduationData();
 
     @JsonDeserialize(as = Pen.class)
     public Pen getPen() {
@@ -47,20 +52,20 @@ public class Student {
         this.firstName = value;
     }
 
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String value) {
-        this.lastName = value;
-    }
-
     public String getMiddleName() {
         return middleName;
     }
 
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String value) {
+        this.lastName = value;
     }
 
     public String getGender() {
@@ -169,6 +174,7 @@ public class Student {
         this.otherProgramParticipation = otherProgramParticipation;
     }
 
+
     public List<NonGradReason> getNonGradReasons() {
         return nonGradReasons;
     }
@@ -183,5 +189,40 @@ public class Student {
 
     public void setGraduationData(GraduationData graduationData) {
         this.graduationData = graduationData;
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
+    @Override
+    public int compareTo(Student student) {
+        String lastNameSt
+                = student.lastName;
+        String firstNameSt
+                = student.firstName;
+        String middleNameSt
+                = student.middleName;
+        String gradProgramSt = student.gradProgram;
+        return "".concat(gradProgramSt).concat(getLastName()).concat(getFirstName()).concat(getMiddleName())
+                .compareTo("".concat(getGradProgram()).concat(lastNameSt).concat(firstNameSt).concat(middleNameSt));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return getPen().equals(student.getPen()) && getFirstName().equals(student.getFirstName()) && getMiddleName().equals(student.getMiddleName()) && getLastName().equals(student.getLastName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPen(), getFirstName(), getMiddleName(), getLastName());
     }
 }

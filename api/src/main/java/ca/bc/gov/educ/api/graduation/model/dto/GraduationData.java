@@ -29,5 +29,6 @@ public class GraduationData {
     private boolean dualDogwood;
     private boolean isGraduated;
     private ExceptionMessage exception;
+    private GraduationProgramCode gradProgram;
     
 }

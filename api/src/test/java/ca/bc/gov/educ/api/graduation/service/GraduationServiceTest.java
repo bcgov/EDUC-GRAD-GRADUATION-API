@@ -1197,10 +1197,10 @@ public class GraduationServiceTest {
 	public void testCreateAndStoreSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
 		String mincode = "1231231231";
-		Map<String,SchoolReportRequest> mapDist = new HashMap<>();
-		SchoolReportRequest scr = new SchoolReportRequest();
-		List<GraduationStudentRecord> sList = new ArrayList<>();
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
 
+		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
 		GradRequirement non = new GradRequirement();
 		non.setRule("1");
@@ -1223,9 +1223,6 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
-		scr.setStudentList(sList);
-		mapDist.put(mincode,scr);
-
 		SchoolTrax sTrax = new SchoolTrax();
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
@@ -1248,9 +1245,67 @@ public class GraduationServiceTest {
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
 
-
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
-		int numberOfRecord = graduationService.createAndStoreSchoolReports(mapDist,"accessToken");
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
+		assertEquals(1,numberOfRecord);
+	}
+
+	@Test
+	public void testCreateAndStoreSchoolReports_TVR() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
+
+		List<GraduationStudentRecord> sList = new ArrayList<>();
+		List<GradRequirement> nonList = new ArrayList<>();
+		GradRequirement non = new GradRequirement();
+		non.setRule("1");
+		non.setDescription("ree");
+		nonList.add(non);
+		ProjectedRunClob pr = new ProjectedRunClob();
+		pr.setGraduated(false);
+		pr.setNonGradReasons(nonList);
+		GraduationStudentRecord gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("ada");
+		gsr.setLegalMiddleNames("qwe");
+		gsr.setLegalLastName("asda");
+		gsr.setStudentGrade("12");
+		gsr.setStudentStatus("CUR");
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+		SchoolTrax sTrax = new SchoolTrax();
+		sTrax.setAddress1("!23123");
+		sTrax.setMinCode("1231231231");
+
+		byte[] bytesSAR = "Any String you want".getBytes();
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
+
+
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN","accessToken");
 		assertEquals(1,numberOfRecord);
 	}
 }
