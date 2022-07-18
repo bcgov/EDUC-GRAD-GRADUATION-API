@@ -238,7 +238,7 @@ public class ReportService {
 			String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 			int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate,today);
 			boolean notCompletedCourse = xml && diff <= 0;
-			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isLessCreditCourse() &&!sc.isValidationCourse() && !sc.isGrade10Course()) {
+			if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) &&!sc.isValidationCourse()) {
 				TranscriptResult result = new TranscriptResult();
 				String equivOrChallenge = "";
 				if (sc.getEquivOrChallenge() != null) {
@@ -258,7 +258,7 @@ public class ReportService {
 	private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
 		TranscriptCourse crse = new TranscriptCourse();
 		crse.setCode(sc.getCourseCode());
-		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseCode(),sc.getOriginalCredits() != null ? sc.getOriginalCredits():null,sc.getCredits(),sc.getFineArtsAppliedSkills(),sc.isRestricted()));
+		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(),sc.getCourseCode(),sc.getCredits(),sc.isRestricted()));
 		crse.setLevel(sc.getCourseLevel());
 		crse.setName(getCourseNameLogic(sc));
 
@@ -417,12 +417,8 @@ public class ReportService {
 		cList.sort(Comparator.comparing(StudentCourse::getCourseCode));
 	}
 
-	private String getCredits(String program,String courseCode, Integer originalCredits, Integer totalCredits,String fineArtsAppliedSkills,boolean isRestricted) {
-		if ((program.contains("2004") || program.contains("2018")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) {
-			return String.format("(%s)",totalCredits);
-		}else if(program.contains("1996") && !courseCode.startsWith("X") && !courseCode.startsWith("CP") && !courseCode.startsWith("IDS") && fineArtsAppliedSkills != null && fineArtsAppliedSkills.compareTo("F") != 0 && fineArtsAppliedSkills.compareTo("A") != 0 && totalCredits < originalCredits) {
-			return String.format("%sp",totalCredits);
-		}else if(isRestricted) {
+	private String getCredits(String program,String courseCode, Integer totalCredits,boolean isRestricted) {
+		if (((program.contains("2004") || program.contains("2018")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
 			return String.format("(%s)",totalCredits);
 		}
 		return String.valueOf(totalCredits);
@@ -990,7 +986,7 @@ public class ReportService {
 
 				List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
 						.stream()
-						.filter(sc -> sc.getGradReqMet().contains(gr.getTranscriptRule()))
+						.filter(sc -> gr.getTranscriptRule() != null && sc.getGradReqMet().contains(gr.getTranscriptRule()))
 						.collect(Collectors.toList());
 				List<AchievementCourse> cdList = new ArrayList<>();
 				scList.forEach(sc -> {
