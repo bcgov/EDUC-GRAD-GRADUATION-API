@@ -25,6 +25,12 @@ env:
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
   workflow_dispatch:
+  push:
+    branches:
+      - grad-release
+    paths:
+      - 'api/**'
+      - 'tools/**'
 
 jobs:
   openshift-ci-cd:
@@ -32,10 +38,6 @@ jobs:
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-18.04
     environment: dev
-
-    outputs:
-      ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
-      SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
 
     steps:
       - name: Check out repository
