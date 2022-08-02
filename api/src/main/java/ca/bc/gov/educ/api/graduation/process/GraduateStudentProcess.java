@@ -38,24 +38,18 @@ public class GraduateStudentProcess extends BaseProcess {
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, false, processorData.getAccessToken(),exception);
-			if (exception.getExceptionName() != null) {
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
+			if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
 				return processorData;
 			}
 			logger.info("**** Prepared Data for Reports: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
-				if (exception.getExceptionName() != null) {
-					algorithmResponse.setException(exception);
-					processorData.setAlgorithmResponse(algorithmResponse);
+				if (checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
-				if (exception.getExceptionName() != null) {
-					algorithmResponse.setException(exception);
-					processorData.setAlgorithmResponse(algorithmResponse);
+				ExceptionMessage eMsg = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
+				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;

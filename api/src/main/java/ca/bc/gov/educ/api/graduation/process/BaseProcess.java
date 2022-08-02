@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.graduation.process;
 
+import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
+import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
 import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
 import ca.bc.gov.educ.api.graduation.service.GradStatusService;
 import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
@@ -27,6 +30,12 @@ public abstract class BaseProcess implements AlgorithmProcess {
     @Autowired
     AlgorithmSupport algorithmSupport;
 
-
-
+    protected boolean checkExceptions(ExceptionMessage exception, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
+        if (exception != null && exception.getExceptionName() != null) {
+            algorithmResponse.setException(exception);
+            processorData.setAlgorithmResponse(algorithmResponse);
+            return true;
+        }
+        return false;
+    }
 }

@@ -160,7 +160,7 @@ public class GradStatusServiceTest {
 		when(this.webClient.post()).thenThrow(new RuntimeException("Test - API is down"));
 		
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, null,accessToken,gradResponse,exception);
-		assertNull(res);
+		assertNotNull(res);
 	}
 
 	@Test

@@ -37,16 +37,11 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
 		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
-		if (exception.getExceptionName() != null) {
-			algorithmResponse.setException(exception);
-			processorData.setAlgorithmResponse(algorithmResponse);
+		if (checkExceptions(data.getException(), algorithmResponse,processorData)) {
 			return processorData;
 		}
-		reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
-
-		if (exception.getExceptionName() != null) {
-			algorithmResponse.setException(exception);
-			processorData.setAlgorithmResponse(algorithmResponse);
+		ExceptionMessage excp = reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+		if (checkExceptions(excp,algorithmResponse,processorData)) {
 			logger.info("**** Problem Generating TVR: ****");
 			return processorData;
 		}

@@ -115,6 +115,7 @@ public class ReportService {
 			exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
 		}
 		ReportData errorData = new ReportData();
+		errorData.setException(exception);
 		errorData.getParameters().put(exception.getExceptionName(), exception.getExceptionDetails());
 		return errorData;
 	}
@@ -945,7 +946,9 @@ public class ReportService {
 		}catch (Exception e) {
 			exception.setExceptionName("PREPARING REPORTING DATA IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
-			return null;
+			ReportData dR = new ReportData();
+			dR.setException(exception);
+			return dR;
 		}
 	}
 
@@ -1009,7 +1012,7 @@ public class ReportService {
 		return  grList;
 	}
 
-	public void saveStudentAchivementReportJasper(String pen,ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
+	public ExceptionMessage saveStudentAchivementReportJasper(String pen,ReportData sample, String accessToken, UUID studentID,ExceptionMessage exception,boolean isGraduated) {
 		String encodedPdfReportTranscript = generateStudentAchievementReportJasper(sample,accessToken,exception);
 		GradStudentReports requestObj = new GradStudentReports();
 		requestObj.setPen(pen);
@@ -1030,8 +1033,10 @@ public class ReportService {
 			if(exception.getExceptionName() == null) {
 				exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
 				exception.setExceptionDetails(e.getLocalizedMessage());
+				return exception;
 			}
 		}
+		return null;
 
 	}
 
