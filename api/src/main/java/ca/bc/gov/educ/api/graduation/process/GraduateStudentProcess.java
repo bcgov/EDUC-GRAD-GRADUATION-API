@@ -2,16 +2,11 @@ package ca.bc.gov.educ.api.graduation.process;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
-import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
-import ca.bc.gov.educ.api.graduation.service.GradStatusService;
-import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
-import ca.bc.gov.educ.api.graduation.service.ReportService;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,27 +15,10 @@ import java.util.List;
 @Data
 @Component
 @NoArgsConstructor
-public class GraduateStudentProcess implements AlgorithmProcess {
+@EqualsAndHashCode(callSuper = false)
+public class GraduateStudentProcess extends BaseProcess {
 	
 	private static Logger logger = LoggerFactory.getLogger(GraduateStudentProcess.class);
-    
-	@Autowired
-	GradStatusService gradStatusService;
-	
-	@Autowired
-	GradAlgorithmService gradAlgorithmService;
-	
-	@Autowired
-	OptionalProgramService optionalProgramService;
-	
-	@Autowired
-	ReportService reportService;
-
-	@Autowired
-	GradValidation validation;
-
-	@Autowired
-	AlgorithmSupport algorithmSupport;
 	
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
@@ -78,7 +56,7 @@ public class GraduateStudentProcess implements AlgorithmProcess {
 				if (exception.getExceptionName() != null) {
 					algorithmResponse.setException(exception);
 					processorData.setAlgorithmResponse(algorithmResponse);
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus != null && graduationDataStatus.isGraduated());
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
