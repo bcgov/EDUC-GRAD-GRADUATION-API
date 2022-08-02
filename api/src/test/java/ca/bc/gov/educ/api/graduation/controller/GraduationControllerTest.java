@@ -1,31 +1,27 @@
 package ca.bc.gov.educ.api.graduation.controller;
 
-import java.util.*;
-
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.service.GraduationService;
+import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import ca.bc.gov.educ.api.graduation.util.MessageHelper;
+import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import ca.bc.gov.educ.api.graduation.service.GraduationService;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import ca.bc.gov.educ.api.graduation.util.MessageHelper;
-import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 @ExtendWith(MockitoExtension.class)
-public class GraduationControllerTest {
+class GraduationControllerTest {
 
 	@Mock
 	private GraduationService graduationService;
@@ -46,7 +42,7 @@ public class GraduationControllerTest {
 	SecurityContextHolder securityContextHolder;
 	
 	@Test
-	public void testGraduateStudentNew() {
+	void testGraduateStudentNew() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType = "REGFM";
 		
@@ -72,6 +68,53 @@ public class GraduationControllerTest {
 		Mockito.when(graduationService.graduateStudent(studentID,null,"accessToken",projectedType)).thenReturn(alRes);
 		graduationController.graduateStudentNew(studentID,projectedType,null, "accessToken");
 		Mockito.verify(graduationService).graduateStudent(studentID,null,"accessToken",projectedType);
+	}
+
+	@Test
+	void testReportDataByPen() {
+		ReportData data = new ReportData();
+		data.setGradProgram(new GradProgram());
+		Mockito.when(graduationService.prepareReportData("12312312312","XML","accessToken")).thenReturn(data);
+		graduationController.reportDataByPen("12312312312","XML","accessToken");
+		Mockito.verify(graduationService).prepareReportData("12312312312","XML","accessToken");
+	}
+
+	@Test
+	void testReportTranscriptByPen() {
+		byte[] bytesSAR = "Any String you want".getBytes();
+		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim","accessToken")).thenReturn(bytesSAR);
+		graduationController.reportTranscriptByPen("12312312312","Interim","accessToken");
+		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim","accessToken");
+	}
+
+	@Test
+	void testReportTranscriptByPen_null() {
+		byte[] bytesSAR = null;
+		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim","accessToken")).thenReturn(bytesSAR);
+		graduationController.reportTranscriptByPen("12312312312","Interim","accessToken");
+		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim","accessToken");
+	}
+
+	@Test
+	void testReportDataFromGraduation() {
+		GraduationData graduationData = new GraduationData();
+		graduationData.setGradMessage("asdasd");
+		GradSearchStudent gsr = new GradSearchStudent();
+		gsr.setStudentID(UUID.randomUUID().toString());
+		graduationData.setGradStudent(gsr);
+
+		ReportData data = new ReportData();
+		data.setGradProgram(new GradProgram());
+		Mockito.when(graduationService.prepareReportData(graduationData,"XML","accessToken")).thenReturn(data);
+		graduationController.reportDataFromGraduation(graduationData,"XML","accessToken");
+		Mockito.verify(graduationService).prepareReportData(graduationData,"XML","accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreSchoolReports() {
+		Mockito.when(graduationService.createAndStoreSchoolReports(List.of("12321312"),"NONGRAD","accessToken")).thenReturn(1);
+		graduationController.createAndStoreSchoolReports(List.of("12321312"),"accessToken","NONGRAD");
+		Mockito.verify(graduationService).createAndStoreSchoolReports(List.of("12321312"),"NONGRAD","accessToken");
 	}
 	
 }

@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -30,7 +31,7 @@ import java.util.Map;
 		NonGradReason.class,
 		Certificate.class
 })
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+@JsonSerialize()
 //@JsonPropertyOrder(alphabetic = true)
 //@JsonRootName("generateReport")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
@@ -87,4 +88,6 @@ public class ReportData implements Serializable {
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private Map<String, String> parameters = new HashMap<>();
+
+	private ExceptionMessage exception;
 }

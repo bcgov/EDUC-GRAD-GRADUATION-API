@@ -1,9 +1,10 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
-import ca.bc.gov.educ.api.graduation.model.report.ReportData;
-import ca.bc.gov.educ.api.graduation.model.report.Student;
+import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.dto.School;
+import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
@@ -26,8 +27,7 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -41,9 +41,6 @@ public class GraduationServiceTest {
 	@Autowired
 	private GraduationService graduationService;
 	
-	@Autowired
-	private ExceptionMessage exception;
-	
 	@MockBean
 	private GradStatusService gradStatusService;
 	
@@ -56,7 +53,13 @@ public class GraduationServiceTest {
 	@MockBean
 	private ReportService reportService;
 
+	@MockBean
+	private ExceptionMessage exception;
+
 	@Autowired
+	private AlgorithmSupport algorithmSupports;
+
+	@MockBean
 	private AlgorithmSupport algorithmSupport;
 
 	@MockBean
@@ -89,7 +92,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();		
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -98,7 +101,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("CUR");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -106,7 +109,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -115,11 +118,11 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -136,7 +139,7 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
@@ -145,14 +148,16 @@ public class GraduationServiceTest {
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
 	}
-	
+
 	@Test
-	public void testGraduateStudent_error() {
+	public void testGraduateStudent_excep_1() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
-		validation.clear();
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage eM2 = new ExceptionMessage();
+		eM2.setExceptionName("RER");
+
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -160,8 +165,7 @@ public class GraduationServiceTest {
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("D");
-		
+		gradResponse.setStudentStatus("CUR");
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -169,7 +173,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -178,11 +182,139 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
+
+		ReportData data = new ReportData();
+		data.setOrgCode("BC");
+		data.setException(eM2);
+		Student std = new Student();
+		std.setFirstName("Sreepad");
+		data.setStudent(std);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
+	@Test
+	public void testGraduateStudent_excep_2() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="REGFM";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage eM2 = new ExceptionMessage();
+		eM2.setExceptionName("RER");
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("CUR");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
+
+		ReportData data = new ReportData();
+		data.setOrgCode("BC");
+		Student std = new Student();
+		std.setFirstName("Sreepad");
+		data.setStudent(std);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+		Mockito.when(reportService.saveStudentAchivementReportJasper("123090109",data,accessToken,UUID.fromString(studentID),exception,false)).thenReturn(eM2);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
+	@Test
+	public void testGraduateStudent_error() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="REGFM";
+		String accessToken="accessToken";
+		validation.clear();
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -198,8 +330,8 @@ public class GraduationServiceTest {
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
 		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,null, exception)).thenReturn(data);
-		
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
@@ -212,14 +344,14 @@ public class GraduationServiceTest {
 			assertEquals(0, errors.size());
 		}
 	}
-	
+
 	@Test
 	public void testGraduateStudent_error2() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";
 		String accessToken="accessToken";
 		validation.clear();
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -259,13 +391,13 @@ public class GraduationServiceTest {
 			assertEquals(0, errors.size());
 		}
 	}
-	
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeFM() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="FM";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -274,7 +406,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -282,7 +414,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -291,11 +423,11 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -303,7 +435,7 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
 		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
@@ -311,13 +443,13 @@ public class GraduationServiceTest {
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
 	}
-	
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeGS() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -326,7 +458,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -334,7 +466,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -343,11 +475,12 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -355,21 +488,21 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
@@ -381,14 +514,326 @@ public class GraduationServiceTest {
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
 	}
-	
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeGS_excep_check() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(UUID.fromString(studentID));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		ExceptionMessage excep2 = new ExceptionMessage();
+		excep2.setExceptionName("RER");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+		graduationDataStatus.setException(excep2);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+		data.setException(excep2);
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		graduationDataStatus.setException(exception);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+
+		ExceptionMessage eM2 = new ExceptionMessage();
+		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		eM2.setExceptionName("RERE");
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeGS_excep_check_2() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(UUID.fromString(studentID));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		ExceptionMessage excep2 = new ExceptionMessage();
+		excep2.setExceptionName("RER");
+		gradResponse.setException(excep2);
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+		graduationDataStatus.setException(excep2);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		graduationDataStatus.setException(exception);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+
+		ExceptionMessage eM2 = new ExceptionMessage();
+		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		eM2.setExceptionName("RERE");
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeGS_excep_check_3() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(UUID.fromString(studentID));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		ExceptionMessage excep2 = new ExceptionMessage();
+		excep2.setExceptionName("RER");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+
+
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		graduationDataStatus.setException(exception);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data, pData)).thenReturn(excep2);
+		ExceptionMessage eM2 = new ExceptionMessage();
+		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
+		eM2.setExceptionName("RERE");
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeGS_excep() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(UUID.fromString(studentID));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		ExceptionMessage excep2 = new ExceptionMessage();
+		excep2.setExceptionName("RER");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+		graduationDataStatus.setException(excep2);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		graduationDataStatus.setException(exception);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+	}
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeGS_programcompletionDate_notnull() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
 		validation.clear();
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -397,7 +842,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -405,14 +850,14 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -420,24 +865,24 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		try {
 			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
@@ -446,15 +891,15 @@ public class GraduationServiceTest {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
 		}
-		
+
 	}
-	
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeGS_Graduated() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -463,7 +908,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -471,7 +916,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -480,11 +925,11 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -492,29 +937,29 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
 		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
@@ -526,13 +971,13 @@ public class GraduationServiceTest {
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
 	}
-	
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeFMR_programCompletionDate_null() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="FMR";
 		String accessToken="accessToken";
-		
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -541,7 +986,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -549,14 +994,14 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -564,24 +1009,24 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
@@ -595,15 +1040,15 @@ public class GraduationServiceTest {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
 		}
-		
+
 	}
-	
+
 	@Test
 	public void testGraduateStudent_withProjectedTypeFMR() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="FMR";
 		String accessToken="accessToken";
-		
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -612,7 +1057,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -620,7 +1065,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -629,11 +1074,11 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -641,24 +1086,24 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
@@ -673,16 +1118,17 @@ public class GraduationServiceTest {
 			assertEquals(0, errors.size());
 
 		}
-		
+
 	}
-	
+
 	@Test
-	public void testGraduateStudent_withProjectedTypeFMR_programcompletionDate_notnull() {
+	public void testGraduateStudent_withProjectedTypeFMR_excep1() {
 		String studentID = new UUID(1, 1).toString();
-		String projectedType="GS";
+		String projectedType="FMR";
 		String accessToken="accessToken";
-		validation.clear();
-		exception = new ExceptionMessage();	
+		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage em2 = new ExceptionMessage();
+		em2.setExceptionName("RERE");
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -691,7 +1137,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+		gradResponse.setException(em2);
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -699,73 +1145,7 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
-		GraduationData graduationDataStatus = new GraduationData();
-		graduationDataStatus.setDualDogwood(false);
-		graduationDataStatus.setGradMessage("Not Graduated");
-		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
-		graduationDataStatus.setGraduated(false);
-		graduationDataStatus.setStudentCourses(null);
-		
-		StudentOptionalProgram spgm = new StudentOptionalProgram();
-		spgm.setPen("123090109");
-		spgm.setOptionalProgramCode("BD");
-		spgm.setOptionalProgramName("International Bacculaurette");
-		spgm.setStudentID(UUID.fromString(studentID));
-		List<StudentOptionalProgram> list = new ArrayList<>();
-		list.add(spgm);
-		
-		StudentDemographics sD = new StudentDemographics();
-		sD.setPen("123123123");
-		sD.setLegalFirstName("ABC");
-		sD.setLegalLastName("FDG");
-		sD.setLegalMiddleNames("DER");
-		sD.setSchoolOfRecord("12321321");
-		
-		GraduationMessages gM = new GraduationMessages();
-		gM.setGradMessage("asdad");
-		
-		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
-		
-		ReportData data = new ReportData();
-		data.setGradMessage("ABC");
-		
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
-			assertNotNull(response);
-		} catch (GradBusinessRuleException e) {
-			List<String> errors = validation.getErrors();
-			assertEquals(0, errors.size());
-		}
-		
-	}
-	
-	@Test
-	public void testGraduateStudent_withProjectedTypeFMR_programCompletionDate_notnull_program_sccp() {
-		String studentID = new UUID(1, 1).toString();
-		String projectedType="GS";
-		String accessToken="accessToken";
-		
-		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
-		gradResponse.setPen("123090109");
-		gradResponse.setStudentID(new UUID(1, 1));
-		gradResponse.setProgram("SCCP");
-		gradResponse.setProgramCompletionDate("2021-09-01");
-		gradResponse.setSchoolOfRecord("06011033");
-		gradResponse.setStudentGrade("11");
-		gradResponse.setStudentStatus("A");
-		
-		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
-		gradAlgorithmGraduationStatus.setPen("123090109");
-		gradAlgorithmGraduationStatus.setProgram("2018-EN");
-		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
-		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
-		gradAlgorithmGraduationStatus.setStudentGrade("11");
-		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -774,11 +1154,11 @@ public class GraduationServiceTest {
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -786,24 +1166,329 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		try {
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			assertNotNull(response);
+		} catch (GradBusinessRuleException e) {
+			List<String> errors = validation.getErrors();
+			assertEquals(0, errors.size());
+
+		}
+
+	}
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeFMR_excep3() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="FMR";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage em2 = new ExceptionMessage();
+		em2.setExceptionName("RERE");
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate("2021-09-01");
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data, pData)).thenReturn(em2);
+		try {
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			assertNotNull(response);
+		} catch (GradBusinessRuleException e) {
+			List<String> errors = validation.getErrors();
+			assertEquals(0, errors.size());
+
+		}
+
+	}
+
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeFMR_excep2() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="FMR";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage em2 = new ExceptionMessage();
+		em2.setExceptionName("RERE");
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate("2021-09-01");
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+		data.setException(em2);
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		try {
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			assertNotNull(response);
+		} catch (GradBusinessRuleException e) {
+			List<String> errors = validation.getErrors();
+			assertEquals(0, errors.size());
+
+		}
+
+	}
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeFMR_programcompletionDate_notnull() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		validation.clear();
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate("2021-09-01");
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setStudentCourses(null);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		try {
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			assertNotNull(response);
+		} catch (GradBusinessRuleException e) {
+			List<String> errors = validation.getErrors();
+			assertEquals(0, errors.size());
+		}
+
+	}
+
+	@Test
+	public void testGraduateStudent_withProjectedTypeFMR_programCompletionDate_notnull_program_sccp() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="GS";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setStudentID(new UUID(1, 1));
+		gradResponse.setProgram("SCCP");
+		gradResponse.setProgramCompletionDate("2021-09-01");
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("A");
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123090109");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setStudentGrade("11");
+		gradAlgorithmGraduationStatus.setStudentStatus("A");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		StudentCourses sc = new StudentCourses();
+		sc.setStudentCourseList(new ArrayList<>());
+		graduationDataStatus.setStudentCourses(sc);
+
+		StudentAssessments sA = new StudentAssessments();
+		sA.setStudentAssessmentList(new ArrayList<>());
+		graduationDataStatus.setStudentAssessments(sA);
+
+		StudentOptionalProgram spgm = new StudentOptionalProgram();
+		spgm.setPen("123090109");
+		spgm.setOptionalProgramCode("BD");
+		spgm.setOptionalProgramName("International Bacculaurette");
+		spgm.setStudentID(UUID.fromString(studentID));
+		List<StudentOptionalProgram> list = new ArrayList<>();
+		list.add(spgm);
+
+		StudentDemographics sD = new StudentDemographics();
+		sD.setPen("123123123");
+		sD.setLegalFirstName("ABC");
+		sD.setLegalLastName("FDG");
+		sD.setLegalMiddleNames("DER");
+		sD.setSchoolOfRecord("12321321");
+
+		GraduationMessages gM = new GraduationMessages();
+		gM.setGradMessage("asdad");
+
+		School schoolObj = new School();
+		schoolObj.setMinCode("1231123");
+		schoolObj.setIndependentDesignation("2");
+
+		ReportData data = new ReportData();
+		data.setGradMessage("ABC");
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
@@ -819,7 +1504,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -828,7 +1513,7 @@ public class GraduationServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -836,21 +1521,21 @@ public class GraduationServiceTest {
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
-		
+
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
 		graduationDataStatus.setGradMessage("Not Graduated");
 		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
 		graduationDataStatus.setGraduated(true);
-		
+
 		StudentCourses sc = new StudentCourses();
 		sc.setStudentCourseList(new ArrayList<>());
 		graduationDataStatus.setStudentCourses(sc);
-		
+
 		StudentAssessments sA = new StudentAssessments();
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
-		
+
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
 		spgm.setOptionalProgramCode("BD");
@@ -858,29 +1543,29 @@ public class GraduationServiceTest {
 		spgm.setStudentID(UUID.fromString(studentID));
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
-		
+
 		StudentDemographics sD = new StudentDemographics();
 		sD.setPen("123123123");
 		sD.setLegalFirstName("ABC");
 		sD.setLegalLastName("FDG");
 		sD.setLegalMiddleNames("DER");
 		sD.setSchoolOfRecord("12321321");
-		
+
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
-		
+
 		School schoolObj = new School();
 		schoolObj.setMinCode("1231123");
 		schoolObj.setIndependentDesignation("2");
-		
+
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		
+
 		List<ProgramCertificateTranscript> certificateList = new ArrayList<>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
-		
+
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
@@ -898,7 +1583,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="GS";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -960,6 +1645,7 @@ public class GraduationServiceTest {
 		data.setGradMessage("ABC");
 		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
 		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
 	}
@@ -969,7 +1655,7 @@ public class GraduationServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="FMR";
 		String accessToken="accessToken";
-		exception = new ExceptionMessage();
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -1038,7 +1724,7 @@ public class GraduationServiceTest {
 	@Test
 	public void testcreateReportNCert() {
 		String studentID = new UUID(1, 1).toString();
-		exception = new ExceptionMessage();
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -1108,14 +1794,14 @@ public class GraduationServiceTest {
 		data.setGradMessage("ABC");
 		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, null, exception)).thenReturn(pList);
 
-		algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
+		algorithmSupports.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
 		assertNotNull(data);
 	}
 
 	@Test
 	public void testcreateReportNCert2() {
 		String studentID = new UUID(1, 1).toString();
-		exception = new ExceptionMessage();
+		ExceptionMessage exception = new ExceptionMessage();
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setStudentID(new UUID(1, 1));
@@ -1189,7 +1875,7 @@ public class GraduationServiceTest {
 		data.setGradMessage("ABC");
 		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, null, exception)).thenReturn(pList);
 
-		algorithmSupport.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
+		algorithmSupports.createReportNCert(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData);
 		assertNotNull(data);
 	}
 
@@ -1307,5 +1993,96 @@ public class GraduationServiceTest {
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN","accessToken");
 		assertEquals(1,numberOfRecord);
+	}
+
+	@Test
+	public void testPrepareReportData() {
+		final String pen = "1231311313";
+		final String accessToken = "accessToken";
+
+		String type = "XML";
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "TRAN";
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "CERT";
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "ACHV";
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+	}
+
+	private void testPrepateReportDataMultiple(String pen,boolean xml,String accessToken,String type) {
+		ReportData data = new ReportData();
+		ca.bc.gov.educ.api.graduation.model.report.GradProgram prg = new ca.bc.gov.educ.api.graduation.model.report.GradProgram();
+		Code code = new Code();
+		code.setCode("2018-EN");
+		prg.setCode(code);
+		data.setGradProgram(prg);
+		Student std = new Student();
+		Pen pens = new Pen();
+		pens.setPen(pen);
+		std.setPen(pens);
+		data.setStudent(std);
+		data.setParameters(new HashMap<>());
+
+		if(!type.equalsIgnoreCase("CERT") && !type.equalsIgnoreCase("ACHV")) {
+			Mockito.when(reportService.prepareTranscriptData(pen, xml, accessToken, new ExceptionMessage())).thenReturn(data);
+		}
+		if(type.equalsIgnoreCase("CERT")) {
+			Mockito.when(reportService.prepareCertificateData(pen,accessToken, new ExceptionMessage())).thenReturn(data);
+		}
+		ReportData res = graduationService.prepareReportData(pen,type,accessToken);
+		assertNotNull(res);
+	}
+
+	@Test
+	public void testPrepareReportData_2() {
+		final String pen = "1231311313";
+		final String accessToken = "accessToken";
+
+		String type = "XML";
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "CERT";
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "ACHV";
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+
+		type = "TRAN";
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+	}
+
+	private void testPrepateReportDataMultiple_2(String pen,boolean xml,String accessToken,String type) {
+		ReportData data = new ReportData();
+		ca.bc.gov.educ.api.graduation.model.report.GradProgram prg = new ca.bc.gov.educ.api.graduation.model.report.GradProgram();
+		Code code = new Code();
+		code.setCode("2018-EN");
+
+		prg.setCode(code);
+
+		Student std = new Student();
+		Pen pens = new Pen();
+		pens.setPen(pen);
+		std.setPen(pens);
+		data.setStudent(std);
+		data.setGradProgram(prg);
+		data.setParameters(new HashMap<>());
+
+		GraduationData graduationData = new GraduationData();
+		graduationData.setGradMessage("123123");
+		graduationData.setGraduated(true);
+
+		if(!type.equalsIgnoreCase("CERT") && !type.equalsIgnoreCase("ACHV")) {
+			Mockito.when(reportService.prepareTranscriptData(graduationData, xml, accessToken, new ExceptionMessage())).thenReturn(data);
+		}
+		if(type.equalsIgnoreCase("CERT")) {
+			Mockito.when(reportService.prepareCertificateData(graduationData,accessToken, new ExceptionMessage())).thenReturn(data);
+		}
+		ReportData res = graduationService.prepareReportData(graduationData,type,accessToken);
+		assertNotNull(res);
 	}
 }
