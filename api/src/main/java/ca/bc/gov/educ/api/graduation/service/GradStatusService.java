@@ -72,7 +72,9 @@ public class GradStatusService {
 		}catch(Exception e) {
 			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
-			return null;
+			GraduationStudentRecord rec = new GraduationStudentRecord();
+			rec.setException(exception);
+			return rec;
 		}
 	}
 

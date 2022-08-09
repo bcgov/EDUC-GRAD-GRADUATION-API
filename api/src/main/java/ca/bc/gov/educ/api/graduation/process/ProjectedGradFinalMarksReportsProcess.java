@@ -2,17 +2,11 @@ package ca.bc.gov.educ.api.graduation.process;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
-import ca.bc.gov.educ.api.graduation.service.GradAlgorithmService;
-import ca.bc.gov.educ.api.graduation.service.GradStatusService;
-import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
-import ca.bc.gov.educ.api.graduation.service.ReportService;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,28 +15,10 @@ import java.util.List;
 @Data
 @Component
 @NoArgsConstructor
-@AllArgsConstructor
-public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
+@EqualsAndHashCode(callSuper = false)
+public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 	
 	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksReportsProcess.class);
-    
-	@Autowired
-	GradStatusService gradStatusService;
-	
-	@Autowired
-	GradAlgorithmService gradAlgorithmService;
-	
-	@Autowired
-	OptionalProgramService optionalProgramService;
-
-	@Autowired
-	ReportService reportService;
-	
-	@Autowired
-	GradValidation validation;
-
-	@Autowired
-	AlgorithmSupport algorithmSupport;
 	
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
@@ -63,25 +39,19 @@ public class ProjectedGradFinalMarksReportsProcess implements AlgorithmProcess {
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,processorData.getAccessToken(),exception);
-			if (exception.getExceptionName() != null) {
-				algorithmResponse.setException(exception);
-				processorData.setAlgorithmResponse(algorithmResponse);
+			if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
 				return processorData;
 			}
 			logger.info("**** Prepared Data for Reports: ****");
 			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse =  gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
-				if(exception.getExceptionName() != null) {
-					algorithmResponse.setException(exception);
-					processorData.setAlgorithmResponse(algorithmResponse);
+				if(checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
-				if(exception.getExceptionName() != null) {
-					algorithmResponse.setException(exception);
-					processorData.setAlgorithmResponse(algorithmResponse);
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus != null && graduationDataStatus.isGraduated());
+				ExceptionMessage excp = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
+				if(checkExceptions(excp,algorithmResponse,processorData)) {
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}

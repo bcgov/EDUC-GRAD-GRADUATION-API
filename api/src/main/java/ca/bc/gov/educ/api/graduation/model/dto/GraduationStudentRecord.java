@@ -31,5 +31,5 @@ public class GraduationStudentRecord extends BaseModel{
     private String legalFirstName;
     private String legalMiddleNames;
     private String legalLastName;
-				
+	private ExceptionMessage exception;
 }
