@@ -26,7 +26,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
-        <springdoc.version>1.6.9</springdoc.version>
+        <springdoc.version>1.6.10</springdoc.version>
         <junit>4.12</junit>
         <log4j.version>2.18.0</log4j.version>
     </properties>
