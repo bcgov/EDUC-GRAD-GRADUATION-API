@@ -15,7 +15,7 @@ objects:
         app.openshift.io/runtime: spring-boot
       name: "${REPO_NAME}-dc"
     spec:
-      replicas: 2
+      replicas: 1
       revisionHistoryLimit: 1
       triggers: []
       selector:
@@ -65,11 +65,11 @@ objects:
                     name: grad-client-secret
               resources:
                 requests:
-                  cpu: "50m"
-                  #memory: "50Mi"
+                  cpu: "${MIN_CPU}"
+                  memory: "${MIN_MEM}"
                 limits:
-                  cpu: "250m"
-                  #memory: "100Mi"
+                  cpu: "${MAX_CPU}"
+                  memory: "${MAX_MEM}"
             - image: artifacts.developer.gov.bc.ca/docker-remote/fluent/fluent-bit:1.5.7
               name: "${REPO_NAME}-fluent-bit-sidecar"
               imagePullPolicy: Always
@@ -150,6 +150,24 @@ objects:
         name: "${REPO_NAME}"
         weight: 100
       wildcardPolicy: None
+  - apiVersion: autoscaling/v2beta2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: "${REPO_NAME}-cpu-autoscaler"
+    spec:
+      scaleTargetRef:
+        apiVersion: apps.openshift.io/v1
+        kind: DeploymentConfig
+        name: "${REPO_NAME}-dc"
+      minReplicas: ${{MIN_REPLICAS}}
+      maxReplicas: ${{MAX_REPLICAS}}
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              averageUtilization: 90
+              type: Utilization
 parameters:
   - name: REPO_NAME
     description: Application repository name
