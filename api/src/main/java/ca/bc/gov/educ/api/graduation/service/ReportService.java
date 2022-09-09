@@ -452,7 +452,7 @@ public class ReportService {
 			int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
 
 			if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-				return "RP";
+				return "";
 			}
 		}
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
