@@ -33,7 +33,7 @@ public class TokenUtils {
 
         logger.info("=========> Check Duration: {} sec <===========", diff);
         if (diff > 180) { // if the previous step took more than 3 minutes, treat it as a long process, and get the new access token
-            logger.info("=========> Getting the new Access Token after 4 minutes <===========");
+            logger.info("=========> Getting the new Access Token after 3 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 return Pair.of(responseObj.getAccess_token(), currentTime);
