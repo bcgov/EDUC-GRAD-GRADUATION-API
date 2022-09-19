@@ -14,6 +14,8 @@ import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 
+import java.time.Instant;
+
 @Component
 public class RequestInterceptor implements AsyncHandlerInterceptor {
 
@@ -25,6 +27,11 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		// for async this is called twice so need a check to avoid setting twice.
+		if (request.getAttribute("startTime") == null) {
+			final long startTime = Instant.now().toEpochMilli();
+			request.setAttribute("startTime", startTime);
+		}
 		validation.clear();
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
 		if (correlationID != null) {

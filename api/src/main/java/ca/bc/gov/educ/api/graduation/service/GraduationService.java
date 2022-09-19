@@ -12,10 +12,12 @@ import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.graduation.util.TokenUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ public class GraduationService {
 	@Autowired GradStatusService gradStatusService;
 	@Autowired SchoolService schoolService;
 	@Autowired ReportService reportService;
+	@Autowired TokenUtils tokenUtils;
 
 	@Autowired
 	EducGraduationApiConstants educGraduationApiConstants;
@@ -128,15 +131,14 @@ public class GraduationService {
 
 	public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList,String type,String accessToken) {
 		int numberOfReports = 0;
-		int counter = 1;
+		long startTime = System.currentTimeMillis();
 		try {
 			ExceptionMessage exception = new ExceptionMessage();
 			for(String usl:uniqueSchoolList) {
-				counter++;
-				if(counter%50 == 0) {
-					ResponseObj obj = reportService.getTokenResponseObject();
-					accessToken = obj.getAccess_token();
-				}
+				Pair<String, Long> res = tokenUtils.checkAndGetAccessToken(startTime, accessToken);
+				accessToken = res.getLeft();
+				startTime = res.getRight();
+
 				List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl,accessToken);
 				SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
 				if (schoolDetails != null) {
