@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.process;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
+import ca.bc.gov.educ.api.graduation.util.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ public class AlgorithmSupport {
 
     @Autowired
     ReportService reportService;
+
+    @Autowired
+    TokenUtils tokenUtils;
 
     public boolean checkForErrors(GraduationData graduationDataStatus, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
         if(graduationDataStatus != null) {
@@ -42,6 +46,7 @@ public class AlgorithmSupport {
             try {
                 if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null && graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getCertificateEligibility().equalsIgnoreCase("Y")) {
                     List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
+                    tokenUtils.checkAndSetAccessToken(processorData);
                     for (ProgramCertificateTranscript certType : certificateList) {
                         reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, exception);
                         logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
@@ -51,6 +56,7 @@ public class AlgorithmSupport {
                 if ((graduationDataStatus.getStudentCourses().getStudentCourseList() == null || graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty()) && (graduationDataStatus.getStudentAssessments().getStudentAssessmentList() == null || graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty())) {
                     logger.info("**** No Transcript Generated: ****");
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
+                    tokenUtils.checkAndSetAccessToken(processorData);
                     reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
                     logger.info("**** Saved Reports: ****");
                 }

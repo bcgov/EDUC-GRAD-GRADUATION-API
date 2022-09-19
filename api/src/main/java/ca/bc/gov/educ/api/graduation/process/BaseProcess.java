@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.graduation.service.GradStatusService;
 import ca.bc.gov.educ.api.graduation.service.OptionalProgramService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
+import ca.bc.gov.educ.api.graduation.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseProcess implements AlgorithmProcess {
@@ -29,6 +30,9 @@ public abstract class BaseProcess implements AlgorithmProcess {
 
     @Autowired
     AlgorithmSupport algorithmSupport;
+
+    @Autowired
+    TokenUtils tokenUtils;
 
     protected boolean checkExceptions(ExceptionMessage exception, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
         if (exception != null && exception.getExceptionName() != null) {
