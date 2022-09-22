@@ -543,8 +543,9 @@ public class ReportService {
 		std.setGrade(gradStudent.getStudentGrade());
 		std.setStudStatus(gradStudent.getStudentStatus());
 		std.setFirstName(gradStudent.getLegalFirstName());
-		std.setGender(gradStudent.getGenderCode());
+		std.setMiddleName(gradStudent.getLegalMiddleNames());
 		std.setLastName(gradStudent.getLegalLastName());
+		std.setGender(gradStudent.getGenderCode());
 		Pen pen = new Pen();
 		pen.setPen(gradStudent.getPen());
 		std.setPen(pen);
