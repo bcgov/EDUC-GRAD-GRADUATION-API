@@ -32,8 +32,8 @@ public class TokenUtils {
         long diff = (currentTime - startTime)/1000;
 
         logger.info("=========> Check Duration: {} sec <===========", diff);
-        if (diff > 180) { // if the previous step took more than 3 minutes, treat it as a long process, and get the new access token
-            logger.info("=========> Getting the new Access Token after 3 minutes <===========");
+        if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
+            logger.info("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 return Pair.of(responseObj.getAccess_token(), currentTime);
@@ -47,8 +47,8 @@ public class TokenUtils {
         long diff = (currentTime - processorData.getStartTime())/1000;
 
         logger.info("=========> Check Duration: {} sec <===========", diff);
-        if (diff > 180) { // if the previous step took more than 3 minutes, treat it as a long process, and get the new access token
-            logger.info("=========> Getting the new Access Token after 3 minutes <===========");
+        if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
+            logger.info("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 processorData.setAccessToken(responseObj.getAccess_token());
