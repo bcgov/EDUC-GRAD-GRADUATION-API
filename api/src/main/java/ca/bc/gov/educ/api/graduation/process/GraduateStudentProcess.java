@@ -51,7 +51,6 @@ public class GraduateStudentProcess extends BaseProcess {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				tokenUtils.checkAndSetAccessToken(processorData);
 				ExceptionMessage eMsg = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
