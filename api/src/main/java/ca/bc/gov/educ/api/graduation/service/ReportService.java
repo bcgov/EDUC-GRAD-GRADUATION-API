@@ -99,15 +99,6 @@ public class ReportService {
 
 	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
 		try {
-			ca.bc.gov.educ.api.graduation.model.dto.School schoolAtGrad = graduationDataStatus.getSchool();
-			if(graduationDataStatus.getGradStatus() != null) {
-				if(graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
-					SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
-					if(schoolDetails != null) {
-						schoolAtGrad = new ca.bc.gov.educ.api.graduation.model.dto.School();
-					}
-				}
-			}
 			ReportData data = new ReportData();
 			data.setSchool(getSchoolData(graduationDataStatus, accessToken, exception));
 			data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
@@ -566,8 +557,7 @@ public class ReportService {
 
 
 	private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
-		if(graduationDataStatus.getGradStatus() != null) {
-			if(graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
+		if(graduationDataStatus.getGradStatus() != null && graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
 				SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
 				if(schoolDetails != null) {
 					School schObj = new School();
@@ -587,9 +577,6 @@ public class ReportService {
 					schObj.setSchlno(schoolDetails.getMinCode());
 					schObj.setStudents(new ArrayList<>());
 					return schObj;
-				} else {
-					return getSchoolData(graduationDataStatus.getSchool());
-				}
 			} else {
 				return getSchoolData(graduationDataStatus.getSchool());
 			}
