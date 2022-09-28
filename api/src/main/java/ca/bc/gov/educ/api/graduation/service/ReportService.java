@@ -859,13 +859,13 @@ public class ReportService {
 			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
 			return errorData;
 		}
-		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken, exceptionMessage);
+		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
 	}
 
 	public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken, ExceptionMessage exceptionMessage) {
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
 		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus, accessToken, exceptionMessage));
+		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
@@ -881,7 +881,7 @@ public class ReportService {
 
 	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
 			ProgramCertificateTranscript certType, ExceptionMessage exception) {
-		ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken, exception);
+		ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken,exception);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(gradResponse.getPen());
