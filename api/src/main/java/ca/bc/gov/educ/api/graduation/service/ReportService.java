@@ -100,10 +100,14 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
+            School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
+            School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
+            GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             ReportData data = new ReportData();
-            data.setSchool(getSchoolData(graduationDataStatus, accessToken, exception));
+            data.setSchool(schoolOfRecord);
             data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
-            data.setGradMessage(graduationDataStatus.getGradMessage());
+            data.setGradMessage(graduationStatus.getGraduationMessage());
+            data.setGraduationStatus(graduationStatus);
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             data.setGraduationData(getGraduationData(graduationDataStatus));
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
@@ -571,14 +575,6 @@ public class ReportService {
         return null;
     }
 
-    private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
-        School school = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
-        if(school == null) {
-            school = getSchoolData(graduationDataStatus.getSchool());
-        }
-        return school;
-    }
-
     private School getSchoolData(SchoolTrax schoolDetails) {
         School schObj = new School();
         Address addRess = new Address();
@@ -619,18 +615,12 @@ public class ReportService {
         return schObj;
     }
 
-    private School getSchoolDataAchvReport(ca.bc.gov.educ.api.graduation.model.dto.School school) {
-        School schObj = new School();
-        schObj.setMincode(school.getMinCode());
-        schObj.setName(school.getSchoolName());
-        schObj.setStudents(new ArrayList<>());
-        return schObj;
-    }
-
-    private GraduationStatus getGraduationStatusAchvReport(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData, School schoolAtGrad, School schoolOfRecord) {
+    private GraduationStatus getGraduationStatus(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData, School schoolAtGrad, School schoolOfRecord) {
         GraduationStatus gradStatus = new GraduationStatus();
         String gradMessage = graduationData.getGradMessage();
-        if(schoolAtGrad != null) {
+        if(schoolAtGrad != null
+                && schoolOfRecord != null
+                && !StringUtils.equalsIgnoreCase(schoolOfRecord.getMincode(), schoolAtGrad.getMincode())) {
             gradMessage = StringUtils.replace(gradMessage, schoolOfRecord.getName(), schoolAtGrad.getName());
         }
         gradStatus.setGraduationMessage(gradMessage);
@@ -984,12 +974,12 @@ public class ReportService {
     public ReportData prepareAchievementReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
         try {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
-            School schoolOfRecord = getSchoolDataAchvReport(graduationDataStatus.getSchool());
+            School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
             data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(), optionalProgramList));
             data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-            data.setGraduationStatus(getGraduationStatusAchvReport(graduationDataStatus, schoolAtGrad, schoolOfRecord));
+            data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
             data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
