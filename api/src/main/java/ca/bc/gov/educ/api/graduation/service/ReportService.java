@@ -43,6 +43,9 @@ public class ReportService {
 	@Autowired
 	EducGraduationApiConstants educGraduationApiConstants;
 
+	@Autowired
+	SchoolService schoolService;
+
 	public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(gradResponse.getProgram());
@@ -96,8 +99,17 @@ public class ReportService {
 
 	public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
 		try {
+			ca.bc.gov.educ.api.graduation.model.dto.School schoolAtGrad = graduationDataStatus.getSchool();
+			if(graduationDataStatus.getGradStatus() != null) {
+				if(graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
+					SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
+					if(schoolDetails != null) {
+						schoolAtGrad = new ca.bc.gov.educ.api.graduation.model.dto.School();
+					}
+				}
+			}
 			ReportData data = new ReportData();
-			data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+			data.setSchool(getSchoolData(graduationDataStatus, accessToken, exception));
 			data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 			data.setGradMessage(graduationDataStatus.getGradMessage());
 			data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
@@ -553,6 +565,39 @@ public class ReportService {
 	}
 
 
+	private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
+		if(graduationDataStatus.getGradStatus() != null) {
+			if(graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
+				SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
+				if(schoolDetails != null) {
+					School schObj = new School();
+					Address addRess = new Address();
+					addRess.setCity(schoolDetails.getCity());
+					addRess.setCode(schoolDetails.getPostal());
+					addRess.setCountry(schoolDetails.getCountryCode());
+					addRess.setRegion(schoolDetails.getProvCode());
+					addRess.setStreetLine1(schoolDetails.getAddress1());
+					addRess.setStreetLine2(schoolDetails.getAddress2());
+					schObj.setTypeIndicator(schoolDetails.getIndependentDesignation());
+					schObj.setAddress(addRess);
+					schObj.setMincode(schoolDetails.getMinCode());
+					schObj.setName(schoolDetails.getSchoolName());
+					schObj.setSignatureCode(schoolDetails.getMinCode().substring(0, 3));
+					schObj.setDistno(schoolDetails.getMinCode().substring(0, 3));
+					schObj.setSchlno(schoolDetails.getMinCode());
+					schObj.setStudents(new ArrayList<>());
+					return schObj;
+				} else {
+					return getSchoolData(graduationDataStatus.getSchool());
+				}
+			} else {
+				return getSchoolData(graduationDataStatus.getSchool());
+			}
+		} else {
+			return getSchoolData(graduationDataStatus.getSchool());
+		}
+	}
+
 	private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.School school) {
 		School schObj = new School();
 		Address addRess = new Address();
@@ -827,13 +872,13 @@ public class ReportService {
 			errorData.getParameters().put(exceptionMessage.getExceptionName(), exceptionMessage.getExceptionDetails());
 			return errorData;
 		}
-		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
+		return prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken, exceptionMessage);
 	}
 
 	public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
-			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
+			ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken, ExceptionMessage exceptionMessage) {
 		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+		data.setSchool(getSchoolData(graduationDataStatus, accessToken, exceptionMessage));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
@@ -848,8 +893,8 @@ public class ReportService {
 	}
 
 	public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse,ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
-			ProgramCertificateTranscript certType,ExceptionMessage exception) {
-		ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
+			ProgramCertificateTranscript certType, ExceptionMessage exception) {
+		ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken, exception);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken,exception);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(gradResponse.getPen());
