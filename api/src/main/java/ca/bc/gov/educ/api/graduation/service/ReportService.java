@@ -557,7 +557,7 @@ public class ReportService {
 
 
 	private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
-		if(graduationDataStatus.getGradStatus() != null && graduationDataStatus.getGradStatus().getSchoolAtGrad() != null) {
+		if(graduationDataStatus.getGradStatus() != null && !StringUtils.isBlank(graduationDataStatus.getGradStatus().getSchoolAtGrad())) {
 				SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
 				if(schoolDetails != null) {
 					School schObj = new School();
