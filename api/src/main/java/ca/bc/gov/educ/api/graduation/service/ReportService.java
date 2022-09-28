@@ -82,7 +82,7 @@ public class ReportService {
 		}
 	}
 
-	@External
+	@Generated
 	public String getSchoolCategoryCode(String accessToken, String mincode) {
 		CommonSchool commonSchoolObj = webClient.get().uri(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode))
 						.headers(h -> {
@@ -169,7 +169,7 @@ public class ReportService {
 		return errorData;
 	}
 
-	@External
+	@Generated
 	private GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken, ExceptionMessage exception) {
 		try {
 			List<GradSearchStudent> stuDataList = webClient.get().uri(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(),pen))
@@ -187,7 +187,7 @@ public class ReportService {
 		return null;
 	}
 
-	@External
+	@Generated
 	private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID, String accessToken, ExceptionMessage exception) {
 		try
 		{
