@@ -18,11 +18,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -547,8 +543,9 @@ public class ReportService {
 		std.setGrade(gradStudent.getStudentGrade());
 		std.setStudStatus(gradStudent.getStudentStatus());
 		std.setFirstName(gradStudent.getLegalFirstName());
-		std.setGender(gradStudent.getGenderCode());
+		std.setMiddleName(gradStudent.getLegalMiddleNames());
 		std.setLastName(gradStudent.getLegalLastName());
+		std.setGender(gradStudent.getGenderCode());
 		Pen pen = new Pen();
 		pen.setPen(gradStudent.getPen());
 		std.setPen(pen);
@@ -1038,18 +1035,5 @@ public class ReportService {
 		}
 		return null;
 
-	}
-
-	public ResponseObj getTokenResponseObject() {
-		HttpHeaders httpHeadersKC = EducGraduationApiUtils.getHeaders(
-				educGraduationApiConstants.getUserName(), educGraduationApiConstants.getPassword());
-		MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-		map.add("grant_type", "client_credentials");
-		return this.webClient.post().uri(educGraduationApiConstants.getTokenUrl())
-				.headers(h -> h.addAll(httpHeadersKC))
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.body(BodyInserters.fromFormData(map))
-				.retrieve()
-				.bodyToMono(ResponseObj.class).block();
 	}
 }

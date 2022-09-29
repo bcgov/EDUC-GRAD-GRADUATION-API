@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import org.springframework.stereotype.Component;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,4 +17,17 @@ public class ProcessorData {
 	private String studentID;
 	private Long batchId;
 	private ExceptionMessage exception;
+
+	private long startTime;
+
+	public ProcessorData(GraduationStudentRecord gradResponse, AlgorithmResponse algorithmResponse, String accessToken, String studentID, Long batchId, ExceptionMessage exception) {
+		this.gradResponse = gradResponse;
+		this.algorithmResponse = algorithmResponse;
+		this.accessToken = accessToken;
+		this.studentID = studentID;
+		this.batchId = batchId;
+		this.exception = exception;
+		this.startTime = System.currentTimeMillis();
+	}
+
 }
