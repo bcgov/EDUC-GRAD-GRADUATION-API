@@ -1529,6 +1529,16 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
 
+		SchoolTrax schtrax = new SchoolTrax();
+		schtrax.setMinCode(commSch.getSchlNo());
+		schtrax.setAddress1("1231");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolDetails(),commSch.getSchlNo()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolTrax.class)).thenReturn(Mono.just(schtrax));
+
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
