@@ -18,9 +18,17 @@
             src/main/java/ca/bc/gov/educ/api/graduation/config/**,
             src/main/java/ca/bc/gov/educ/api/graduation/exception/**,
             src/main/java/ca/bc/gov/educ/api/graduation/model/**,
-            src/main/java/ca/bc/gov/educ/api/graduation/util/**
+            src/main/java/ca/bc/gov/educ/api/graduation/util/**,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.exclusions>
+        <sonar.junit.exclusions>
+            src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/config/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/exception/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/model/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/util/**,
+            src/main/test/ca/bc/gov/educ/api/graduation/**
+        </sonar.junit.exclusions>
         <java.version>11</java.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

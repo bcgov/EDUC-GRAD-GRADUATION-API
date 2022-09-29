@@ -1,10 +1,9 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import java.util.UUID;
-
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
+import java.util.UUID;
 
 @Data
 @Component
@@ -23,4 +22,6 @@ public class GradAlgorithmGraduationStudentRecord {
     private String studentStatus;
     private UUID studentID;
     private String schoolAtGrad;
+    private String consumerEducationRequirementMet;
+    private String schoolAtGradName;
 }

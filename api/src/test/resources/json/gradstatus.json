@@ -15,7 +15,7 @@
     "emailVerified": "Y",
     "deceasedDate": null,
     "postalCode": null,
-    "mincode": "00502024",
+    "mincode": "09323027",
     "localID": null,
     "gradeCode": "05",
     "gradeYear": "0",
@@ -24,8 +24,8 @@
     "memo": null,
     "trueStudentID": null,
     "program": "2018-EN",
-    "schoolOfRecord": "00502001",
-    "schoolOfRecordName": "MOUNT BAKER SECONDARY",
+    "schoolOfRecord": "09323027",
+    "schoolOfRecordName": "DE L'ANSE-AU-SABLE",
     "schoolOfRecordindependentAffiliation": "",
     "studentGrade": "11",
     "studentStatus": "CUR"
@@ -39,11 +39,11 @@
     "gpa": null,
     "honoursStanding": null,
     "recalculateGradStatus": null,
-    "schoolOfRecord": "00502001",
+    "schoolOfRecord": "09323027",
     "studentGrade": "11",
     "studentStatus": "CUR",
     "studentID": "ac339d70-7649-1a2e-8176-4a33cd87651e",
-    "schoolAtGrad": null
+    "schoolAtGrad": "00502001"
   },
   "gradProgram": {
     "assessmentReleaseDate": "2002-08-05"
@@ -621,8 +621,8 @@
     }
   ],
   "school": {
-    "minCode": "00502001",
-    "schoolName": "MOUNT BAKER SECONDARY",
+    "minCode": "09323027",
+    "schoolName": "DE L'ANSE-AU-SABLE",
     "districtName": "SOUTHEAST KOOTENAY",
     "transcriptEligibility": "Y",
     "certificateEligibility": "Y",
@@ -639,7 +639,7 @@
     "independentAffiliation": "",
     "openFlag": "Y",
     "signatureDistrict": "",
-    "newMinCode": "00502001",
+    "newMinCode": "09323027",
     "schoolOrg": "S",
     "appendTrans": "",
     "ministryContact": "P",
