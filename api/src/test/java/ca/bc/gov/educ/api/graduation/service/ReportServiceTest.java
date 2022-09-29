@@ -201,7 +201,7 @@ public class ReportServiceTest {
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -251,7 +251,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 
 		GraduationData graduationDataStatus = new GraduationData();
@@ -313,7 +313,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -383,7 +383,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -453,7 +453,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -535,7 +535,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -586,7 +586,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -656,7 +656,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GraduationData graduationDataStatus = new GraduationData();
@@ -718,7 +718,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("1");
 		
 		GradSearchStudent stuObj = new GradSearchStudent();
@@ -786,7 +786,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -921,7 +921,7 @@ public class ReportServiceTest {
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("2018-EN");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("1");
 
 		GradSearchStudent stuObj = getStudentObj();
@@ -963,7 +963,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -1005,7 +1005,7 @@ public class ReportServiceTest {
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus(program);
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("1");
 		
 		GradSearchStudent stuObj = getStudentObj();
@@ -1094,7 +1094,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("3");
 		
 		GradSearchStudent stuObj = new GradSearchStudent();
@@ -1160,7 +1160,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -1200,7 +1200,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("4");
 		
 		GradSearchStudent stuObj = new GradSearchStudent();
@@ -1267,7 +1267,7 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -1307,7 +1307,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 		
 		School schoolObj = new School();
-		schoolObj.setMinCode("1231123");
+		schoolObj.setMinCode("09323027");
 		schoolObj.setIndependentDesignation("2");
 		
 		GradSearchStudent stuObj = new GradSearchStudent();
@@ -1387,7 +1387,7 @@ public class ReportServiceTest {
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 		ExceptionMessage exception = new ExceptionMessage();
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
@@ -1492,11 +1492,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -1528,6 +1528,17 @@ public class ReportServiceTest {
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
+
+		SchoolTrax schtrax = new SchoolTrax();
+		schtrax.setMinCode("00502001");
+		schtrax.setSchoolName("ROBERT DDGELL");
+		schtrax.setAddress1("My Address");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolDetails(),schtrax.getMinCode()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolTrax.class)).thenReturn(Mono.just(schtrax));
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
@@ -1714,11 +1725,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -1805,11 +1816,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -1872,11 +1883,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(null);
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -1949,11 +1960,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -2012,11 +2023,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -2079,11 +2090,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(null);
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
@@ -2156,11 +2167,11 @@ public class ReportServiceTest {
 		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
 
 		CommonSchool commSch = new CommonSchool();
-		commSch.setSchlNo("1231123");
+		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "00502001"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(), "09323027"))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
