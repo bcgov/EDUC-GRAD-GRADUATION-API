@@ -100,6 +100,7 @@ endpoint:
   certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
   student_non_grad: ${GRAD_REPORT_API}api/v1/reports/studentnongrad
   school_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolgraduation
+  school_non_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolnongraduation
  grad-student-graduation-api:
   get-special-cases: 
     url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s

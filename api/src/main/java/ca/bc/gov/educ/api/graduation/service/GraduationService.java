@@ -149,27 +149,35 @@ public class GraduationService {
 						schoolObj.setName(schoolDetails.getSchoolName());
 						List<Student> processedList = processStudentList(stdList,type);
 						if(!processedList.isEmpty() && type.equalsIgnoreCase("TVRRUN")) {
-							numberOfReports = processProjectedNonGradReport(schoolObj, processedList, usl, exception, accessToken, numberOfReports);
-						}else {
-							numberOfReports = processGradReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
+							numberOfReports = processNonGradPrjReport(schoolObj, processedList, usl, exception, accessToken, numberOfReports);
+						} else {
+							numberOfReports = processGradRegReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
+							numberOfReports = processNonGradRegReport(schoolObj,processedList,usl,exception,accessToken,numberOfReports);
 						}
-
 					}
 				}
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			logger.debug("Error {}",e.getLocalizedMessage());
 		}
 		return numberOfReports;
 	}
 
 
-	private int processGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
+	private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
 		ReportData gradReport = getReportDataObj(schoolObj,stdList);
-		createAndSaveSchoolReportGradReport(gradReport, mincode, exception, accessToken);
+		createAndSaveSchoolReportGradRegReport(gradReport, mincode, exception, accessToken);
 		numberOfReports++;
 		return numberOfReports;
 	}
+
+	private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
+		ReportData gradReport = getReportDataObj(schoolObj,stdList);
+		createAndSaveSchoolReportNonGradRegReport(gradReport, mincode, exception, accessToken);
+		numberOfReports++;
+		return numberOfReports;
+	}
+
 	private ReportData getReportDataObj(School schoolObj, List<Student> stdList) {
 		ReportData data = new ReportData();
 		schoolObj.setStudents(stdList);
@@ -178,9 +186,10 @@ public class GraduationService {
 		data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
 		return data;
 	}
-	private int processProjectedNonGradReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
+
+	private int processNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, ExceptionMessage exception, String accessToken, int numberOfReports) {
 		ReportData nongradProjected = getReportDataObj(schoolObj,stdList);
-		createAndSaveSchoolReportNonGradReport(nongradProjected, mincode, exception, accessToken);
+		createAndSaveSchoolReportNonGradPrjReport(nongradProjected, mincode, exception, accessToken);
 		numberOfReports++;
 		return numberOfReports;
 	}
@@ -236,7 +245,7 @@ public class GraduationService {
 		return nList;
 	}
 
-	private void createAndSaveSchoolReportGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken) {
+	private void createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, ExceptionMessage exception, String accessToken) {
 		ReportOptions options = new ReportOptions();
 		options.setReportFile(String.format("%s_%s00_GRADREG",mincode, LocalDate.now().getYear()));
 		options.setReportName(String.format("%s_%s00_GRADREG.pdf",mincode, LocalDate.now().getYear()));
@@ -246,7 +255,7 @@ public class GraduationService {
 
 		String encodedPdf = null;
 		try {
-			byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getSchoolgraduation())
+			byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getSchoolGraduation())
 					.headers(h -> {
 						h.setBearerAuth(accessToken);
 						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
@@ -277,7 +286,48 @@ public class GraduationService {
 		}
 	}
 
-	private void createAndSaveSchoolReportNonGradReport(ReportData data,String mincode,ExceptionMessage exception, String accessToken) {
+	private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, ExceptionMessage exception, String accessToken) {
+		ReportOptions options = new ReportOptions();
+		options.setReportFile(String.format("%s_%s00_NONGRADREG",mincode, LocalDate.now().getYear()));
+		options.setReportName(String.format("%s_%s00_NONGRADREG.pdf",mincode, LocalDate.now().getYear()));
+		ReportRequest reportParams = new ReportRequest();
+		reportParams.setOptions(options);
+		reportParams.setData(data);
+
+		String encodedPdf = null;
+		try {
+			byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getSchoolNonGraduation())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+			byte[] encoded = Base64.encodeBase64(bytesSAR);
+			encodedPdf= new String(encoded, StandardCharsets.US_ASCII);
+		}catch (Exception e) {
+			exception.setExceptionName("GRAD_REPORT_API_DOWN");
+			exception.setExceptionDetails(e.getLocalizedMessage());
+		}
+
+		SchoolReports requestObj = new SchoolReports();
+		requestObj.setReport(encodedPdf);
+		requestObj.setSchoolOfRecord(mincode);
+		requestObj.setReportTypeCode("NONGRADREG");
+
+		try {
+			webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+					}).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+		}catch(Exception e) {
+			if(exception.getExceptionName() == null) {
+				exception.setExceptionName("GRAD_GRADUATION_REPORT_API_DOWN");
+				exception.setExceptionDetails(e.getLocalizedMessage());
+			}
+		}
+	}
+
+	private void createAndSaveSchoolReportNonGradPrjReport(ReportData data, String mincode, ExceptionMessage exception, String accessToken) {
 		data.setReportTitle("Graduation Records and Achievement Data");
 		data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
 		ReportOptions options = new ReportOptions();
