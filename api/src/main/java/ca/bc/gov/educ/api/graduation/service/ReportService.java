@@ -113,6 +113,7 @@ public class ReportService {
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
             data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+            data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -230,7 +231,7 @@ public class ReportService {
             code.setCode(pcObj.getTranscriptTypeCode());
             transcriptData.setTranscriptTypeCode(code);
         }
-        transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(gradResponse.getUpdateDate().toString()));
+        transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
         transcriptData.setResults(getTranscriptResults(graduationDataStatus, xml, accessToken));
         return transcriptData;
     }
