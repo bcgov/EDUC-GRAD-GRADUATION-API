@@ -348,7 +348,7 @@ public class GraduationService {
 					}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 			byte[] encoded = Base64.encodeBase64(bytesSAR);
 			encodedPdf= new String(encoded, StandardCharsets.US_ASCII);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			exception.setExceptionName(GRAD_REPORT_API_DOWN);
 			exception.setExceptionDetails(e.getLocalizedMessage());
 		}
@@ -364,7 +364,7 @@ public class GraduationService {
 						h.setBearerAuth(accessToken);
 						h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 					}).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
-		}catch(Exception e) {
+		} catch(Exception e) {
 			if(exception.getExceptionName() == null) {
 				exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
 				exception.setExceptionDetails(e.getLocalizedMessage());
