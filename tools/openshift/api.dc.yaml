@@ -145,7 +145,7 @@ objects:
           resource:
             name: cpu
             target:
-              averageUtilization: 400
+              averageUtilization: 300
               type: Utilization
 parameters:
   - name: REPO_NAME
