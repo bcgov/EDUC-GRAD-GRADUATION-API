@@ -13,6 +13,8 @@
 
     <properties>
         <sonar.language>java</sonar.language>
+        <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
+        <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S106</sonar.issue.ignore.multicriteria.e1.ruleKey>
         <sonar.exclusions>
             src/main/resources/**,
             src/main/java/ca/bc/gov/educ/api/graduation/config/**,
