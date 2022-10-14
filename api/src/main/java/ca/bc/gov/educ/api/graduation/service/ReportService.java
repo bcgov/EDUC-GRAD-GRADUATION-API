@@ -924,40 +924,27 @@ public class ReportService {
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
         reportParams.setData(sample);
-        try {
-            byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getCertificateReport())
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
-            return getEncodedStringFromBytes(bytesSAR);
-        } catch (Exception e) {
-            exception.setExceptionName(GRAD_REPORT_API_DOWN);
-            exception.setExceptionDetails(e.getLocalizedMessage());
-            return null;
-        }
+        byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getCertificateReport())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return getEncodedStringFromBytes(bytesSAR);
     }
 
-    private String generateStudentAchievementReportJasper(ReportData data, String accessToken, ExceptionMessage exception) {
+    private String generateStudentAchievementReportJasper(ReportData data, String accessToken) {
         ReportOptions options = new ReportOptions();
         options.setReportFile("achievement");
         options.setReportName("Student Achievement Report.pdf");
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
         reportParams.setData(data);
-        try {
-            byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getAchievementReport())
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
-            return getEncodedStringFromBytes(bytesSAR);
-        } catch (Exception e) {
-            exception.setExceptionName(GRAD_REPORT_API_DOWN);
-            exception.setExceptionDetails(e.getLocalizedMessage());
-            return null;
-        }
-
+        byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getAchievementReport())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return getEncodedStringFromBytes(bytesSAR);
     }
 
     public ReportData prepareAchievementReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, String accessToken, ExceptionMessage exception) {
@@ -1045,7 +1032,7 @@ public class ReportService {
     }
 
     public ExceptionMessage saveStudentAchivementReportJasper(String pen, ReportData sample, String accessToken, UUID studentID, ExceptionMessage exception, boolean isGraduated) {
-        String encodedPdfReportTranscript = generateStudentAchievementReportJasper(sample, accessToken, exception);
+        String encodedPdfReportTranscript = generateStudentAchievementReportJasper(sample, accessToken);
         GradStudentReports requestObj = new GradStudentReports();
         requestObj.setPen(pen);
         requestObj.setReport(encodedPdfReportTranscript);
@@ -1055,20 +1042,13 @@ public class ReportService {
         if (isGraduated)
             requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
-        try {
-            webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(), isGraduated))
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); 
-        } catch (Exception e) {
-            if (exception.getExceptionName() == null) {
-                exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-                exception.setExceptionDetails(e.getLocalizedMessage());
-                return exception;
-            }
-        }
-        return null;
+        webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentReport(), isGraduated))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
+
+        return exception;
 
     }
 }
