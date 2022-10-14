@@ -64,7 +64,7 @@ public class GraduationService {
 	     	AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
 	     	data = process.fire(data);
 	        return data.getAlgorithmResponse();		     	
-		}else {
+		} else {
 			AlgorithmResponse aR= new AlgorithmResponse();
 			ExceptionMessage exp = new ExceptionMessage();
 			exp.setExceptionName("STUDENT-NOT-ACCEPTABLE");
