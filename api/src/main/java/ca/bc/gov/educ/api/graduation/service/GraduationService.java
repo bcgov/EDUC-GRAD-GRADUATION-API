@@ -257,11 +257,15 @@ public class GraduationService {
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "GRADREG");
 
+        updateSchoolReport(accessToken, requestObj);
+    }
+
+    private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
         webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block(); 
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -287,11 +291,7 @@ public class GraduationService {
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADREG");
 
-        webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block(); 
+        updateSchoolReport(accessToken, requestObj);
     }
 
     private void createAndSaveSchoolReportNonGradPrjReport(ReportData data, String mincode, String accessToken) {
@@ -313,11 +313,7 @@ public class GraduationService {
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADPRJ");
 
-        webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block(); 
+        updateSchoolReport(accessToken, requestObj);
     }
 
     private SchoolReports getSchoolReports(String mincode, String encodedPdf, String nongradreg) {
