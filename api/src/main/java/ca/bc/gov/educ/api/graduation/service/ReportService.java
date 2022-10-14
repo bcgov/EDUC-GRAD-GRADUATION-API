@@ -787,13 +787,17 @@ public class ReportService {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
-            byte[] encoded = Base64.encodeBase64(bytesSAR);
-            return new String(encoded, StandardCharsets.US_ASCII);
+            return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getLocalizedMessage());
             return null;
         }
+    }
+
+    private String getEncodedStringFromBytes(byte[] bytesSAR) {
+        byte[] encoded = Base64.encodeBase64(bytesSAR);
+        return new String(encoded, StandardCharsets.US_ASCII);
     }
 
     public ReportData prepareCertificateData(String pen, String accessToken, ExceptionMessage exception) {
@@ -926,8 +930,7 @@ public class ReportService {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
-            byte[] encoded = Base64.encodeBase64(bytesSAR);
-            return new String(encoded, StandardCharsets.US_ASCII);
+            return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getLocalizedMessage());
@@ -948,8 +951,7 @@ public class ReportService {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
-            byte[] encoded = Base64.encodeBase64(bytesSAR);
-            return new String(encoded, StandardCharsets.US_ASCII);
+            return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getLocalizedMessage());

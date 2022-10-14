@@ -253,8 +253,7 @@ public class GraduationService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
-        byte[] encoded = Base64.encodeBase64(bytesSAR);
-        String encodedPdf = new String(encoded, StandardCharsets.US_ASCII);
+        String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "GRADREG");
 
@@ -263,6 +262,11 @@ public class GraduationService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block(); //NOSONAR
+    }
+
+    private String getEncodedPdfFromBytes(byte[] bytesSAR) {
+        byte[] encoded = Base64.encodeBase64(bytesSAR);
+        return new String(encoded, StandardCharsets.US_ASCII);
     }
 
     private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
@@ -279,8 +283,7 @@ public class GraduationService {
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
 
-        byte[] encoded = Base64.encodeBase64(bytesSAR);
-        String encodedPdf = new String(encoded, StandardCharsets.US_ASCII);
+        String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADREG");
 
@@ -306,8 +309,7 @@ public class GraduationService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
-        byte[] encoded = Base64.encodeBase64(bytesSAR);
-        String encodedPdf = new String(encoded, StandardCharsets.US_ASCII);
+        String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADPRJ");
 
