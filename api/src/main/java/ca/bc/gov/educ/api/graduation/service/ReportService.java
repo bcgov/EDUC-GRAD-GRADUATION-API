@@ -884,10 +884,18 @@ public class ReportService {
         data.setGraduationData(getGraduationData(graduationDataStatus));
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
         data.setCertificate(getCertificateData(gradResponse, certType));
-        if (certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
-            data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
-        } else if (certType.getCertificateTypeCode().equalsIgnoreCase("F") || certType.getCertificateTypeCode().equalsIgnoreCase("S") || certType.getCertificateTypeCode().equalsIgnoreCase("SCF")) {
-            data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+        switch (certType.getCertificateTypeCode()) {
+            case "F":
+                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+                break;
+            case "S":
+                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+                break;
+            case "SCF":
+                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+                break;
+            default:
+                data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
         }
         return data;
     }
