@@ -970,7 +970,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,exception);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
@@ -1576,7 +1576,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,exception);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
