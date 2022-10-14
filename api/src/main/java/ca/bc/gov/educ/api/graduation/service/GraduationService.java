@@ -33,8 +33,6 @@ import java.util.Optional;
 public class GraduationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(GraduationService.class);
-	private static final String GRAD_REPORT_API_DOWN = "GRAD_REPORT_API_DOWN";
-	private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD_GRADUATION_REPORT_API_DOWN";
 
 	@Autowired WebClient webClient;
 	@Autowired AlgorithmProcessFactory algorithmProcessFactory;
