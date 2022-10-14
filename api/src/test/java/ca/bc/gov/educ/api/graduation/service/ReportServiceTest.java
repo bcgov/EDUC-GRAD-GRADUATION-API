@@ -178,7 +178,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));		
-		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc,exception);
+		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc);
         assertThat(exception.getExceptionName()).isNull();
 	}
 	
