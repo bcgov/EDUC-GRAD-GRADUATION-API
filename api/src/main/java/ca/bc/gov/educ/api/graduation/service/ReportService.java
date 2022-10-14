@@ -55,7 +55,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block(); 
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -78,7 +78,7 @@ public class ReportService {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
-                    }).block(); //NOSONAR
+                    }).block(); 
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -91,7 +91,7 @@ public class ReportService {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(CommonSchool.class).block(); //NOSONAR
+                }).retrieve().bodyToMono(CommonSchool.class).block(); 
         if (commonSchoolObj != null) {
             return commonSchoolObj.getSchoolCategoryCode();
         }
@@ -175,7 +175,7 @@ public class ReportService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<GradSearchStudent>>() {
-                }).block(); //NOSONAR
+                }).block(); 
         if (stuDataList != null && !stuDataList.isEmpty()) {
             return stuDataList.get(0);
         }
@@ -189,7 +189,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).retrieve().bodyToMono(GraduationStudentRecord.class).block(); //NOSONAR
+                    }).retrieve().bodyToMono(GraduationStudentRecord.class).block(); 
         } catch (Exception e) {
             throw new EntityNotFoundException(
                     ReportService.class, String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
@@ -457,7 +457,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).retrieve().bodyToMono(SpecialCase.class).block(); //NOSONAR
+                    }).retrieve().bodyToMono(SpecialCase.class).block(); 
             finalPercent = spC != null ? spC.getLabel() : "";
         }
 
@@ -476,7 +476,7 @@ public class ReportService {
             SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase()))
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); //NOSONAR
+                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); 
                     }).retrieve().bodyToMono(SpecialCase.class).block();
             finalPercent = spC != null ? spC.getLabel() : "";
         }
@@ -527,7 +527,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).retrieve().bodyToMono(ca.bc.gov.educ.api.graduation.model.dto.GradProgram.class).block(); //NOSONAR
+                    }).retrieve().bodyToMono(ca.bc.gov.educ.api.graduation.model.dto.GradProgram.class).block(); 
             if (gradProgram != null) {
                 code.setDescription(gradProgram.getProgramName());
                 code.setName(gradProgram.getProgramName());
@@ -763,7 +763,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); 
         } catch (Exception e) {
             if (exception.getExceptionName() == null) {
                 exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
@@ -786,7 +786,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
             return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
@@ -896,7 +896,7 @@ public class ReportService {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block(); //NOSONAR
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block(); 
 
     }
 
@@ -929,7 +929,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
             return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
@@ -950,7 +950,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
             return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
@@ -1060,7 +1060,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); //NOSONAR
+                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); 
         } catch (Exception e) {
             if (exception.getExceptionName() == null) {
                 exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
