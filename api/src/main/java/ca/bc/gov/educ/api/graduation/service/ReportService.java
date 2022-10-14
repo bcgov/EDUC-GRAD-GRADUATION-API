@@ -828,11 +828,6 @@ public class ReportService {
             }
 
             GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken, exception);
-            if (graduationStudentRecord == null) {
-                throw new EntityNotFoundException(
-                        ReportService.class,
-                        "Student with ID " + studentID + " value not exists in GRAD Student system");
-            }
             return prepareCertificateData(graduationStudentRecord, graduationDataStatus, accessToken);
         } catch (Exception e) {
             exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
