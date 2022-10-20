@@ -151,15 +151,18 @@ public class GraduationService {
                     if (type.equalsIgnoreCase("TVRRUN")) {
                         List<Student> nonGradPrjStudents = processStudentList(stdList, type);
                         if(!nonGradPrjStudents.isEmpty()) {
+                            logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
                             numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
                         }
                     } else {
                         List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), type);
                         if(!gradRegStudents.isEmpty()) {
+                            logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         }
                         List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), type);
                         if(!nonGradRegStudents.isEmpty()) {
+                            logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                         }
                     }
