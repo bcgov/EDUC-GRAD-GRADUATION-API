@@ -1896,15 +1896,18 @@ public class GraduationServiceTest {
 		non.setRule("1");
 		non.setDescription("ree");
 		nonList.add(non);
+
 		ProjectedRunClob pr = new ProjectedRunClob();
 		pr.setGraduated(false);
 		pr.setNonGradReasons(nonList);
+
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
-		gsr.setLegalFirstName("ada");
-		gsr.setLegalMiddleNames("qwe");
-		gsr.setLegalLastName("asda");
+		gsr.setLegalFirstName("My First Name");
+		gsr.setLegalMiddleNames("My Middle Name");
+		gsr.setLegalLastName("My Last Name");
 		gsr.setStudentGrade("12");
 		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate("10/20/2020");
 
 		try {
 			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
@@ -1913,6 +1916,23 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
+
+		gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("Just Another My First Name");
+		gsr.setLegalMiddleNames("Just Another My Middle Name");
+		gsr.setLegalLastName("Just Another My Last Name");
+		gsr.setStudentGrade("AD");
+		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate(null);
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+
 		SchoolTrax sTrax = new SchoolTrax();
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
