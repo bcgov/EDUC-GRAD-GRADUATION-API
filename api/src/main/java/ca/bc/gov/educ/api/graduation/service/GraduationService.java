@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GraduationService {
@@ -147,12 +148,20 @@ public class GraduationService {
                     ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
                     schoolObj.setName(schoolDetails.getSchoolName());
-                    List<Student> processedList = processStudentList(stdList, type);
-                    if (!processedList.isEmpty() && type.equalsIgnoreCase("TVRRUN")) {
-                        numberOfReports = processNonGradPrjReport(schoolObj, processedList, usl, accessToken, numberOfReports);
+                    if (type.equalsIgnoreCase("TVRRUN")) {
+                        List<Student> nonGradPrjStudents = processStudentList(stdList, type);
+                        if(!nonGradPrjStudents.isEmpty()) {
+                            numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
+                        }
                     } else {
-                        numberOfReports = processGradRegReport(schoolObj, processedList, usl, accessToken, numberOfReports);
-                        numberOfReports = processNonGradRegReport(schoolObj, processedList, usl, accessToken, numberOfReports);
+                        List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), type);
+                        if(!gradRegStudents.isEmpty()) {
+                            numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
+                        }
+                        List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), type);
+                        if(!nonGradRegStudents.isEmpty()) {
+                            numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
+                        }
                     }
                 }
             }
@@ -211,8 +220,7 @@ public class GraduationService {
                     gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
                     gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
                     std.setGraduationData(gradData);
-                    if (gsr.getProgramCompletionDate() != null)
-                        stdPrjList.add(std);
+                    stdPrjList.add(std);
                 } else {
                     std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
                     if (gsr.getStudentProjectedGradData() != null) {
