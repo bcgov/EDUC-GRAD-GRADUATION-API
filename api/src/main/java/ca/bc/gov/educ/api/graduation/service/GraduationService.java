@@ -223,6 +223,7 @@ public class GraduationService {
                     gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
                     gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
                     std.setGraduationData(gradData);
+                    std.setNonGradReasons(getNonGradReasons(gsr.getNonGradReasons()));
                     stdPrjList.add(std);
                 } else {
                     std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
