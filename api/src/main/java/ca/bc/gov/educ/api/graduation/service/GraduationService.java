@@ -214,6 +214,7 @@ public class GraduationService {
                 std.setMiddleName(gsr.getLegalMiddleNames());
                 Pen pen = new Pen();
                 pen.setPen(gsr.getPen());
+                pen.setEntityID(gsr.getStudentID());
                 std.setPen(pen);
                 std.setGrade(gsr.getStudentGrade());
                 std.setGradProgram(gsr.getProgram());

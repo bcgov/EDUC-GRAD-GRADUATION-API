@@ -545,6 +545,7 @@ public class ReportService {
         std.setGender(gradStudent.getGenderCode());
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
+        pen.setEntityID(gradStudent.getStudentID());
         std.setPen(pen);
         return std;
     }
