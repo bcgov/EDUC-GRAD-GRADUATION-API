@@ -150,25 +150,20 @@ public class GraduationService {
                 ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
                 schoolObj.setMincode(schoolDetails.getMinCode());
                 schoolObj.setName(schoolDetails.getSchoolName());
+                ReportData gradReport;
                 switch(type) {
                     case GRADREG:
                         List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), REGALG);
-                    {
-                        ReportData gradReport = getReportDataObj(schoolObj, gradRegStudents);
+                        gradReport = getReportDataObj(schoolObj, gradRegStudents);
                         return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    }
                     case NONGRADREG:
                         List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), REGALG);
-                    {
-                        ReportData gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
+                        gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
                         return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    }
                     case NONGRADPRJ:
                         List<Student> nonGradPrjStudents = processStudentList(stdList, "TVRRUN");
-                    {
-                        ReportData nongradProjected = getReportDataObj(schoolObj, nonGradPrjStudents);
-                        return getSchoolReportNonGradPrjReport(nongradProjected, schoolObj.getMincode(), accessToken);
-                    }
+                        gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
+                        return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
                     default:
                         return result;
                 }
