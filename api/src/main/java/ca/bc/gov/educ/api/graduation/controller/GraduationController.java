@@ -101,6 +101,18 @@ public class GraduationController {
         return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, "")));
     }
 
+    @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Report Generation", description = "When triggered, School Report is generated", tags = { "Reports", "type=GRADREG", "type=NONGRADREG", "type=NONGRADPRJ" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = true) String type ) {
+        byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, ""));
+        if(resultBinary == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return handleBinaryResponse(resultBinary, String.format("%sSchoolReport.pdf", type), MediaType.APPLICATION_PDF);
+    }
+
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
         ResponseEntity<byte[]> responseEntity = null;
 
