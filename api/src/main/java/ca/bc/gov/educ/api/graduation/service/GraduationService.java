@@ -140,7 +140,7 @@ public class GraduationService {
         byte[] result = new byte[0];
         long startTime = System.currentTimeMillis();
         for (String usl : uniqueSchoolList) {
-            Pair<String, Long> res = tokenUtils.checkAndGetAccessToken(startTime, accessToken);
+            Pair<String, Long> res = getAccessToken(startTime, accessToken);
             accessToken = res.getLeft();
             startTime = res.getRight();
 
@@ -153,25 +153,22 @@ public class GraduationService {
                 switch(type) {
                     case GRADREG:
                         List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), REGALG);
-                        if(!gradRegStudents.isEmpty()) {
-                            ReportData gradReport = getReportDataObj(schoolObj, gradRegStudents);
-                            return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                        }
-                        break;
+                    {
+                        ReportData gradReport = getReportDataObj(schoolObj, gradRegStudents);
+                        return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                    }
                     case NONGRADREG:
                         List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), REGALG);
-                        if(!nonGradRegStudents.isEmpty()) {
-                            ReportData gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
-                            return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                        }
-                        break;
+                    {
+                        ReportData gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
+                        return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                    }
                     case NONGRADPRJ:
                         List<Student> nonGradPrjStudents = processStudentList(stdList, "TVRRUN");
-                        if(!nonGradPrjStudents.isEmpty()) {
-                            ReportData nongradProjected = getReportDataObj(schoolObj, nonGradPrjStudents);
-                            return getSchoolReportNonGradPrjReport(nongradProjected, schoolObj.getMincode(), accessToken);
-                        }
-                        break;
+                    {
+                        ReportData nongradProjected = getReportDataObj(schoolObj, nonGradPrjStudents);
+                        return getSchoolReportNonGradPrjReport(nongradProjected, schoolObj.getMincode(), accessToken);
+                    }
                     default:
                         return result;
                 }
