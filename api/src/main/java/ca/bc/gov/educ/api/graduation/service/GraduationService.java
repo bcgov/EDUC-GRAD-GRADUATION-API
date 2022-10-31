@@ -33,6 +33,11 @@ public class GraduationService {
 
     private static final Logger logger = LoggerFactory.getLogger(GraduationService.class);
 
+    private static final String GRADREG = "GRADREG";
+    private static final String NONGRADREG = "NONGRADREG";
+    private static final String NONGRADPRJ = "NONGRADPRJ";
+
+
     @Autowired
     WebClient webClient;
     @Autowired
@@ -149,7 +154,7 @@ public class GraduationService {
                     schoolObj.setMincode(schoolDetails.getMinCode());
                     schoolObj.setName(schoolDetails.getSchoolName());
                     switch(type) {
-                        case "GRADREG":
+                        case GRADREG:
                             List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), "REGALG");
                             if(!gradRegStudents.isEmpty()) {
                                 logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
@@ -157,7 +162,7 @@ public class GraduationService {
                                 return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
                             }
                             break;
-                        case "NONGRADREG":
+                        case NONGRADREG:
                             List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), "REGALG");
                             if(!nonGradRegStudents.isEmpty()) {
                                 logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
@@ -165,7 +170,7 @@ public class GraduationService {
                                 return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
                             }
                             break;
-                        case "NONGRADPRJ":
+                        case NONGRADPRJ:
                             List<Student> nonGradPrjStudents = processStudentList(stdList, "TVRRUN");
                             if(!nonGradPrjStudents.isEmpty()) {
                                 logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
@@ -173,6 +178,8 @@ public class GraduationService {
                                 return getSchoolReportNonGradPrjReport(nongradProjected, schoolObj.getMincode(), accessToken);
                             }
                             break;
+                        default:
+                            return result;
                     }
                 }
             }
@@ -324,7 +331,7 @@ public class GraduationService {
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "GRADREG");
+        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, GRADREG);
 
         updateSchoolReport(accessToken, requestObj);
 
@@ -366,7 +373,7 @@ public class GraduationService {
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADREG");
+        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
 
         updateSchoolReport(accessToken, requestObj);
 
@@ -395,7 +402,7 @@ public class GraduationService {
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, "NONGRADPRJ");
+        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADPRJ);
 
         updateSchoolReport(accessToken, requestObj);
 
