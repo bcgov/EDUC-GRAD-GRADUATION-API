@@ -103,17 +103,20 @@ public class ReportService {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
+            GraduationData graduationData = getGraduationData(graduationDataStatus);
+            graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
             data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
             data.setGradMessage(graduationStatus.getGraduationMessage());
             data.setGraduationStatus(graduationStatus);
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-            data.setGraduationData(getGraduationData(graduationDataStatus));
+            data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
             data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+            data.getStudent().setGraduationData(graduationData);
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -854,12 +857,14 @@ public class ReportService {
     public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
+        GraduationData graduationData = getGraduationData(graduationDataStatus);
         data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-        data.setGraduationData(getGraduationData(graduationDataStatus));
+        data.setGraduationData(graduationData);
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
         data.setCertificate(getCertificateData(gradResponse, certType));
+        data.getStudent().setGraduationData(graduationData);
         switch (certType.getCertificateTypeCode()) {
             case "F":
             case "SCF":
