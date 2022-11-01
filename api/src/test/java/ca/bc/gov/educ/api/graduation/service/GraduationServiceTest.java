@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
-import ca.bc.gov.educ.api.graduation.model.dto.School;
-import ca.bc.gov.educ.api.graduation.model.report.*;
+import ca.bc.gov.educ.api.graduation.model.report.Code;
+import ca.bc.gov.educ.api.graduation.model.report.Pen;
+import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.model.report.Student;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
@@ -24,10 +24,14 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -966,7 +970,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,exception);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
@@ -1572,7 +1576,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,exception);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
 		assertNotNull(response);
@@ -1892,15 +1896,18 @@ public class GraduationServiceTest {
 		non.setRule("1");
 		non.setDescription("ree");
 		nonList.add(non);
+
 		ProjectedRunClob pr = new ProjectedRunClob();
 		pr.setGraduated(false);
 		pr.setNonGradReasons(nonList);
+
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
-		gsr.setLegalFirstName("ada");
-		gsr.setLegalMiddleNames("qwe");
-		gsr.setLegalLastName("asda");
+		gsr.setLegalFirstName("My First Name");
+		gsr.setLegalMiddleNames("My Middle Name");
+		gsr.setLegalLastName("My Last Name");
 		gsr.setStudentGrade("12");
 		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate("10/20/2020");
 
 		try {
 			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
@@ -1909,18 +1916,45 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
+
+		gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("Just Another My First Name");
+		gsr.setLegalMiddleNames("Just Another My Middle Name");
+		gsr.setLegalLastName("Just Another My Last Name");
+		gsr.setStudentGrade("AD");
+		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate(null);
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+
 		SchoolTrax sTrax = new SchoolTrax();
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
 
-		byte[] bytesSAR = "Any String you want".getBytes();
+		byte[] bytesSAR1 = "Any String you want".getBytes();
+
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolGraduation()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR1));
+
+		byte[] bytesSAR2 = "Just another string".getBytes();
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
@@ -1930,11 +1964,112 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
-
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
-		assertEquals(1,numberOfRecord);
+		assertEquals(2,numberOfRecord);
+	}
+
+	@Test
+	public void testGetSchoolReports() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
+
+		List<GraduationStudentRecord> sList = new ArrayList<>();
+		List<GradRequirement> nonList = new ArrayList<>();
+		GradRequirement non = new GradRequirement();
+		non.setRule("1");
+		non.setDescription("ree");
+		nonList.add(non);
+
+		ProjectedRunClob pr = new ProjectedRunClob();
+		pr.setGraduated(false);
+		pr.setNonGradReasons(nonList);
+
+		GraduationStudentRecord gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("My First Name");
+		gsr.setLegalMiddleNames("My Middle Name");
+		gsr.setLegalLastName("My Last Name");
+		gsr.setStudentGrade("12");
+		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate("10/20/2020");
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+
+		gsr = new GraduationStudentRecord();
+		gsr.setLegalFirstName("Just Another My First Name");
+		gsr.setLegalMiddleNames("Just Another My Middle Name");
+		gsr.setLegalLastName("Just Another My Last Name");
+		gsr.setStudentGrade("AD");
+		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate(null);
+
+		try {
+			gsr.setStudentProjectedGradData(new ObjectMapper().writeValueAsString(pr));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		sList.add(gsr);
+
+		SchoolTrax sTrax = new SchoolTrax();
+		sTrax.setAddress1("!23123");
+		sTrax.setMinCode("1231231231");
+
+		byte[] bytesSAR1 = "Any String you want".getBytes();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR1));
+
+		byte[] bytesSAR2 = "Any String you want".getBytes();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolGraduation()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
+
+		byte[] bytesSAR3 = "Just another string".getBytes();
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR3));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
+
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		assertNotNull(result);
+		result = graduationService.getSchoolReports(uniqueList,"NONGRADREG","accessToken");
+		assertNotNull(result);
+		result = graduationService.getSchoolReports(uniqueList,"NONGRADPRJ","accessToken");
+		assertNotNull(result);
 	}
 
 	@Test
