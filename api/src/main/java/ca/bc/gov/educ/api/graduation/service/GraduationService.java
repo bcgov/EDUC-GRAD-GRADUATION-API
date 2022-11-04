@@ -37,6 +37,7 @@ public class GraduationService {
     private static final String NONGRADREG = "NONGRADREG";
     private static final String NONGRADPRJ = "NONGRADPRJ";
     private static final String REGALG = "REGALG";
+    private static final String TVRRUN = "TVRRUN";
 
     @Autowired
     WebClient webClient;
@@ -132,7 +133,7 @@ public class GraduationService {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
+                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 
     }
 
@@ -151,17 +152,17 @@ public class GraduationService {
                 schoolObj.setMincode(schoolDetails.getMinCode());
                 schoolObj.setName(schoolDetails.getSchoolName());
                 ReportData gradReport;
-                switch(type) {
+                switch (type) {
                     case GRADREG:
-                        List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), REGALG);
+                        List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
                         gradReport = getReportDataObj(schoolObj, gradRegStudents);
                         return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
                     case NONGRADREG:
-                        List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), REGALG);
+                        List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
                         gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
                         return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
                     case NONGRADPRJ:
-                        List<Student> nonGradPrjStudents = processStudentList(stdList, "TVRRUN");
+                        List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
                         gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
                         return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
                     default:
@@ -189,20 +190,20 @@ public class GraduationService {
                     ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
                     schoolObj.setName(schoolDetails.getSchoolName());
-                    if (type.equalsIgnoreCase("TVRRUN")) {
-                        List<Student> nonGradPrjStudents = processStudentList(stdList, type);
-                        if(!nonGradPrjStudents.isEmpty()) {
+                    if (TVRRUN.equalsIgnoreCase(type)) {
+                        List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
+                        if (!nonGradPrjStudents.isEmpty()) {
                             logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
                             numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
                         }
                     } else {
-                        List<Student> gradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() != null).collect(Collectors.toList()), type);
-                        if(!gradRegStudents.isEmpty()) {
+                        List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
+                        if (!gradRegStudents.isEmpty()) {
                             logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         }
-                        List<Student> nonGradRegStudents = processStudentList(stdList.stream().filter(c->c.getProgramCompletionDate() == null).collect(Collectors.toList()), type);
-                        if(!nonGradRegStudents.isEmpty()) {
+                        List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
+                        if (!nonGradRegStudents.isEmpty()) {
                             logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                         }
@@ -213,6 +214,19 @@ public class GraduationService {
         return numberOfReports;
     }
 
+    private List<GraduationStudentRecord> filterStudentList(List<GraduationStudentRecord> stdList, String type) {
+        stdList.removeIf(p -> !"CUR".equalsIgnoreCase(p.getStudentStatus()));
+        switch (type) {
+            case GRADREG:
+                return stdList.stream().filter(c -> (c.getProgramCompletionDate() != null && !"SCCP".equalsIgnoreCase(c.getProgram()))).collect(Collectors.toList());
+            case NONGRADREG:
+                return stdList.stream().filter(c -> c.getProgramCompletionDate() == null && ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).collect(Collectors.toList());
+            case NONGRADPRJ:
+                return stdList.stream().filter(c -> ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).collect(Collectors.toList());
+            default:
+                return stdList;
+        }
+    }
 
     private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
         ReportData gradReport = getReportDataObj(schoolObj, stdList);
@@ -248,33 +262,31 @@ public class GraduationService {
     private List<Student> processStudentList(List<GraduationStudentRecord> gradStudList, String type) {
         List<Student> stdPrjList = new ArrayList<>();
         for (GraduationStudentRecord gsr : gradStudList) {
-            if (gsr.getStudentStatus().equals("CUR") && (gsr.getStudentGrade().equalsIgnoreCase("AD") || gsr.getStudentGrade().equalsIgnoreCase("12"))) {
-                Student std = new Student();
-                std.setFirstName(gsr.getLegalFirstName());
-                std.setLastName(gsr.getLegalLastName());
-                std.setMiddleName(gsr.getLegalMiddleNames());
-                Pen pen = new Pen();
-                pen.setPen(gsr.getPen());
-                pen.setEntityID(gsr.getStudentID());
-                std.setPen(pen);
-                std.setGrade(gsr.getStudentGrade());
-                std.setGradProgram(gsr.getProgram());
-                std.setLastUpdateDate(gsr.getUpdateDate());
-                if (type.equalsIgnoreCase(REGALG)) {
-                    ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
-                    gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
-                    gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
-                    std.setGraduationData(gradData);
-                    std.setNonGradReasons(getNonGradReasons(gsr.getNonGradReasons()));
-                    stdPrjList.add(std);
-                } else {
-                    std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
-                    if (gsr.getStudentProjectedGradData() != null) {
-                        ProjectedRunClob projectedClob = new ObjectMapper().readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
-                        std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
-                        if (!projectedClob.isGraduated())
-                            stdPrjList.add(std);
-                    }
+            Student std = new Student();
+            std.setFirstName(gsr.getLegalFirstName());
+            std.setLastName(gsr.getLegalLastName());
+            std.setMiddleName(gsr.getLegalMiddleNames());
+            Pen pen = new Pen();
+            pen.setPen(gsr.getPen());
+            pen.setEntityID(gsr.getStudentID());
+            std.setPen(pen);
+            std.setGrade(gsr.getStudentGrade());
+            std.setGradProgram(gsr.getProgram());
+            std.setLastUpdateDate(gsr.getUpdateDate());
+            if (type.equalsIgnoreCase(REGALG)) {
+                ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
+                gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
+                gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
+                std.setGraduationData(gradData);
+                std.setNonGradReasons(getNonGradReasons(gsr.getNonGradReasons()));
+                stdPrjList.add(std);
+            } else {
+                std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
+                if (gsr.getStudentProjectedGradData() != null) {
+                    ProjectedRunClob projectedClob = new ObjectMapper().readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
+                    std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
+                    if (!projectedClob.isGraduated())
+                        stdPrjList.add(std);
                 }
             }
         }
