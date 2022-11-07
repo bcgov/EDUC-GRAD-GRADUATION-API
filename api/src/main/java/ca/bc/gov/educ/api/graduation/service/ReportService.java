@@ -718,6 +718,7 @@ public class ReportService {
             tList.add(result);
         }
         if (!tList.isEmpty()) {
+            tList.removeIf(a->"A".equalsIgnoreCase(a.getSpecialCase()) && ((graduationProgramCode.getProgramCode().contains("SCCP") || graduationProgramCode.getProgramCode().contains("1950"))));
             tList.sort(Comparator.comparing(AssessmentResult::getAssessmentCode)
                     .thenComparing(AssessmentResult::getSessionDate));
         }
