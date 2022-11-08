@@ -328,7 +328,7 @@ public class ReportService {
                 notCompletedCourse = xml && diff <= 0;
             }
             if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected())) {
-                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0) {
+                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && (sc.getSpecialCase().compareTo("E") == 0 || sc.getSpecialCase().compareTo("A") == 0)) {
                     skipProcessing = true;
                 }
                 if (!skipProcessing) {
@@ -636,7 +636,7 @@ public class ReportService {
         data.setStudentCourses(processStudentCourses(sCourseList, studentCourseList));
         Assessment achv = new Assessment();
         achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
-        achv.setResults(getAssessmentResults(studentAssessmentList, accessToken));
+        achv.setResults(getAssessmentResults(studentAssessmentList, graduationDataStatus.getGradProgram(), accessToken));
         data.setAssessment(achv);
         data.setStudentExams(processStudentExams(sExamList, studentExamList));
     }
@@ -703,7 +703,7 @@ public class ReportService {
         return sCourseList;
     }
 
-    private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList, String accessToken) {
+    private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList, GraduationProgramCode graduationProgramCode, String accessToken) {
         List<AssessmentResult> tList = new ArrayList<>();
         for (StudentAssessment sA : studentAssessmentList) {
             AssessmentResult result = new AssessmentResult();
@@ -718,6 +718,7 @@ public class ReportService {
             tList.add(result);
         }
         if (!tList.isEmpty()) {
+            tList.removeIf(a->"A".equalsIgnoreCase(a.getSpecialCase()) && (graduationProgramCode.getProgramCode().contains("SCCP") || graduationProgramCode.getProgramCode().contains("1950")));
             tList.sort(Comparator.comparing(AssessmentResult::getAssessmentCode)
                     .thenComparing(AssessmentResult::getSessionDate));
         }
