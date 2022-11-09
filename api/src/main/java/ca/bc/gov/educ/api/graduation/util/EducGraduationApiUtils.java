@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -139,7 +140,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static Date parsingTraxDate(String sessionDate) {
-		String actualSessionDate = sessionDate + "/01";
+		String actualSessionDate = StringUtils.countMatches(sessionDate, "/") == 2 ? sessionDate : sessionDate + "/01";
 		Date sDate = null;
 		Date temp = EducGraduationApiUtils.parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
 		String sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -148,7 +149,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String parsingNFormating(String inDate) {
-		String actualDate = inDate + "/01";
+		String actualDate = StringUtils.countMatches(inDate, "/") == 2 ? inDate : inDate + "/01";
 		String sDates = null;
 		Date temp = EducGraduationApiUtils.parseDate(actualDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
 		sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -156,6 +157,9 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String getSimpleDateFormat(Date date) {
+		if(date == null) {
+			return null;
+		}
 		SimpleDateFormat formatter = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return formatter.format(date);
 	}

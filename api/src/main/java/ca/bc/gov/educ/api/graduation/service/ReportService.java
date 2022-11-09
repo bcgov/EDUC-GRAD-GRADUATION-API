@@ -103,17 +103,20 @@ public class ReportService {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
+            GraduationData graduationData = getGraduationData(graduationDataStatus);
+            graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
             data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
             data.setGradMessage(graduationStatus.getGraduationMessage());
             data.setGraduationStatus(graduationStatus);
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-            data.setGraduationData(getGraduationData(graduationDataStatus));
+            data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
             data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+            data.getStudent().setGraduationData(graduationData);
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -134,7 +137,7 @@ public class ReportService {
                         "Student ID can't be NULL");
             }
 
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken, exception);
+            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken);
             return prepareTranscriptData(graduationDataStatus, graduationStudentRecord, xml, accessToken, exception);
         } catch (Exception e) {
             exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
@@ -147,8 +150,8 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(String pen, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken, exception);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken, exception);
+            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
+            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
             if (graduationStudentRecord.getStudentGradData() == null) {
                 throw new EntityNotFoundException(
                         ReportService.class, String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
@@ -164,7 +167,7 @@ public class ReportService {
         return errorData;
     }
 
-    private GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken, ExceptionMessage exception) {
+    private GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken) {
         List<GradSearchStudent> stuDataList = webClient.get().uri(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(), pen))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
@@ -178,7 +181,7 @@ public class ReportService {
                 ReportService.class, String.format("Student with PEN %s value not exists in PEN system", pen));
     }
 
-    private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID, String accessToken, ExceptionMessage exception) {
+    private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID, String accessToken) {
         GraduationStudentRecord graduationStudentRecord = webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(), studentID))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
@@ -325,23 +328,10 @@ public class ReportService {
                 notCompletedCourse = xml && diff <= 0;
             }
             if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected())) {
-                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && sc.getSpecialCase().compareTo("E") == 0) {
+                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && (sc.getSpecialCase().compareTo("E") == 0 || sc.getSpecialCase().compareTo("A") == 0)) {
                     skipProcessing = true;
                 }
                 if (!skipProcessing) {
-                    String finalPercent = getValue(sc.getProficiencyScore());
-                    String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-                    if (sc.getSessionDate() != null) {
-                        String sessionDate = sc.getSessionDate() + "/01";
-                        Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-                        sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-
-                        int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
-
-                        if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-                            continue;
-                        }
-                    }
                     TranscriptResult result = new TranscriptResult();
                     TranscriptCourse crse = new TranscriptCourse();
                     crse.setCode(sc.getAssessmentCode());
@@ -433,20 +423,8 @@ public class ReportService {
         }
     }
 
-    private String getAssessmentFinalPercentAchievement(StudentAssessment sA, Date assessmentReleaseDate, String accessToken) {
+    private String getAssessmentFinalPercentAchievement(StudentAssessment sA, String accessToken) {
         String finalPercent = getValue(sA.getProficiencyScore());
-        if (sA.getSessionDate() != null) {
-            String cutoffDate = EducGraduationApiUtils.formatDate(assessmentReleaseDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-            String sessionDate = sA.getSessionDate() + "/01";
-            Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-            sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-
-            int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
-
-            if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-                return "";
-            }
-        }
         if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim())) {
             finalPercent = getSpecialCase(sA, accessToken);
         }
@@ -658,7 +636,7 @@ public class ReportService {
         data.setStudentCourses(processStudentCourses(sCourseList, studentCourseList));
         Assessment achv = new Assessment();
         achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
-        achv.setResults(getAssessmentResults(studentAssessmentList, graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), accessToken));
+        achv.setResults(getAssessmentResults(studentAssessmentList, graduationDataStatus.getGradProgram(), accessToken));
         data.setAssessment(achv);
         data.setStudentExams(processStudentExams(sExamList, studentExamList));
     }
@@ -725,7 +703,7 @@ public class ReportService {
         return sCourseList;
     }
 
-    private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList, Date assessmentReleaseDate, String accessToken) {
+    private List<AssessmentResult> getAssessmentResults(List<StudentAssessment> studentAssessmentList, GraduationProgramCode graduationProgramCode, String accessToken) {
         List<AssessmentResult> tList = new ArrayList<>();
         for (StudentAssessment sA : studentAssessmentList) {
             AssessmentResult result = new AssessmentResult();
@@ -733,13 +711,14 @@ public class ReportService {
             result.setAssessmentName(sA.getAssessmentName());
             result.setGradReqMet(sA.getGradReqMet());
             result.setSessionDate(sA.getSessionDate() != null ? sA.getSessionDate() : "");
-            result.setProficiencyScore(getAssessmentFinalPercentAchievement(sA, assessmentReleaseDate, accessToken));
+            result.setProficiencyScore(getAssessmentFinalPercentAchievement(sA, accessToken));
             result.setSpecialCase(sA.getSpecialCase());
             result.setExceededWriteFlag(sA.getExceededWriteFlag());
             result.setProjected(sA.isProjected());
             tList.add(result);
         }
         if (!tList.isEmpty()) {
+            tList.removeIf(a->"A".equalsIgnoreCase(a.getSpecialCase()) && (graduationProgramCode.getProgramCode().contains("SCCP") || graduationProgramCode.getProgramCode().contains("1950")));
             tList.sort(Comparator.comparing(AssessmentResult::getAssessmentCode)
                     .thenComparing(AssessmentResult::getSessionDate));
         }
@@ -801,8 +780,8 @@ public class ReportService {
 
     public ReportData prepareCertificateData(String pen, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken, exception);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken, exception);
+            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
+            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
             if (graduationStudentRecord.getStudentGradData() == null) {
                 throw new EntityNotFoundException(
                         ReportService.class,
@@ -828,7 +807,7 @@ public class ReportService {
                         "Student ID can't be NULL");
             }
 
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken, exception);
+            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(studentID, accessToken);
             return prepareCertificateData(graduationStudentRecord, graduationDataStatus, accessToken);
         } catch (Exception e) {
             exception.setExceptionName("PREPARE REPORT DATA FROM GRADUATION STATUS");
@@ -854,12 +833,14 @@ public class ReportService {
     public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
+        GraduationData graduationData = getGraduationData(graduationDataStatus);
         data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
-        data.setGraduationData(getGraduationData(graduationDataStatus));
+        data.setGraduationData(graduationData);
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
         data.setCertificate(getCertificateData(gradResponse, certType));
+        data.getStudent().setGraduationData(graduationData);
         switch (certType.getCertificateTypeCode()) {
             case "F":
             case "SCF":
