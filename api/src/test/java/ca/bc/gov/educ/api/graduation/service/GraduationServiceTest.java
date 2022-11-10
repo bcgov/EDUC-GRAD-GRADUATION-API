@@ -159,6 +159,26 @@ public class GraduationServiceTest {
 	}
 
 	@Test
+	public void testGraduateStudent_when_gradResponse_has_exception() {
+		String studentID = new UUID(1, 1).toString();
+		String projectedType="REGFM";
+		String accessToken="accessToken";
+		ExceptionMessage exception = new ExceptionMessage();
+
+		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken, exception)).thenCallRealMethod();
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(), studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenThrow(new RuntimeException("Unknown Exception"));
+
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		assertNotNull(response);
+		assertNotNull(response.getException());
+	}
+
+	@Test
 	public void testGraduateStudent_excep_1() {
 		String studentID = new UUID(1, 1).toString();
 		String projectedType="REGFM";

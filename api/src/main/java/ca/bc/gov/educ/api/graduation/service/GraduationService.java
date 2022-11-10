@@ -130,10 +130,8 @@ public class GraduationService {
         reportParams.setData(reportData);
 
         return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 
     }
 
@@ -327,10 +325,8 @@ public class GraduationService {
         reportParams.setData(data);
 
         return webClient.post().uri(educGraduationApiConstants.getSchoolGraduation())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 
     }
 
@@ -349,10 +345,8 @@ public class GraduationService {
 
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
         webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -369,10 +363,8 @@ public class GraduationService {
         reportParams.setData(data);
 
         return webClient.post().uri(educGraduationApiConstants.getSchoolNonGraduation())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
 
     }
 
@@ -399,10 +391,8 @@ public class GraduationService {
         reportParams.setData(data);
 
         return webClient.post().uri(educGraduationApiConstants.getNonGradProjected())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
     }
 
     private void createAndSaveSchoolReportNonGradPrjReport(ReportData data, String mincode, String accessToken) {
