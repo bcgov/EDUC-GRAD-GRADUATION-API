@@ -27,8 +27,9 @@ public class TokenUtils {
         this.webClient = webClient;
     }
 
-    public Pair<String, Long> checkAndGetAccessToken(long startTime, String accessToken) {
+    public Pair<String, Long> checkAndGetAccessToken(Pair<String, Long> req) {
         long currentTime = System.currentTimeMillis();
+        long startTime = req.getRight();
         long diff = (currentTime - startTime)/1000;
 
         logger.info("=========> Check Duration: {} sec <===========", diff);
@@ -38,6 +39,16 @@ public class TokenUtils {
             if (responseObj != null) {
                 return Pair.of(responseObj.getAccess_token(), currentTime);
             }
+        }
+        return req;
+    }
+
+    public Pair<String, Long> getAccessToken(String accessToken) {
+        long startTime = System.currentTimeMillis();
+        logger.info("=========> Getting the new Access Token at the beginning <===========");
+        ResponseObj responseObj = getTokenResponseObject();
+        if (responseObj != null) {
+            return Pair.of(responseObj.getAccess_token(), startTime);
         }
         return Pair.of(accessToken, startTime);
     }
@@ -54,6 +65,17 @@ public class TokenUtils {
                 processorData.setAccessToken(responseObj.getAccess_token());
                 processorData.setStartTime(currentTime);
             }
+        }
+    }
+
+    public void setAccessToken(ProcessorData processorData) {
+        long startTime = System.currentTimeMillis();
+
+        logger.info("=========> Getting the new Access Token at the beginning <===========");
+        ResponseObj responseObj = getTokenResponseObject();
+        if (responseObj != null) {
+            processorData.setAccessToken(responseObj.getAccess_token());
+            processorData.setStartTime(startTime);
         }
     }
 

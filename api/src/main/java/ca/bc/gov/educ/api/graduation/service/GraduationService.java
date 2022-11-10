@@ -139,11 +139,15 @@ public class GraduationService {
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
         byte[] result = new byte[0];
-        long startTime = System.currentTimeMillis();
+        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
+        int i = 0;
         for (String usl : uniqueSchoolList) {
-            Pair<String, Long> res = getAccessToken(startTime, accessToken);
+            if (i == 0) {
+                res = getAccessToken(accessToken);
+            } else {
+                res = checkAndGetAccessToken(res);
+            }
             accessToken = res.getLeft();
-            startTime = res.getRight();
 
             List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
             SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
@@ -169,18 +173,23 @@ public class GraduationService {
                         return result;
                 }
             }
+            i++;
         }
         return result;
     }
 
     public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
         int numberOfReports = 0;
-        long startTime = System.currentTimeMillis();
+        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
         ExceptionMessage exception = new ExceptionMessage();
+        int i = 0;
         for (String usl : uniqueSchoolList) {
-            Pair<String, Long> res = getAccessToken(startTime, accessToken);
+            if (i == 0) {
+                res = getAccessToken(accessToken);
+            } else {
+                res = checkAndGetAccessToken(res);
+            }
             accessToken = res.getLeft();
-            startTime = res.getRight();
 
             List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
             SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
@@ -202,6 +211,8 @@ public class GraduationService {
                             logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         }
+                        res = checkAndGetAccessToken(res);
+                        accessToken = res.getLeft();
                         List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                         if (!nonGradRegStudents.isEmpty()) {
                             logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
@@ -210,6 +221,7 @@ public class GraduationService {
                     }
                 }
             }
+            i++;
         }
         return numberOfReports;
     }
@@ -413,8 +425,12 @@ public class GraduationService {
         return requestObj;
     }
 
-    private Pair<String, Long> getAccessToken(long startTime, String accessToken) {
-        return tokenUtils.checkAndGetAccessToken(startTime, accessToken);
+    private Pair<String, Long> checkAndGetAccessToken(Pair<String, Long> req) {
+        return tokenUtils.checkAndGetAccessToken(req);
+    }
+
+    private Pair<String, Long> getAccessToken(String accessToken) {
+        return tokenUtils.getAccessToken(accessToken);
     }
 
 }
