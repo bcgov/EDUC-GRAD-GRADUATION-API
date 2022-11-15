@@ -58,9 +58,9 @@ public class AlgorithmSupport {
                                 } else if (("A".equalsIgnoreCase(certType.getCertificateTypeCode()) || "AI".equalsIgnoreCase(certType.getCertificateTypeCode()))  && "DD".equalsIgnoreCase(optionalProgram.getOptionalProgramCode())) {
                                     createCertificate = true;
                                 }
-                                if(createCertificate) {
-                                    reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
-                                }
+                            }
+                            if(createCertificate) {
+                                reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
                             }
                         } else {
                             reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
