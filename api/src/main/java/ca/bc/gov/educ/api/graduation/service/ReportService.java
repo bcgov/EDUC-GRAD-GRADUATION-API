@@ -725,7 +725,7 @@ public class ReportService {
         return tList;
     }
 
-    public void saveStudentTranscriptReportJasper(ReportData sample, String accessToken, UUID studentID, ExceptionMessage exception, boolean isGraduated) {
+    public void saveStudentTranscriptReportJasper(ReportData sample, String accessToken, UUID studentID, ExceptionMessage exception, boolean isGraduated, boolean overwrite) {
 
         String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken, exception);
         GradStudentTranscripts requestObj = new GradStudentTranscripts();
@@ -733,6 +733,7 @@ public class ReportService {
         requestObj.setStudentID(studentID);
         requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
         requestObj.setDocumentStatusCode("IP");
+        requestObj.setOverwrite(overwrite);
         if (isGraduated)
             requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 

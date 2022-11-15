@@ -52,7 +52,7 @@ public class GraduateStudentProcess extends BaseProcess {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				ExceptionMessage eMsg = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
+				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "GS");
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");

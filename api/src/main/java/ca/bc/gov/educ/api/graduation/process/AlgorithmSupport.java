@@ -41,15 +41,31 @@ public class AlgorithmSupport {
         return false;
     }
 
-    public ExceptionMessage createReportNCert(GraduationData graduationDataStatus, GraduationStudentRecord graduationStatusResponse, GraduationStudentRecord gradResponse, List<StudentOptionalProgram> projectedOptionalGradResponse, ExceptionMessage exception, ReportData data,ProcessorData processorData) {
+    public ExceptionMessage createStudentCertificateTranscriptReports(GraduationData graduationDataStatus, GraduationStudentRecord graduationStatusResponse, GraduationStudentRecord gradResponse, List<StudentOptionalProgram> projectedOptionalGradResponse, ExceptionMessage exception, ReportData data, ProcessorData processorData, String processName) {
         if(graduationDataStatus != null) {
             try {
                 if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null && graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getCertificateEligibility().equalsIgnoreCase("Y")) {
                     List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
                     tokenUtils.checkAndSetAccessToken(processorData);
                     for (ProgramCertificateTranscript certType : certificateList) {
-                        reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
-                        logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                        if("FMR".equalsIgnoreCase(processName)) {
+                            boolean createCertificate = false;
+                            for(StudentOptionalProgram optionalProgram :projectedOptionalGradResponse) {
+                                if ("F".equalsIgnoreCase(certType.getCertificateTypeCode()) && "FI".equalsIgnoreCase(optionalProgram.getOptionalProgramCode())) {
+                                    createCertificate = true;
+                                } else if (("E".equalsIgnoreCase(certType.getCertificateTypeCode()) || "EI".equalsIgnoreCase(certType.getCertificateTypeCode()))  && "DD".equalsIgnoreCase(optionalProgram.getOptionalProgramCode())) {
+                                    createCertificate = true;
+                                } else if (("A".equalsIgnoreCase(certType.getCertificateTypeCode()) || "AI".equalsIgnoreCase(certType.getCertificateTypeCode()))  && "DD".equalsIgnoreCase(optionalProgram.getOptionalProgramCode())) {
+                                    createCertificate = true;
+                                }
+                                if(createCertificate) {
+                                    reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
+                                }
+                            }
+                        } else {
+                            reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
+                            logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                        }
                     }
                 }
 
@@ -57,7 +73,7 @@ public class AlgorithmSupport {
                     logger.info("**** No Transcript Generated: ****");
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
                     tokenUtils.checkAndSetAccessToken(processorData);
-                    reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+                    reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
                     logger.info("**** Saved Reports: ****");
                 }
             }catch (Exception e) {
