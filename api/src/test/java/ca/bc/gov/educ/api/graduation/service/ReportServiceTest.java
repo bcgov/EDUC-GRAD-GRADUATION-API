@@ -226,7 +226,7 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentReports.class)).thenReturn(Mono.just(rep));		
 
-		reportService.saveStudentTranscriptReportJasper(data, accessToken, UUID.fromString(studentID),exception,isGraduated);
+		reportService.saveStudentTranscriptReportJasper(data, accessToken, UUID.fromString(studentID),exception,isGraduated, false);
 		assertThat(exception.getExceptionName()).isNull();
 	}
 
