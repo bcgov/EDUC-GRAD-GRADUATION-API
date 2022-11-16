@@ -24,6 +24,7 @@ public class GraduateStudentProcess extends BaseProcess {
 	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
 		logger.info("************* TIME START  ************ {}",startTime);
+		tokenUtils.setAccessToken(processorData);
 		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
@@ -51,7 +52,7 @@ public class GraduateStudentProcess extends BaseProcess {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				ExceptionMessage eMsg = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
+				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "GS");
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");

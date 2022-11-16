@@ -27,17 +27,28 @@ public class TokenUtils {
         this.webClient = webClient;
     }
 
-    public Pair<String, Long> checkAndGetAccessToken(long startTime, String accessToken) {
+    public Pair<String, Long> checkAndGetAccessToken(Pair<String, Long> req) {
         long currentTime = System.currentTimeMillis();
+        long startTime = req.getRight();
         long diff = (currentTime - startTime)/1000;
 
-        logger.info("=========> Check Duration: {} sec <===========", diff);
+        logger.debug("=========> Check Duration: {} sec <===========", diff);
         if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
-            logger.info("=========> Getting the new Access Token after 2 minutes <===========");
+            logger.debug("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 return Pair.of(responseObj.getAccess_token(), currentTime);
             }
+        }
+        return req;
+    }
+
+    public Pair<String, Long> getAccessToken(String accessToken) {
+        long startTime = System.currentTimeMillis();
+        logger.debug("=========> Getting the new Access Token at the beginning <===========");
+        ResponseObj responseObj = getTokenResponseObject();
+        if (responseObj != null) {
+            return Pair.of(responseObj.getAccess_token(), startTime);
         }
         return Pair.of(accessToken, startTime);
     }
@@ -46,14 +57,25 @@ public class TokenUtils {
         long currentTime = System.currentTimeMillis();
         long diff = (currentTime - processorData.getStartTime())/1000;
 
-        logger.info("=========> Check Duration: {} sec <===========", diff);
+        logger.debug("=========> Check Duration: {} sec <===========", diff);
         if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
-            logger.info("=========> Getting the new Access Token after 2 minutes <===========");
+            logger.debug("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 processorData.setAccessToken(responseObj.getAccess_token());
                 processorData.setStartTime(currentTime);
             }
+        }
+    }
+
+    public void setAccessToken(ProcessorData processorData) {
+        long startTime = System.currentTimeMillis();
+
+        logger.debug("=========> Getting the new Access Token at the beginning <===========");
+        ResponseObj responseObj = getTokenResponseObject();
+        if (responseObj != null) {
+            processorData.setAccessToken(responseObj.getAccess_token());
+            processorData.setStartTime(startTime);
         }
     }
 
