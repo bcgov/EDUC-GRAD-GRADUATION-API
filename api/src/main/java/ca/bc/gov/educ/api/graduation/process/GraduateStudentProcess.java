@@ -38,20 +38,20 @@ public class GraduateStudentProcess extends BaseProcess {
 
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
-			tokenUtils.checkAndSetAccessToken(processorData);
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
-			ReportData data = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, false, processorData.getAccessToken(),exception);
-			if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
-				return processorData;
-			}
-			logger.info("**** Prepared Data for Reports: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
-				tokenUtils.checkAndSetAccessToken(processorData);
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
 				if (checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
+				tokenUtils.checkAndSetAccessToken(processorData);
+				ReportData data = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, false, processorData.getAccessToken(),exception);
+				if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
+					return processorData;
+				}
+				logger.info("**** Prepared Data for Reports: ****");
+				tokenUtils.checkAndSetAccessToken(processorData);
 				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "GS");
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
