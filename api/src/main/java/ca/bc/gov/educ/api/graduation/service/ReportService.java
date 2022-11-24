@@ -8,10 +8,7 @@ import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.model.report.*;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
-import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
-import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
@@ -318,7 +315,11 @@ public class ReportService {
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml, String accessToken) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-        for (StudentAssessment sc : studentAssessmentList) {
+        List<StudentAssessment> processList = studentAssessmentList;
+        if(xml) {
+            processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList);
+        }
+        for (StudentAssessment sc : processList) {
             boolean skipProcessing = false;
             boolean notCompletedCourse = false;
             if (sc.getSessionDate() != null) {
@@ -358,6 +359,17 @@ public class ReportService {
                 }
             }
         }
+    }
+
+    public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList) {
+        if(studentAssessmentList == null) {
+            return new ArrayList<StudentAssessment>();
+        }
+        return studentAssessmentList.stream()
+                .map(StudentAssessmentDuplicatesWrapper::new)
+                .distinct()
+                .map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
+                .collect(Collectors.toList());
     }
 
     private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken) {
