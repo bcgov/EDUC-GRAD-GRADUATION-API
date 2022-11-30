@@ -502,12 +502,14 @@ public class ReportService {
             }
         }
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = graduationDataStatus.getOptionalGradStatus();
-        optionalGradStatus.removeIf(p -> "DD".equalsIgnoreCase(p.getOptionalProgramCode()) || "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
-        for(GradAlgorithmOptionalStudentProgram op: optionalGradStatus) {
-            if("FI".equalsIgnoreCase(op.getOptionalProgramCode())) {
-                data.getProgramCodes().add("FIP");
-            } else {
-                data.getProgramCodes().add(op.getOptionalProgramCode());
+        if(optionalGradStatus != null) {
+            optionalGradStatus.removeIf(p -> "DD".equalsIgnoreCase(p.getOptionalProgramCode()) || "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
+            for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
+                if ("FI".equalsIgnoreCase(op.getOptionalProgramCode())) {
+                    data.getProgramCodes().add("FIP");
+                } else {
+                    data.getProgramCodes().add(op.getOptionalProgramCode());
+                }
             }
         }
         return data;
