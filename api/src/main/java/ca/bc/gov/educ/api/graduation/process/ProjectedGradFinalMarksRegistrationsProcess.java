@@ -32,7 +32,10 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		}
 		logger.info("**** Grad Algorithm Completed: ****");
 		//Code to prepare achievement report
-		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(graduationDataStatus.isGraduated()).nonGradReasons(graduationDataStatus.getNonGradReasons()).build();
+		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder()
+				.graduated(graduationDataStatus.isGraduated())
+				.nonGradReasons(graduationDataStatus.getNonGradReasons())
+				.build();
 		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
 		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
