@@ -506,16 +506,18 @@ public class ReportService {
             optionalGradStatus.removeIf(p -> "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
             for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
                 String code = op.getOptionalProgramCode();
-                switch(code) {
-                    case "FI":
-                        data.getProgramCodes().add("FIP");
-                        break;
-                    case "DD":
-                        data.getProgramCodes().add("PFD");
-                        break;
-                    default:
-                        data.getProgramCodes().add(code);
-                        break;
+                if(!StringUtils.isBlank(code)) {
+                    switch (code) {
+                        case "FI":
+                            data.getProgramCodes().add("FIP");
+                            break;
+                        case "DD":
+                            data.getProgramCodes().add("PFD");
+                            break;
+                        default:
+                            data.getProgramCodes().add(code);
+                            break;
+                    }
                 }
             }
         }
