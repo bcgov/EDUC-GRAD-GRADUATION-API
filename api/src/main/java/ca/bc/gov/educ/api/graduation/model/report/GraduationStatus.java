@@ -1,7 +1,14 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class GraduationStatus implements Serializable {
 
     private static final long serialVersionUID = 2L;
@@ -105,4 +112,6 @@ public class GraduationStatus implements Serializable {
     public void setProgramName(String programName) {
         this.programName = programName;
     }
+
+
 }

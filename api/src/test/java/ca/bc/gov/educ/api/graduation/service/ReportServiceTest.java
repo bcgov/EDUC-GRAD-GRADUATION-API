@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.graduation.model.report.Transcript;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
+import ca.bc.gov.educ.api.graduation.util.StudentAssessmentDuplicatesWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -2195,6 +2197,90 @@ public class ReportServiceTest {
 		assertNull(data.getStudent());
 		assertNull(data.getCertificate());
 
+	}
+
+	@Test
+	public void testRemoveDuplicatedAssessments() throws Exception {
+		StudentAssessment assessment1 = new StudentAssessment();
+		assessment1.setPen("128309473");
+		assessment1.setAssessmentCode("LTE12");
+		assessment1.setAssessmentName("Literacy 12");
+		assessment1.setSessionDate("2022/04");
+		assessment1.setUsed(true);
+		assessment1.setProjected(false);
+
+		StudentAssessment assessment2 = new StudentAssessment();
+		assessment2.setPen("128309473");
+		assessment2.setAssessmentCode("LTE12");
+		assessment2.setAssessmentName("Literacy 12");
+		assessment2.setSessionDate("2023/01");
+		assessment2.setUsed(false);
+		assessment2.setProjected(true);
+
+		StudentAssessment assessment3 = new StudentAssessment();
+		assessment3.setPen("128309473");
+		assessment3.setAssessmentCode("LTE10");
+		assessment3.setAssessmentName("Literacy 10");
+		assessment3.setSessionDate("2020/01");
+		assessment3.setGradReqMet("15");
+		assessment3.setGradReqMetDetail("15 - Literacy 10 Assessment");
+		assessment3.setProficiencyScore(3.0D);
+		assessment3.setUsed(true);
+		assessment3.setProjected(false);
+
+		StudentAssessment assessment4 = new StudentAssessment();
+		assessment4.setPen("128309473");
+		assessment4.setAssessmentCode("NME10");
+		assessment4.setAssessmentName("Numeracy 10");
+		assessment4.setSessionDate("2021/01");
+		assessment4.setGradReqMet("16");
+		assessment4.setGradReqMetDetail("16 - Numeracy 10 Assessment");
+		assessment4.setProficiencyScore(1.0D);
+		assessment4.setUsed(true);
+		assessment4.setProjected(false);
+
+		StudentAssessment assessment5 = new StudentAssessment();
+		assessment5.setPen("128309473");
+		assessment5.setAssessmentCode("NME10");
+		assessment5.setAssessmentName("Numeracy 10");
+		assessment5.setSessionDate("2020/04");
+		assessment5.setUsed(false);
+		assessment5.setProjected(false);
+
+		StudentAssessment assessment6 = new StudentAssessment();
+		assessment6.setPen("128309473");
+		assessment6.setAssessmentCode("NME11");
+		assessment6.setAssessmentName("Numeracy 11");
+		assessment6.setSessionDate("2020/04");
+		assessment6.setUsed(false);
+		assessment6.setProjected(true);
+
+		StudentAssessment assessment7 = new StudentAssessment();
+		assessment7.setPen("128309473");
+		assessment7.setAssessmentCode("NME11");
+		assessment7.setAssessmentName("Numeracy 11");
+		assessment7.setSessionDate("2020/04");
+		assessment7.setUsed(true);
+		assessment7.setProjected(false);
+
+		StudentAssessment assessment8 = new StudentAssessment();
+		assessment8.setPen("128309473");
+		assessment8.setAssessmentCode("NME11");
+		assessment8.setAssessmentName("Numeracy 11");
+		assessment8.setSessionDate("2020/04");
+		assessment8.setUsed(false);
+		assessment8.setProjected(false);
+
+		List<StudentAssessment> studentAssessmentList = List.of(
+				assessment1, assessment2, assessment3, assessment4, assessment5, assessment6, assessment7, assessment8
+		);
+
+		List<StudentAssessment> result = studentAssessmentList.stream()
+				.map(StudentAssessmentDuplicatesWrapper::new)
+				.distinct()
+				.map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
+				.collect(Collectors.toList());
+		assertTrue(result.size() < 8);
 	}
 
 	protected GraduationData createGraduationData(String jsonPath) throws Exception {

@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
@@ -283,6 +284,17 @@ public class GraduationService {
             std.setGrade(gsr.getStudentGrade());
             std.setGradProgram(gsr.getProgram());
             std.setLastUpdateDate(gsr.getUpdateDate());
+            std.setGraduationStatus(GraduationStatus.builder()
+                            .programCompletionDate(gsr.getProgramCompletionDate())
+                            .honours(gsr.getHonoursStanding())
+                            .gpa(gsr.getGpa())
+                            .programName(gsr.getProgramName())
+                            .studentStatus(gsr.getStudentStatus())
+                            .studentStatusName(gsr.getStudentStatusName())
+                            .studentGrade(gsr.getStudentGrade())
+                            .schoolAtGrad(gsr.getSchoolAtGrad())
+                            .schoolOfRecord(gsr.getSchoolOfRecord())
+                    .build());
             if (type.equalsIgnoreCase(REGALG)) {
                 ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
                 gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
