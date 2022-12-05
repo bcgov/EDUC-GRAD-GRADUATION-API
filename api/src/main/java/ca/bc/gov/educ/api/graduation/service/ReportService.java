@@ -552,6 +552,7 @@ public class ReportService {
         std.setMiddleName(gradStudent.getLegalMiddleNames());
         std.setLastName(gradStudent.getLegalLastName());
         std.setGender(gradStudent.getGenderCode());
+        std.setCitizenship(gradStudent.getCitizenshipCode());
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
         pen.setEntityID(gradStudent.getStudentID());
@@ -626,6 +627,7 @@ public class ReportService {
     private Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
         Student studObj = new Student();
         studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
+        studObj.setCitizenship(studentObj.getCitizenshipCode());
         studObj.setFirstName(studentObj.getLegalFirstName());
         studObj.setLastName(studentObj.getLegalLastName());
         studObj.setGrade(studentObj.getStudentGrade());
