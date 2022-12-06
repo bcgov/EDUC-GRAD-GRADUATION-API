@@ -277,6 +277,7 @@ public class GraduationService {
             std.setFirstName(gsr.getLegalFirstName());
             std.setLastName(gsr.getLegalLastName());
             std.setMiddleName(gsr.getLegalMiddleNames());
+            std.setCitizenship(gsr.getStudentCitizenship());
             Pen pen = new Pen();
             pen.setPen(gsr.getPen());
             pen.setEntityID(gsr.getStudentID());
