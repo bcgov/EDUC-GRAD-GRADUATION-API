@@ -20,6 +20,7 @@ public class GradAlgorithmGraduationStudentRecord {
     private String schoolOfRecord;
     private String studentGrade;	
     private String studentStatus;
+    private String studentCitizenship;
     private UUID studentID;
     private String schoolAtGrad;
     private String consumerEducationRequirementMet;

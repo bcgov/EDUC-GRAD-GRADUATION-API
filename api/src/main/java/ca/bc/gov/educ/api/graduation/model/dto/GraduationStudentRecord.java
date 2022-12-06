@@ -32,6 +32,7 @@ public class GraduationStudentRecord extends BaseModel{
     private String legalFirstName;
     private String legalMiddleNames;
     private String legalLastName;
+    private String studentCitizenship;
 	private ExceptionMessage exception;
 
     private List<GradRequirement> nonGradReasons;
