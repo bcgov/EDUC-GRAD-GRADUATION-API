@@ -503,12 +503,21 @@ public class ReportService {
         }
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = graduationDataStatus.getOptionalGradStatus();
         if(optionalGradStatus != null) {
-            optionalGradStatus.removeIf(p -> "DD".equalsIgnoreCase(p.getOptionalProgramCode()) || "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
+            optionalGradStatus.removeIf(p -> "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
             for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
-                if ("FI".equalsIgnoreCase(op.getOptionalProgramCode())) {
-                    data.getProgramCodes().add("FIP");
-                } else {
-                    data.getProgramCodes().add(op.getOptionalProgramCode());
+                String code = op.getOptionalProgramCode();
+                if(!StringUtils.isBlank(code)) {
+                    switch (code) {
+                        case "FI":
+                            data.getProgramCodes().add("FIP");
+                            break;
+                        case "DD":
+                            data.getProgramCodes().add("PFD");
+                            break;
+                        default:
+                            data.getProgramCodes().add(code);
+                            break;
+                    }
                 }
             }
         }
@@ -543,6 +552,7 @@ public class ReportService {
         std.setMiddleName(gradStudent.getLegalMiddleNames());
         std.setLastName(gradStudent.getLegalLastName());
         std.setGender(gradStudent.getGenderCode());
+        std.setCitizenship(gradStudent.getStudentCitizenship());
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
         pen.setEntityID(gradStudent.getStudentID());
@@ -617,6 +627,7 @@ public class ReportService {
     private Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
         Student studObj = new Student();
         studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
+        studObj.setCitizenship(studentObj.getStudentCitizenship());
         studObj.setFirstName(studentObj.getLegalFirstName());
         studObj.setLastName(studentObj.getLegalLastName());
         studObj.setGrade(studentObj.getStudentGrade());
