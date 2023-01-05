@@ -118,14 +118,16 @@ public class GraduationService {
         }
     }
 
-    public byte[] prepareTranscriptReport(String pen, String interim, String accessToken) {
+    public byte[] prepareTranscriptReport(String pen, String interim, String preview, String accessToken) {
 
         boolean isInterim = StringUtils.trimToNull(Optional.ofNullable(interim).orElse("")) != null;
+        boolean isPreview = StringUtils.trimToNull(Optional.ofNullable(preview).orElse("")) != null;
         ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, accessToken, new ExceptionMessage());
 
         ReportOptions options = new ReportOptions();
         options.setReportFile("transcript");
         options.setReportName("Transcript Report.pdf");
+        options.setPreview(isPreview);
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
         reportParams.setData(reportData);

@@ -1779,7 +1779,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
 
-		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "accessToken");
+		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
 		assertNotNull(result);
 		assertNotEquals(0, result.length);
 
