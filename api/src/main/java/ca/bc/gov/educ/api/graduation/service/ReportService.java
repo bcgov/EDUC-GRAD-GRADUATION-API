@@ -1007,7 +1007,7 @@ public class ReportService {
         for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr : optionalRequirementsMet) {
             if (!gr.isProjected()) {
                 GradRequirement gRAchv = new GradRequirement();
-                gRAchv.setCode(gr.getRule());
+                gRAchv.setCode(gr.getTranscriptRule());
                 gRAchv.setDescription(gr.getDescription());
 
                 List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
