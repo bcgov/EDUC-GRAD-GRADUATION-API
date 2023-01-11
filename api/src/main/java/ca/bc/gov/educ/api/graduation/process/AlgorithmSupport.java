@@ -59,6 +59,10 @@ public class AlgorithmSupport {
                                     createCertificate = true;
                                 }
                             }
+                            if ("SCCP".equalsIgnoreCase(graduationStatusResponse.getProgram()) &&
+                                ("SC".equalsIgnoreCase(certType.getCertificateTypeCode()) || "SCF".equalsIgnoreCase(certType.getCertificateTypeCode()) || "SCI".equalsIgnoreCase(certType.getCertificateTypeCode())) ) {
+                                createCertificate = true;
+                            }
                             if(createCertificate) {
                                 reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
                             }

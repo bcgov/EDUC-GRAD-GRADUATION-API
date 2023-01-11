@@ -196,7 +196,7 @@ public class ReportService {
         if (nonGradReasons != null) {
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(StringUtils.isBlank(gR.getTranscriptRule()) ? gR.getRule() : gR.getTranscriptRule());
+                obj.setCode(gR.getRule());
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }
@@ -1007,7 +1007,7 @@ public class ReportService {
         for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr : optionalRequirementsMet) {
             if (!gr.isProjected()) {
                 GradRequirement gRAchv = new GradRequirement();
-                gRAchv.setCode(StringUtils.isBlank(gr.getTranscriptRule()) ? gr.getRule() : gr.getTranscriptRule());
+                gRAchv.setCode(gr.getTranscriptRule());
                 gRAchv.setDescription(gr.getDescription());
 
                 List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
@@ -1027,7 +1027,7 @@ public class ReportService {
                 grList.add(gRAchv);
             } else {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(StringUtils.isBlank(gr.getTranscriptRule()) ? gr.getRule() : gr.getTranscriptRule());
+                obj.setCode(gr.getRule());
                 obj.setDescription(gr.getDescription());
                 nonGradReasons.add(obj);
             }
