@@ -71,10 +71,12 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_TRANSCRIPT)
     @Operation(summary = "Get Transcript binary from graduation by student pen", description = "Get Transcript binary from graduation by student pen", tags = { "Graduation Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String interim,
-                                                      @RequestHeader(name="Authorization") String accessToken) {
+    public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen,
+                                                        @RequestParam(required = false) String interim,
+                                                        @RequestParam(required = false) String preview,
+                                                        @RequestHeader(name="Authorization") String accessToken) {
         LOGGER.debug("Report Data By Student Pen: {}", pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, accessToken.replace(BEARER, ""));
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview, accessToken.replace(BEARER, ""));
         if(resultBinary == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
