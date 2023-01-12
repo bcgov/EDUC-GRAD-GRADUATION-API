@@ -558,14 +558,12 @@ public class ReportService {
     }
 
     private List<ProgramRequirementCode> getAllProgramRequirementCodeList(String accessToken) {
-        UUID correlationID = UUID.randomUUID();
         final ParameterizedTypeReference<List<ProgramRequirementCode>> responseType = new ParameterizedTypeReference<>() {
         };
         return this.webClient.get()
                 .uri(educGraduationApiConstants.getProgramRequirementsEndpoint())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, correlationID.toString());
                 })
                 .retrieve().bodyToMono(responseType).block();
     }
