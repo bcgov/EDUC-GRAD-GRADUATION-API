@@ -562,9 +562,7 @@ public class ReportService {
         };
         return this.webClient.get()
                 .uri(educGraduationApiConstants.getProgramRequirementsEndpoint())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
