@@ -1545,12 +1545,6 @@ public class ReportServiceTest {
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
 		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("100");
-		programRequirementCode.setTraxReqChar("g");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
 		programRequirementCode.setProReqCode("105");
 		programRequirementCode.setTraxReqChar("h");
 
@@ -1808,12 +1802,6 @@ public class ReportServiceTest {
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
 		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("100");
-		programRequirementCode.setTraxReqChar("g");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
 		programRequirementCode.setProReqCode("105");
 		programRequirementCode.setTraxReqChar("h");
 
@@ -1936,12 +1924,6 @@ public class ReportServiceTest {
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
 		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("100");
-		programRequirementCode.setTraxReqChar("g");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
 		programRequirementCode.setProReqCode("105");
 		programRequirementCode.setTraxReqChar("h");
 

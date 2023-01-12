@@ -202,6 +202,7 @@ public class ReportService {
             }
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
                 String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getRule()), gR.getRule());
+                assert code != null;
                 NonGradReason obj = new NonGradReason();
                 obj.setCode(code);
                 obj.setDescription(gR.getDescription());
