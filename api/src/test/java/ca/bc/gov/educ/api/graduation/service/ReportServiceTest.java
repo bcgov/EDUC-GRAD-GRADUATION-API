@@ -1447,6 +1447,9 @@ public class ReportServiceTest {
 
 		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram,null, exception);
 		assertNotNull(data);
+		assertNotNull(data.getStudentExams());
+		assertNotNull(data.getStudentCourses());
+		assertNotNull(data.getNonGradReasons());
 	}
 
 	@Test
