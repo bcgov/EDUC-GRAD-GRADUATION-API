@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -200,9 +201,9 @@ public class ReportService {
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
-                String code = xml ? traxReqCodes.get(gR.getRule()) : gR.getRule();
+                String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getRule()), gR.getRule());
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(StringUtils.isBlank(code) ? gR.getRule() : code);
+                obj.setCode(code);
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }
