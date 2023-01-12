@@ -99,7 +99,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          timeout: '10'
+          timeout: '10m'
 
       # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
 
