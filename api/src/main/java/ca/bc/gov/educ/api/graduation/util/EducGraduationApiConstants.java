@@ -77,6 +77,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
     private String programNameEndpoint;
+
+    @Value("${endpoint.grad-program-api.program_requirement_codes.url}")
+    private String programRequirementsEndpoint;
     
     @Value("${endpoint.grad-student-api.save-optional-program-grad-status}")
     private String saveOptionalProgramGradStatus;

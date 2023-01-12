@@ -78,6 +78,8 @@ endpoint:
  grad-program-api: 
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s
+  program_requirement_codes:
+   url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programrequirementcode
  gradalgorithm-api: 
   gradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s
   projectedgradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b

@@ -1542,6 +1542,47 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolTrax.class)).thenReturn(Mono.just(schtrax));
 
+		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
+
+		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("100");
+		programRequirementCode.setTraxReqChar("g");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("105");
+		programRequirementCode.setTraxReqChar("h");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("109");
+		programRequirementCode.setTraxReqChar("I");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("113");
+		programRequirementCode.setTraxReqChar("n");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("117");
+		programRequirementCode.setTraxReqChar("i");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		ParameterizedTypeReference<List<ProgramRequirementCode>> programRequirementCodeResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(constants.getProgramRequirementsEndpoint())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
+
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
@@ -1764,6 +1805,47 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
 
+		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
+
+		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("100");
+		programRequirementCode.setTraxReqChar("g");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("105");
+		programRequirementCode.setTraxReqChar("h");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("109");
+		programRequirementCode.setTraxReqChar("I");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("113");
+		programRequirementCode.setTraxReqChar("n");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("117");
+		programRequirementCode.setTraxReqChar("i");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		ParameterizedTypeReference<List<ProgramRequirementCode>> programRequirementCodeResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(constants.getProgramRequirementsEndpoint())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
+
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
@@ -1850,6 +1932,47 @@ public class ReportServiceTest {
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(ProgramCertificateTranscript.class)).thenReturn(Mono.just(programCertificateTranscript));
+
+		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
+
+		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("100");
+		programRequirementCode.setTraxReqChar("g");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("105");
+		programRequirementCode.setTraxReqChar("h");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("109");
+		programRequirementCode.setTraxReqChar("I");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("113");
+		programRequirementCode.setTraxReqChar("n");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		programRequirementCode = new ProgramRequirementCode();
+		programRequirementCode.setProReqCode("117");
+		programRequirementCode.setTraxReqChar("i");
+
+		programRequirementCodes.add(programRequirementCode);
+
+		ParameterizedTypeReference<List<ProgramRequirementCode>> programRequirementCodeResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(constants.getProgramRequirementsEndpoint())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, "accessToken", exception);
 		assertNotNull(data);
