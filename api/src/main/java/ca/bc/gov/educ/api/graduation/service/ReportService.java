@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -111,7 +112,7 @@ public class ReportService {
             data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
-            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons(), xml, accessToken));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             data.getStudent().setGraduationData(graduationData);
             return data;
@@ -191,17 +192,30 @@ public class ReportService {
                 ReportService.class, String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
     }
 
-    private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons) {
+    private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons, boolean xml, String accessToken) {
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
+            Map<String, String> traxReqCodes = new HashMap<>();
+            if(xml && StringUtils.isNotBlank(accessToken)) {
+                List<ProgramRequirementCode> programReqCodes = getAllProgramRequirementCodeList(accessToken);
+                populateTraxReqCodesMap(programReqCodes, traxReqCodes);
+            }
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
+                String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getRule()), gR.getRule());
+                assert code != null;
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gR.getRule());
+                obj.setCode(code);
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }
         }
         return nList;
+    }
+
+    private void populateTraxReqCodesMap(List<ProgramRequirementCode> programReqCodes, Map<String, String> traxReqCodes) {
+        for(ProgramRequirementCode code: programReqCodes) {
+            traxReqCodes.put(code.getProReqCode(), code.getTraxReqChar());
+        }
     }
 
     private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
@@ -541,6 +555,15 @@ public class ReportService {
         code.setCode(graduationDataStatus.getGradStatus().getProgram());
         gPgm.setCode(code);
         return gPgm;
+    }
+
+    private List<ProgramRequirementCode> getAllProgramRequirementCodeList(String accessToken) {
+        final ParameterizedTypeReference<List<ProgramRequirementCode>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(educGraduationApiConstants.getProgramRequirementsEndpoint())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(responseType).block();
     }
 
     private Student getStudentData(GradSearchStudent gradStudent) {
@@ -962,7 +985,7 @@ public class ReportService {
             data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
-            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons(), false, null));
             data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             return data;
@@ -990,7 +1013,7 @@ public class ReportService {
                 e.printStackTrace();
             }
             if (existingData != null && existingData.getOptionalNonGradReasons() != null) {
-                op.setNonGradReasons(getNonGradReasons(existingData.getOptionalNonGradReasons()));
+                op.setNonGradReasons(getNonGradReasons(existingData.getOptionalNonGradReasons(), false, null));
             }
             op.setHasRequirementMet(" Check with School");
             if (existingData != null && existingData.getOptionalRequirementsMet() != null) {
