@@ -42,7 +42,7 @@ jobs:
   openshift-ci-cd:
     name: Build and deploy to OpenShift DEV from release branch
     # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: dev
 
     steps:
@@ -99,6 +99,7 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+          timeout: '30m'
 
       # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
 

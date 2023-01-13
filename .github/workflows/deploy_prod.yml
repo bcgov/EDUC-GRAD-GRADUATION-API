@@ -6,19 +6,19 @@ env:
   # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
-  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_BUSINESS_NAMESPACE }}-prod
+  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}-prod
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-graduation-api-dc
 
   REPO_NAME: "educ-grad-graduation-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
-  NAMESPACE: ${{ secrets.GRAD_BUSINESS_NAMESPACE }}
+  NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
   TAG: "latest"
 
   MIN_CPU: "20m"
-  MAX_CPU: "80m"
-  MIN_MEM: "600Mi"
-  MAX_MEM: "2048Mi"
+  MAX_CPU: "100m"
+  MIN_MEM: "250Mi"
+  MAX_MEM: "1024Mi"
   MIN_REPLICAS: "3"
   MAX_REPLICAS: "5"
 
@@ -31,7 +31,7 @@ jobs:
   deploy-to-openshift-prod:
     name: Deploy to OpenShift PROD
     # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: prod
 
     outputs:
@@ -66,7 +66,7 @@ jobs:
           oc tag ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }}
           
           # Process and apply deployment template
-        oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ steps.get-latest-tag.outputs.tag }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }}  \
+          oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ steps.get-latest-tag.outputs.tag }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }}  \
           | oc apply -f -
           
           # Start rollout (if necessary) and follow it
