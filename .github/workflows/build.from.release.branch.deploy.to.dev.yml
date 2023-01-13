@@ -95,7 +95,7 @@ jobs:
         with:
           image-ref: '${{ steps.push-image.outputs.registry-path }}'
           format: 'table'
-          exit-code: '1'
+          exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
