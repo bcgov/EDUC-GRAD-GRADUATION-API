@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -323,7 +324,7 @@ public class GraduationService {
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gR.getRule());
+                obj.setCode(ObjectUtils.defaultIfNull(gR.getTranscriptRule(), gR.getRule()));
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -201,8 +202,8 @@ public class ReportService {
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
-                String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getRule()), gR.getRule());
-                assert code != null;
+                String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getTranscriptRule()), gR.getTranscriptRule());
+                code = ObjectUtils.defaultIfNull(code, RandomStringUtils.random(4, false, true));
                 NonGradReason obj = new NonGradReason();
                 obj.setCode(code);
                 obj.setDescription(gR.getDescription());
@@ -1050,7 +1051,7 @@ public class ReportService {
                 grList.add(gRAchv);
             } else {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gr.getRule());
+                obj.setCode(ObjectUtils.defaultIfNull(gr.getTranscriptRule(), gr.getRule()));
                 obj.setDescription(gr.getDescription());
                 nonGradReasons.add(obj);
             }
