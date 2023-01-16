@@ -12,7 +12,6 @@ import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -201,8 +200,7 @@ public class ReportService {
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
-                String code = ObjectUtils.defaultIfNull((xml ? traxReqCodes.get(gR.getRule()) : gR.getRule()), gR.getRule());
-                assert code != null;
+                String code = xml ? traxReqCodes.get(gR.getRule()) : gR.getTranscriptRule();
                 NonGradReason obj = new NonGradReason();
                 obj.setCode(code);
                 obj.setDescription(gR.getDescription());
@@ -518,6 +516,7 @@ public class ReportService {
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = graduationDataStatus.getOptionalGradStatus();
         if(optionalGradStatus != null) {
             optionalGradStatus.removeIf(p -> "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
+            /***
             for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
                 String code = op.getOptionalProgramCode();
                 if(!StringUtils.isBlank(code)) {
@@ -534,6 +533,7 @@ public class ReportService {
                     }
                 }
             }
+            **/
         }
         return data;
     }
@@ -1050,7 +1050,7 @@ public class ReportService {
                 grList.add(gRAchv);
             } else {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gr.getRule());
+                obj.setCode(gr.getTranscriptRule());
                 obj.setDescription(gr.getDescription());
                 nonGradReasons.add(obj);
             }

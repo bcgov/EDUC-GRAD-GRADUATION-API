@@ -323,7 +323,7 @@ public class GraduationService {
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gR.getRule());
+                obj.setCode(gR.getTranscriptRule());
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }
