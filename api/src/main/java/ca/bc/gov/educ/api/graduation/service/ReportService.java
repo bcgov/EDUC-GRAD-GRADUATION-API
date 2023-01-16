@@ -516,6 +516,7 @@ public class ReportService {
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = graduationDataStatus.getOptionalGradStatus();
         if(optionalGradStatus != null) {
             optionalGradStatus.removeIf(p -> "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
+            /***
             for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
                 String code = op.getOptionalProgramCode();
                 if(!StringUtils.isBlank(code)) {
@@ -532,6 +533,7 @@ public class ReportService {
                     }
                 }
             }
+            **/
         }
         return data;
     }
