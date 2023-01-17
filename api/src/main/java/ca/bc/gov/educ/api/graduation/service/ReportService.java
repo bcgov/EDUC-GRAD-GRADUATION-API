@@ -521,10 +521,10 @@ public class ReportService {
                 if(!StringUtils.isBlank(code)) {
                     switch (code) {
                         case "FI":
-                            //data.getProgramCodes().add("FIP");
+                            /**data.getProgramCodes().add("FIP");**/
                             break;
                         case "DD":
-                            //data.getProgramCodes().add("PFD");
+                            /**data.getProgramCodes().add("PFD");**/
                             break;
                         default:
                             data.getProgramCodes().add(code);
