@@ -78,7 +78,9 @@ endpoint:
   student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
  grad-program-api: 
   program_name_by_program_code: 
-   url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s   
+   url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
+  program_requirement_codes:
+   url: ${GRAD_PROGRAM_API}api/v1/program/programrequirementcode
  gradalgorithm-api: 
   gradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s
   projectedgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b

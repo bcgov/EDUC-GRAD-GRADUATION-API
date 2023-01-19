@@ -202,23 +202,17 @@ public class GraduationService {
                     schoolObj.setName(schoolDetails.getSchoolName());
                     if (TVRRUN.equalsIgnoreCase(type)) {
                         List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
-                        if (!nonGradPrjStudents.isEmpty()) {
-                            logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
-                            numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
-                        }
+                        logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
+                        numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
                     } else {
                         List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
-                        if (!gradRegStudents.isEmpty()) {
-                            logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
-                            numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
-                        }
+                        logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                        numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         res = checkAndGetAccessToken(res);
                         accessToken = res.getLeft();
                         List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
-                        if (!nonGradRegStudents.isEmpty()) {
-                            logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
-                            numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
-                        }
+                        logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                        numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                     }
                 }
             }
@@ -323,7 +317,7 @@ public class GraduationService {
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
                 NonGradReason obj = new NonGradReason();
-                obj.setCode(gR.getRule());
+                obj.setCode(gR.getTranscriptRule());
                 obj.setDescription(gR.getDescription());
                 nList.add(obj);
             }
