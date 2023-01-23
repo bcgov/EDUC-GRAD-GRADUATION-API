@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Transcript;
+import ca.bc.gov.educ.api.graduation.model.report.TranscriptResult;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
@@ -12,6 +13,7 @@ import ca.bc.gov.educ.api.graduation.util.StudentAssessmentDuplicatesWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1591,6 +1593,13 @@ public class ReportServiceTest {
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
+
+		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
+			if("3".equalsIgnoreCase(result.getRequirement())) {
+				assertEquals(result.getRequirement(), "3");
+				assertTrue(StringUtils.contains(result.getRequirementName(), "3"));
+			}
+		}
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, "accessToken", exception);
 		assertNotNull(certificateData);
