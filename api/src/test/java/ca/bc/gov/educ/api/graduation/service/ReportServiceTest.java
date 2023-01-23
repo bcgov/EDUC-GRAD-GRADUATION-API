@@ -1596,7 +1596,7 @@ public class ReportServiceTest {
 
 		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
 			if("3".equalsIgnoreCase(result.getRequirement())) {
-				assertEquals(result.getRequirement(), "3");
+				assertEquals("3", result.getRequirement());
 				assertTrue(StringUtils.contains(result.getRequirementName(), "3"));
 			}
 		}
