@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
@@ -100,7 +101,7 @@ public class ReportService {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
-            GraduationData graduationData = getGraduationData(graduationDataStatus);
+            GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
@@ -496,7 +497,7 @@ public class ReportService {
     }
 
     private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord) {
         GraduationData data = new GraduationData();
         data.setDogwoodFlag(graduationDataStatus.isDualDogwood());
         if (graduationDataStatus.isGraduated()) {
@@ -513,11 +514,11 @@ public class ReportService {
                 data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
         }
-        List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = graduationDataStatus.getOptionalGradStatus();
-        if(optionalGradStatus != null) {
-            optionalGradStatus.removeIf(p -> "FR".equalsIgnoreCase(p.getOptionalProgramCode()));
-            for (GradAlgorithmOptionalStudentProgram op : optionalGradStatus) {
-                String code = op.getOptionalProgramCode();
+        List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
+        if(careerPrograms != null) {
+            careerPrograms.removeIf(p -> "FR".equalsIgnoreCase(p.getCareerProgramCode()));
+            for (StudentCareerProgram op : careerPrograms) {
+                String code = op.getCareerProgramCode();
                 if(!StringUtils.isBlank(code)) {
                     switch (code) {
                         case "FI":
@@ -888,7 +889,7 @@ public class ReportService {
     public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
-        GraduationData graduationData = getGraduationData(graduationDataStatus);
+        GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
         data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
