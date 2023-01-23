@@ -247,9 +247,14 @@ public class ReportService {
                 }
                 result.setCourse(setCourseObjForTranscript(sc, graduationDataStatus));
                 result.setMark(setMarkObjForTranscript(sc, graduationDataStatus.getGradStatus().getProgram(), provincially));
-                result.setRequirement(sc.getGradReqMet());
+                if("1950".equalsIgnoreCase(graduationDataStatus.getGradProgram().getProgramCode()) && "3, 4".equalsIgnoreCase(sc.getGradReqMet())) {
+                    result.setRequirement(StringUtils.substringBefore(sc.getGradReqMet(), ","));
+                    result.setRequirementName(StringUtils.substringBefore(sc.getGradReqMetDetail(), ","));
+                } else {
+                    result.setRequirement(sc.getGradReqMet());
+                    result.setRequirementName(sc.getGradReqMetDetail());
+                }
                 result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
-                result.setRequirementName(sc.getGradReqMetDetail());
                 result.setEquivalency(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("C") == 0 ? "C" : equivOrChallenge);
                 tList.add(result);
             }
