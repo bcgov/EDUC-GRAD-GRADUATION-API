@@ -1489,6 +1489,13 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
+		for(StudentCourse result: gradStatus.getStudentCourses().getStudentCourseList()) {
+			if("3, 4".equalsIgnoreCase(result.getGradReqMet())) {
+				assertEquals("3, 4", result.getGradReqMet());
+				assertTrue(StringUtils.contains(result.getGradReqMetDetail(), "3 - met, 4 - met again"));
+			}
+		}
+
 		GradProgram gradProgram = new GradProgram();
 		gradProgram.setProgramCode("1950");
 		gradProgram.setProgramName("1950 Adult Graduation Program");
