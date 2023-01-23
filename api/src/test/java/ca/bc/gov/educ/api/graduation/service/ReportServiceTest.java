@@ -1488,8 +1488,8 @@ public class ReportServiceTest {
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
 		GradProgram gradProgram = new GradProgram();
-		gradProgram.setProgramCode("2018-EN");
-		gradProgram.setProgramName("2018 Graduation Program");
+		gradProgram.setProgramCode("1950");
+		gradProgram.setProgramName("1950 Adult Graduation Program");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
