@@ -51,6 +51,9 @@ objects:
                 failureThreshold: 10
                 successThreshold: 1
               name: "${REPO_NAME}"
+              volumeMounts:
+                - name: log-storage
+                  mountPath: /logs
               ports:
                 - containerPort: ${{CONTAINER_PORT}}
                   protocol: TCP
