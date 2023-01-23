@@ -516,7 +516,6 @@ public class ReportService {
         }
         List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
         if(careerPrograms != null) {
-            careerPrograms.removeIf(p -> "FR".equalsIgnoreCase(p.getCareerProgramCode()));
             for (StudentCareerProgram op : careerPrograms) {
                 String code = op.getCareerProgramCode();
                 if(!StringUtils.isBlank(code)) {
@@ -526,6 +525,9 @@ public class ReportService {
                             break;
                         case "DD":
                             /**data.getProgramCodes().add("PFD");**/
+                            break;
+                        case "FR":
+                            //ignore
                             break;
                         default:
                             data.getProgramCodes().add(code);

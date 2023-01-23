@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -1470,11 +1471,17 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
 
+		StudentCareerProgram studentCareerProgram1 = new StudentCareerProgram();
+		studentCareerProgram1.setCareerProgramCode("XH");
+		StudentCareerProgram studentCareerProgram2 = new StudentCareerProgram();
+		studentCareerProgram2.setCareerProgramCode("FR");
+
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
+		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
