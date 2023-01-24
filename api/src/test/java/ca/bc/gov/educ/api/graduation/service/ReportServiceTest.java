@@ -1610,7 +1610,8 @@ public class ReportServiceTest {
 		assertEquals("1950", transcriptData.getGradProgram().getCode().getCode());
 
 		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
-			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(),"3, 4"));
+			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(), "3, 4"));
+			assertFalse(result.getRequirementName(), StringUtils.contains(result.getRequirementName(), "3 - met, 4 - met again"));
 		}
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, "accessToken", exception);
