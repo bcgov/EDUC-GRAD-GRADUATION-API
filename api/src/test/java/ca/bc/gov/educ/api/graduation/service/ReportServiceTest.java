@@ -1485,6 +1485,15 @@ public class ReportServiceTest {
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
 		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
 
+		GradProgram gradProgram = new GradProgram();
+		gradProgram.setProgramCode("1950");
+		gradProgram.setProgramName("1950 Adult Graduation Program");
+
+		GraduationProgramCode graduationProgramCode = new GraduationProgramCode();
+		graduationProgramCode.setProgramCode(gradProgram.getProgramCode());
+		graduationProgramCode.setProgramName(gradProgram.getProgramName());
+		gradStatus.setGradProgram(graduationProgramCode);
+
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
@@ -1495,10 +1504,6 @@ public class ReportServiceTest {
 				assertTrue(StringUtils.contains(result.getGradReqMetDetail(), "3 - met, 4 - met again"));
 			}
 		}
-
-		GradProgram gradProgram = new GradProgram();
-		gradProgram.setProgramCode("1950");
-		gradProgram.setProgramName("1950 Adult Graduation Program");
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
@@ -1600,12 +1605,10 @@ public class ReportServiceTest {
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
+		assertNotEquals("1950", transcriptData.getGradProgram().getCode().getCode());
 
 		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
-			if("3".equalsIgnoreCase(result.getRequirement())) {
-				assertEquals("3", result.getRequirement());
-				assertTrue(StringUtils.contains(result.getRequirementName(), "3"));
-			}
+			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(),"3, 4"));
 		}
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, "accessToken", exception);
