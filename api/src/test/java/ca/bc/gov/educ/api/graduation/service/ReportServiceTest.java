@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Transcript;
+import ca.bc.gov.educ.api.graduation.model.report.TranscriptResult;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
@@ -11,6 +13,7 @@ import ca.bc.gov.educ.api.graduation.util.StudentAssessmentDuplicatesWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1470,22 +1473,42 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
 
+		StudentCareerProgram studentCareerProgram1 = new StudentCareerProgram();
+		studentCareerProgram1.setCareerProgramCode("XH");
+		StudentCareerProgram studentCareerProgram2 = new StudentCareerProgram();
+		studentCareerProgram2.setCareerProgramCode("FR");
+
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
+		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
+
+		GradProgram gradProgram = new GradProgram();
+		gradProgram.setProgramCode("1950");
+		gradProgram.setProgramName("1950 Adult Graduation Program");
+
+		GraduationProgramCode graduationProgramCode = new GraduationProgramCode();
+		graduationProgramCode.setProgramCode(gradProgram.getProgramCode());
+		graduationProgramCode.setProgramName(gradProgram.getProgramName());
+		gradStatus.setGradProgram(graduationProgramCode);
+		gradStatus.getGradStatus().setProgram(gradProgram.getProgramCode());
+		gradStatus.getGradStatus().setProgramName(gradProgram.getProgramName());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
-		GradProgram gradProgram = new GradProgram();
-		gradProgram.setProgramCode("2018-EN");
-		gradProgram.setProgramName("2018 Graduation Program");
+		for(StudentCourse result: gradStatus.getStudentCourses().getStudentCourseList()) {
+			if("3, 4".equalsIgnoreCase(result.getGradReqMet())) {
+				assertEquals("3, 4", result.getGradReqMet());
+				assertTrue(StringUtils.contains(result.getGradReqMetDetail(), "3 - met, 4 - met again"));
+			}
+		}
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradProgram.getProgramCode()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
@@ -1584,6 +1607,12 @@ public class ReportServiceTest {
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
+		assertEquals("1950", transcriptData.getGradProgram().getCode().getCode());
+
+		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
+			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(), "3, 4"));
+			assertFalse(result.getRequirementName(), StringUtils.contains(result.getRequirementName(), "3 - met, 4 - met again"));
+		}
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, "accessToken", exception);
 		assertNotNull(certificateData);
