@@ -522,21 +522,7 @@ public class ReportService {
         List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
         if (careerPrograms != null) {
             for (StudentCareerProgram op : careerPrograms) {
-                String code = op.getCareerProgramCode();
-                switch (code) {
-                    case "FI":
-                        /**data.getProgramCodes().add("FIP");**/
-                        break;
-                    case "DD":
-                        /**data.getProgramCodes().add("PFD");**/
-                        break;
-                    case "FR":
-                        //ignore
-                        break;
-                    default:
-                        data.getProgramCodes().add(code);
-                        break;
-                }
+                data.getProgramCodes().add(op.getCareerProgramCode());
             }
         }
         return data;
