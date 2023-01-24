@@ -1493,6 +1493,8 @@ public class ReportServiceTest {
 		graduationProgramCode.setProgramCode(gradProgram.getProgramCode());
 		graduationProgramCode.setProgramName(gradProgram.getProgramName());
 		gradStatus.setGradProgram(graduationProgramCode);
+		gradStatus.getGradStatus().setProgram(gradProgram.getProgramCode());
+		gradStatus.getGradStatus().setProgramName(gradProgram.getProgramName());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -1506,7 +1508,7 @@ public class ReportServiceTest {
 		}
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradProgram.getProgramCode()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
@@ -1605,7 +1607,7 @@ public class ReportServiceTest {
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
-		assertNotEquals("1950", transcriptData.getGradProgram().getCode().getCode());
+		assertEquals("1950", transcriptData.getGradProgram().getCode().getCode());
 
 		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
 			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(),"3, 4"));
