@@ -53,7 +53,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block(); 
+                    }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -76,7 +76,7 @@ public class ReportService {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
-                    }).block(); 
+                    }).block();
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -89,7 +89,7 @@ public class ReportService {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(CommonSchool.class).block(); 
+                }).retrieve().bodyToMono(CommonSchool.class).block();
         if (commonSchoolObj != null) {
             return commonSchoolObj.getSchoolCategoryCode();
         }
@@ -171,7 +171,7 @@ public class ReportService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<GradSearchStudent>>() {
-                }).block(); 
+                }).block();
         if (stuDataList != null && !stuDataList.isEmpty()) {
             return stuDataList.get(0);
         }
@@ -185,7 +185,7 @@ public class ReportService {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(GraduationStudentRecord.class).block();
-        if(graduationStudentRecord != null) {
+        if (graduationStudentRecord != null) {
             return graduationStudentRecord;
         }
         throw new EntityNotFoundException(
@@ -196,7 +196,7 @@ public class ReportService {
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             Map<String, String> traxReqCodes = new HashMap<>();
-            if(xml && StringUtils.isNotBlank(accessToken)) {
+            if (xml && StringUtils.isNotBlank(accessToken)) {
                 List<ProgramRequirementCode> programReqCodes = getAllProgramRequirementCodeList(accessToken);
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
@@ -212,7 +212,7 @@ public class ReportService {
     }
 
     private void populateTraxReqCodesMap(List<ProgramRequirementCode> programReqCodes, Map<String, String> traxReqCodes) {
-        for(ProgramRequirementCode code: programReqCodes) {
+        for (ProgramRequirementCode code : programReqCodes) {
             traxReqCodes.put(code.getProReqCode(), code.getTraxReqChar());
         }
     }
@@ -247,7 +247,7 @@ public class ReportService {
                 }
                 result.setCourse(setCourseObjForTranscript(sc, graduationDataStatus));
                 result.setMark(setMarkObjForTranscript(sc, graduationDataStatus.getGradStatus().getProgram(), provincially));
-                if("1950".equalsIgnoreCase(graduationDataStatus.getGradProgram().getProgramCode()) && "3, 4".equalsIgnoreCase(sc.getGradReqMet())) {
+                if ("1950".equalsIgnoreCase(graduationDataStatus.getGradProgram().getProgramCode()) && "3, 4".equalsIgnoreCase(sc.getGradReqMet())) {
                     result.setRequirement(StringUtils.substringBefore(sc.getGradReqMet(), ","));
                     result.setRequirementName(StringUtils.substringBefore(sc.getGradReqMetDetail(), ","));
                 } else {
@@ -334,7 +334,7 @@ public class ReportService {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         List<StudentAssessment> processList = studentAssessmentList;
-        if(xml) {
+        if (xml) {
             processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList);
         }
         for (StudentAssessment sc : processList) {
@@ -380,7 +380,7 @@ public class ReportService {
     }
 
     public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList) {
-        if(studentAssessmentList == null) {
+        if (studentAssessmentList == null) {
             return new ArrayList<StudentAssessment>();
         }
         return studentAssessmentList.stream()
@@ -520,24 +520,22 @@ public class ReportService {
             }
         }
         List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
-        if(careerPrograms != null) {
+        if (careerPrograms != null) {
             for (StudentCareerProgram op : careerPrograms) {
                 String code = op.getCareerProgramCode();
-                if(!StringUtils.isBlank(code)) {
-                    switch (code) {
-                        case "FI":
-                            /**data.getProgramCodes().add("FIP");**/
-                            break;
-                        case "DD":
-                            /**data.getProgramCodes().add("PFD");**/
-                            break;
-                        case "FR":
-                            //ignore
-                            break;
-                        default:
-                            data.getProgramCodes().add(code);
-                            break;
-                    }
+                switch (code) {
+                    case "FI":
+                        /**data.getProgramCodes().add("FIP");**/
+                        break;
+                    case "DD":
+                        /**data.getProgramCodes().add("PFD");**/
+                        break;
+                    case "FR":
+                        //ignore
+                        break;
+                    default:
+                        data.getProgramCodes().add(code);
+                        break;
                 }
             }
         }
@@ -552,7 +550,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).retrieve().bodyToMono(ca.bc.gov.educ.api.graduation.model.dto.GradProgram.class).block(); 
+                    }).retrieve().bodyToMono(ca.bc.gov.educ.api.graduation.model.dto.GradProgram.class).block();
             if (gradProgram != null) {
                 code.setDescription(gradProgram.getProgramName());
                 code.setName(gradProgram.getProgramName());
@@ -644,7 +642,7 @@ public class ReportService {
     private GraduationStatus getGraduationStatus(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData, School schoolAtGrad, School schoolOfRecord) {
         GraduationStatus gradStatus = new GraduationStatus();
         String gradMessage = graduationData.getGradMessage();
-        if(schoolAtGrad != null
+        if (schoolAtGrad != null
                 && schoolOfRecord != null
                 && !StringUtils.equalsIgnoreCase(schoolOfRecord.getMincode(), schoolAtGrad.getMincode())) {
             gradMessage = StringUtils.replace(gradMessage, schoolOfRecord.getName(), schoolAtGrad.getName());
@@ -780,7 +778,7 @@ public class ReportService {
             tList.add(result);
         }
         if (!tList.isEmpty()) {
-            tList.removeIf(a->"A".equalsIgnoreCase(a.getSpecialCase()) && (graduationProgramCode.getProgramCode().contains("SCCP") || graduationProgramCode.getProgramCode().contains("1950")));
+            tList.removeIf(a -> "A".equalsIgnoreCase(a.getSpecialCase()) && (graduationProgramCode.getProgramCode().contains("SCCP") || graduationProgramCode.getProgramCode().contains("1950")));
             tList.sort(Comparator.comparing(AssessmentResult::getAssessmentCode)
                     .thenComparing(AssessmentResult::getSessionDate));
         }
@@ -804,7 +802,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block(); 
+                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
         } catch (Exception e) {
             if (exception.getExceptionName() == null) {
                 exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
@@ -827,7 +825,7 @@ public class ReportService {
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block(); 
+                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
             return getEncodedStringFromBytes(bytesSAR);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
@@ -930,7 +928,7 @@ public class ReportService {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block(); 
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
 
     }
 
