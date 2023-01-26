@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
+import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
@@ -37,4 +38,5 @@ public class GraduationStudentRecord extends BaseModel{
 	private ExceptionMessage exception;
 
     private List<GradRequirement> nonGradReasons;
+    private List<StudentCareerProgram> careerPrograms;
 }
