@@ -36,6 +36,7 @@ public class GraduationStudentRecord extends BaseModel{
     private String consumerEducationRequirementMet;
     private String studentCitizenship;
 	private ExceptionMessage exception;
+    private String adultStartDate;
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;
