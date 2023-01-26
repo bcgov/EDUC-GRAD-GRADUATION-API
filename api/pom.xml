@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-graduation-api</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.1</version>
     <name>educ-grad-graduation-api</name>
     <description>Ministry of Education GRAD GRADUATION API</description>
 
@@ -19,6 +19,7 @@
             src/main/java/ca/bc/gov/educ/api/graduation/exception/**,
             src/main/java/ca/bc/gov/educ/api/graduation/model/**,
             src/main/java/ca/bc/gov/educ/api/graduation/util/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/process/**,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.exclusions>
         <sonar.junit.exclusions>
@@ -27,6 +28,7 @@
             src/main/java/ca/bc/gov/educ/api/graduation/exception/**,
             src/main/java/ca/bc/gov/educ/api/graduation/model/**,
             src/main/java/ca/bc/gov/educ/api/graduation/util/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/process/**,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.junit.exclusions>
         <java.version>11</java.version>
@@ -63,6 +65,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>5.7.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

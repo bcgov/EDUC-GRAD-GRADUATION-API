@@ -49,7 +49,7 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				ExceptionMessage excp = algorithmSupport.createReportNCert(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData);
+				ExceptionMessage excp = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "FMR");
 				if(checkExceptions(excp,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");

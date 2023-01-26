@@ -46,7 +46,8 @@
     "schoolAtGrad": "00502001"
   },
   "gradProgram": {
-    "assessmentReleaseDate": "2002-08-05"
+    "programCode": "1950",
+    "programName": "1950 Adult Graduation Program"
   },
   "optionalGradStatus": [
     {
@@ -183,8 +184,8 @@
             "courseLevel": "11",
             "sessionDate": "2020/11",
             "customizedCourseName": "",
-            "gradReqMet": "",
-            "gradReqMetDetail": "",
+            "gradReqMet": "3, 4",
+            "gradReqMetDetail": "3 - met, 4 - met again",
             "completedCoursePercentage": 84.0,
             "completedCourseLetterGrade": "B",
             "interimPercent": 84.0,

@@ -14,6 +14,7 @@ public class ReportOptions implements Serializable {
 	private boolean cacheReport;
 	private String convertTo;
 	private boolean overwrite;
+	private boolean preview;
 	private String reportName;
 	private String reportFile;
 

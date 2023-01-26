@@ -25,6 +25,7 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_CERTIFICATE_REPORT = "/report/certificate/{pen}";
     public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
     public static final String SCHOOL_REPORTS = "/report/school";
+    public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;
@@ -76,6 +77,9 @@ public class EducGraduationApiConstants {
     
     @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
     private String programNameEndpoint;
+
+    @Value("${endpoint.grad-program-api.program_requirement_codes.url}")
+    private String programRequirementsEndpoint;
     
     @Value("${endpoint.grad-student-api.save-optional-program-grad-status}")
     private String saveOptionalProgramGradStatus;
