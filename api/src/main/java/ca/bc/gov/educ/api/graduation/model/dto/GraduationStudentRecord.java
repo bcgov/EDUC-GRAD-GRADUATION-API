@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class GraduationStudentRecord extends BaseModel{
     private String consumerEducationRequirementMet;
     private String studentCitizenship;
 	private ExceptionMessage exception;
-    private String adultStartDate;
+    private Date adultStartDate;
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;
