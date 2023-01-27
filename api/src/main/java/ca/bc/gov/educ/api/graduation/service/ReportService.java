@@ -117,7 +117,7 @@ public class ReportService {
             data.getStudent().setGraduationData(graduationData);
             data.getStudent().setGraduationStatus(graduationStatus);
             if("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
-                data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate() == null ? "N" : "Y");
+                data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate());
             }
             return data;
         } catch (Exception e) {
