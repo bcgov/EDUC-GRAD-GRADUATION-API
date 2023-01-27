@@ -115,6 +115,10 @@ public class ReportService {
             data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons(), xml, accessToken));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             data.getStudent().setGraduationData(graduationData);
+            data.getStudent().setGraduationStatus(graduationStatus);
+            if("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
+                data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate() == null ? "N" : "Y");
+            }
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -504,7 +508,6 @@ public class ReportService {
     private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord) {
         GraduationData data = new GraduationData();
-        data.setDogwoodFlag(graduationDataStatus.isDualDogwood());
         if (graduationDataStatus.isGraduated()) {
             if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
                 if (graduationDataStatus.getGradStatus().getProgramCompletionDate() != null) {
@@ -518,6 +521,7 @@ public class ReportService {
             } else {
                 data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
+            data.setDogwoodFlag(data.getGraduationDate() != null);
         }
         List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
         if (careerPrograms != null) {
