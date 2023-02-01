@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.model.dto;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.util.UUID;
 
 @Data
@@ -25,4 +26,5 @@ public class GradAlgorithmGraduationStudentRecord {
     private String schoolAtGrad;
     private String consumerEducationRequirementMet;
     private String schoolAtGradName;
+    private Date adultStartDate;
 }
