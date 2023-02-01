@@ -42,7 +42,7 @@ logging:
         gov:
           educ:
             api:
-              graduation: INFO
+              graduation: DEBUG
     org:
       springframework:
         web: INFO
