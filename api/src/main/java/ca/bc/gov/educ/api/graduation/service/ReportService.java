@@ -118,7 +118,7 @@ public class ReportService {
             data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
-            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons(), xml, accessToken));
+            data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             if(traxSchool != null && "Y".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
@@ -205,7 +205,7 @@ public class ReportService {
                 ReportService.class, String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
     }
 
-    private List<NonGradReason> getNonGradReasons(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons, boolean xml, String accessToken) {
+    private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons, boolean xml, String accessToken, boolean applyFilters) {
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             Map<String, String> traxReqCodes = new HashMap<>();
@@ -213,6 +213,7 @@ public class ReportService {
                 List<ProgramRequirementCode> programReqCodes = getAllProgramRequirementCodeList(accessToken);
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
+            nonGradReasons.removeIf(a -> applyFilters && "505".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
                 String code = xml ? traxReqCodes.get(gR.getRule()) : gR.getTranscriptRule();
                 NonGradReason obj = new NonGradReason();
@@ -987,8 +988,8 @@ public class ReportService {
             data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
-            data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons(), false, null));
-            data.setOptionalPrograms(getOptionalProgramAchvReport(optionalProgramList));
+            data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), false, null, true));
+            data.setOptionalPrograms(getOptionalProgramAchvReport(data.getGradProgram().getCode().getCode(), optionalProgramList));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             return data;
         } catch (Exception e) {
@@ -1000,7 +1001,7 @@ public class ReportService {
         }
     }
 
-    private List<OptionalProgram> getOptionalProgramAchvReport(List<StudentOptionalProgram> optionalProgramList) {
+    private List<OptionalProgram> getOptionalProgramAchvReport(String gradProgramCode, List<StudentOptionalProgram> optionalProgramList) {
         List<OptionalProgram> opList = new ArrayList<>();
         for (StudentOptionalProgram sPO : optionalProgramList) {
             OptionalProgram op = new OptionalProgram();
@@ -1015,7 +1016,7 @@ public class ReportService {
                 e.printStackTrace();
             }
             if (existingData != null && existingData.getOptionalNonGradReasons() != null) {
-                op.setNonGradReasons(getNonGradReasons(existingData.getOptionalNonGradReasons(), false, null));
+                op.setNonGradReasons(getNonGradReasons(gradProgramCode, existingData.getOptionalNonGradReasons(), false, null, false));
             }
             op.setHasRequirementMet(" Check with School");
             if (existingData != null && existingData.getOptionalRequirementsMet() != null) {
