@@ -347,10 +347,7 @@ public class ReportService {
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml, String accessToken) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-        List<StudentAssessment> processList = studentAssessmentList;
-        if (xml) {
-            processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList);
-        }
+        List<StudentAssessment> processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList, xml);
         for (StudentAssessment sc : processList) {
             boolean skipProcessing = false;
             boolean notCompletedCourse = false;
@@ -387,18 +384,20 @@ public class ReportService {
                     result.setMark(mrk);
                     result.setRequirement(sc.getGradReqMet());
                     result.setRequirementName(sc.getGradReqMetDetail());
-                    tList.add(result);
+                    if(!tList.contains(result)) {
+                        tList.add(result);
+                    }
                 }
             }
         }
     }
 
-    public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList) {
+    public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList, boolean xml) {
         if (studentAssessmentList == null) {
             return new ArrayList<StudentAssessment>();
         }
         return studentAssessmentList.stream()
-                .map(StudentAssessmentDuplicatesWrapper::new)
+                .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
                 .distinct()
                 .map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
                 .collect(Collectors.toList());

@@ -7,9 +7,11 @@ import java.util.Objects;
 public class StudentAssessmentDuplicatesWrapper {
 
     private StudentAssessment studentAssessment;
+    private boolean xml;
 
-    public StudentAssessmentDuplicatesWrapper(StudentAssessment studentAssessment) {
+    public StudentAssessmentDuplicatesWrapper(StudentAssessment studentAssessment, boolean xml) {
         this.studentAssessment = studentAssessment;
+        this.xml = xml;
     }
 
     public StudentAssessment getStudentAssessment() {
@@ -31,10 +33,13 @@ public class StudentAssessmentDuplicatesWrapper {
         if(!studentAssessment.isUsed() && !studentAssessment.isProjected()) {
             return true;
         }
-        return Objects.equals(studentAssessment.getAssessmentCode(), other.studentAssessment.getAssessmentCode())
+        return Objects.equals(other.studentAssessment.getAssessmentCode(), studentAssessment.getAssessmentCode())
                 && (
-                        Objects.equals(studentAssessment.isUsed(), other.studentAssessment.isProjected())
-                        || Objects.equals(studentAssessment.isProjected(), other.studentAssessment.isUsed())
+                        !xml && (
+                            Objects.equals(studentAssessment.isUsed(), other.studentAssessment.isProjected())
+                                    ||
+                            Objects.equals(studentAssessment.isProjected(), other.studentAssessment.isUsed())
+                        )
                 )
                ;
     }

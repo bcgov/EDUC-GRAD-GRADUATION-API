@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.Objects;
+
 public class TranscriptResult {
 
     private TranscriptCourse course;
@@ -58,5 +60,18 @@ public class TranscriptResult {
 
     public void setUsedForGrad(String value) {
         this.usedForGrad = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TranscriptResult that = (TranscriptResult) o;
+        return course.equals(that.course);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(course);
     }
 }

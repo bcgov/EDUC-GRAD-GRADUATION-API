@@ -2413,7 +2413,7 @@ public class ReportServiceTest {
 		);
 
 		List<StudentAssessment> result = studentAssessmentList.stream()
-				.map(StudentAssessmentDuplicatesWrapper::new)
+				.map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, true))
 				.distinct()
 				.map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
 				.collect(Collectors.toList());
