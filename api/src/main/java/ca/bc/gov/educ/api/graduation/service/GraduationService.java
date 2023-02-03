@@ -325,7 +325,6 @@ public class GraduationService {
         return nList;
     }
 
-    @SneakyThrows
     private byte[] getSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
         ReportOptions options = new ReportOptions();
         options.setReportFile(String.format("%s_%s00_GRADREG", mincode, LocalDate.now().getYear()));
@@ -340,7 +339,6 @@ public class GraduationService {
 
     }
 
-    @SneakyThrows
     private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
 
         byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode, accessToken);
@@ -354,7 +352,6 @@ public class GraduationService {
         return bytesSAR;
     }
 
-    @SneakyThrows
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
         webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
                 .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
@@ -366,7 +363,6 @@ public class GraduationService {
         return new String(encoded, StandardCharsets.US_ASCII);
     }
 
-    @SneakyThrows
     private byte[] getSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
         ReportOptions options = new ReportOptions();
         options.setReportFile(String.format("%s_%s00_NONGRADREG", mincode, LocalDate.now().getYear()));
@@ -381,7 +377,6 @@ public class GraduationService {
 
     }
 
-    @SneakyThrows
     private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
 
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
