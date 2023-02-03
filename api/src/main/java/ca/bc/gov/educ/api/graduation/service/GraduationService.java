@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -336,8 +334,6 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        System.out.println(jsonTransformer.marshall(reportParams));
-
         return webClient.post().uri(educGraduationApiConstants.getSchoolGraduation())
                 .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
                 ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
@@ -348,10 +344,6 @@ public class GraduationService {
     private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
 
         byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode, accessToken);
-
-        try (OutputStream out = new FileOutputStream("/tmp/SchoolReportGradRegReport.pdf")) {
-            out.write(bytesSAR);
-        }
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
@@ -364,7 +356,6 @@ public class GraduationService {
 
     @SneakyThrows
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
-        System.out.println(jsonTransformer.marshall(requestObj));
         webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
                 .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
                 ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
@@ -384,8 +375,6 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        System.out.println(jsonTransformer.marshall(reportParams));
-
         return webClient.post().uri(educGraduationApiConstants.getSchoolNonGraduation())
                 .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
                 ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
@@ -396,10 +385,6 @@ public class GraduationService {
     private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
 
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
-
-        try (OutputStream out = new FileOutputStream("/tmp/SchoolReportNonGradRegReport.pdf")) {
-            out.write(bytesSAR);
-        }
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
