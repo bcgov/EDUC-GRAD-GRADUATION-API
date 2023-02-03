@@ -150,6 +150,7 @@ public class ReportServiceTest {
 		byte[] bytesSAR = RandomUtils.nextBytes(20);		
 		
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setStudentID(studentID);
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate("2020/02");
@@ -157,6 +158,20 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
 		gradResponse.setUpdateDate(new Date(System.currentTimeMillis()));
+
+		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
+		studentOptionalProgram.setStudentID(studentID);
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentOptionalPrograms(), studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
 
 		GradProgram gP = new GradProgram();
 		gP.setProgramCode("2018-EN");
@@ -167,7 +182,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
-		
+
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getCertificateReport())).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
@@ -182,7 +197,8 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));		
+        when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));
+
 		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc);
         assertThat(exception.getExceptionName()).isNull();
 	}
@@ -1603,6 +1619,20 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
 
+		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
+		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
+
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
@@ -1866,6 +1896,20 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
 
+		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
+		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
+
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, "accessToken", exception);
 		assertNotNull(transcriptData);
 		assertNotNull(transcriptData.getStudent());
@@ -1987,6 +2031,20 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(programRequirementCodeResponseType)).thenReturn(Mono.just(programRequirementCodes));
+
+		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
+		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, "accessToken", exception);
 		assertNotNull(data);
@@ -2160,6 +2218,20 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
+
+		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
+		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
@@ -2413,7 +2485,7 @@ public class ReportServiceTest {
 		);
 
 		List<StudentAssessment> result = studentAssessmentList.stream()
-				.map(StudentAssessmentDuplicatesWrapper::new)
+				.map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, true))
 				.distinct()
 				.map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
 				.collect(Collectors.toList());

@@ -73,6 +73,7 @@ endpoint:
   read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
   save-optional-program-grad-status: ${GRAD_STUDENT_API}api/v1/student/optionalprogram
   get-optional-program-details: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/%s/%s
+  get-student-optional-programs: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/studentid/%s
   update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
   update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
   student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
