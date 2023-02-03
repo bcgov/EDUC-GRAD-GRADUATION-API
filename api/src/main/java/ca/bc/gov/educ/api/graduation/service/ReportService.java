@@ -44,6 +44,9 @@ public class ReportService {
     @Autowired
     SchoolService schoolService;
 
+    @Autowired
+    OptionalProgramService optionalProgramService;
+
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
@@ -107,7 +110,7 @@ public class ReportService {
                 traxSchool = schoolService.getSchoolDetails(mincode, accessToken, exception);
             }
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
-            GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
+            GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
@@ -515,7 +518,7 @@ public class ReportService {
     }
 
     private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord) {
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord, String accessToken) {
         GraduationData data = new GraduationData();
         if (graduationDataStatus.isGraduated()) {
             if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
@@ -531,13 +534,40 @@ public class ReportService {
                 data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
         }
-        List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
-        if (careerPrograms != null) {
-            for (StudentCareerProgram op : careerPrograms) {
-                data.getProgramCodes().add(op.getCareerProgramCode());
+        List<StudentOptionalProgram> optionalPrograms = optionalProgramService.getStudentOptionalPrograms(graduationStudentRecord.getStudentID(), accessToken);
+        if(optionalPrograms != null) {
+            for (StudentOptionalProgram op : optionalPrograms) {
+                switch(op.getOptionalProgramCode()) {
+                    case "FR":
+                        //skip
+                        break;
+                    case "DD":
+                        //Replace (ON HOLD till June)
+                        /**data.getProgramCodes().add("PDF");**/
+                        break;
+                    case "FI":
+                        //Replace (ON HOLD till June)
+                        /**data.getProgramCodes().add("FIP");**/
+                        break;
+                    case "CP":
+                        setGraduationDataSpecialPrograms(data, graduationStudentRecord);
+                        break;
+                    default:
+                        data.getProgramCodes().add(op.getOptionalProgramCode());
+                        break;
+                }
             }
         }
         return data;
+    }
+
+    private void setGraduationDataSpecialPrograms(GraduationData data, GraduationStudentRecord graduationStudentRecord) {
+        List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
+        if (careerPrograms != null) {
+            for (StudentCareerProgram cp : careerPrograms) {
+                data.getProgramCodes().add(cp.getCareerProgramCode());
+            }
+        }
     }
 
     private GradProgram getGradProgram(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken) {
@@ -892,7 +922,7 @@ public class ReportService {
     public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
-        GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
+        GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
         data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
