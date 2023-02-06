@@ -923,7 +923,16 @@ public class ReportService {
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
         GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
-        data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+        School certificateSchool;
+        School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, new ExceptionMessage());
+        if(schoolAtGrad != null) {
+            //schoolAtGrad
+            certificateSchool = schoolAtGrad;
+        } else {
+            //schoolOfRecord
+            certificateSchool = getSchoolData(graduationDataStatus.getSchool());
+        }
+        data.setSchool(certificateSchool);
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
         data.setGraduationData(graduationData);
