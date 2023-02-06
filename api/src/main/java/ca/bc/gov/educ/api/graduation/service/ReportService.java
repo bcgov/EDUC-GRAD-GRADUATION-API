@@ -164,12 +164,7 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(String pen, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
-            if (graduationStudentRecord.getStudentGradData() == null) {
-                throw new EntityNotFoundException(
-                        ReportService.class, String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
-            }
+            GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return prepareTranscriptData(graduationData, graduationStudentRecord, xml, accessToken, exception);
         } catch (Exception e) {
@@ -869,13 +864,7 @@ public class ReportService {
 
     public ReportData prepareCertificateData(String pen, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
-            if (graduationStudentRecord.getStudentGradData() == null) {
-                throw new EntityNotFoundException(
-                        ReportService.class,
-                        String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
-            }
+            GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return prepareCertificateData(graduationStudentRecord, graduationData, accessToken);
         } catch (Exception e) {
@@ -923,7 +912,16 @@ public class ReportService {
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
         GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
-        data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+        School certificateSchool;
+        School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, new ExceptionMessage());
+        if(schoolAtGrad != null) {
+            //schoolAtGrad
+            certificateSchool = schoolAtGrad;
+        } else {
+            //schoolOfRecord
+            certificateSchool = getSchoolData(graduationDataStatus.getSchool());
+        }
+        data.setSchool(certificateSchool);
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
         data.setGraduationData(graduationData);
@@ -1028,6 +1026,17 @@ public class ReportService {
             dR.setException(exception);
             return dR;
         }
+    }
+
+    private GraduationStudentRecord getGraduationStudentRecordByPen(String pen, String accessToken) {
+        GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
+        GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
+        if (graduationStudentRecord.getStudentGradData() == null) {
+            throw new EntityNotFoundException(
+                    ReportService.class,
+                    String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
+        }
+        return graduationStudentRecord;
     }
 
     private List<OptionalProgram> getOptionalProgramAchvReport(String gradProgramCode, List<StudentOptionalProgram> optionalProgramList) {
