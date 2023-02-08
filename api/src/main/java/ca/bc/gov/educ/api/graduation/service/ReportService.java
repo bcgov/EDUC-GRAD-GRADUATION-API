@@ -44,6 +44,9 @@ public class ReportService {
     @Autowired
     SchoolService schoolService;
 
+    @Autowired
+    OptionalProgramService optionalProgramService;
+
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
@@ -107,7 +110,7 @@ public class ReportService {
                 traxSchool = schoolService.getSchoolDetails(mincode, accessToken, exception);
             }
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
-            GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
+            GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
@@ -161,12 +164,7 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(String pen, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
-            if (graduationStudentRecord.getStudentGradData() == null) {
-                throw new EntityNotFoundException(
-                        ReportService.class, String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
-            }
+            GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return prepareTranscriptData(graduationData, graduationStudentRecord, xml, accessToken, exception);
         } catch (Exception e) {
@@ -347,10 +345,7 @@ public class ReportService {
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml, String accessToken) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-        List<StudentAssessment> processList = studentAssessmentList;
-        if (xml) {
-            processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList);
-        }
+        List<StudentAssessment> processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList, xml);
         for (StudentAssessment sc : processList) {
             boolean skipProcessing = false;
             boolean notCompletedCourse = false;
@@ -387,18 +382,20 @@ public class ReportService {
                     result.setMark(mrk);
                     result.setRequirement(sc.getGradReqMet());
                     result.setRequirementName(sc.getGradReqMetDetail());
-                    tList.add(result);
+                    if(!tList.contains(result)) {
+                        tList.add(result);
+                    }
                 }
             }
         }
     }
 
-    public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList) {
+    public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList, boolean xml) {
         if (studentAssessmentList == null) {
             return new ArrayList<StudentAssessment>();
         }
         return studentAssessmentList.stream()
-                .map(StudentAssessmentDuplicatesWrapper::new)
+                .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
                 .distinct()
                 .map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
                 .collect(Collectors.toList());
@@ -516,7 +513,7 @@ public class ReportService {
     }
 
     private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord) {
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord, String accessToken) {
         GraduationData data = new GraduationData();
         if (graduationDataStatus.isGraduated()) {
             if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
@@ -532,13 +529,40 @@ public class ReportService {
                 data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
         }
-        List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
-        if (careerPrograms != null) {
-            for (StudentCareerProgram op : careerPrograms) {
-                data.getProgramCodes().add(op.getCareerProgramCode());
+        List<StudentOptionalProgram> optionalPrograms = optionalProgramService.getStudentOptionalPrograms(graduationStudentRecord.getStudentID(), accessToken);
+        if(optionalPrograms != null) {
+            for (StudentOptionalProgram op : optionalPrograms) {
+                switch(op.getOptionalProgramCode()) {
+                    case "FR":
+                        //skip
+                        break;
+                    case "DD":
+                        //Replace (ON HOLD till June)
+                        /**data.getProgramCodes().add("PDF");**/
+                        break;
+                    case "FI":
+                        //Replace (ON HOLD till June)
+                        /**data.getProgramCodes().add("FIP");**/
+                        break;
+                    case "CP":
+                        setGraduationDataSpecialPrograms(data, graduationStudentRecord);
+                        break;
+                    default:
+                        data.getProgramCodes().add(op.getOptionalProgramCode());
+                        break;
+                }
             }
         }
         return data;
+    }
+
+    private void setGraduationDataSpecialPrograms(GraduationData data, GraduationStudentRecord graduationStudentRecord) {
+        List<StudentCareerProgram> careerPrograms = graduationStudentRecord.getCareerPrograms();
+        if (careerPrograms != null) {
+            for (StudentCareerProgram cp : careerPrograms) {
+                data.getProgramCodes().add(cp.getCareerProgramCode());
+            }
+        }
     }
 
     private GradProgram getGradProgram(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken) {
@@ -840,13 +864,7 @@ public class ReportService {
 
     public ReportData prepareCertificateData(String pen, String accessToken, ExceptionMessage exception) {
         try {
-            GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
-            GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
-            if (graduationStudentRecord.getStudentGradData() == null) {
-                throw new EntityNotFoundException(
-                        ReportService.class,
-                        String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
-            }
+            GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return prepareCertificateData(graduationStudentRecord, graduationData, accessToken);
         } catch (Exception e) {
@@ -893,8 +911,17 @@ public class ReportService {
     public ReportData prepareCertificateData(GraduationStudentRecord gradResponse,
                                              ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
         ReportData data = new ReportData();
-        GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
-        data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+        GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
+        School certificateSchool;
+        School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, new ExceptionMessage());
+        if(schoolAtGrad != null) {
+            //schoolAtGrad
+            certificateSchool = schoolAtGrad;
+        } else {
+            //schoolOfRecord
+            certificateSchool = getSchoolData(graduationDataStatus.getSchool());
+        }
+        data.setSchool(certificateSchool);
         data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
         data.setGraduationData(graduationData);
@@ -999,6 +1026,17 @@ public class ReportService {
             dR.setException(exception);
             return dR;
         }
+    }
+
+    private GraduationStudentRecord getGraduationStudentRecordByPen(String pen, String accessToken) {
+        GradSearchStudent student = getStudentByPenFromStudentApi(pen, accessToken);
+        GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID(), accessToken);
+        if (graduationStudentRecord.getStudentGradData() == null) {
+            throw new EntityNotFoundException(
+                    ReportService.class,
+                    String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
+        }
+        return graduationStudentRecord;
     }
 
     private List<OptionalProgram> getOptionalProgramAchvReport(String gradProgramCode, List<StudentOptionalProgram> optionalProgramList) {

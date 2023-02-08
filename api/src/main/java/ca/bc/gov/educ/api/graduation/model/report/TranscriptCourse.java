@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import java.util.Objects;
+
 public class TranscriptCourse {
 
     private String name;
@@ -73,5 +75,18 @@ public class TranscriptCourse {
 
     public void setRelatedLevel(String value) {
         this.relatedLevel = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TranscriptCourse that = (TranscriptCourse) o;
+        return Objects.equals(code, that.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code);
     }
 }

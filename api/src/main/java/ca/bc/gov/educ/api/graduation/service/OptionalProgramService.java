@@ -1,22 +1,22 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ca.bc.gov.educ.api.graduation.model.dto.CodeDTO;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmOptionalStudentProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class OptionalProgramService {
@@ -100,5 +100,14 @@ public class OptionalProgramService {
 			projectedOptionalGradResponse.add(optionalProgramProjectedObj);
 		}
 		return projectedOptionalGradResponse;
+	}
+
+	public List<StudentOptionalProgram> getStudentOptionalPrograms(UUID studentID, String accessToken) {
+		return webClient.get().uri(String.format(educGraduationApiConstants.getStudentOptionalPrograms(), studentID))
+				.headers(h -> {
+					h.setBearerAuth(accessToken);
+					h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+				}).retrieve().bodyToMono(new ParameterizedTypeReference<List<StudentOptionalProgram>>() {
+				}).block();
 	}
 }

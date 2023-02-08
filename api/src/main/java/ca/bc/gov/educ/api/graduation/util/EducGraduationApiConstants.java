@@ -85,7 +85,10 @@ public class EducGraduationApiConstants {
     private String saveOptionalProgramGradStatus;
     
     @Value("${endpoint.grad-student-api.get-optional-program-details}")
-    private String getOptionalProgramDetails; 
+    private String getOptionalProgramDetails;
+
+    @Value("${endpoint.grad-student-api.get-student-optional-programs}")
+    private String studentOptionalPrograms;
     
     @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
     private String certList;
