@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @Component
 public class ExceptionMessage {
