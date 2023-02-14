@@ -47,15 +47,20 @@ public class GradStatusService {
 		}
 	}
 	
-	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus) {
+	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus, ExceptionMessage exception) {
 		GraduationStudentRecord obj = new GraduationStudentRecord();
 		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
+		prepareGraduationStatusData(obj, graduationDataStatus, exception);
+		return obj;
+	}
+
+	public void prepareGraduationStatusData(GraduationStudentRecord obj, GraduationData graduationDataStatus, ExceptionMessage exception) {
 		try {
 			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
-			e.getMessage();
+			exception.setExceptionName("UNABLE TO SERILIALIZE OBJECT");
+			exception.setExceptionDetails(e.getCause() == null ? e.getMessage() : e.getCause().getLocalizedMessage());
 		}
-		return obj;
 	}
 	
 	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
