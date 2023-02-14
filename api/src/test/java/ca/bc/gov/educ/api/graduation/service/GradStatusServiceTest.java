@@ -135,7 +135,7 @@ public class GradStatusServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 
-		GraduationStudentRecord obj = gradStatusService.prepareGraduationStatusObj(graduationDataStatus, exception);
+		GraduationStudentRecord obj = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 		assertNotNull(obj.getStudentGradData());
 	}
 
@@ -155,7 +155,7 @@ public class GradStatusServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 
-		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus, exception);
+		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus);
 		assertNotNull(gradResponse.getStudentGradData());
 		assertNull(exception.getExceptionName());
 

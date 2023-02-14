@@ -38,7 +38,7 @@ public class GraduateStudentProcess extends BaseProcess {
 
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
-			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus, exception);
+			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			if(checkExceptions(exception,algorithmResponse,processorData)) {
 				return processorData;
 			}
@@ -62,7 +62,7 @@ public class GraduateStudentProcess extends BaseProcess {
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
-				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus, exception);
+				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
 				tokenUtils.checkAndSetAccessToken(processorData);
 				gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
 				if (checkExceptions(exception,algorithmResponse,processorData)) {
