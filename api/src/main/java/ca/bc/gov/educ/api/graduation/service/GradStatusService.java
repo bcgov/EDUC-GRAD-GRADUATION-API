@@ -58,8 +58,7 @@ public class GradStatusService {
 		try {
 			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		} catch (JsonProcessingException e) {
-			exception.setExceptionName("UNABLE TO SERILIALIZE OBJECT");
-			exception.setExceptionDetails(e.getCause() == null ? e.getMessage() : e.getCause().getLocalizedMessage());
+			e.printStackTrace();
 		}
 	}
 	
