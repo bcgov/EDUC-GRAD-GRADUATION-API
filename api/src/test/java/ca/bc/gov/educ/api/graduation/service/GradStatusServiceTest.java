@@ -140,6 +140,28 @@ public class GradStatusServiceTest {
 	}
 
 	@Test
+	public void testPrepareGraduationStatusData() {
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setStudentCourses(null);
+
+		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus, exception);
+		assertNotNull(gradResponse.getStudentGradData());
+		assertNull(exception.getExceptionName());
+
+	}
+
+	@Test
 	public void testSaveStudentGradStatus_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
@@ -242,9 +264,6 @@ public class GradStatusServiceTest {
 		res = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
-
-		
-		
 	}
 
 	@Test
