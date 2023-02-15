@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class GradCertificateType extends BaseModel {
+public class GradCertificateType {
 
 	private String code;	
 	private String description;
