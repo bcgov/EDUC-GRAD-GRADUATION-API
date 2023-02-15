@@ -11,17 +11,20 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class StudentCertificatesTranscript implements Serializable {
 
-	private List<String> certificateTypeCodes = new ArrayList<>();
+	private List<GradCertificateType> certificateTypeCodes = new ArrayList<>();
 	private String transcriptTypeCode;
 
-	public List<String> getCertificateTypeCodes() {
+	public List<GradCertificateType> getCertificateTypeCodes() {
 		if(this.certificateTypeCodes == null) {
 			this.certificateTypeCodes = new ArrayList<>();
 		}
 		return this.certificateTypeCodes;
 	}
 
-	public void addCertificateTypeCode(String code) {
-		getCertificateTypeCodes().add(code);
+	public void addCertificateType(GradCertificateType certType) {
+		List<GradCertificateType> certTypes = getCertificateTypeCodes();
+		if(!certTypes.contains(certType)) {
+			certTypes.add(certType);
+		}
 	}
 }

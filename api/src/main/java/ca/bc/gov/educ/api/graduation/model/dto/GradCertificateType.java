@@ -1,14 +1,15 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
+import lombok.*;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class GradCertificateTypes extends BaseModel {
+public class GradCertificateType extends BaseModel {
 
 	private String code;	
 	private String description;
