@@ -62,11 +62,17 @@ public class AlgorithmSupport {
                             }
                             if(createCertificate) {
                                 reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
-                                graduationDataStatus.getStudentCertificatesTranscript().addCertificateTypeCode(ObjectUtils.defaultIfNull(certType.getCertificateTypeCode(), ""));
+                                graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
+                                        .code(certType.getCertificateTypeCode())
+                                        .description(certType.getCertificateTypeLabel())
+                                        .build());
                             }
                         } else {
                             reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
-                            graduationDataStatus.getStudentCertificatesTranscript().addCertificateTypeCode(ObjectUtils.defaultIfNull(certType.getCertificateTypeCode(), ""));
+                            graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
+                                    .code(certType.getCertificateTypeCode())
+                                    .description(certType.getCertificateTypeLabel())
+                                    .build());
                             logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
                         }
                     }

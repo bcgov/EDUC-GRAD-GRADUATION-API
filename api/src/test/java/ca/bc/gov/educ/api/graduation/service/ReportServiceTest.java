@@ -88,7 +88,7 @@ public class ReportServiceTest {
     @Mock
     private WebClient.ResponseSpec responseMock;    
     @Mock
-    private Mono<GradCertificateTypes> monoResponse;
+    private Mono<GradCertificateType> monoResponse;
 	
     @Before
     public void setUp() {
