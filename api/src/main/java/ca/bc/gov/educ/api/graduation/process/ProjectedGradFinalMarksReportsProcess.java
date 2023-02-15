@@ -29,13 +29,13 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 		ExceptionMessage exception = new ExceptionMessage();
 		if(gradResponse.getProgramCompletionDate() != null) {
 			List<CodeDTO> optionalProgram = new ArrayList<>();
-			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(),exception);
-
+			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(), exception);
 			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
-			logger.info("**** Grad Algorithm Completed: ****");
-			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,processorData.getStudentID(),processorData.getAccessToken(),optionalProgram);
+			logger.info("**** Grad Algorithm Completed:{} **** ",gradResponse.getStudentID());
+
+			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
 			logger.info("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,processorData.getAccessToken(),exception);
@@ -43,22 +43,31 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 				return processorData;
 			}
 			logger.info("**** Prepared Data for Reports: ****");
-			if(toBeSaved != null && toBeSaved.getStudentID() != null) {
-				GraduationStudentRecord graduationStatusResponse =  gradStatusService.saveStudentGradStatus(processorData.getStudentID(),processorData.getBatchId(), processorData.getAccessToken(),toBeSaved,exception);
-				if(checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
+			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
+				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
+				if (checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
 				logger.info("**** Saved Grad Status: ****");
-				ExceptionMessage excp = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "FMR");
-				if(checkExceptions(excp,algorithmResponse,processorData)) {
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(),graduationDataStatus.isGraduated());
+				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "FMR");
+				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.info("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
+				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
+				tokenUtils.checkAndSetAccessToken(processorData);
+				gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
+				if (checkExceptions(exception,algorithmResponse,processorData)) {
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
+					logger.info("**** Record Restored Due to Error: ****");
+					return processorData;
+				}
+				logger.info("**** Saved Grad Status: ****");
 				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
-		}else {
+		} else {
 			exception.setExceptionName("STUDENT-NOT-GRADUATED-YET");
 			exception.setExceptionDetails("Graduation Algorithm Cannot be Run for this graduated Student");
 			algorithmResponse.setException(exception);

@@ -23,6 +23,7 @@ public class GraduationData {
     private StudentExams studentExams;
     private List<GradRequirement> nonGradReasons;
     private List<GradRequirement> requirementsMet;
+    private StudentCertificatesTranscript studentCertificatesTranscript;
     private String gradMessage;
     //Student Career Programs
     private boolean dualDogwood;
@@ -30,5 +31,11 @@ public class GraduationData {
     private ExceptionMessage exception;
     private GraduationProgramCode gradProgram;
     private String latestSessionDate;
-    
+
+    public StudentCertificatesTranscript getStudentCertificatesTranscript() {
+        if(this.studentCertificatesTranscript == null) {
+            this.studentCertificatesTranscript = new StudentCertificatesTranscript();
+        }
+        return this.studentCertificatesTranscript;
+    }
 }
