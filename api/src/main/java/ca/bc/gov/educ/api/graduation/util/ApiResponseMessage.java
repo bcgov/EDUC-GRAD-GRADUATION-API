@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * ApiResponseMessage
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-11T13:04:32.545-08:00")
+@jakarta.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2020-02-11T13:04:32.545-08:00")
 
 public class ApiResponseMessage   {
   @JsonProperty("message")
