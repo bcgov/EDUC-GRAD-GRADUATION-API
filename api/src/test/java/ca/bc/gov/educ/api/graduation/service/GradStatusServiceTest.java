@@ -1,19 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,13 +16,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 
 @RunWith(SpringRunner.class)
@@ -146,6 +140,27 @@ public class GradStatusServiceTest {
 	}
 
 	@Test
+	public void testPrepareGraduationStatusData() {
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123090109");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setStudentGrade("11");
+		gradResponse.setStudentStatus("D");
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setStudentCourses(null);
+
+		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus);
+		assertNotNull(gradResponse.getStudentGradData());
+
+	}
+
+	@Test
 	public void testSaveStudentGradStatus_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
@@ -248,9 +263,6 @@ public class GradStatusServiceTest {
 		res = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
-
-		
-		
 	}
 
 	@Test

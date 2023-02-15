@@ -3,8 +3,8 @@ package ca.bc.gov.educ.api.graduation.model.dto;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Data
 @Component
@@ -157,9 +157,6 @@ public class CommonSchool {
     private Long elemTeachersHc;
 
     private Long secTeachersHc;
-
-//  @Size(max = 45)
-//  private String comment;
 
     @Size(max = 1)
     private String gradeKhInd;

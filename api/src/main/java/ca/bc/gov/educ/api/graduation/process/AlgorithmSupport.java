@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.util.TokenUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,11 @@ public class AlgorithmSupport {
                             }
                             if(createCertificate) {
                                 reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
+                                graduationDataStatus.getStudentCertificatesTranscript().addCertificateTypeCode(ObjectUtils.defaultIfNull(certType.getCertificateTypeCode(), ""));
                             }
                         } else {
                             reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType);
+                            graduationDataStatus.getStudentCertificatesTranscript().addCertificateTypeCode(ObjectUtils.defaultIfNull(certType.getCertificateTypeCode(), ""));
                             logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
                         }
                     }
@@ -74,9 +77,13 @@ public class AlgorithmSupport {
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
                     tokenUtils.checkAndSetAccessToken(processorData);
                     reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
+                    if(data.getTranscript() != null && data.getTranscript().getTranscriptTypeCode() != null) {
+                        String transcriptTypeCode = ObjectUtils.defaultIfNull(data.getTranscript().getTranscriptTypeCode().getCode(), "");
+                        graduationDataStatus.getStudentCertificatesTranscript().setTranscriptTypeCode(transcriptTypeCode);
+                    }
                     logger.info("**** Saved Reports: ****");
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 exception.setExceptionName("REPORT GENERATION FAILURE");
                 exception.setExceptionDetails(e.getLocalizedMessage());
                 return exception;

@@ -6,8 +6,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProjectedRunClob;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -50,12 +50,13 @@ public class GradStatusService {
 	public GraduationStudentRecord prepareGraduationStatusObj(GraduationData graduationDataStatus) {
 		GraduationStudentRecord obj = new GraduationStudentRecord();
 		BeanUtils.copyProperties(graduationDataStatus.getGradStatus(), obj);
-		try {
-			obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
-		} catch (JsonProcessingException e) {
-			e.getMessage();
-		}
+		prepareGraduationStatusData(obj, graduationDataStatus);
 		return obj;
+	}
+
+	@SneakyThrows
+	public void prepareGraduationStatusData(GraduationStudentRecord obj, GraduationData graduationDataStatus) {
+		obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 	}
 	
 	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
@@ -96,13 +97,10 @@ public class GradStatusService {
 		}
 	}
 
+	@SneakyThrows
 	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus)  {
 
-		try {
-			gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+		gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
 		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
 		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
 		gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursStanding());
