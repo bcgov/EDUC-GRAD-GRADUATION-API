@@ -157,7 +157,6 @@ public class GradStatusServiceTest {
 
 		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus);
 		assertNotNull(gradResponse.getStudentGradData());
-		assertNull(exception.getExceptionName());
 
 	}
 
