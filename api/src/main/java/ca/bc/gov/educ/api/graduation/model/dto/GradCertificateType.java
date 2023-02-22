@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class GradCertificateType {
 
-	private String code;	
+	private String code;
+	private String label;
 	private String description;
 	
 	@Override
 	public String toString() {
-		return "GradCertificateTypes [code=" + code + ", description=" + description + "]";
+		return "GradCertificateTypes [code=" + code + ", label=" + label + ", description=" + description + "]";
 	}
 	
 	

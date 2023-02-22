@@ -90,6 +90,8 @@ endpoint:
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-school-report:
      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
+  school-year-end-students:
+     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/getstudentsforschoolyearendreport
   update-grad-student-transcript:
     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
   update-grad-student-certificate: 
@@ -104,6 +106,7 @@ endpoint:
   student_non_grad: ${GRAD_REPORT_API}api/v1/reports/studentnongrad
   school_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolgraduation
   school_non_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolnongraduation
+  school_distribution_year_end: ${GRAD_REPORT_API}api/v1/reports/schooldistributionyearend
  grad-student-graduation-api:
   get-special-cases: 
     url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
