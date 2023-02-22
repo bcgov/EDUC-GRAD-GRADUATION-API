@@ -6,12 +6,11 @@ import ca.bc.gov.educ.api.graduation.model.report.Pen;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Student;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmSupport;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import ca.bc.gov.educ.api.graduation.util.TokenUtils;
+import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,14 +25,17 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -79,6 +81,9 @@ public class GraduationServiceTest {
 	
 	@MockBean
 	WebClient webClient;
+
+	@Autowired
+	JsonTransformer jsonTransformer;
 
 	@Mock
 	private WebClient.RequestHeadersSpec requestHeadersMock;
@@ -2232,6 +2237,49 @@ public class GraduationServiceTest {
 		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
 	}
 
+	@Test
+	public void testSchoolYearEndReport() {
+		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		Mockito.when(reportService.getStudentsForSchoolYearEndReport("accessToken")).thenReturn(gradStudentDataList);
+
+		byte[] bytesSAR1 = "Any String you want".getBytes();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolDistributionYearEnd()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR1));
+
+		byte[] bytesSAR2 = "Any String you want".getBytes();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getDistrictDistributionYearEnd()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
+
+		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+
+		Integer reportsCount = graduationService.createAndStoreSchoolYearEndReports("accessToken");
+		assertTrue(reportsCount > 0);
+
+		reportsCount = graduationService.createAndStoreDistrictYearEndReports("accessToken");
+		assertTrue(reportsCount > 0);
+
+	}
+
 	private void testPrepateReportDataMultiple_2(String pen,boolean xml,String accessToken,String type) {
 		ReportData data = new ReportData();
 		ca.bc.gov.educ.api.graduation.model.report.GradProgram prg = new ca.bc.gov.educ.api.graduation.model.report.GradProgram();
@@ -2260,5 +2308,28 @@ public class GraduationServiceTest {
 		}
 		ReportData res = graduationService.prepareReportData(graduationData,type,accessToken);
 		assertNotNull(res);
+	}
+
+	@SneakyThrows
+	private List<ReportGradStudentData> createStudentSchoolYearEndData(String jsonPath) {
+		String json = readFile(jsonPath);
+		return (List<ReportGradStudentData>) jsonTransformer.unmarshall(json, new TypeReference<List<ReportGradStudentData>>(){});
+	}
+
+	private String readFile(String jsonPath) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(jsonPath);
+		return readInputStream(inputStream);
+	}
+
+	private String readInputStream(InputStream is) throws Exception {
+		StringBuffer sb = new StringBuffer();
+		InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+		BufferedReader reader = new BufferedReader(streamReader);
+		String line;
+		while ((line = reader.readLine()) != null) {
+			sb.append(line);
+		}
+		return sb.toString();
 	}
 }

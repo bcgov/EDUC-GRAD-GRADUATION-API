@@ -26,6 +26,7 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
     public static final String SCHOOL_REPORTS = "/report/school";
     public static final String SCHOOL_REPORTS_YEAR_END = "/report/schoolyearend";
+    public static final String DISTRICT_REPORTS_YEAR_END = "/report/districtyearend";
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
@@ -69,6 +70,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.report-api.school_distribution_year_end}")
     private String schoolDistributionYearEnd;
+
+    @Value("${endpoint.report-api.district_distribution_year_end}")
+    private String districtDistributionYearEnd;
     
     @Value("${endpoint.report-api.certificate_report}")
     private String certificateReport;

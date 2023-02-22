@@ -111,6 +111,14 @@ public class GraduationController {
         return response.GET(gradService.createAndStoreSchoolYearEndReports(accessToken.replace(BEARER, "")));
     }
 
+    @GetMapping(EducGraduationApiConstants.DISTRICT_REPORTS_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreDistrictYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(gradService.createAndStoreDistrictYearEndReports(accessToken.replace(BEARER, "")));
+    }
+
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_PDF)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School Report Generation", description = "When triggered, School Report is generated", tags = { "Reports", "type=GRADREG", "type=NONGRADREG", "type=NONGRADPRJ" })

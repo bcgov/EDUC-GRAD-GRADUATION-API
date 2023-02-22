@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import ca.bc.gov.educ.api.graduation.util.StudentAssessmentDuplicatesWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -99,6 +100,22 @@ public class ReportServiceTest {
     public void tearDown() {
 
     }
+
+	@Test
+	public void testGetStudentsForSchoolYearEndReport() {
+		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		ParameterizedTypeReference<List<ReportGradStudentData>> reportGradStudentDataType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(constants.getSchoolYearEndStudents())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(reportGradStudentDataType)).thenReturn(Mono.just(gradStudentDataList));
+
+		var result = reportService.getStudentsForSchoolYearEndReport("accessToken");
+		assertNotNull(result);
+	}
 
 	@Test
 	public void testSaveStudentCertificateReport() {
@@ -2509,7 +2526,14 @@ public class ReportServiceTest {
 		return readInputStream(inputStream);
 	}
 
-	protected List<StudentOptionalProgram> createStudentOptionalProgramData(String jsonPath) throws Exception {
+	@SneakyThrows
+	private List<ReportGradStudentData> createStudentSchoolYearEndData(String jsonPath) {
+		String json = readFile(jsonPath);
+		return (List<ReportGradStudentData>) jsonTransformer.unmarshall(json, new TypeReference<List<ReportGradStudentData>>(){});
+	}
+
+	@SneakyThrows
+	protected List<StudentOptionalProgram> createStudentOptionalProgramData(String jsonPath) {
 		String json = readFile(jsonPath);
 		return new ObjectMapper().readValue(json, new TypeReference<List<StudentOptionalProgram>>(){});
 	}

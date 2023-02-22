@@ -118,6 +118,20 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreSchoolYearEndReports() {
+		Mockito.when(graduationService.createAndStoreSchoolYearEndReports("accessToken")).thenReturn(1);
+		graduationController.createAndStoreSchoolYearEndReports("accessToken");
+		Mockito.verify(graduationService).createAndStoreSchoolYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictYearEndReports() {
+		Mockito.when(graduationService.createAndStoreDistrictYearEndReports("accessToken")).thenReturn(1);
+		graduationController.createAndStoreDistrictYearEndReports("accessToken");
+		Mockito.verify(graduationService).createAndStoreDistrictYearEndReports("accessToken");
+	}
+
+	@Test
 	void testGetSchoolReports() {
 		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG","accessToken")).thenReturn(new byte[0]);
 		graduationController.getSchoolReports(List.of("12321312"),"accessToken","GRADREG");
