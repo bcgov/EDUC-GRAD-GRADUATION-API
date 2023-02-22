@@ -246,7 +246,7 @@ public class GraduationService {
                 ReportData reportData = new ReportData();
                 reportData.setSchool(transcriptSchool);
                 reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
-                reportRequest.getDataMap().put("IssuedTranscriptsReportData", reportData);
+                reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
                 School newCredentialsSchool = newCredentialsSchoolMap.get(transcriptSchool.getMincode());
                 if(newCredentialsSchool != null) {
                     reportData = new ReportData();

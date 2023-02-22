@@ -132,11 +132,11 @@ public class ReportService {
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
             data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
-            if(traxSchool != null && "Y".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
+            if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
                     data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate());
                 }
-                graduationData.setDogwoodFlag(graduationData.getGraduationDate() != null);
+                graduationData.setDogwoodFlag(graduationStatus.getProgramCompletionDate() != null);
             }
             data.getStudent().setGraduationData(graduationData);
             data.getStudent().setGraduationStatus(graduationStatus);
