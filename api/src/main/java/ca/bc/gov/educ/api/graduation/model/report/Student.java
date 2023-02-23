@@ -32,6 +32,8 @@ public class Student implements Comparable<Student>, Serializable {
     private Date lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
+    private List<CertificateType> certificateTypes = new ArrayList<>();
+    private List<String> transcriptTypes = new ArrayList<>();
 
     @JsonDeserialize(as = GraduationData.class)
     private GraduationData graduationData = new GraduationData();
@@ -192,6 +194,22 @@ public class Student implements Comparable<Student>, Serializable {
 
     public void setNonGradReasons(List<NonGradReason> nonGradReasons) {
         this.nonGradReasons = nonGradReasons;
+    }
+
+    public List<CertificateType> getCertificateTypes() {
+        return certificateTypes;
+    }
+
+    public void setCertificateTypes(List<CertificateType> certificateTypes) {
+        this.certificateTypes = certificateTypes;
+    }
+
+    public List<String> getTranscriptTypes() {
+        return transcriptTypes;
+    }
+
+    public void setTranscriptTypes(List<String> transcriptTypes) {
+        this.transcriptTypes = transcriptTypes;
     }
 
     public GraduationData getGraduationData() {

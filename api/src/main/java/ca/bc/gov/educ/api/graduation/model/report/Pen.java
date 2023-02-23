@@ -1,7 +1,12 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pen implements Serializable {
 
     private static final long serialVersionUID = 2L;

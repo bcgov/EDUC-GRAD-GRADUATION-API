@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 import lombok.Data;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.springframework.stereotype.Component;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlSeeAlso;
-import jakarta.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,6 +85,8 @@ public class ReportData implements Serializable {
 	private List<AchievementCourse> studentCourses;
 	private List<Exam> studentExams;
 	private List<OptionalProgram> optionalPrograms;
+
+	private List<School> schools;
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	private Map<String, String> parameters = new HashMap<>();
