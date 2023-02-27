@@ -50,7 +50,7 @@ server:
     threads:
       worker: 128
       io: 16
-  port: 9006
+  #port: ${HTTP_PORT}
 
 authorization:
   user: ${GRAD_CLIENT_NAME}
