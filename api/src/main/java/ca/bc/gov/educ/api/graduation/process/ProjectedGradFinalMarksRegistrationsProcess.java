@@ -23,14 +23,14 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 	public ProcessorData fire(ProcessorData processorData) {
 		ExceptionMessage exception = new ExceptionMessage();
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ {}",startTime);
+		logger.debug("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
-		logger.info("**** Grad Algorithm Completed: ****");
+		logger.debug("**** Grad Algorithm Completed: ****");
 		//Code to prepare achievement report
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder()
 				.graduated(graduationDataStatus.isGraduated())
@@ -45,14 +45,14 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		}
 		ExceptionMessage excp = reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 		if (checkExceptions(excp,algorithmResponse,processorData)) {
-			logger.info("**** Problem Generating TVR: ****");
+			logger.debug("**** Problem Generating TVR: ****");
 			return processorData;
 		}
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 		algorithmResponse.setGraduationStudentRecord(gradResponse);
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ {}",diff);
+		logger.debug("************* TIME Taken  ************ {}",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 

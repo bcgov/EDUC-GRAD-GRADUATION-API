@@ -26,19 +26,19 @@ public class AlgorithmProcessFactory {
         AlgorithmProcess pcs = null;
         switch(processImplementation.name()) {        
 	        case "REGFM":
-	        	logger.info("\n************* PROJECTED (REGFM): Graduating Student START  ************");
+	        	logger.debug("\n************* PROJECTED (REGFM): Graduating Student START  ************");
 	        	pcs = projectedGradFinalMarksRegistrationsProcess;
 	        	break;
 	        case "FM":
-	        	logger.info("\n************* PROJECTED (FM): Graduating Student START  ************");
+	        	logger.debug("\n************* PROJECTED (FM): Graduating Student START  ************");
 	        	pcs = projectedGradFinalMarksProcess;
 	        	break;
 	        case "FMR":
-	        	logger.info("\n************* PROJECTED (FMR): Graduating Student START  ************");
+	        	logger.debug("\n************* PROJECTED (FMR): Graduating Student START  ************");
 	        	pcs = projectedGradFinalMarksReportsProcess;
 	        	break;
 	        case "GS":
-	        	logger.info("\n************* Graduating Student START  ************");
+	        	logger.debug("\n************* Graduating Student START  ************");
 	        	pcs = graduateStudentProcess;
 	        	break;
 	        default:
