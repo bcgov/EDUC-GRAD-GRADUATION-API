@@ -21,7 +21,7 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ {}",startTime);
+		logger.debug("************* TIME START  ************ {}",startTime);
 		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
@@ -29,7 +29,7 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
-		logger.info("**** Grad Algorithm Completed: ****");
+		logger.debug("**** Grad Algorithm Completed: ****");
 		gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
@@ -37,7 +37,7 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ {} secs",diff);
+		logger.debug("************* TIME Taken  ************ {} secs",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}

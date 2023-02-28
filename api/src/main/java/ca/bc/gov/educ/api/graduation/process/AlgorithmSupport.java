@@ -26,13 +26,13 @@ public class AlgorithmSupport {
     public boolean checkForErrors(GraduationData graduationDataStatus, AlgorithmResponse algorithmResponse, ProcessorData processorData) {
         if(graduationDataStatus != null) {
             if (graduationDataStatus.getException() != null && graduationDataStatus.getException().getExceptionName() != null) {
-                logger.info("**** Grad Algorithm Has Errors: ****");
+                logger.debug("**** Grad Algorithm Has Errors: ****");
                 algorithmResponse.setException(graduationDataStatus.getException());
                 processorData.setAlgorithmResponse(algorithmResponse);
                 return true;
             }
         }else {
-            logger.info("**** Grad Algorithm Has Errors: ****");
+            logger.debug("**** Grad Algorithm Has Errors: ****");
             ExceptionMessage exceptionMessage = new ExceptionMessage();
             exceptionMessage.setExceptionName("GRAD-ALGORITHM-API FAILED");
             algorithmResponse.setException(exceptionMessage);
@@ -75,13 +75,13 @@ public class AlgorithmSupport {
                                     .code(certType.getCertificateTypeCode())
                                     .description(certType.getCertificateTypeLabel())
                                     .build());
-                            logger.info("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                            logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
                         }
                     }
                 }
 
                 if ((graduationDataStatus.getStudentCourses().getStudentCourseList() == null || graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty()) && (graduationDataStatus.getStudentAssessments().getStudentAssessmentList() == null || graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty())) {
-                    logger.info("**** No Transcript Generated: ****");
+                    logger.debug("**** No Transcript Generated: ****");
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
                     tokenUtils.checkAndSetAccessToken(processorData);
                     reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
@@ -89,7 +89,7 @@ public class AlgorithmSupport {
                         String transcriptTypeCode = ObjectUtils.defaultIfNull(data.getTranscript().getTranscriptTypeCode().getCode(), "");
                         graduationDataStatus.getStudentCertificatesTranscript().setTranscriptTypeCode(transcriptTypeCode);
                     }
-                    logger.info("**** Saved Reports: ****");
+                    logger.debug("**** Saved Reports: ****");
                 }
             } catch (Exception e) {
                 exception.setExceptionName("REPORT GENERATION FAILURE");
