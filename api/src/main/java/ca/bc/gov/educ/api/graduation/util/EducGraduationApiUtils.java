@@ -37,6 +37,10 @@ public class EducGraduationApiUtils {
 		if (dateString == null || "".compareTo(dateString) == 0)
 			return null;
 
+		//fix TRAX date
+		if(dateString.contains("/") && dateString.length() < 10) {
+			dateString = dateString.replace("/", "-").concat("-01");
+		}
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		Date date = new Date();
 
@@ -53,6 +57,10 @@ public class EducGraduationApiUtils {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
 		Date date = new Date();
 
+		//fix TRAX date
+		if(dateString.contains("/") && dateString.length() < 10) {
+			dateString = dateString.replace("/", "-").concat("-01");
+		}
 		try {
 			date = simpleDateFormat.parse(dateString);
 		} catch (ParseException e) {

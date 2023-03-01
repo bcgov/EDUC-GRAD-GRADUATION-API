@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @CrossOrigin
@@ -101,6 +101,22 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = false) String type ) {
         return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, "")));
+    }
+
+    @GetMapping(EducGraduationApiConstants.SCHOOL_REPORTS_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(gradService.createAndStoreSchoolYearEndReports(accessToken.replace(BEARER, "")));
+    }
+
+    @GetMapping(EducGraduationApiConstants.DISTRICT_REPORTS_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreDistrictYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(gradService.createAndStoreDistrictYearEndReports(accessToken.replace(BEARER, "")));
     }
 
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_PDF)

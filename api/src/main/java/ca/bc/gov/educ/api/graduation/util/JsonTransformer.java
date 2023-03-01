@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class JsonTransformer implements Transformer {
         } catch (IOException e) {
             throw new TransformerException(e);
         }
-        log.info("Time taken for unmarshalling response from bytes to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
+        log.debug("Time taken for unmarshalling response from bytes to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -58,7 +59,7 @@ public class JsonTransformer implements Transformer {
         } catch (IOException e) {
             throw new TransformerException(e);
         }
-        log.info("Time taken for unmarshalling response from String to {} is {} ms", clazz.getSimpleName(), (System.currentTimeMillis() - start));
+        log.debug("Time taken for unmarshalling response from String to {} is {} ms", clazz.getSimpleName(), (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -85,7 +86,20 @@ public class JsonTransformer implements Transformer {
         } catch (IOException e) {
             throw new TransformerException(e);
         }
-        log.info("Time taken for unmarshalling response from String to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
+        log.debug("Time taken for unmarshalling response from String to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
+        return result;
+    }
+
+    @Override
+    public Object unmarshall(String input, TypeReference<?> valueTypeRef) throws TransformerException {
+        Object result = null;
+        long start = System.currentTimeMillis();
+        try {
+            result = OBJECT_MAPPER.readValue(input, valueTypeRef);
+        } catch (IOException e) {
+            throw new TransformerException(e);
+        }
+        log.debug("Time taken for unmarshalling response from String to {} is {} ms", valueTypeRef.getType().getTypeName(), (System.currentTimeMillis() - start));
         return result;
     }
 
@@ -98,7 +112,7 @@ public class JsonTransformer implements Transformer {
         } catch (IOException e) {
             throw new TransformerException(e);
         }
-        log.info("Time taken for unmarshalling response from stream to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
+        log.debug("Time taken for unmarshalling response from stream to {} is {} ms", clazz.getName(), (System.currentTimeMillis() - start));
         return result;
     }
 

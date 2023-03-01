@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class School implements Serializable {
 
@@ -20,6 +22,8 @@ public class School implements Serializable {
     private Address address;
     private String phoneNumber = "";
     private String dogwoodElig = "";
+
+    private SchoolStatistic schoolStatistic = new SchoolStatistic();
 
     private List<Student> students;
 
@@ -113,10 +117,31 @@ public class School implements Serializable {
     }
 
     public List<Student> getStudents() {
-        return students;
+        return this.students;
     }
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    public SchoolStatistic getSchoolStatistic() {
+        return schoolStatistic;
+    }
+
+    public void setSchoolStatistic(SchoolStatistic schoolStatistic) {
+        this.schoolStatistic = schoolStatistic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        School school = (School) o;
+        return StringUtils.equalsIgnoreCase(mincode, school.mincode) && StringUtils.equalsIgnoreCase(name, school.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mincode, name);
     }
 }

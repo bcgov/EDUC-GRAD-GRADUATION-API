@@ -99,6 +99,15 @@ public class ReportService {
         return null;
     }
 
+    public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
+        return webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
+                }).block();
+    }
+
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
@@ -123,11 +132,11 @@ public class ReportService {
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
             data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
-            if(traxSchool != null && "Y".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
+            if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
                     data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate());
                 }
-                graduationData.setDogwoodFlag(graduationData.getGraduationDate() != null);
+                graduationData.setDogwoodFlag(graduationStatus.getProgramCompletionDate() != null);
             }
             data.getStudent().setGraduationData(graduationData);
             data.getStudent().setGraduationStatus(graduationStatus);

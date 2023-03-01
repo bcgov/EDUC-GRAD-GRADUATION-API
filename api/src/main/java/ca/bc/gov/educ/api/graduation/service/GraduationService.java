@@ -24,9 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +37,8 @@ public class GraduationService {
     private static final String NONGRADPRJ = "NONGRADPRJ";
     private static final String REGALG = "REGALG";
     private static final String TVRRUN = "TVRRUN";
+    private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
+    private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
 
     @Autowired
     WebClient webClient;
@@ -63,14 +63,14 @@ public class GraduationService {
 
         ExceptionMessage exception = new ExceptionMessage();
         AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
-        logger.info("\n************* NEW STUDENT:***********************");
+        logger.debug("\n************* NEW STUDENT:***********************");
         GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken, exception);
         if (exception.getExceptionName() != null) {
             AlgorithmResponse aR = new AlgorithmResponse();
             aR.setException(exception);
             return aR;
         }
-        logger.info("**** Fetched Student Information: ****");
+        logger.debug("**** Fetched Student Information: ****");
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
             ProcessorData data = new ProcessorData(gradResponse, null, accessToken, studentID, batchId, exception);
             AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
@@ -195,23 +195,23 @@ public class GraduationService {
             List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
             SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
             if (schoolDetails != null) {
-                logger.info("*** School Details Acquired {}", schoolDetails.getSchoolName());
+                logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
                 if (stdList != null && !stdList.isEmpty()) {
                     ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
                     schoolObj.setName(schoolDetails.getSchoolName());
                     if (TVRRUN.equalsIgnoreCase(type)) {
                         List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
-                        logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
+                        logger.debug("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
                         numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
                     } else {
                         List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
-                        logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                        logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                         numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         res = checkAndGetAccessToken(res);
                         accessToken = res.getLeft();
                         List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
-                        logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                        logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                         numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                     }
                 }
@@ -219,6 +219,257 @@ public class GraduationService {
             i++;
         }
         return numberOfReports;
+    }
+
+    @SneakyThrows
+    public Integer createAndStoreDistrictYearEndReports(String accessToken) {
+        Integer reportsCount = 0;
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        Map<School, List<School>> districtSchoolsMap = new HashMap<>();
+        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+            School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
+            processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+        }
+        for (var entry : districtSchoolsMap.entrySet()) {
+            School district = entry.getKey();
+            List<School> schools = entry.getValue();
+            ReportRequest reportRequest = buildDistrictYearEndReportRequest(district);
+            reportRequest.getData().getSchools().addAll(schools);
+            accessToken = getAccessToken(accessToken).getLeft();
+            byte[] reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
+            saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SD, reportAsBytes);
+            reportsCount ++;
+        }
+        return reportsCount;
+    }
+
+    public Integer createAndStoreSchoolYearEndReports(String accessToken) {
+        Integer reportsCount = 0;
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        Map<String, School> newCredentialsSchoolMap = new HashMap<>();
+        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+            School school = populateSchoolObjectByReportGradStudentData(newCredentialsSchoolMap, reportGradStudentData);
+            Student student = processNewCredentialsSchoolMap(reportGradStudentData);
+            if(student != null) {
+                school.getStudents().add(student);
+            }
+        }
+        Map<String, School> issuedTranscriptsSchoolMap = new HashMap<>();
+        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+            School school = populateSchoolObjectByReportGradStudentData(issuedTranscriptsSchoolMap, reportGradStudentData);
+            Student student = processIssuedTranscriptsSchoolMap(reportGradStudentData);
+            if(student != null) {
+                school.getStudents().add(student);
+            }
+        }
+        if(issuedTranscriptsSchoolMap.size() > newCredentialsSchoolMap.size()) {
+            for (var entry : issuedTranscriptsSchoolMap.entrySet()) {
+                School transcriptSchool = entry.getValue();
+                ReportRequest reportRequest = buildSchoolYearEndReportRequest(transcriptSchool);
+                ReportData reportData = new ReportData();
+                reportData.setSchool(transcriptSchool);
+                reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
+                reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
+                School newCredentialsSchool = newCredentialsSchoolMap.get(transcriptSchool.getMincode());
+                if(newCredentialsSchool != null) {
+                    reportData = new ReportData();
+                    reportData.setSchool(newCredentialsSchool);
+                    reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
+                    reportRequest.getDataMap().put("newCredentialsReportData", reportData);
+                }
+                accessToken = getAccessToken(accessToken).getLeft();
+                byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
+                saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SC, reportAsBytes);
+                reportsCount ++;
+            }
+        } else {
+            for (var entry : newCredentialsSchoolMap.entrySet()) {
+                School newCredentialsSchool = entry.getValue();
+                ReportRequest reportRequest = buildSchoolYearEndReportRequest(newCredentialsSchool);
+                ReportData reportData = new ReportData();
+                reportData.setSchool(newCredentialsSchool);
+                reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
+                reportRequest.getDataMap().put("newCredentialsReportData", reportData);
+                School transcriptSchool = issuedTranscriptsSchoolMap.get(newCredentialsSchool.getMincode());
+                if(transcriptSchool != null) {
+                    reportData = new ReportData();
+                    reportData.setSchool(transcriptSchool);
+                    reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
+                    reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
+                }
+                accessToken = getAccessToken(accessToken).getLeft();
+                byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
+                saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SC, reportAsBytes);
+                reportsCount ++;
+            }
+        }
+        return reportsCount;
+    }
+
+    private void saveDistrictSchoolYearEndReport(String accessToken, ReportRequest reportRequest, String reportType, byte[] reportAsBytes) {
+        String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
+        SchoolReports schoolReports = getSchoolReports(reportRequest.getData().getSchool().getMincode(), encodedPdf, reportType);
+        updateSchoolReport(accessToken, schoolReports);
+    }
+
+    private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
+        return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
+        return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
+                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    private ReportRequest buildSchoolYearEndReportRequest(School school) {
+        ReportRequest reportRequest = new ReportRequest();
+        ReportOptions reportOptions = new ReportOptions();
+        reportOptions.setReportName("schooldistributionyearend");
+        reportOptions.setReportFile(String.format("%s School Distribution Report Year End.pdf", school.getMincode()));
+        reportRequest.setOptions(reportOptions);
+        ReportData headerData = new ReportData();
+        School headerSchool = new School();
+        headerSchool.setMincode(school.getMincode());
+        headerSchool.setName(school.getName());
+        headerData.setSchool(headerSchool);
+        headerData.setOrgCode(getReportOrgCode(headerSchool.getMincode()));
+        headerData.setIssueDate(new Date());
+        reportRequest.setData(headerData);
+        Map<String, ReportData> reportDataMap = new HashMap<>();
+        reportRequest.setDataMap(reportDataMap);
+        return reportRequest;
+    }
+
+    private ReportRequest buildDistrictYearEndReportRequest(School headerSchool) {
+        ReportRequest reportRequest = new ReportRequest();
+        ReportOptions reportOptions = new ReportOptions();
+        reportOptions.setReportName("districtdistributionyearend");
+        reportOptions.setReportFile(String.format("%s District Distribution Report Year End.pdf", headerSchool.getMincode()));
+        reportRequest.setOptions(reportOptions);
+        ReportData headerData = new ReportData();
+        headerData.setSchool(headerSchool);
+        headerData.setOrgCode(getReportOrgCode(headerSchool.getMincode()));
+        headerData.setIssueDate(new Date());
+        headerData.setSchools(new ArrayList<>());
+        reportRequest.setData(headerData);
+        return reportRequest;
+    }
+
+    private String getReportOrgCode(String mincode) {
+        return (StringUtils.startsWith(mincode, "098") ? "YU" : "BC");
+    }
+
+    private School populateDistrictObjectByReportGradStudentData(Map<School, List<School>> districtSchoolsMap, ReportGradStudentData reportGradStudentData) {
+        //district data, not school
+        String distcode = StringUtils.substring(reportGradStudentData.getMincode(), 0, 3);
+        boolean addNewDistrict = true;
+        School district = null;
+        for (var entry : districtSchoolsMap.entrySet()) {
+            School currentDistrict = entry.getKey();
+            if(StringUtils.equals(distcode, currentDistrict.getDistno())) {
+                addNewDistrict = false;
+                district = currentDistrict;
+            }
+        }
+        if(addNewDistrict) {
+            district = new School();
+            district.setDistno(distcode);
+            district.setMincode(distcode);
+            district.setName(reportGradStudentData.getDistrictName());
+            districtSchoolsMap.put(district, new ArrayList<>());
+        }
+        return district;
+    }
+
+    private School populateSchoolObjectByReportGradStudentData(Map<String, School> schoolMap, ReportGradStudentData reportGradStudentData) {
+        String mincode = reportGradStudentData.getMincode();
+        School school = schoolMap.get(mincode);
+        if(school == null) {
+            school = new School();
+            school.setDistno(StringUtils.substring(mincode, 0, 3));
+            school.setMincode(mincode);
+            school.setName(reportGradStudentData.getSchoolName());
+            school.setStudents(new ArrayList<>());
+            schoolMap.put(mincode, school);
+        }
+        return school;
+    }
+
+    private void processDistrictSchoolMap(List<School> schools, ReportGradStudentData reportGradStudentData) {
+        boolean addNewSchool = true;
+        for(School school: schools) {
+            if(StringUtils.equals(school.getMincode(), reportGradStudentData.getMincode())) {
+                addNewSchool = false;
+                processDistrictSchool(school, reportGradStudentData);
+            }
+        }
+        if(addNewSchool) {
+            School school = new School();
+            school.setDistno(StringUtils.substring(reportGradStudentData.getMincode(), 0, 3));
+            school.setMincode(reportGradStudentData.getMincode());
+            school.setName(reportGradStudentData.getSchoolName());
+            schools.add(processDistrictSchool(school, reportGradStudentData));
+        }
+    }
+
+    private School processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
+        if (reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
+            for(GradCertificateType certType: reportGradStudentData.getCertificateTypes()) {
+                switch (certType.getCode()) {
+                    case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
+                    case "A", "AI" -> school.getSchoolStatistic().setAdultDogwoodCount(school.getSchoolStatistic().getAdultDogwoodCount() + 1);
+                    case "F" -> school.getSchoolStatistic().setFrenchImmersionCount(school.getSchoolStatistic().getFrenchImmersionCount() + 1);
+                    case "S" -> school.getSchoolStatistic().setProgramFrancophoneCount(school.getSchoolStatistic().getProgramFrancophoneCount() + 1);
+                    case "SC", "SCF", "SCI" -> school.getSchoolStatistic().setEvergreenCount(school.getSchoolStatistic().getEvergreenCount() + 1);
+                    default -> school.setTypeIndicator(null);
+                }
+            }
+            school.getSchoolStatistic().setTotalCertificateCount(school.getSchoolStatistic().getTotalCertificateCount() + 1);
+        }
+        if(StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
+            school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
+        }
+        return school;
+    }
+
+    private Student processNewCredentialsSchoolMap(ReportGradStudentData reportGradStudentData) {
+        if(reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
+            return populateStudentObjectByReportGradStudentData(reportGradStudentData);
+        }
+        return null;
+    }
+
+    private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
+        if(StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
+            return populateStudentObjectByReportGradStudentData(reportGradStudentData);
+        }
+        return null;
+    }
+
+    private Student populateStudentObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
+        Student student = new Student();
+        student.setPen(new Pen(reportGradStudentData.getPen(), reportGradStudentData.getGraduationStudentRecordId().toString()));
+        student.setFirstName(reportGradStudentData.getFirstName());
+        student.setMiddleName(reportGradStudentData.getMiddleName());
+        student.setLastName(reportGradStudentData.getLastName());
+        student.setGradProgram(reportGradStudentData.getProgramCode());
+
+        GraduationStatus gradStatus = new GraduationStatus();
+        gradStatus.setProgramCompletionDate(reportGradStudentData.getProgramCompletionDate());
+        gradStatus.setSchoolAtGrad(reportGradStudentData.getMincode());
+        gradStatus.setProgramName(reportGradStudentData.getProgramCode());
+        student.setGraduationStatus(gradStatus);
+
+        ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
+        gradData.setGraduationDate(EducGraduationApiUtils.parseDate(reportGradStudentData.getProgramCompletionDate()));
+        gradData.setProgramCodes(List.of(reportGradStudentData.getProgramCode()));
+        gradData.setProgramNames(List.of(reportGradStudentData.getProgramName()));
+        student.setGraduationData(gradData);
+
+        return student;
     }
 
     private List<GraduationStudentRecord> filterStudentList(List<GraduationStudentRecord> stdList, String type) {

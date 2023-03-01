@@ -5,14 +5,16 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonPropertyOrder({ "options", "data"})
+@JsonPropertyOrder({ "options", "data", "dataMap"})
 public class ReportRequest implements Serializable {
 
 	private static final long serialVersionUID = 2L;
 
 	private ReportData data;
+	private Map<String, ReportData> dataMap;
 	private ReportOptions options;
 
 	@JsonProperty("data")
@@ -21,6 +23,14 @@ public class ReportRequest implements Serializable {
 	}
 	public void setData(ReportData data) {
 		this.data = data;
+	}
+
+	@JsonProperty("dataMap")
+	public Map<String, ReportData> getDataMap() {
+		return dataMap;
+	}
+	public void setDataMap(Map<String, ReportData> dataMap) {
+		this.dataMap = dataMap;
 	}
 
 	@JsonProperty("options")

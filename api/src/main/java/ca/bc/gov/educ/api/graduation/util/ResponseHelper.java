@@ -59,9 +59,8 @@ public class ResponseHelper {
 
 	/**
 	 * Get Response Entity using a LIST of JPA Entity Sources
-	 * @param <T>
-	 * @param optional - the JPA entity Source LIST
-	 * @param type - The API model type to map to.
+	 * @param entitySet - the JPA entity Source LIST
+	 * @param T - The API model type to map to.
 	 * @return
 	 */
 	public <T> ResponseEntity<List<T>> GET(Collection<?> entitySet, Type T) {
@@ -77,8 +76,7 @@ public class ResponseHelper {
 	 * Get Response Entity using a LIST of REST Model objects. This
 	 * should only be used when you need fine-grained control over the model
 	 * mapping and the mapping gets performed within the API.
-	 * @param <T>
-	 * @param optional - the JPA entity Source LIST
+	 * @param list - the JPA entity Source LIST
 	 * @return
 	 */
 	public <T> ResponseEntity<List<T>> GET(List<T> list) {
