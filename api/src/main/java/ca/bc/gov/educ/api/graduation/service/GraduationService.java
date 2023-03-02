@@ -63,14 +63,14 @@ public class GraduationService {
 
         ExceptionMessage exception = new ExceptionMessage();
         AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
-        logger.info("\n************* NEW STUDENT:***********************");
+        logger.debug("\n************* NEW STUDENT:***********************");
         GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken, exception);
         if (exception.getExceptionName() != null) {
             AlgorithmResponse aR = new AlgorithmResponse();
             aR.setException(exception);
             return aR;
         }
-        logger.info("**** Fetched Student Information: ****");
+        logger.debug("**** Fetched Student Information: ****");
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
             ProcessorData data = new ProcessorData(gradResponse, null, accessToken, studentID, batchId, exception);
             AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
@@ -195,23 +195,23 @@ public class GraduationService {
             List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
             SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
             if (schoolDetails != null) {
-                logger.info("*** School Details Acquired {}", schoolDetails.getSchoolName());
+                logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
                 if (stdList != null && !stdList.isEmpty()) {
                     ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
                     schoolObj.setName(schoolDetails.getSchoolName());
                     if (TVRRUN.equalsIgnoreCase(type)) {
                         List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
-                        logger.info("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
+                        logger.debug("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
                         numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
                     } else {
                         List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
-                        logger.info("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                        logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                         numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                         res = checkAndGetAccessToken(res);
                         accessToken = res.getLeft();
                         List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
-                        logger.info("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                        logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                         numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                     }
                 }

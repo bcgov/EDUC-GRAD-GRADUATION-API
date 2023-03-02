@@ -23,7 +23,7 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
-		logger.info("************* TIME START  ************ {}",startTime);
+		logger.debug("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		ExceptionMessage exception = new ExceptionMessage();
@@ -33,26 +33,26 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
-			logger.info("**** Grad Algorithm Completed:{} **** ",gradResponse.getStudentID());
+			logger.debug("**** Grad Algorithm Completed:{} **** ",gradResponse.getStudentID());
 
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
-			logger.info("**** Saved Optional Programs: ****");
+			logger.debug("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			ReportData data = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,processorData.getAccessToken(),exception);
 			if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
 				return processorData;
 			}
-			logger.info("**** Prepared Data for Reports: ****");
+			logger.debug("**** Prepared Data for Reports: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
 				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
 				if (checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
-				logger.info("**** Saved Grad Status: ****");
+				logger.debug("**** Saved Grad Status: ****");
 				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "FMR");
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
-					logger.info("**** Record Restored Due to Error: ****");
+					logger.debug("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
 				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
@@ -60,10 +60,10 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 				gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
 				if (checkExceptions(exception,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
-					logger.info("**** Record Restored Due to Error: ****");
+					logger.debug("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
-				logger.info("**** Saved Grad Status: ****");
+				logger.debug("**** Saved Grad Status: ****");
 				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
@@ -74,7 +74,7 @@ public class ProjectedGradFinalMarksReportsProcess extends BaseProcess{
 		}
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.info("************* TIME Taken  ************ {} secs",diff);
+		logger.debug("************* TIME Taken  ************ {} secs",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
