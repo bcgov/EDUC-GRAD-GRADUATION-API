@@ -400,6 +400,7 @@ public class GraduationService {
 
     private void processDistrictSchoolMap(List<School> schools, ReportGradStudentData reportGradStudentData) {
         boolean addNewSchool = true;
+        String distNo = StringUtils.substring(reportGradStudentData.getMincode(), 0, 3);
         for(School school: schools) {
             if(StringUtils.equals(school.getMincode(), reportGradStudentData.getMincode())) {
                 addNewSchool = false;
@@ -408,7 +409,7 @@ public class GraduationService {
         }
         if(addNewSchool) {
             School school = new School();
-            school.setDistno(StringUtils.substring(reportGradStudentData.getMincode(), 0, 3));
+            school.setDistno(distNo);
             school.setMincode(reportGradStudentData.getMincode());
             school.setName(reportGradStudentData.getSchoolName());
             schools.add(processDistrictSchool(school, reportGradStudentData));

@@ -26,4 +26,13 @@ public class ReportGradStudentData implements Serializable {
     private String transcriptTypeCode;
     private List<GradCertificateType> certificateTypes;
 
+    @Override
+    public String toString() {
+        return "ReportGradStudentData{" +
+                "mincode='" + mincode + '\'' +
+                ", pen='" + pen + '\'' +
+                ", districtName='" + districtName + '\'' +
+                ", schoolName='" + schoolName + '\'' +
+                '}';
+    }
 }

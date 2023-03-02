@@ -144,4 +144,13 @@ public class School implements Serializable {
     public int hashCode() {
         return Objects.hash(mincode, name);
     }
+
+    @Override
+    public String toString() {
+        return "School{" +
+                "mincode='" + mincode + '\'' +
+                ", name='" + name + '\'' +
+                ", distno='" + distno + '\'' +
+                '}';
+    }
 }
