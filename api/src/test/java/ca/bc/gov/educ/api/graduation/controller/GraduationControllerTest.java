@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
+import ca.bc.gov.educ.api.graduation.service.SchoolReportsService;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.MessageHelper;
 import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
@@ -25,6 +26,9 @@ class GraduationControllerTest {
 
 	@Mock
 	private GraduationService graduationService;
+
+	@Mock
+	private SchoolReportsService schoolReportsService;
 	
 	@Mock
 	ResponseHelper response;
@@ -119,16 +123,30 @@ class GraduationControllerTest {
 
 	@Test
 	void testCreateAndStoreSchoolYearEndReports() {
-		Mockito.when(graduationService.createAndStoreSchoolYearEndReports("accessToken")).thenReturn(1);
+		Mockito.when(schoolReportsService.createAndStoreSchoolYearEndReports("accessToken")).thenReturn(1);
 		graduationController.createAndStoreSchoolYearEndReports("accessToken");
-		Mockito.verify(graduationService).createAndStoreSchoolYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolYearEndReports("accessToken");
 	}
 
 	@Test
 	void testCreateAndStoreDistrictYearEndReports() {
-		Mockito.when(graduationService.createAndStoreDistrictYearEndReports("accessToken")).thenReturn(1);
+		Mockito.when(schoolReportsService.createAndStoreDistrictYearEndReports("accessToken")).thenReturn(1);
 		graduationController.createAndStoreDistrictYearEndReports("accessToken");
-		Mockito.verify(graduationService).createAndStoreDistrictYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreDistrictYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictSchoolYearEndReports() {
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken")).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictSchoolYearEndPdfReports() {
+		Mockito.when(schoolReportsService.getSchoolDistrictYearEndReports("accessToken")).thenReturn(new byte[0]);
+		graduationController.getSchoolDistrictYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).getSchoolDistrictYearEndReports("accessToken");
 	}
 
 	@Test

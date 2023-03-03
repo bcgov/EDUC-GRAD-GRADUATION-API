@@ -121,7 +121,10 @@ public class JsonTransformer implements Transformer {
         ObjectWriter prettyPrinter = OBJECT_MAPPER.writerWithDefaultPrettyPrinter();
         String result = null;
         try {
-            result = prettyPrinter.writeValueAsString(input);
+            result = prettyPrinter
+                    .with(SerializationFeature.INDENT_OUTPUT)
+                    .with(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
+                    .writeValueAsString(input);
         } catch (IOException e) {
             throw new TransformerException(e);
         }

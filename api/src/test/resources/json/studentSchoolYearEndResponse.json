@@ -1,11 +1,33 @@
 [
   {
+    "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a1f06df5d06",
+    "mincode": "02396738",
+    "pen": "118701325",
+    "firstName": "ROBERT",
+    "middleName": "LYNNEA",
+    "lastName": "BERGERON",
+    "districtName": "CENTRAL OKANAGAN PUBLIC SCHOOLS SD 23",
+    "schoolName": "HERITAGE CHRISTIAN ONLINE SCHOOL",
+    "programCode": "SCCP",
+    "programName": "Student Completion Certificate Program",
+    "programCompletionDate": "2012/02",
+    "graduated": "true",
+    "transcriptTypeCode": "SCCP-EN",
+    "certificateTypes": [
+      {
+        "code": "SCI",
+        "label": null,
+        "description": "Evergreen (Independent)"
+      }
+    ]
+  },
+  {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a3356591819",
     "mincode": "02396738",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
+    "pen": "128320223",
+    "firstName": "MARVIN",
+    "middleName": "RICHARD",
+    "lastName": "SMITH",
     "districtName": "CENTRAL OKANAGAN PUBLIC SCHOOLS SD 23",
     "schoolName": "HERITAGE CHRISTIAN ONLINE SCHOOL",
     "programCode": "2018-EN",
@@ -15,28 +37,41 @@
     "transcriptTypeCode": "BC2018-IND",
     "certificateTypes": [
       {
-        "createUser": null,
-        "createDate": null,
-        "updateUser": null,
-        "updateDate": null,
         "code": "EI",
         "label": null,
-        "language": null,
-        "description": "Dogwood (Independent)",
-        "displayOrder": null,
-        "effectiveDate": null,
-        "expiryDate": null,
-        "paperType": null
+        "description": "Dogwood (Independent)"
+      }
+    ]
+  },
+  {
+    "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a3e88604a7f",
+    "mincode": "00501007",
+    "pen": "133802710",
+    "firstName": "EVA",
+    "middleName": "DOUGLAS",
+    "lastName": "TOOR",
+    "districtName": "SOUTHEAST KOOTENAY",
+    "schoolName": "JAFFRAY ELEM-JR SECONDARY",
+    "programCode": "SCCP",
+    "programName": "Student Completion Certificate Program",
+    "programCompletionDate": "2010/03",
+    "graduated": "true",
+    "transcriptTypeCode": "SCCP-EN",
+    "certificateTypes": [
+      {
+        "code": "SC",
+        "label": null,
+        "description": "Evergreen"
       }
     ]
   },
   {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a3b89277754",
     "mincode": "00502001",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
+    "pen": "130521487",
+    "firstName": "YUN HSUAN",
+    "middleName": "PETER",
+    "lastName": "ABBOTT",
     "districtName": "SOUTHEAST KOOTENAY",
     "schoolName": "ROBERT EDGELL",
     "programCode": "SCCP",
@@ -49,10 +84,10 @@
   {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a33566e1e28",
     "mincode": "00502001",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
+    "pen": "128329158",
+    "firstName": "DYLAN",
+    "middleName": "MICHAEL",
+    "lastName": "FISHER",
     "districtName": "SOUTHEAST KOOTENAY",
     "schoolName": "ROBERT EDGELL",
     "programCode": "2018-EN",
@@ -65,10 +100,10 @@
   {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a3b766f61cb",
     "mincode": "00502001",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
+    "pen": "130490329",
+    "firstName": "LES",
+    "middleName": "HENRY",
+    "lastName": "OGLEND",
     "districtName": "SOUTHEAST KOOTENAY",
     "schoolName": "ROBERT EDGELL",
     "programCode": "SCCP",
@@ -79,74 +114,12 @@
     "certificateTypes": null
   },
   {
-    "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a2e622435c2",
-    "mincode": "00502001",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
-    "districtName": "SOUTHEAST KOOTENAY",
-    "schoolName": "ROBERT EDGELL",
-    "programCode": "2018-EN",
-    "programName": "Graduation Program 2018",
-    "programCompletionDate": "2020-06-01",
-    "graduated": "true",
-    "transcriptTypeCode": "BC2018-PUB",
-    "certificateTypes": [
-      {
-        "createUser": null,
-        "createDate": null,
-        "updateUser": null,
-        "updateDate": null,
-        "code": "E",
-        "label": null,
-        "language": null,
-        "description": "Dogwood (Public)",
-        "displayOrder": null,
-        "effectiveDate": null,
-        "expiryDate": null,
-        "paperType": null
-      }
-    ]
-  },
-  {
-    "graduationStudentRecordId": "0a614e84-7e27-1815-817f-09852dc321e8",
-    "mincode": "06262038",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
-    "districtName": "SOOKE",
-    "schoolName": "ROYAL BAY SECONDARY",
-    "programCode": "2018-EN",
-    "programName": "Graduation Program 2018",
-    "programCompletionDate": "2022-02-01",
-    "graduated": "true",
-    "transcriptTypeCode": "BC2018-PUB",
-    "certificateTypes": [
-      {
-        "createUser": null,
-        "createDate": null,
-        "updateUser": null,
-        "updateDate": null,
-        "code": "E",
-        "label": null,
-        "language": null,
-        "description": "Dogwood (Public)",
-        "displayOrder": null,
-        "effectiveDate": null,
-        "expiryDate": null,
-        "paperType": null
-      }
-    ]
-  },
-  {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a2e119f5cff",
     "mincode": "07897034",
-    "pen": "111111111",
-    "firstName": "John",
-    "middleName": "",
-    "lastName": "Doe",
+    "pen": "124781733",
+    "firstName": "BRIAN",
+    "middleName": "LEIGH",
+    "lastName": "OVERTON",
     "districtName": "FRASER-CASCADE",
     "schoolName": "STS'AILES COMMUNITY SCHOOL",
     "programCode": "2018-EN",
@@ -156,18 +129,9 @@
     "transcriptTypeCode": "BC2018-PUB",
     "certificateTypes": [
       {
-        "createUser": null,
-        "createDate": null,
-        "updateUser": null,
-        "updateDate": null,
         "code": "FN",
         "label": null,
-        "language": null,
-        "description": "First Nations",
-        "displayOrder": null,
-        "effectiveDate": null,
-        "expiryDate": null,
-        "paperType": null
+        "description": "First Nations"
       }
     ]
   }
