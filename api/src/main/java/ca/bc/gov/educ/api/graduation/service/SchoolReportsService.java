@@ -27,7 +27,7 @@ public class SchoolReportsService {
 
     private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
-    private static final String DISTREP_YE_SL = "DISTREP_YE_SL";
+    private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
 
     @Autowired
     WebClient webClient;
@@ -80,8 +80,9 @@ public class SchoolReportsService {
             pdfs.add(is);
         }
         if (pdfs == null) {
-            saveDistrictSchoolYearEndReport(accessToken, "000000000", DISTREP_YE_SL, reportAsBytes);
+            saveDistrictSchoolYearEndReport(accessToken, "000000000", ADDRESS_LABEL_YE, reportAsBytes);
         }
+        reportsCount++;
         return reportsCount;
     }
 
