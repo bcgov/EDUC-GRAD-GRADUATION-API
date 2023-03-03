@@ -11,8 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -26,8 +24,6 @@ import java.util.*;
 
 @Service
 public class SchoolReportsService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SchoolReportsService.class);
 
     private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
