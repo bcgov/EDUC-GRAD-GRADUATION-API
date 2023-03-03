@@ -15,8 +15,6 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -437,16 +432,6 @@ public class GraduationService {
 
     private Pair<String, Long> getAccessToken(String accessToken) {
         return tokenUtils.getAccessToken(accessToken);
-    }
-
-    @SneakyThrows
-    private byte[] mergeDocuments(List<InputStream> sources) {
-        ByteArrayOutputStream tempOutStream = new ByteArrayOutputStream();
-        PDFMergerUtility mergedDoc = new PDFMergerUtility();
-        mergedDoc.setDestinationStream(tempOutStream);
-        mergedDoc.addSources(sources);
-        mergedDoc.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
-        return new ByteArrayInputStream(tempOutStream.toByteArray()).readAllBytes();
     }
 
 }

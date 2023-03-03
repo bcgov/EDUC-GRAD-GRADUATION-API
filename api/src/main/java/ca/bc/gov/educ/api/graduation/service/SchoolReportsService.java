@@ -48,8 +48,6 @@ public class SchoolReportsService {
     @SneakyThrows
     public byte[] getSchoolDistrictYearEndReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
-        logger.debug("\nStudentsForSchoolYearEndReport:");
-        logger.debug(jsonTransformer.marshall(reportGradStudentDataList));
         List<InputStream> pdfs = new ArrayList<>();
         createAndStoreDistrictYearEndReports(reportGradStudentDataList, accessToken, pdfs);
         createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, pdfs);
@@ -60,8 +58,6 @@ public class SchoolReportsService {
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken) {
         Integer reportsCount = 0;
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
-        logger.debug("\nStudentsForSchoolYearEndReport:");
-        logger.debug(jsonTransformer.marshall(reportGradStudentDataList));
         reportsCount += createAndStoreDistrictYearEndReports(reportGradStudentDataList, accessToken, null);
         reportsCount += createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, null);
         return reportsCount;
@@ -101,8 +97,6 @@ public class SchoolReportsService {
                     reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
                     reportRequest.getDataMap().put("newCredentialsReportData", reportData);
                 }
-                logger.debug(String.format("\nSchool %s Report Request:", transcriptSchool.getMincode()));
-                logger.debug(jsonTransformer.marshall(reportRequest));
                 accessToken = getAccessToken(accessToken).getLeft();
                 byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
                 if(reportAsBytes != null && pdfs != null) {
@@ -129,8 +123,6 @@ public class SchoolReportsService {
                     reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
                     reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
                 }
-                logger.debug(String.format("\nSchool %s Report Request:", newCredentialsSchool.getMincode()));
-                logger.debug(jsonTransformer.marshall(reportRequest));
                 accessToken = getAccessToken(accessToken).getLeft();
                 byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
                 if(reportAsBytes != null && pdfs != null) {
@@ -159,8 +151,6 @@ public class SchoolReportsService {
             List<School> schools = entry.getValue();
             ReportRequest reportRequest = buildDistrictYearEndReportRequest(district);
             reportRequest.getData().getSchools().addAll(schools);
-            logger.debug(String.format("\nDistrict %s Report Request:", district.getMincode()));
-            logger.debug(jsonTransformer.marshall(reportRequest));
             accessToken = getAccessToken(accessToken).getLeft();
             byte[] reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
             if(reportAsBytes != null && pdfs != null) {
