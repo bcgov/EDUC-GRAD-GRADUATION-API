@@ -75,6 +75,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.report-api.district_distribution_year_end}")
     private String districtDistributionYearEnd;
+
+    @Value("${endpoint.report-api.school_labels}")
+    private String schoolLabels;
     
     @Value("${endpoint.report-api.certificate_report}")
     private String certificateReport;

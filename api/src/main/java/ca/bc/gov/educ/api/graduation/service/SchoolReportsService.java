@@ -27,11 +27,14 @@ public class SchoolReportsService {
 
     private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
+    private static final String DISTREP_YE_SL = "DISTREP_YE_SL";
 
     @Autowired
     WebClient webClient;
     @Autowired
     ReportService reportService;
+    @Autowired
+    SchoolService schoolService;
     @Autowired
     TokenUtils tokenUtils;
 
@@ -45,6 +48,7 @@ public class SchoolReportsService {
     public byte[] getSchoolDistrictYearEndReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
+        createAndStoreSchoolLabelsReports(reportGradStudentDataList, accessToken, pdfs);
         createAndStoreDistrictYearEndReports(reportGradStudentDataList, accessToken, pdfs);
         createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, pdfs);
         return mergeDocuments(pdfs);
@@ -54,8 +58,30 @@ public class SchoolReportsService {
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken) {
         Integer reportsCount = 0;
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        reportsCount += createAndStoreSchoolLabelsReports(reportGradStudentDataList, accessToken, null);
         reportsCount += createAndStoreDistrictYearEndReports(reportGradStudentDataList, accessToken, null);
         reportsCount += createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, null);
+        return reportsCount;
+    }
+
+    @SneakyThrows
+    public Integer createAndStoreSchoolLabelsReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
+        Integer reportsCount = 0;
+        Map<String, School> schoolMap = new HashMap<>();
+        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
+            populateSchoolObjectByReportGradStudentData(schoolMap, reportGradStudentData);
+        }
+        List<School> schools = new ArrayList<>(schoolMap.values());
+        ReportRequest reportRequest = buildSchoolLabelsReportRequest(schools);
+        accessToken = getAccessToken(accessToken).getLeft();
+        byte[] reportAsBytes = getSchoolLabelsReportJasper(reportRequest, accessToken);
+        if (reportAsBytes != null && pdfs != null) {
+            ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
+            pdfs.add(is);
+        }
+        if (pdfs == null) {
+            saveDistrictSchoolYearEndReport(accessToken, "000000000", DISTREP_YE_SL, reportAsBytes);
+        }
         return reportsCount;
     }
 
@@ -63,22 +89,22 @@ public class SchoolReportsService {
     private Integer createAndStoreSchoolYearEndReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<String, School> newCredentialsSchoolMap = new HashMap<>();
-        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             School school = populateSchoolObjectByReportGradStudentData(newCredentialsSchoolMap, reportGradStudentData);
             Student student = processNewCredentialsSchoolMap(reportGradStudentData);
-            if(student != null) {
+            if (student != null) {
                 school.getStudents().add(student);
             }
         }
         Map<String, School> issuedTranscriptsSchoolMap = new HashMap<>();
-        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             School school = populateSchoolObjectByReportGradStudentData(issuedTranscriptsSchoolMap, reportGradStudentData);
             Student student = processIssuedTranscriptsSchoolMap(reportGradStudentData);
-            if(student != null) {
+            if (student != null) {
                 school.getStudents().add(student);
             }
         }
-        if(issuedTranscriptsSchoolMap.size() > newCredentialsSchoolMap.size()) {
+        if (issuedTranscriptsSchoolMap.size() > newCredentialsSchoolMap.size()) {
             for (var entry : issuedTranscriptsSchoolMap.entrySet()) {
                 School transcriptSchool = entry.getValue();
                 ReportRequest reportRequest = buildSchoolYearEndReportRequest(transcriptSchool);
@@ -87,7 +113,7 @@ public class SchoolReportsService {
                 reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
                 reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
                 School newCredentialsSchool = newCredentialsSchoolMap.get(transcriptSchool.getMincode());
-                if(newCredentialsSchool != null) {
+                if (newCredentialsSchool != null) {
                     reportData = new ReportData();
                     reportData.setSchool(newCredentialsSchool);
                     reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
@@ -95,14 +121,14 @@ public class SchoolReportsService {
                 }
                 accessToken = getAccessToken(accessToken).getLeft();
                 byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
-                if(reportAsBytes != null && pdfs != null) {
+                if (reportAsBytes != null && pdfs != null) {
                     ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
                     pdfs.add(is);
                 }
-                if(pdfs == null) {
-                    saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SC, reportAsBytes);
+                if (pdfs == null) {
+                    saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), DISTREP_YE_SC, reportAsBytes);
                 }
-                reportsCount ++;
+                reportsCount++;
             }
         } else {
             for (var entry : newCredentialsSchoolMap.entrySet()) {
@@ -113,7 +139,7 @@ public class SchoolReportsService {
                 reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
                 reportRequest.getDataMap().put("newCredentialsReportData", reportData);
                 School transcriptSchool = issuedTranscriptsSchoolMap.get(newCredentialsSchool.getMincode());
-                if(transcriptSchool != null) {
+                if (transcriptSchool != null) {
                     reportData = new ReportData();
                     reportData.setSchool(transcriptSchool);
                     reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
@@ -121,14 +147,14 @@ public class SchoolReportsService {
                 }
                 accessToken = getAccessToken(accessToken).getLeft();
                 byte[] reportAsBytes = getSchoolYearEndReportJasper(reportRequest, accessToken);
-                if(reportAsBytes != null && pdfs != null) {
+                if (reportAsBytes != null && pdfs != null) {
                     ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
                     pdfs.add(is);
                 }
-                if(pdfs == null) {
-                    saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SC, reportAsBytes);
+                if (pdfs == null) {
+                    saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), DISTREP_YE_SC, reportAsBytes);
                 }
-                reportsCount ++;
+                reportsCount++;
             }
         }
         return reportsCount;
@@ -138,7 +164,7 @@ public class SchoolReportsService {
     private Integer createAndStoreDistrictYearEndReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<School, List<School>> districtSchoolsMap = new HashMap<>();
-        for(ReportGradStudentData reportGradStudentData: reportGradStudentDataList) {
+        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
             processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
         }
@@ -149,14 +175,14 @@ public class SchoolReportsService {
             reportRequest.getData().getSchools().addAll(schools);
             accessToken = getAccessToken(accessToken).getLeft();
             byte[] reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
-            if(reportAsBytes != null && pdfs != null) {
+            if (reportAsBytes != null && pdfs != null) {
                 ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
                 pdfs.add(is);
             }
-            if(pdfs == null) {
-                saveDistrictSchoolYearEndReport(accessToken, reportRequest, DISTREP_YE_SD, reportAsBytes);
+            if (pdfs == null) {
+                saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), DISTREP_YE_SD, reportAsBytes);
             }
-            reportsCount ++;
+            reportsCount++;
         }
         return reportsCount;
     }
@@ -171,21 +197,36 @@ public class SchoolReportsService {
         return createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, null);
     }
 
-    private void saveDistrictSchoolYearEndReport(String accessToken, ReportRequest reportRequest, String reportType, byte[] reportAsBytes) {
+    private void saveDistrictSchoolYearEndReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
-        SchoolReports schoolReports = getSchoolReports(reportRequest.getData().getSchool().getMincode(), encodedPdf, reportType);
+        SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
         updateSchoolReport(accessToken, schoolReports);
     }
 
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
         return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }
+                ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest, String accessToken) {
+        return webClient.post().uri(educGraduationApiConstants.getSchoolLabels())
+                .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }
                 ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
     }
 
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }
                 ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
     }
 
@@ -223,6 +264,19 @@ public class SchoolReportsService {
         return reportRequest;
     }
 
+    private ReportRequest buildSchoolLabelsReportRequest(List<School> schools) {
+        ReportRequest reportRequest = new ReportRequest();
+        ReportOptions reportOptions = new ReportOptions();
+        reportOptions.setReportName("schoollabels");
+        reportOptions.setReportFile("School Labels.pdf");
+        reportRequest.setOptions(reportOptions);
+        ReportData data = new ReportData();
+        data.setIssueDate(new Date());
+        data.setSchools(schools);
+        reportRequest.setData(data);
+        return reportRequest;
+    }
+
     private String getReportOrgCode(String mincode) {
         return (StringUtils.startsWith(mincode, "098") ? "YU" : "BC");
     }
@@ -234,12 +288,12 @@ public class SchoolReportsService {
         School district = null;
         for (var entry : districtSchoolsMap.entrySet()) {
             School currentDistrict = entry.getKey();
-            if(StringUtils.equals(distcode, currentDistrict.getDistno())) {
+            if (StringUtils.equals(distcode, currentDistrict.getDistno())) {
                 addNewDistrict = false;
                 district = currentDistrict;
             }
         }
-        if(addNewDistrict) {
+        if (addNewDistrict) {
             district = new School();
             district.setDistno(distcode);
             district.setMincode(distcode);
@@ -249,15 +303,28 @@ public class SchoolReportsService {
         return district;
     }
 
+    private School populateSchoolObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
+        School school = new School();
+        school.setDistno(StringUtils.substring(reportGradStudentData.getMincode(), 0, 3));
+        school.setMincode(reportGradStudentData.getMincode());
+        school.setName(reportGradStudentData.getSchoolName());
+        Address address = new Address();
+        address.setStreetLine1(reportGradStudentData.getSchoolAddress1());
+        address.setStreetLine2(reportGradStudentData.getSchoolAddress2());
+        address.setCity(reportGradStudentData.getSchoolCity());
+        address.setRegion(reportGradStudentData.getSchoolProvince());
+        address.setCountry(reportGradStudentData.getSchoolCountry());
+        address.setCode(reportGradStudentData.getSchoolPostal());
+        school.setAddress(address);
+        school.setStudents(new ArrayList<>());
+        return school;
+    }
+
     private School populateSchoolObjectByReportGradStudentData(Map<String, School> schoolMap, ReportGradStudentData reportGradStudentData) {
         String mincode = reportGradStudentData.getMincode();
         School school = schoolMap.get(mincode);
-        if(school == null) {
-            school = new School();
-            school.setDistno(StringUtils.substring(mincode, 0, 3));
-            school.setMincode(mincode);
-            school.setName(reportGradStudentData.getSchoolName());
-            school.setStudents(new ArrayList<>());
+        if (school == null) {
+            school = populateSchoolObjectByReportGradStudentData(reportGradStudentData);
             schoolMap.put(mincode, school);
         }
         return school;
@@ -266,13 +333,13 @@ public class SchoolReportsService {
     private void processDistrictSchoolMap(List<School> schools, ReportGradStudentData reportGradStudentData) {
         boolean addNewSchool = true;
         String distNo = StringUtils.substring(reportGradStudentData.getMincode(), 0, 3);
-        for(School school: schools) {
-            if(StringUtils.equals(school.getMincode(), reportGradStudentData.getMincode())) {
+        for (School school : schools) {
+            if (StringUtils.equals(school.getMincode(), reportGradStudentData.getMincode())) {
                 addNewSchool = false;
                 processDistrictSchool(school, reportGradStudentData);
             }
         }
-        if(addNewSchool) {
+        if (addNewSchool) {
             School school = new School();
             school.setDistno(distNo);
             school.setMincode(reportGradStudentData.getMincode());
@@ -283,7 +350,7 @@ public class SchoolReportsService {
 
     private School processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
         if (reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
-            for(GradCertificateType certType: reportGradStudentData.getCertificateTypes()) {
+            for (GradCertificateType certType : reportGradStudentData.getCertificateTypes()) {
                 switch (certType.getCode()) {
                     case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
                     case "A", "AI" -> school.getSchoolStatistic().setAdultDogwoodCount(school.getSchoolStatistic().getAdultDogwoodCount() + 1);
@@ -295,21 +362,21 @@ public class SchoolReportsService {
             }
             school.getSchoolStatistic().setTotalCertificateCount(school.getSchoolStatistic().getTotalCertificateCount() + 1);
         }
-        if(StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
+        if (StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
             school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
         }
         return school;
     }
 
     private Student processNewCredentialsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if(reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
+        if (reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
         return null;
     }
 
     private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if(StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
+        if (StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
         return null;
@@ -340,7 +407,10 @@ public class SchoolReportsService {
 
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
         webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
+                .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }
                 ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
     }
 
@@ -349,11 +419,11 @@ public class SchoolReportsService {
         return new String(encoded, StandardCharsets.US_ASCII);
     }
 
-    private SchoolReports getSchoolReports(String mincode, String encodedPdf, String nongradreg) {
+    private SchoolReports getSchoolReports(String mincode, String encodedPdf, String reportType) {
         SchoolReports requestObj = new SchoolReports();
         requestObj.setReport(encodedPdf);
         requestObj.setSchoolOfRecord(mincode);
-        requestObj.setReportTypeCode(nongradreg);
+        requestObj.setReportTypeCode(reportType);
         return requestObj;
     }
 
