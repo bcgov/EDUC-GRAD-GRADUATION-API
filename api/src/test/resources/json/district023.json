@@ -1,0 +1,82 @@
+{
+  "options": {
+    "cacheReport": false,
+    "convertTo": null,
+    "overwrite": false,
+    "preview": false,
+    "reportName": "districtdistributionyearend",
+    "reportFile": "023 District Distribution Report Year End.pdf"
+  },
+  "data": {
+    "student": null,
+    "school": {
+      "mincode": "023",
+      "name": "CENTRAL OKANAGAN PUBLIC SCHOOLS SD 23",
+      "typeIndicator": null,
+      "typeBanner": null,
+      "signatureCode": null,
+      "distno": "023",
+      "schlno": null,
+      "schoolCategoryCode": null,
+      "address": null,
+      "phoneNumber": null,
+      "dogwoodElig": null,
+      "schoolStatistic": {
+        "transcriptCount": 0,
+        "dogwoodCount": 0,
+        "adultDogwoodCount": 0,
+        "frenchImmersionCount": 0,
+        "programFrancophoneCount": 0,
+        "evergreenCount": 0,
+        "totalCertificateCount": 0
+      },
+      "students": null
+    },
+    "logo": null,
+    "transcript": null,
+    "assessment": null,
+    "gradProgram": null,
+    "graduationData": null,
+    "gradMessage": null,
+    "updateDate": null,
+    "certificate": null,
+    "graduationStatus": null,
+    "orgCode": "BC",
+    "issueDate": "2023-03-02",
+    "reportNumber": null,
+    "reportTitle": null,
+    "reportSubTitle": null,
+    "nonGradReasons": null,
+    "studentCourses": null,
+    "studentExams": null,
+    "optionalPrograms": null,
+    "schools": [
+      {
+        "mincode": "02396738",
+        "name": "HERITAGE CHRISTIAN ONLINE SCHOOL",
+        "typeIndicator": null,
+        "typeBanner": null,
+        "signatureCode": null,
+        "distno": "023",
+        "schlno": null,
+        "schoolCategoryCode": null,
+        "address": null,
+        "phoneNumber": null,
+        "dogwoodElig": null,
+        "schoolStatistic": {
+          "transcriptCount": 2,
+          "dogwoodCount": 1,
+          "adultDogwoodCount": 0,
+          "frenchImmersionCount": 0,
+          "programFrancophoneCount": 0,
+          "evergreenCount": 1,
+          "totalCertificateCount": 2
+        },
+        "students": null
+      }
+    ],
+    "exception": null
+  },
+  "dataMap": null
+}
+

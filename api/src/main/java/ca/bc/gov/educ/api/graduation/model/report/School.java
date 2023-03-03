@@ -20,8 +20,8 @@ public class School implements Serializable {
     private String schlno;
     private String schoolCategoryCode;
     private Address address;
-    private String phoneNumber = "";
-    private String dogwoodElig = "";
+    private String phoneNumber;
+    private String dogwoodElig;
 
     private SchoolStatistic schoolStatistic = new SchoolStatistic();
 
