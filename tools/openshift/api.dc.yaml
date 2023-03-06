@@ -143,12 +143,19 @@ objects:
         name: "${REPO_NAME}-dc"
       minReplicas: ${{MIN_REPLICAS}}
       maxReplicas: ${{MAX_REPLICAS}}
+      #GRAD2-1947 Resource optmization
       metrics:
         - type: Resource
           resource:
             name: cpu
             target:
-              averageUtilization: 300
+              averageUtilization: 450
+              type: Utilization
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              averageUtilization: 200
               type: Utilization
 parameters:
   - name: REPO_NAME
