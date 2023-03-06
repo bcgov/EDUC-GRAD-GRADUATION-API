@@ -15,12 +15,13 @@ env:
   NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
   TAG: "latest"
 
+  #GRAD2-1947 Resource optmization
   MIN_CPU: "20m"
-  MAX_CPU: "100m"
-  MIN_MEM: "250Mi"
-  MAX_MEM: "1024Mi"
+  MAX_CPU: "120m"
+  MIN_MEM: "600Mi"
+  MAX_MEM: "1500Mi"
   MIN_REPLICAS: "3"
-  MAX_REPLICAS: "5"
+  MAX_REPLICAS: "7"
 
 
 on:
