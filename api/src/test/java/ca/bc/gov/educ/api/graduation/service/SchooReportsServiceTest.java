@@ -133,6 +133,12 @@ public class SchooReportsServiceTest {
 		byte[] result = schoolReportsService.getSchoolDistrictYearEndReports("accessToken");
 		assertNotNull(result);
 
+		result = schoolReportsService.getSchoolYearEndReports("accessToken");
+		assertNotNull(result);
+
+		result = schoolReportsService.getDistrictYearEndReports("accessToken");
+		assertNotNull(result);
+
 	}
 
 	@SneakyThrows

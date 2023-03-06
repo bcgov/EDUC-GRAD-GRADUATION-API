@@ -115,12 +115,30 @@ public class GraduationController {
         return response.GET(schoolReportsService.createAndStoreSchoolYearEndReports(accessToken.replace(BEARER, "")));
     }
 
+    @GetMapping(EducGraduationApiConstants.SCHOOL_REPORTS_YEAR_END_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Year End Report Generation (PDF)", description = "When triggered, School Year End Reports returns in PDF", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getSchoolYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
+        byte[] resultBinary = schoolReportsService.getSchoolYearEndReports(accessToken.replace(BEARER, ""));
+        return handleBinaryResponse(resultBinary, "SchoolYearEndReports.pdf", MediaType.APPLICATION_PDF);
+    }
+
     @GetMapping(EducGraduationApiConstants.DISTRICT_REPORTS_YEAR_END)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "District Report Creation", description = "When triggered, District Reports are created", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreDistrictYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
         return response.GET(schoolReportsService.createAndStoreDistrictYearEndReports(accessToken.replace(BEARER, "")));
+    }
+
+    @GetMapping(EducGraduationApiConstants.DISTRICT_REPORTS_YEAR_END_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "District Report Generation (PDF)", description = "When triggered, District Reports returns in PDF", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getDistrictYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
+        byte[] resultBinary = schoolReportsService.getDistrictYearEndReports(accessToken.replace(BEARER, ""));
+        return handleBinaryResponse(resultBinary, "DistrictYearEndReports.pdf", MediaType.APPLICATION_PDF);
     }
 
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_YEAR_END)

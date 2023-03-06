@@ -55,6 +55,22 @@ public class SchoolReportsService {
     }
 
     @SneakyThrows
+    public byte[] getSchoolYearEndReports(String accessToken) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        List<InputStream> pdfs = new ArrayList<>();
+        createAndStoreSchoolYearEndReports(reportGradStudentDataList, accessToken, pdfs);
+        return mergeDocuments(pdfs);
+    }
+
+    @SneakyThrows
+    public byte[] getDistrictYearEndReports(String accessToken) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        List<InputStream> pdfs = new ArrayList<>();
+        createAndStoreDistrictYearEndReports(reportGradStudentDataList, accessToken, pdfs);
+        return mergeDocuments(pdfs);
+    }
+
+    @SneakyThrows
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken) {
         Integer reportsCount = 0;
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);

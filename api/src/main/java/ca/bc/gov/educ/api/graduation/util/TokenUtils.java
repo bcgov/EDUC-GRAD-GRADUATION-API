@@ -45,7 +45,6 @@ public class TokenUtils {
 
     public Pair<String, Long> getAccessToken(String accessToken) {
         long startTime = System.currentTimeMillis();
-        logger.debug("=========> Getting the new Access Token at the beginning <===========");
         ResponseObj responseObj = getTokenResponseObject();
         if (responseObj != null) {
             return Pair.of(responseObj.getAccess_token(), startTime);
@@ -70,8 +69,6 @@ public class TokenUtils {
 
     public void setAccessToken(ProcessorData processorData) {
         long startTime = System.currentTimeMillis();
-
-        logger.debug("=========> Getting the new Access Token at the beginning <===========");
         ResponseObj responseObj = getTokenResponseObject();
         if (responseObj != null) {
             processorData.setAccessToken(responseObj.getAccess_token());
