@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class GraduationControllerTest {
@@ -123,16 +125,30 @@ class GraduationControllerTest {
 
 	@Test
 	void testCreateAndStoreSchoolYearEndReports() {
-		Mockito.when(schoolReportsService.createAndStoreSchoolYearEndReports("accessToken")).thenReturn(1);
+		Mockito.when(schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken")).thenReturn(1);
 		graduationController.createAndStoreSchoolYearEndReports("accessToken");
-		Mockito.verify(schoolReportsService).createAndStoreSchoolYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreSchoolsReports() {
+		Mockito.when(schoolReportsService.createAndStoreSchoolReports(DISTREP_SC, "accessToken")).thenReturn(1);
+		graduationController.createAndStoreSchoolReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolReports(DISTREP_SC, "accessToken");
 	}
 
 	@Test
 	void testCreateAndStoreDistrictYearEndReports() {
-		Mockito.when(schoolReportsService.createAndStoreDistrictYearEndReports("accessToken")).thenReturn(1);
+		Mockito.when(schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken")).thenReturn(1);
 		graduationController.createAndStoreDistrictYearEndReports("accessToken");
-		Mockito.verify(schoolReportsService).createAndStoreDistrictYearEndReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictReports() {
+		Mockito.when(schoolReportsService.createAndStoreDistrictReports(DISTREP_SD, "accessToken")).thenReturn(1);
+		graduationController.createAndStoreDistrictReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreDistrictReports(DISTREP_SD, "accessToken");
 	}
 
 	@Test
@@ -143,10 +159,24 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreDistrictSchoolReports() {
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken")).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken");
+	}
+
+	@Test
 	void testCreateAndStoreDistrictSchoolYearEndPdfReports() {
 		Mockito.when(schoolReportsService.getSchoolDistrictYearEndReports("accessToken")).thenReturn(new byte[0]);
 		graduationController.getSchoolDistrictYearEndReports("accessToken");
 		Mockito.verify(schoolReportsService).getSchoolDistrictYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictSchoolPdfReports() {
+		Mockito.when(schoolReportsService.getSchoolDistrictReports("accessToken")).thenReturn(new byte[0]);
+		graduationController.getSchoolDistrictReports("accessToken");
+		Mockito.verify(schoolReportsService).getSchoolDistrictReports("accessToken");
 	}
 
 	@Test
@@ -157,10 +187,24 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreSchoolPdfReports() {
+		Mockito.when(schoolReportsService.getSchoolReports("accessToken")).thenReturn(new byte[0]);
+		graduationController.getSchoolReports("accessToken");
+		Mockito.verify(schoolReportsService).getSchoolReports("accessToken");
+	}
+
+	@Test
 	void testCreateAndStoreDistrictYearEndPdfReports() {
 		Mockito.when(schoolReportsService.getDistrictYearEndReports("accessToken")).thenReturn(new byte[0]);
 		graduationController.getDistrictYearEndReports("accessToken");
 		Mockito.verify(schoolReportsService).getDistrictYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictPdfReports() {
+		Mockito.when(schoolReportsService.getDistrictReports("accessToken")).thenReturn(new byte[0]);
+		graduationController.getDistrictReports("accessToken");
+		Mockito.verify(schoolReportsService).getDistrictReports("accessToken");
 	}
 
 	@Test
