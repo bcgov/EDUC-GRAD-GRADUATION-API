@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SC;
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SD;
+
 @CrossOrigin
 @RestController
 @RequestMapping(EducGraduationApiConstants.GRADUATION_API_ROOT_MAPPING)
@@ -112,7 +115,7 @@ public class GraduationController {
     @Operation(summary = "School Year End Report Creation", description = "When triggered, School Year End Reports are created", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreSchoolYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(schoolReportsService.createAndStoreSchoolYearEndReports(accessToken.replace(BEARER, "")));
+        return response.GET(schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGraduationApiConstants.SCHOOL_REPORTS_YEAR_END_PDF)
@@ -129,7 +132,7 @@ public class GraduationController {
     @Operation(summary = "District Report Creation", description = "When triggered, District Reports are created", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreDistrictYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(schoolReportsService.createAndStoreDistrictYearEndReports(accessToken.replace(BEARER, "")));
+        return response.GET(schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, accessToken.replace(BEARER, "")));
     }
 
     @GetMapping(EducGraduationApiConstants.DISTRICT_REPORTS_YEAR_END_PDF)

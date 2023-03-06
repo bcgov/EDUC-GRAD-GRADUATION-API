@@ -30,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SC;
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SD;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,10 +123,10 @@ public class SchooReportsServiceTest {
 
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
-		Integer reportsCount = schoolReportsService.createAndStoreSchoolYearEndReports("accessToken");
+		Integer reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken");
 		assertTrue(reportsCount > 0);
 
-		reportsCount = schoolReportsService.createAndStoreDistrictYearEndReports("accessToken");
+		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken");

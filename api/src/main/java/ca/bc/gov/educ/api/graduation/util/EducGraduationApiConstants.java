@@ -132,6 +132,9 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-graduation-report-api.school-year-end-students.url}")
     private String schoolYearEndStudents;
 
+    @Value("${endpoint.grad-graduation-report-api.school-students.url}")
+    private String schoolStudents;
+
     @Value("${authorization.user}")
     private String userName;
 

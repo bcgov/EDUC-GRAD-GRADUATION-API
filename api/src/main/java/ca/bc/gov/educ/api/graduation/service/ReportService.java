@@ -108,6 +108,15 @@ public class ReportService {
                 }).block();
     }
 
+    public List<ReportGradStudentData> getStudentsForSchoolReport(String accessToken) {
+        return webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
+                }).block();
+    }
+
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
         try {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
