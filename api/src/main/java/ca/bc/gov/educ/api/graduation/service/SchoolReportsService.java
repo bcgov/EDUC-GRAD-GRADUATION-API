@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -24,6 +26,8 @@ import java.util.*;
 
 @Service
 public class SchoolReportsService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SchoolReportsService.class);
 
     public static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     public static final String DISTREP_YE_SD = "DISTREP_YE_SD";
@@ -101,22 +105,36 @@ public class SchoolReportsService {
 
     @SneakyThrows
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken) {
-        Integer reportsCount = 0;
+        logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
-        reportsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
-        reportsCount += createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, null);
-        reportsCount += createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, null);
-        return reportsCount;
+        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        int schoolLabelsCount = 0;
+        schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
+        int districtReportsCount = 0;
+        districtReportsCount += createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Districts Reports Created *****", districtReportsCount);
+        int schoolReportsCount = 0;
+        schoolReportsCount += createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
+        return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
     @SneakyThrows
     public Integer createAndStoreSchoolDistrictReports(String accessToken) {
-        Integer reportsCount = 0;
+        logger.debug("***** Get Students for School Monthly Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
-        reportsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL, reportGradStudentDataList, accessToken, null);
-        reportsCount += createAndStoreDistrictReports(DISTREP_SD, reportGradStudentDataList, accessToken, null);
-        reportsCount += createAndStoreSchoolReports(DISTREP_SC, reportGradStudentDataList, accessToken, null);
-        return reportsCount;
+        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        int schoolLabelsCount = 0;
+        schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
+        int districtReportsCount = 0;
+        districtReportsCount += createAndStoreDistrictReports(DISTREP_SD, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Districts Reports Created *****", districtReportsCount);
+        int schoolReportsCount = 0;
+        schoolReportsCount += createAndStoreSchoolReports(DISTREP_SC, reportGradStudentDataList, accessToken, null);
+        logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
+        return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
     @SneakyThrows
