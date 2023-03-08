@@ -95,6 +95,8 @@ endpoint:
    url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
   school-year-end-students:
     url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/getstudentsforschoolyearendreport
+  school-students:
+      url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/getstudentsforschoolreport
   get-certificate-name: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s
   get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
   get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
@@ -109,6 +111,7 @@ endpoint:
   school_non_graduation: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/schoolnongraduation
   school_distribution_year_end: https://educ-grad-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/schooldistributionyearend
   district_distribution_year_end: https://educ-grad-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/districtdistributionyearend
+  school_labels: https://educ-grad-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/schoollabel
  grad-student-graduation-api:
   get-special-cases: 
     url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase/%s

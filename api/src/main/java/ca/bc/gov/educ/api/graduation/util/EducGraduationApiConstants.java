@@ -15,7 +15,7 @@ public class EducGraduationApiConstants {
     public static final String CORRELATION_ID = "correlationID";
 
     //API end-point Mapping constants
-	  public static final String API_ROOT_MAPPING = "";
+	public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRADUATION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/graduate";
     public static final String GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE = "/studentid/{studentID}/run/{projectedType}";
@@ -25,8 +25,19 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_CERTIFICATE_REPORT = "/report/certificate/{pen}";
     public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
     public static final String SCHOOL_REPORTS = "/report/school";
+
     public static final String SCHOOL_REPORTS_YEAR_END = "/report/schoolyearend";
+    public static final String SCHOOL_REPORTS_MONTH = "/report/schoolmonth";
+    public static final String SCHOOL_REPORTS_YEAR_END_PDF = "/report/schoolyearendpdf";
+    public static final String SCHOOL_REPORTS_MONTH_PDF = "/report/schoolmonthpdf";
     public static final String DISTRICT_REPORTS_YEAR_END = "/report/districtyearend";
+    public static final String DISTRICT_REPORTS_MONTH = "/report/districtmonth";
+    public static final String DISTRICT_REPORTS_YEAR_END_PDF = "/report/districtyearendpdf";
+    public static final String DISTRICT_REPORTS_MONTH_PDF = "/report/districtmonthpdf";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END = "/report/schooldistrictyearend";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH = "/report/schooldistrictmonth";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF = "/report/schooldistrictyearendpdf";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH_PDF = "/report/schooldistrictmonthpdf";
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
@@ -73,6 +84,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.report-api.district_distribution_year_end}")
     private String districtDistributionYearEnd;
+
+    @Value("${endpoint.report-api.school_labels}")
+    private String schoolLabels;
     
     @Value("${endpoint.report-api.certificate_report}")
     private String certificateReport;
@@ -124,6 +138,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.grad-graduation-report-api.school-year-end-students.url}")
     private String schoolYearEndStudents;
+
+    @Value("${endpoint.grad-graduation-report-api.school-students.url}")
+    private String schoolStudents;
 
     @Value("${authorization.user}")
     private String userName;

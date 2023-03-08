@@ -20,8 +20,8 @@ public class School implements Serializable {
     private String schlno;
     private String schoolCategoryCode;
     private Address address;
-    private String phoneNumber = "";
-    private String dogwoodElig = "";
+    private String phoneNumber;
+    private String dogwoodElig;
 
     private SchoolStatistic schoolStatistic = new SchoolStatistic();
 
@@ -143,5 +143,14 @@ public class School implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(mincode, name);
+    }
+
+    @Override
+    public String toString() {
+        return "School{" +
+                "mincode='" + mincode + '\'' +
+                ", name='" + name + '\'' +
+                ", distno='" + distno + '\'' +
+                '}';
     }
 }
