@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
@@ -11,13 +12,17 @@ import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class GradStatusService {
@@ -118,15 +123,28 @@ public class GradStatusService {
 	}
 
 	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord, String accessToken) {
-		UUID correlationID = UUID.randomUUID();
-		final ParameterizedTypeReference<List<GraduationStudentRecord>> responseType = new ParameterizedTypeReference<>() {
-		};
-		return this.webClient.get()
-				.uri(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord))
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGraduationApiConstants.CORRELATION_ID, correlationID.toString());
-				})
-				.retrieve().bodyToMono(responseType).block();
+		final ParameterizedTypeReference<List<GraduationStudentRecord>> responseType = new ParameterizedTypeReference<>() {};
+		List<GraduationStudentRecord> records;
+		try {
+			records = this.webClient.get()
+					.uri(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord))
+					.headers(h -> {
+						h.setBearerAuth(accessToken);
+					})
+					.retrieve()
+					.onStatus(HttpStatusCode::is5xxServerError,
+							clientResponse -> Mono.error(new ServiceException("Server Error when accessing GRAD_STUDENT_API: ", clientResponse.statusCode().value())))
+					.bodyToMono(responseType)
+					.retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+					.filter(throwable -> throwable instanceof ServiceException)
+							.onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+								throw new ServiceException("GRAD-STUDENT-API Service failed to process after max retries.", HttpStatus.SERVICE_UNAVAILABLE.value());
+							}))
+					.block();
+		} catch (Exception e) {
+			throw new ServiceException("GRAD-STUDENT-API Service failed to process: " + e.getLocalizedMessage(), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+		}
+		return records;
 	}
+
 }
