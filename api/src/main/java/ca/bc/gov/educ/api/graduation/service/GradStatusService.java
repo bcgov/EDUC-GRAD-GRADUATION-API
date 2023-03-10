@@ -1,42 +1,42 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProjectedRunClob;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
 import java.util.List;
 
 @Service
 public class GradStatusService {
 
 	private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
-	@Autowired
     WebClient webClient;
-
-	@Autowired
+	RESTService restService;
 	RestTemplate restTemplate;
-	
-	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
-	
+	JsonTransformer jsonTransformer;
+	@Autowired
+	public GradStatusService(WebClient webClient, RESTService restService, RestTemplate restTemplate, EducGraduationApiConstants educGraduationApiConstants, JsonTransformer jsonTransformer) {
+		this.webClient = webClient;
+		this.restService = restService;
+		this.restTemplate = restTemplate;
+		this.educGraduationApiConstants = educGraduationApiConstants;
+		this.jsonTransformer = jsonTransformer;
+	}
+
 	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
 		try
 		{
@@ -124,27 +124,11 @@ public class GradStatusService {
 
 	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord, String accessToken) {
 		final ParameterizedTypeReference<List<GraduationStudentRecord>> responseType = new ParameterizedTypeReference<>() {};
-		List<GraduationStudentRecord> records;
-		try {
-			records = this.webClient.get()
-					.uri(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord))
-					.headers(h -> {
-						h.setBearerAuth(accessToken);
-					})
-					.retrieve()
-					.onStatus(HttpStatusCode::is5xxServerError,
-							clientResponse -> Mono.error(new ServiceException("Server Error when accessing GRAD_STUDENT_API: ", clientResponse.statusCode().value())))
-					.bodyToMono(responseType)
-					.retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
-					.filter(throwable -> throwable instanceof ServiceException)
-							.onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
-								throw new ServiceException("GRAD-STUDENT-API Service failed to process after max retries.", HttpStatus.SERVICE_UNAVAILABLE.value());
-							}))
-					.block();
-		} catch (Exception e) {
-			throw new ServiceException("GRAD-STUDENT-API Service failed to process: " + e.getLocalizedMessage(), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
-		}
-		return records;
+		String url = String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord);
+		List<GraduationStudentRecord> response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord),
+				responseType,
+				accessToken);
+		return response;
 	}
 
 }
