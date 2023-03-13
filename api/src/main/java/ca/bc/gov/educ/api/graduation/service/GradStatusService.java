@@ -5,36 +5,37 @@ import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ProjectedRunClob;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class GradStatusService {
 
-	private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
+	private static final String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
     WebClient webClient;
 	RESTService restService;
 	RestTemplate restTemplate;
     EducGraduationApiConstants educGraduationApiConstants;
-	JsonTransformer jsonTransformer;
+	ObjectMapper objectMapper;
+
 	@Autowired
-	public GradStatusService(WebClient webClient, RESTService restService, RestTemplate restTemplate, EducGraduationApiConstants educGraduationApiConstants, JsonTransformer jsonTransformer) {
+	public GradStatusService(WebClient webClient, RESTService restService, RestTemplate restTemplate, EducGraduationApiConstants educGraduationApiConstants, ObjectMapper objectMapper) {
 		this.webClient = webClient;
 		this.restService = restService;
 		this.restTemplate = restTemplate;
 		this.educGraduationApiConstants = educGraduationApiConstants;
-		this.jsonTransformer = jsonTransformer;
+		this.objectMapper = objectMapper;
 	}
 
 	public GraduationStudentRecord getGradStatus(String studentID, String accessToken, ExceptionMessage exception) {
@@ -123,12 +124,10 @@ public class GradStatusService {
 	}
 
 	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord, String accessToken) {
-		final ParameterizedTypeReference<List<GraduationStudentRecord>> responseType = new ParameterizedTypeReference<>() {};
-		String url = String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord);
-		List<GraduationStudentRecord> response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord),
-				responseType,
+		List<Map> response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord),
+				List.class,
 				accessToken);
-		return response;
+		return objectMapper.convertValue(response, new TypeReference<>(){});
 	}
 
 }
