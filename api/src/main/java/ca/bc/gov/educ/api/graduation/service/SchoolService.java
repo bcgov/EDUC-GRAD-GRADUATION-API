@@ -5,25 +5,21 @@ import ca.bc.gov.educ.api.graduation.model.dto.SchoolTrax;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 public class SchoolService {
+	EducGraduationApiConstants educGraduationApiConstants;
+	RESTService restService;
 
 	@Autowired
-    WebClient webClient;
-	
-	@Autowired
-	EducGraduationApiConstants educGraduationApiConstants;
-	
-	public SchoolTrax getSchoolDetails(String mincode, String accessToken, ExceptionMessage exception) {
-		try
-		{
-			return webClient.get().uri(String.format(educGraduationApiConstants.getSchoolDetails(),mincode)).headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(SchoolTrax.class).block();
-		} catch (Exception e) {
-			exception.setExceptionName("GRAD-TRAX-API IS DOWN");
-			exception.setExceptionDetails(e.getLocalizedMessage());
-			return null;
-		}
+	public SchoolService(EducGraduationApiConstants educGraduationApiConstants, RESTService restService) {
+		this.educGraduationApiConstants = educGraduationApiConstants;
+		this.restService = restService;
+	}
+
+	public SchoolTrax getSchoolDetails(String mincode, String accessToken, ExceptionMessage message) {
+		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode, accessToken),
+				SchoolTrax.class,
+				accessToken);
 	}
 }
