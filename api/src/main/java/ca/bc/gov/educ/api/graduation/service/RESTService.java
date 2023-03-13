@@ -1,10 +1,13 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
@@ -37,7 +40,7 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> h.setBearerAuth(accessToken))
+                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -53,6 +56,29 @@ public class RESTService {
                     .block();
         } catch (Exception e) {
             // catches IOExceptions and the like
+            throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
+        }
+        return obj;
+    }
+
+    public <T> T post(String url, Object body, Class<T> clazz, String accessToken) {
+        T obj;
+        try {
+            obj = webClient.post()
+                    .uri(url)
+                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .body(BodyInserters.fromValue(body))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is5xxServerError,
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, "5xx error."), clientResponse.statusCode().value())))
+                    .bodyToMono(clazz)
+                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                            .filter(ServiceException.class::isInstance)
+                            .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                                throw new ServiceException(getErrorMessage(url, "Service failed to process after max retries."), HttpStatus.SERVICE_UNAVAILABLE.value());
+                            }))
+                    .block();
+        } catch (Exception e) {
             throw new ServiceException(getErrorMessage(url, e.getLocalizedMessage()), HttpStatus.SERVICE_UNAVAILABLE.value(), e);
         }
         return obj;

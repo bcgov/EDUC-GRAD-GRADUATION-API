@@ -40,24 +40,27 @@ public class GraduationService {
     private static final String REGALG = "REGALG";
     private static final String TVRRUN = "TVRRUN";
 
-    @Autowired
-    WebClient webClient;
-    @Autowired
-    AlgorithmProcessFactory algorithmProcessFactory;
-    @Autowired
-    GradStatusService gradStatusService;
-    @Autowired
-    SchoolService schoolService;
-    @Autowired
-    ReportService reportService;
-    @Autowired
-    TokenUtils tokenUtils;
 
-    @Autowired
+    WebClient webClient;
+    AlgorithmProcessFactory algorithmProcessFactory;
+    GradStatusService gradStatusService;
+    SchoolService schoolService;
+    ReportService reportService;
+    TokenUtils tokenUtils;
+    RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
 
     @Autowired
-    JsonTransformer jsonTransformer;
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants) {
+        this.webClient = webClient;
+        this.algorithmProcessFactory = algorithmProcessFactory;
+        this.gradStatusService = gradStatusService;
+        this.schoolService = schoolService;
+        this.reportService = reportService;
+        this.tokenUtils = tokenUtils;
+        this.restService = restService;
+        this.educGraduationApiConstants = educGraduationApiConstants;
+    }
 
     public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
 
@@ -357,9 +360,10 @@ public class GraduationService {
     }
 
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
-        webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+        this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
+                requestObj,
+                SchoolReports.class,
+                accessToken);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -403,9 +407,10 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return webClient.post().uri(educGraduationApiConstants.getNonGradProjected())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return this.restService.post(educGraduationApiConstants.getNonGradProjected(),
+                reportParams,
+                byte[].class,
+                accessToken);
     }
 
     private void createAndSaveSchoolReportNonGradPrjReport(ReportData data, String mincode, String accessToken) {
