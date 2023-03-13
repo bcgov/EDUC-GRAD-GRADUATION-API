@@ -199,6 +199,26 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreSchoolLabelsReports() {
+		ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+		Mockito.when(schoolReportsService.createAndStoreSchoolLabelsReportsFromSchools("ADDRESS_LABEL_PSI", List.of(school),"accessToken", null)).thenReturn(1);
+		graduationController.createAndStoreSchoolLabelsReports(List.of(school),"accessToken", "ADDRESS_LABEL_PSI");
+		Mockito.verify(schoolReportsService).createAndStoreSchoolLabelsReportsFromSchools("ADDRESS_LABEL_PSI", List.of(school),"accessToken", null);
+	}
+
+	@Test
+	void testGetSchoolLabelsReports() {
+		ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+		Mockito.when(schoolReportsService.getSchoolLabelsReportsFromSchools("ADDRESS_LABEL_PSI", List.of(school),"accessToken")).thenReturn(new byte[0]);
+		graduationController.getSchoolLabelsReports(List.of(school),"accessToken", "ADDRESS_LABEL_PSI");
+		Mockito.verify(schoolReportsService).getSchoolLabelsReportsFromSchools("ADDRESS_LABEL_PSI", List.of(school),"accessToken");
+	}
+
+	@Test
 	void testCreateAndStoreDistrictYearEndPdfReports() {
 		Mockito.when(schoolReportsService.getDistrictYearEndReports("accessToken")).thenReturn(new byte[0]);
 		graduationController.getDistrictYearEndReports("accessToken");
