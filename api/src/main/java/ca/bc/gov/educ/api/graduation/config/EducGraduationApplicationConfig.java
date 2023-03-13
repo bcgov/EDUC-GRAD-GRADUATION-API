@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,11 @@ public class EducGraduationApplicationConfig {
 
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     @Bean
