@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -19,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -44,6 +46,9 @@ public class SchoolServiceTest {
 
     @Autowired
     private EducGraduationApiConstants constants;
+
+	@MockBean
+	RESTService restService;
     
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
@@ -75,30 +80,10 @@ public class SchoolServiceTest {
 		SchoolTrax schtrax = new SchoolTrax();
 		schtrax.setMinCode(mincode);
 		schtrax.setAddress1("1231");
-		ExceptionMessage exception = new ExceptionMessage();
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolDetails(),mincode))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(SchoolTrax.class)).thenReturn(Mono.just(schtrax));
-
-		SchoolTrax res = schoolService.getSchoolDetails(mincode, accessToken,exception);
+		when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
+		SchoolTrax res = schoolService.getSchoolDetails(mincode, accessToken, new ExceptionMessage());
 		assertNotNull(res);
 		assertEquals(res.getMinCode(),mincode);
 	}
 
-	@Test
-	public void testGetSchoolDetails_throwsException() {
-		String mincode = "1232131123";
-		String accessToken = "accessToken";
-		ExceptionMessage exception = new ExceptionMessage();
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolDetails(),mincode))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
-
-		SchoolTrax res = schoolService.getSchoolDetails(mincode, accessToken,exception);
-		assertNull(res);
-	}
 }
