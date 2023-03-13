@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.controller;
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.service.SchoolReportsService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
@@ -107,6 +108,23 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = false) String type ) {
         return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, "")));
+    }
+
+    @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_LABELS)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Labels Report Creation", description = "When triggered, School Labels Reports are created from list of Schools", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolLabelsReports(@RequestBody List<School> schools, @RequestHeader(name="Authorization") String accessToken, @RequestParam String reportType ) {
+        return response.GET(schoolReportsService.createAndStoreSchoolLabelsReportsFromSchools(reportType, schools, accessToken.replace(BEARER, ""), null));
+    }
+
+    @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_LABELS_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School Labels Report Creation", description = "When triggered, School Labels Reports are created from list of Schools", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getSchoolLabelsReports(@RequestBody List<School> schools, @RequestHeader(name="Authorization") String accessToken, @RequestParam String reportType ) {
+        byte[] resultBinary = schoolReportsService.getSchoolLabelsReportsFromSchools(reportType, schools, accessToken.replace(BEARER, ""));
+        return handleBinaryResponse(resultBinary, "SchoolLabelsReports.pdf", MediaType.APPLICATION_PDF);
     }
 
     @GetMapping(EducGraduationApiConstants.SCHOOL_REPORTS_YEAR_END)
