@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class RESTServiceTest {
+public class RESTServiceGETTest {
 
     @Autowired
     private RESTService restService;
@@ -31,7 +31,5 @@ public class RESTServiceTest {
     public void testGet_Given4xxErrorFromService_ExpectServiceError(){
         this.restService.get("https://httpstat.us/403", String.class, "1234");
     }
-
-    //TODO: add POST tests
 
 }

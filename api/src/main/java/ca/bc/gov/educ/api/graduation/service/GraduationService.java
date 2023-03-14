@@ -153,29 +153,33 @@ public class GraduationService {
             }
             accessToken = res.getLeft();
 
-            List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
-            SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
-            if (schoolDetails != null) {
-                ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
-                schoolObj.setMincode(schoolDetails.getMinCode());
-                schoolObj.setName(schoolDetails.getSchoolName());
-                ReportData gradReport;
-                switch (type) {
-                    case GRADREG:
-                        List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
-                        gradReport = getReportDataObj(schoolObj, gradRegStudents);
-                        return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    case NONGRADREG:
-                        List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
-                        gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
-                        return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    case NONGRADPRJ:
-                        List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
-                        gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
-                        return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
-                    default:
-                        return result;
+            try {
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
+                SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
+                if (schoolDetails != null) {
+                    School schoolObj = new School();
+                    schoolObj.setMincode(schoolDetails.getMinCode());
+                    schoolObj.setName(schoolDetails.getSchoolName());
+                    ReportData gradReport;
+                    switch (type) {
+                        case GRADREG:
+                            List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
+                            gradReport = getReportDataObj(schoolObj, gradRegStudents);
+                            return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                        case NONGRADREG:
+                            List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
+                            gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
+                            return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                        case NONGRADPRJ:
+                            List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
+                            gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
+                            return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
+                        default:
+                            return result;
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Failed to generate report for mincode: {} due to: {}", usl, e.getLocalizedMessage());
             }
             i++;
         }
@@ -216,7 +220,6 @@ public class GraduationService {
                             accessToken = res.getLeft();
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                             logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
-                            //TODO: update processNonGradRegReport
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                         }
                     }
