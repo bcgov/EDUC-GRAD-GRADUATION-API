@@ -32,4 +32,6 @@ public class RESTServiceTest {
         this.restService.get("https://httpstat.us/403", String.class, "1234");
     }
 
+    //TODO: add POST tests
+
 }

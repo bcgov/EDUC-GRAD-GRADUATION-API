@@ -211,11 +211,13 @@ public class GraduationService {
                         } else {
                             List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
                             logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                            //TODO: update processGradRegReport
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                             res = checkAndGetAccessToken(res);
                             accessToken = res.getLeft();
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                             logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                            //TODO: update processNonGradRegReport
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
                         }
                     }
@@ -340,9 +342,10 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return webClient.post().uri(educGraduationApiConstants.getSchoolGraduation())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return this.restService.post(educGraduationApiConstants.getSchoolGraduation(),
+                reportParams,
+                byte[].class,
+                accessToken);
 
     }
 
