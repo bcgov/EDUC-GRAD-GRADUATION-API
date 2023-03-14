@@ -51,7 +51,6 @@ public class SchoolReportsService {
     @Autowired
     JsonTransformer jsonTransformer;
 
-    @SneakyThrows
     public byte[] getSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -67,7 +66,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public byte[] getSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -83,7 +81,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public byte[] getSchoolYearEndReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -91,7 +88,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public byte[] getSchoolReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -99,7 +95,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public byte[] getDistrictYearEndReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -107,7 +102,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public byte[] getDistrictReports(String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
@@ -115,7 +109,6 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    @SneakyThrows
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
@@ -138,7 +131,6 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
-    @SneakyThrows
     public Integer createAndStoreSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
@@ -161,7 +153,6 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
-    @SneakyThrows
     public Integer createAndStoreDistrictReports(String reportType, String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList;
         if(DISTREP_YE_SD.equalsIgnoreCase(reportType)) {
@@ -172,7 +163,6 @@ public class SchoolReportsService {
         return createAndStoreDistrictReports(reportType, reportGradStudentDataList, accessToken, null);
     }
 
-    @SneakyThrows
     public Integer createAndStoreSchoolReports(String reportType, String accessToken) {
         List<ReportGradStudentData> reportGradStudentDataList;
         if(DISTREP_YE_SC.equalsIgnoreCase(reportType)) {
@@ -183,14 +173,14 @@ public class SchoolReportsService {
         return createAndStoreSchoolReports(reportType, reportGradStudentDataList, accessToken, null);
     }
 
-    @SneakyThrows
-    private Integer createAndStoreSchoolLabelsReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
+    public byte[] getSchoolLabelsReportsFromSchools(String reportType, List<School> schools, String accessToken) {
+        List<InputStream> pdfs = new ArrayList<>();
+        createAndStoreSchoolLabelsReportsFromSchools(reportType, schools, accessToken, pdfs);
+        return mergeDocuments(pdfs);
+    }
+
+    public Integer createAndStoreSchoolLabelsReportsFromSchools(String reportType, List<School> schools, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
-        Map<String, School> schoolMap = new HashMap<>();
-        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
-            populateSchoolObjectByReportGradStudentData(schoolMap, reportGradStudentData);
-        }
-        List<School> schools = new ArrayList<>(schoolMap.values());
         ReportRequest reportRequest = buildSchoolLabelsReportRequest(schools);
         accessToken = getAccessToken(accessToken).getLeft();
         byte[] reportAsBytes = getSchoolLabelsReportJasper(reportRequest, accessToken);
@@ -199,13 +189,21 @@ public class SchoolReportsService {
             pdfs.add(is);
         }
         if (pdfs == null) {
-            saveDistrictSchoolYearEndReport(accessToken, "000000000", reportType, reportAsBytes);
+            saveDistrictOrSchoolOrLabelsReport(accessToken, "000000000", reportType, reportAsBytes);
         }
         reportsCount++;
         return reportsCount;
     }
 
-    @SneakyThrows
+    private Integer createAndStoreSchoolLabelsReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
+        Map<String, School> schoolMap = new HashMap<>();
+        for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
+            populateSchoolObjectByReportGradStudentData(schoolMap, reportGradStudentData);
+        }
+        List<School> schools = new ArrayList<>(schoolMap.values());
+        return createAndStoreSchoolLabelsReportsFromSchools(reportType, schools, accessToken, pdfs);
+    }
+
     private Integer createAndStoreSchoolReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<String, School> newCredentialsSchoolMap = new HashMap<>();
@@ -246,7 +244,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -272,7 +270,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -300,14 +298,14 @@ public class SchoolReportsService {
                 pdfs.add(is);
             }
             if (pdfs == null) {
-                saveDistrictSchoolYearEndReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
             }
             reportsCount++;
         }
         return reportsCount;
     }
 
-    private void saveDistrictSchoolYearEndReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
+    private void saveDistrictOrSchoolOrLabelsReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
         SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
         updateSchoolReport(accessToken, schoolReports);
@@ -550,5 +548,4 @@ public class SchoolReportsService {
         mergedDoc.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
         return new ByteArrayInputStream(tempOutStream.toByteArray()).readAllBytes();
     }
-
 }
