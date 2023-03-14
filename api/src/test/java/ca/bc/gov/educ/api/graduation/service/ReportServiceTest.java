@@ -74,6 +74,9 @@ public class ReportServiceTest {
 	@MockBean
     WebClient webClient;
 
+	@MockBean
+	RESTService restService;
+
     @Autowired
     private EducGraduationApiConstants constants;
     

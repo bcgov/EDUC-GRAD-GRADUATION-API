@@ -53,6 +53,9 @@ public class GradStatusServiceTest {
 	@MockBean
     WebClient webClient;
 
+	@MockBean
+	RESTService restService;
+
     @Autowired
     private EducGraduationApiConstants constants;
     
@@ -371,11 +374,7 @@ public class GradStatusServiceTest {
 		};
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
 		gsr.setLegalLastName("qweqw");
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(this.constants.getGradStudentListSchoolReport(),mincode))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(studentResponseType)).thenReturn(Mono.just(List.of(gsr)));
+		when(this.restService.get(any(String.class), any(), any())).thenReturn(List.of(gsr));
 
 		List<GraduationStudentRecord> res = gradStatusService.getStudentListByMinCode(mincode,"accessToken");
 		assertThat(res).isNotEmpty().hasSize(1);
