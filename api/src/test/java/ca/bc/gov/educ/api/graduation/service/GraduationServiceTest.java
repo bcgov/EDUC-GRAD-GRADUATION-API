@@ -56,6 +56,9 @@ public class GraduationServiceTest {
 	
 	@MockBean
 	private OptionalProgramService optionalProgramService;
+
+	@MockBean
+	RESTService restService;
 	
 	@MockBean
 	private ReportService reportService;
@@ -1996,6 +1999,8 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
 
+		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR2);
+
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
@@ -2104,6 +2109,8 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
+		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR3);
+
 		when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
@@ -2151,13 +2158,8 @@ public class GraduationServiceTest {
 		sTrax.setMinCode("1231231231");
 
 		byte[] bytesSAR = "Any String you want".getBytes();
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.uri(String.format(constants.getNonGradProjected()))).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+
+		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR);
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);

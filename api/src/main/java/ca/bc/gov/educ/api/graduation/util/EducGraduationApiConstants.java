@@ -39,6 +39,8 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF = "/report/schooldistrictyearendpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH_PDF = "/report/schooldistrictmonthpdf";
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
+    public static final String SCHOOL_REPORTS_LABELS = "/report/school/labels";
+    public static final String SCHOOL_REPORTS_LABELS_PDF = "/report/school/labels/pdf";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;

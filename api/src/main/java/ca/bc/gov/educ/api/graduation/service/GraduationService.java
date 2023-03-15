@@ -39,27 +39,28 @@ public class GraduationService {
     private static final String NONGRADPRJ = "NONGRADPRJ";
     private static final String REGALG = "REGALG";
     private static final String TVRRUN = "TVRRUN";
-    private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
-    private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
 
-    @Autowired
+
     WebClient webClient;
-    @Autowired
     AlgorithmProcessFactory algorithmProcessFactory;
-    @Autowired
     GradStatusService gradStatusService;
-    @Autowired
     SchoolService schoolService;
-    @Autowired
     ReportService reportService;
-    @Autowired
     TokenUtils tokenUtils;
-
-    @Autowired
+    RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
 
     @Autowired
-    JsonTransformer jsonTransformer;
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants) {
+        this.webClient = webClient;
+        this.algorithmProcessFactory = algorithmProcessFactory;
+        this.gradStatusService = gradStatusService;
+        this.schoolService = schoolService;
+        this.reportService = reportService;
+        this.tokenUtils = tokenUtils;
+        this.restService = restService;
+        this.educGraduationApiConstants = educGraduationApiConstants;
+    }
 
     public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
 
@@ -152,29 +153,33 @@ public class GraduationService {
             }
             accessToken = res.getLeft();
 
-            List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
-            SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
-            if (schoolDetails != null) {
-                ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
-                schoolObj.setMincode(schoolDetails.getMinCode());
-                schoolObj.setName(schoolDetails.getSchoolName());
-                ReportData gradReport;
-                switch (type) {
-                    case GRADREG:
-                        List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
-                        gradReport = getReportDataObj(schoolObj, gradRegStudents);
-                        return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    case NONGRADREG:
-                        List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
-                        gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
-                        return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
-                    case NONGRADPRJ:
-                        List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
-                        gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
-                        return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
-                    default:
-                        return result;
+            try {
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
+                SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
+                if (schoolDetails != null) {
+                    School schoolObj = new School();
+                    schoolObj.setMincode(schoolDetails.getMinCode());
+                    schoolObj.setName(schoolDetails.getSchoolName());
+                    ReportData gradReport;
+                    switch (type) {
+                        case GRADREG:
+                            List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
+                            gradReport = getReportDataObj(schoolObj, gradRegStudents);
+                            return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                        case NONGRADREG:
+                            List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
+                            gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
+                            return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                        case NONGRADPRJ:
+                            List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
+                            gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
+                            return getSchoolReportNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
+                        default:
+                            return result;
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Failed to generate report for mincode: {} due to: {}", usl, e.getLocalizedMessage());
             }
             i++;
         }
@@ -194,29 +199,33 @@ public class GraduationService {
             }
             accessToken = res.getLeft();
 
-            List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
-            SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
-            if (schoolDetails != null) {
-                logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
-                if (stdList != null && !stdList.isEmpty()) {
-                    ca.bc.gov.educ.api.graduation.model.report.School schoolObj = new ca.bc.gov.educ.api.graduation.model.report.School();
-                    schoolObj.setMincode(schoolDetails.getMinCode());
-                    schoolObj.setName(schoolDetails.getSchoolName());
-                    if (TVRRUN.equalsIgnoreCase(type)) {
-                        List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
-                        logger.debug("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
-                        numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
-                    } else {
-                        List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
-                        logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
-                        numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
-                        res = checkAndGetAccessToken(res);
-                        accessToken = res.getLeft();
-                        List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
-                        logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
-                        numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
+            try {
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
+                SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
+                if (schoolDetails != null) {
+                    logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
+                    if (stdList != null && !stdList.isEmpty()) {
+                        School schoolObj = new School();
+                        schoolObj.setMincode(schoolDetails.getMinCode());
+                        schoolObj.setName(schoolDetails.getSchoolName());
+                        if (TVRRUN.equalsIgnoreCase(type)) {
+                            List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
+                            logger.debug("*** Process processNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
+                            numberOfReports = processNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
+                        } else {
+                            List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
+                            logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                            numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
+                            res = checkAndGetAccessToken(res);
+                            accessToken = res.getLeft();
+                            List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
+                            logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                            numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
+                        }
                     }
                 }
+            } catch (Exception e) {
+                logger.error("Failed to generate report for mincode: {} due to: {}", usl, e.getLocalizedMessage());
             }
             i++;
         }
@@ -335,9 +344,10 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return webClient.post().uri(educGraduationApiConstants.getSchoolGraduation())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return this.restService.post(educGraduationApiConstants.getSchoolGraduation(),
+                reportParams,
+                byte[].class,
+                accessToken);
 
     }
 
@@ -355,9 +365,10 @@ public class GraduationService {
     }
 
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
-        webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+        this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
+                requestObj,
+                SchoolReports.class,
+                accessToken);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -373,9 +384,10 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return webClient.post().uri(educGraduationApiConstants.getSchoolNonGraduation())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(),
+                reportParams,
+                byte[].class,
+                accessToken);
 
     }
 
@@ -401,9 +413,10 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return webClient.post().uri(educGraduationApiConstants.getNonGradProjected())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+        return this.restService.post(educGraduationApiConstants.getNonGradProjected(),
+                reportParams,
+                byte[].class,
+                accessToken);
     }
 
     private void createAndSaveSchoolReportNonGradPrjReport(ReportData data, String mincode, String accessToken) {

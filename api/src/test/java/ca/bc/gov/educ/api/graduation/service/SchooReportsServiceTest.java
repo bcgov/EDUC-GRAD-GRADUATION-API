@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolReports;
+import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
@@ -30,8 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SC;
-import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.DISTREP_YE_SD;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +41,14 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 public class SchooReportsServiceTest {
+
+	private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
+	private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
+	private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
+	private static final String ADDRESS_LABEL = "ADDRESS_LABEL";
+	private static final String ADDRESS_LABEL_PSI = "ADDRESS_LABEL_PSI";
+	private static final String DISTREP_SD = "DISTREP_SD";
+	private static final String DISTREP_SC = "DISTREP_SC";
 
 	@Autowired
 	private SchoolReportsService schoolReportsService;
@@ -123,22 +130,29 @@ public class SchooReportsServiceTest {
 
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
+		School school = new School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+
 		Integer reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken");
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
 		assertTrue(reportsCount > 0);
 
-		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken");
+		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertTrue(reportsCount > 0);
 
-		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken");
+		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
 		assertTrue(reportsCount > 0);
 
-		byte[] result = schoolReportsService.getSchoolDistrictYearEndReports("accessToken");
+		reportsCount = schoolReportsService.createAndStoreSchoolLabelsReportsFromSchools(ADDRESS_LABEL_PSI, List.of(school), "accessToken", null);
+		assertTrue(reportsCount > 0);
+
+		byte[] result = schoolReportsService.getSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertNotNull(result);
 
-		result = schoolReportsService.getSchoolDistrictReports("accessToken");
+		result = schoolReportsService.getSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
 		assertNotNull(result);
 
 		result = schoolReportsService.getSchoolYearEndReports("accessToken");
@@ -151,6 +165,9 @@ public class SchooReportsServiceTest {
 		assertNotNull(result);
 
 		result = schoolReportsService.getDistrictReports("accessToken");
+		assertNotNull(result);
+
+		result = schoolReportsService.getSchoolLabelsReportsFromSchools("ADDRESS_LABEL_PSI", List.of(school), "accessToken");
 		assertNotNull(result);
 
 	}
