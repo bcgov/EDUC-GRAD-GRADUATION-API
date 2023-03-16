@@ -416,6 +416,7 @@ public class SchoolReportsService {
         school.setDistno(StringUtils.substring(reportGradStudentData.getMincode(), 0, 3));
         school.setMincode(reportGradStudentData.getMincode());
         school.setName(reportGradStudentData.getSchoolName());
+        school.setTypeBanner("Principal");
         Address address = new Address();
         address.setStreetLine1(reportGradStudentData.getSchoolAddress1());
         address.setStreetLine2(reportGradStudentData.getSchoolAddress2());
@@ -452,6 +453,7 @@ public class SchoolReportsService {
             school.setDistno(distNo);
             school.setMincode(reportGradStudentData.getMincode());
             school.setName(reportGradStudentData.getSchoolName());
+            school.setTypeBanner("Principal");
             schools.add(processDistrictSchool(school, reportGradStudentData));
         }
     }
