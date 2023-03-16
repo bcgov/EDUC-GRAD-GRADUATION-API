@@ -1,0 +1,46 @@
+[
+  {
+    "mincode": "001",
+    "name": "SOUTHERN ALBERTA INST OF TECH (CALGARY)",
+    "typeIndicator": null,
+    "typeBanner": "OFFICE OF THE REGISTRAR",
+    "signatureCode": null,
+    "distno": null,
+    "schlno": null,
+    "schoolCategoryCode": null,
+    "address": {
+      "streetLine1": "1301 16TH AVE NW",
+      "streetLine2": "",
+      "streetLine3": "",
+      "city": "CALGARY",
+      "region": "AB",
+      "country": "CANADA",
+      "code": "T2M0L4"
+    },
+    "phoneNumber": "",
+    "dogwoodElig": "",
+    "students": null
+  },
+  {
+    "mincode": "003",
+    "name": "UNIVERSITY OF LETHBRIDGE",
+    "typeIndicator": null,
+    "typeBanner": "OFFICE OF THE REGISTRAR",
+    "signatureCode": null,
+    "distno": null,
+    "schlno": null,
+    "schoolCategoryCode": null,
+    "address": {
+      "streetLine1": "4401 UNIVERSITY DR",
+      "streetLine2": "",
+      "streetLine3": "",
+      "city": "LETHBRIDGE",
+      "region": "AB",
+      "country": "CANADA",
+      "code": "T1K3M4"
+    },
+    "phoneNumber": "",
+    "dogwoodElig": "",
+    "students": null
+  }
+]
