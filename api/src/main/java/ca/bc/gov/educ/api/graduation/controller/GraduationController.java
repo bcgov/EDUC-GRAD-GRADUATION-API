@@ -269,7 +269,7 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School & District Report Retrieval", description = "When triggered, School & District Reports generated on fly", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<byte[]> getSchoolDistrictReportsSupp(
+    public ResponseEntity<byte[]> getSchoolDistrictSuppReports(
             @RequestHeader(name="Authorization") String accessToken,
             @RequestParam(required = false) String slrt,
             @RequestParam(required = false) String drt,
