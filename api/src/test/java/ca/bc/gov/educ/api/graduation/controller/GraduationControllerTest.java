@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
+import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.service.SchoolReportsService;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.MessageHelper;
@@ -37,6 +38,9 @@ class GraduationControllerTest {
 
 	@Mock
 	private SchoolReportsService schoolReportsService;
+
+	@Mock
+	private ReportService reportService;
 	
 	@Mock
 	ResponseHelper response;
@@ -183,6 +187,17 @@ class GraduationControllerTest {
 		Mockito.when(schoolReportsService.getSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC)).thenReturn(new byte[0]);
 		graduationController.getSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		Mockito.verify(schoolReportsService).getSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
+	}
+
+	@Test
+	void testCreateAndStoreDistrictSchoolSuppReports() {
+		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
+		ReportGradStudentData data = new ReportGradStudentData();
+		reportGradStudentData.add(data);
+		Mockito.when(reportService.getStudentsForSchoolYearEndReport("accessToken")).thenReturn(reportGradStudentData);
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, SchoolReportsService.ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictSuppReports("accessToken", ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
 	}
 
 	@Test
