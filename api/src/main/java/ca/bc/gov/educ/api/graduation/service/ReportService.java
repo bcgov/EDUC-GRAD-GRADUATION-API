@@ -697,6 +697,7 @@ public class ReportService {
         studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
         studObj.setCitizenship(studentObj.getStudentCitizenship());
         studObj.setFirstName(studentObj.getLegalFirstName());
+        studObj.setMiddleName(studentObj.getLegalMiddleNames());
         studObj.setLastName(studentObj.getLegalLastName());
         studObj.setGrade(studentObj.getStudentGrade());
         Pen pen = new Pen();
