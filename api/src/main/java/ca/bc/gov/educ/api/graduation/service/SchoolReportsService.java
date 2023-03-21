@@ -34,7 +34,7 @@ public class SchoolReportsService {
     public static final String DISTREP_SC = "DISTREP_SC";
     public static final String DISTREP_SD = "DISTREP_SD";
     public static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
-    public static final String ADDRESS_LABEL = "ADDRESS_LABEL";
+    public static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
 
     @Autowired
     WebClient webClient;
@@ -66,11 +66,10 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
-    public byte[] getSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+    public byte[] getSchoolDistrictReports(String accessToken, List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
         List<InputStream> pdfs = new ArrayList<>();
-        if(ADDRESS_LABEL.equalsIgnoreCase(slrt)) {
-            createAndStoreSchoolLabelsReports(ADDRESS_LABEL, reportGradStudentDataList, accessToken, pdfs);
+        if(ADDRESS_LABEL_SCHL.equalsIgnoreCase(slrt)) {
+            createAndStoreSchoolLabelsReports(ADDRESS_LABEL_SCHL, reportGradStudentDataList, accessToken, pdfs);
         }
         if(DISTREP_SD.equalsIgnoreCase(drt)) {
             createAndStoreDistrictReports(DISTREP_SD, reportGradStudentDataList, accessToken, pdfs);
@@ -79,6 +78,11 @@ public class SchoolReportsService {
             createAndStoreSchoolReports(DISTREP_SC, reportGradStudentDataList, accessToken, pdfs);
         }
         return mergeDocuments(pdfs);
+    }
+
+    public byte[] getSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        return getSchoolDistrictReports(accessToken, reportGradStudentDataList, slrt, drt, srt);
     }
 
     public byte[] getSchoolYearEndReports(String accessToken) {
@@ -131,13 +135,11 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
-    public Integer createAndStoreSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
+    public Integer createAndStoreSchoolDistrictReports(String accessToken, List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
-        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         int schoolLabelsCount = 0;
-        if(ADDRESS_LABEL.equalsIgnoreCase(slrt)) {
-            schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL, reportGradStudentDataList, accessToken, null);
+        if(ADDRESS_LABEL_SCHL.equalsIgnoreCase(slrt)) {
+            schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_SCHL, reportGradStudentDataList, accessToken, null);
             logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
         }
         int districtReportsCount = 0;
@@ -151,6 +153,12 @@ public class SchoolReportsService {
             logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
+    }
+
+    public Integer createAndStoreSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
+        logger.debug("***** Get Students for School Monthly Reports Starts *****");
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        return createAndStoreSchoolDistrictReports(accessToken, reportGradStudentDataList, slrt, drt, srt);
     }
 
     public Integer createAndStoreDistrictReports(String reportType, String accessToken) {

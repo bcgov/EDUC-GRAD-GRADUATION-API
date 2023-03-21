@@ -24,10 +24,11 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class GraduationControllerTest {
 
-	private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
 	private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
 	private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
-	private static final String ADDRESS_LABEL = "ADDRESS_LABEL";
+	private static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
+	private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
+	private static final String ADDRESS_LABEL_PSI = "ADDRESS_LABEL_PSI";
 	private static final String DISTREP_SD = "DISTREP_SD";
 	private static final String DISTREP_SC = "DISTREP_SC";
 
@@ -164,10 +165,17 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreDistrictSchoolPsiReports() {
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_PSI, null, null)).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_PSI, null, null);
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_PSI, null, null);
+	}
+
+	@Test
 	void testCreateAndStoreDistrictSchoolReports() {
-		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC)).thenReturn(1);
-		graduationController.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
-		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC)).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
 	}
 
 	@Test
@@ -179,9 +187,9 @@ class GraduationControllerTest {
 
 	@Test
 	void testCreateAndStoreDistrictSchoolPdfReports() {
-		Mockito.when(schoolReportsService.getSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC)).thenReturn(new byte[0]);
-		graduationController.getSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
-		Mockito.verify(schoolReportsService).getSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
+		Mockito.when(schoolReportsService.getSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC)).thenReturn(new byte[0]);
+		graduationController.getSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
+		Mockito.verify(schoolReportsService).getSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
 	}
 
 	@Test

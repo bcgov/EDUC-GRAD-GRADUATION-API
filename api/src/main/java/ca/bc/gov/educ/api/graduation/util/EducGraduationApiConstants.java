@@ -36,8 +36,10 @@ public class EducGraduationApiConstants {
     public static final String DISTRICT_REPORTS_MONTH_PDF = "/report/districtmonthpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END = "/report/schooldistrictyearend";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH = "/report/schooldistrictmonth";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_SUPP = "/report/schooldistrictsupp";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF = "/report/schooldistrictyearendpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH_PDF = "/report/schooldistrictmonthpdf";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_SUPP_PDF = "/report/schooldistrictsupppdf";
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     public static final String SCHOOL_REPORTS_LABELS = "/report/school/labels";
     public static final String SCHOOL_REPORTS_LABELS_PDF = "/report/school/labels/pdf";
