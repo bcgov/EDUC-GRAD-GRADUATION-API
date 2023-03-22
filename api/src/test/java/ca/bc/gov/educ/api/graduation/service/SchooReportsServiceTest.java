@@ -45,7 +45,7 @@ public class SchooReportsServiceTest {
 	private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
 	private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
 	private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
-	private static final String ADDRESS_LABEL = "ADDRESS_LABEL";
+	private static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
 	private static final String ADDRESS_LABEL_PSI = "ADDRESS_LABEL_PSI";
 	private static final String DISTREP_SD = "DISTREP_SD";
 	private static final String DISTREP_SC = "DISTREP_SC";
@@ -89,6 +89,7 @@ public class SchooReportsServiceTest {
 	public void testSchoolReports() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolData("json/studentSchoolYearEndResponse.json");
 		Mockito.when(reportService.getStudentsForSchoolYearEndReport("accessToken")).thenReturn(gradStudentDataList);
+		Mockito.when(reportService.getStudentsForSchoolReport("accessToken")).thenReturn(gradStudentDataList);
 
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
 
@@ -143,7 +144,10 @@ public class SchooReportsServiceTest {
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertTrue(reportsCount > 0);
 
-		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
+		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
+		assertTrue(reportsCount > 0);
+
+		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", gradStudentDataList, ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreSchoolLabelsReportsFromSchools(ADDRESS_LABEL_PSI, List.of(school), "accessToken", null);
@@ -152,7 +156,7 @@ public class SchooReportsServiceTest {
 		byte[] result = schoolReportsService.getSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertNotNull(result);
 
-		result = schoolReportsService.getSchoolDistrictReports("accessToken", ADDRESS_LABEL, DISTREP_SD, DISTREP_SC);
+		result = schoolReportsService.getSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);
 		assertNotNull(result);
 
 		result = schoolReportsService.getSchoolYearEndReports("accessToken");

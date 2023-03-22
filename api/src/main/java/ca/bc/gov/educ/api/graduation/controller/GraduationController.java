@@ -2,9 +2,11 @@ package ca.bc.gov.educ.api.graduation.controller;
 
 import ca.bc.gov.educ.api.graduation.model.dto.AlgorithmResponse;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
+import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
+import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.service.SchoolReportsService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
@@ -46,6 +48,9 @@ public class GraduationController {
 
     @Autowired
     SchoolReportsService schoolReportsService;
+
+    @Autowired
+    ReportService reportService;
 
     @Autowired
     GradValidation validation;
@@ -220,6 +225,20 @@ public class GraduationController {
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), slrt, drt, srt));
     }
 
+    @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_SUPP)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolDistrictSuppReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt
+    ) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken.replace(BEARER, ""));
+        return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt));
+    }
+
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School & District Report Retrieval", description = "When triggered, School & District Reports generated on fly", tags = { "Reports" })
@@ -243,6 +262,20 @@ public class GraduationController {
             @RequestParam(required = false) String drt,
             @RequestParam(required = false) String srt) {
         byte[] resultBinary = schoolReportsService.getSchoolDistrictReports(accessToken.replace(BEARER, ""), slrt, drt, srt);
+        return handleBinaryResponse(resultBinary, "DistrictSchoolReports.pdf", MediaType.APPLICATION_PDF);
+    }
+
+    @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_SUPP_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Retrieval", description = "When triggered, School & District Reports generated on fly", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getSchoolDistrictSuppReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken.replace(BEARER, ""));
+        byte[] resultBinary = schoolReportsService.getSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt);
         return handleBinaryResponse(resultBinary, "DistrictSchoolReports.pdf", MediaType.APPLICATION_PDF);
     }
 
