@@ -133,7 +133,7 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.update-grad-status-projected}")
     private String saveStudentRecordProjectedRun;
 
-    @Value("${endpoint.grad-student-api.school-nongrad-year-end-students.url}")
+    @Value("${endpoint.grad-student-api.school-nongrad-year-end-students}")
     private String schoolNonGradYearEndStudents;
 
     @Value("${endpoint.pen-student-api.by-pen.url}")

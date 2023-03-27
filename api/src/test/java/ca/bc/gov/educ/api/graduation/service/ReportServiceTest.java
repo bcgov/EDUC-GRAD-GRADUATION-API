@@ -127,7 +127,7 @@ public class ReportServiceTest {
 		};
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(constants.getSchoolYearEndStudents())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(constants.getSchoolNonGradYearEndStudents())).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(reportGradStudentDataType)).thenReturn(Mono.just(gradStudentDataList));
@@ -135,8 +135,6 @@ public class ReportServiceTest {
 		var result = reportService.getStudentsForSchoolNonGradYearEndReport("accessToken");
 		assertNotNull(result);
 	}
-
-
 
 	@Test
 	public void testSaveStudentCertificateReport() {
