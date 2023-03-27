@@ -76,6 +76,7 @@ endpoint:
   update-grad-status-algo-error: https://educ-grad-student-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/student/algorithmerror/%s?isGraduated=%s
   update-grad-status-projected: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/projected/studentid/%s
   student-for-school-report: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/batch/schoolreport/%s
+  school-nongrad-year-end-students: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentschoolreportdata
  grad-program-api: 
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s

@@ -320,6 +320,7 @@ public class SchoolReportsService {
     }
 
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
+        logger.debug("getSchoolYearEndReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -329,6 +330,7 @@ public class SchoolReportsService {
     }
 
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest, String accessToken) {
+        logger.debug("getSchoolLabelsReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getSchoolLabels())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -338,6 +340,7 @@ public class SchoolReportsService {
     }
 
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
+        logger.debug("getDistrictYearEndReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);

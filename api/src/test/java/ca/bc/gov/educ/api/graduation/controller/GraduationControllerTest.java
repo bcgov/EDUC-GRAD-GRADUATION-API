@@ -201,6 +201,28 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testCreateAndStoreDistrictSchoolYearEndNonGradReports() {
+		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
+		ReportGradStudentData data = new ReportGradStudentData();
+		reportGradStudentData.add(data);
+		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport("accessToken")).thenReturn(reportGradStudentData);
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, SchoolReportsService.ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictYearEndNonGradReports("accessToken", ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+	}
+
+	@Test
+	void testGetDistrictSchoolYearEndNonGradPdfReports() {
+		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
+		ReportGradStudentData data = new ReportGradStudentData();
+		reportGradStudentData.add(data);
+		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport("accessToken")).thenReturn(reportGradStudentData);
+		Mockito.when(schoolReportsService.getSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(new byte[0]);
+		graduationController.getSchoolDistrictYearEndNonGradReports("accessToken", ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+		Mockito.verify(schoolReportsService).getSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+	}
+
+	@Test
 	void testGetDistrictSchoolSuppPdfReports() {
 		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
 		ReportGradStudentData data = new ReportGradStudentData();
