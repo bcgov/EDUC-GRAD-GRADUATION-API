@@ -37,6 +37,8 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END = "/report/schooldistrictyearend";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH = "/report/schooldistrictmonth";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_SUPP = "/report/schooldistrictsupp";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END = "/report/schooldistrictnongradyearend";
+    public static final String SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END_PDF = "/report/schooldistrictnongradyearendpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF = "/report/schooldistrictyearendpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH_PDF = "/report/schooldistrictmonthpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_SUPP_PDF = "/report/schooldistrictsupppdf";
@@ -130,6 +132,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.grad-student-api.update-grad-status-projected}")
     private String saveStudentRecordProjectedRun;
+
+    @Value("${endpoint.grad-student-api.school-nongrad-year-end-students.url}")
+    private String schoolNonGradYearEndStudents;
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
