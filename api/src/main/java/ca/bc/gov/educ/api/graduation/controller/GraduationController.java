@@ -239,6 +239,34 @@ public class GraduationController {
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt));
     }
 
+    @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolDistrictYearEndNonGradReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt
+    ) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken.replace(BEARER, ""));
+        return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt));
+    }
+
+    @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END_PDF)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Retrieval", description = "When triggered, School & District Reports generated on fly", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> getSchoolDistrictYearEndNonGradReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken.replace(BEARER, ""));
+        byte[] resultBinary = schoolReportsService.getSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt);
+        return handleBinaryResponse(resultBinary, "DistrictSchoolYearEndNonGradReports.pdf", MediaType.APPLICATION_PDF);
+    }
+
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_YEAR_END_PDF)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School & District Report Retrieval", description = "When triggered, School & District Reports generated on fly", tags = { "Reports" })
