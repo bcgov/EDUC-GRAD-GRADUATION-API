@@ -292,6 +292,8 @@ public class GraduationService {
             std.setGrade(gsr.getStudentGrade());
             std.setGradProgram(gsr.getProgram());
             std.setLastUpdateDate(gsr.getUpdateDate());
+            //Grad2-1931 - mchintha
+            std.setConsumerEducReqt(gsr.getConsumerEducationRequirementMet());
             std.setGraduationStatus(GraduationStatus.builder()
                             .programCompletionDate(gsr.getProgramCompletionDate())
                             .honours(gsr.getHonoursStanding())
