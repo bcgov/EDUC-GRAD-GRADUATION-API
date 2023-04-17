@@ -311,6 +311,8 @@ public class ReportService {
         crse.setRelatedLevel(sc.getRelatedLevel());
         crse.setType(sc.getProvExamCourse().equals("Y") ? "1" : "2");
         crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
+        //Grad2-1931
+        crse.setSpecialCase(sc.getSpecialCase());
         return crse;
     }
 
