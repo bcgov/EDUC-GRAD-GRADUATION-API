@@ -26,6 +26,8 @@ public class Student implements Comparable<Student>, Serializable {
     private String mincodeGrad = "";
     private String englishCert = "";
     private String frenchCert = "";
+    //Grad2-1931 - mchintha
+    private String consumerEducReqt= "";
 
     private String localId = "";
     private String hasOtherProgram = "";
@@ -235,6 +237,14 @@ public class Student implements Comparable<Student>, Serializable {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public String getConsumerEducReqt() {
+        return consumerEducReqt;
+    }
+
+    public void setConsumerEducReqt(String consumerEducReqt) {
+        this.consumerEducReqt = consumerEducReqt;
     }
 
     @Override

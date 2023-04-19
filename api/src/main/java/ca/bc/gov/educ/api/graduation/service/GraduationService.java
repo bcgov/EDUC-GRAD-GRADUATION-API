@@ -9,7 +9,10 @@ import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
-import ca.bc.gov.educ.api.graduation.util.*;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.graduation.util.TokenUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
@@ -27,7 +30,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GraduationService {
@@ -49,9 +51,10 @@ public class GraduationService {
     TokenUtils tokenUtils;
     RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
+    SchoolYearDates schoolYearDates;
 
     @Autowired
-    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants) {
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates) {
         this.webClient = webClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
@@ -60,6 +63,7 @@ public class GraduationService {
         this.tokenUtils = tokenUtils;
         this.restService = restService;
         this.educGraduationApiConstants = educGraduationApiConstants;
+        this.schoolYearDates = schoolYearDates;
     }
 
     public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
@@ -236,11 +240,11 @@ public class GraduationService {
         stdList.removeIf(p -> !"CUR".equalsIgnoreCase(p.getStudentStatus()));
         switch (type) {
             case GRADREG:
-                return stdList.stream().filter(c -> (c.getProgramCompletionDate() != null && !"SCCP".equalsIgnoreCase(c.getProgram()))).collect(Collectors.toList());
+                return stdList.stream().filter(c -> (c.getProgramCompletionDate() != null && !"SCCP".equalsIgnoreCase(c.getProgram()) && EducGraduationApiUtils.parsingTraxDate(c.getProgramCompletionDate()).after(schoolYearDates.getDateFrom()) && EducGraduationApiUtils.parsingTraxDate(c.getProgramCompletionDate()).before(schoolYearDates.getDateTo()))).toList();
             case NONGRADREG:
-                return stdList.stream().filter(c -> c.getProgramCompletionDate() == null && ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).collect(Collectors.toList());
+                return stdList.stream().filter(c -> c.getProgramCompletionDate() == null && ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).toList();
             case NONGRADPRJ:
-                return stdList.stream().filter(c -> ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).collect(Collectors.toList());
+                return stdList.stream().filter(c -> ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).toList();
             default:
                 return stdList;
         }
@@ -292,6 +296,8 @@ public class GraduationService {
             std.setGrade(gsr.getStudentGrade());
             std.setGradProgram(gsr.getProgram());
             std.setLastUpdateDate(gsr.getUpdateDate());
+            //Grad2-1931 - mchintha
+            std.setConsumerEducReqt(gsr.getConsumerEducationRequirementMet());
             std.setGraduationStatus(GraduationStatus.builder()
                             .programCompletionDate(gsr.getProgramCompletionDate())
                             .honours(gsr.getHonoursStanding())
