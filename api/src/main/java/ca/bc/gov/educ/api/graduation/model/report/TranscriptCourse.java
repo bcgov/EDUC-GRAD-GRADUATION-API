@@ -12,6 +12,8 @@ public class TranscriptCourse {
     private String type;
     private String relatedCourse;
     private String relatedLevel;
+    //Grad2-1931
+    private String specialCase;
 
     public String getName() {
         return name;
@@ -76,6 +78,10 @@ public class TranscriptCourse {
     public void setRelatedLevel(String value) {
         this.relatedLevel = value;
     }
+
+    public String getSpecialCase() { return specialCase; }
+
+    public void setSpecialCase(String specialCase) { this.specialCase = specialCase; }
 
     @Override
     public boolean equals(Object o) {
