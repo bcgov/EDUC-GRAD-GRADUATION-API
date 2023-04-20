@@ -197,7 +197,8 @@ public class SchoolReportsService {
             pdfs.add(is);
         }
         if (pdfs == null) {
-            saveDistrictOrSchoolOrLabelsReport(accessToken, "000000000", reportType, reportAsBytes);
+            String schoolLabelMinCode = (schools != null && schools.size() == 1) ? schools.get(0).getMincode() : "000000000";
+            saveDistrictOrSchoolOrLabelsReport(accessToken, schoolLabelMinCode, reportType, reportAsBytes);
         }
         reportsCount++;
         return reportsCount;
