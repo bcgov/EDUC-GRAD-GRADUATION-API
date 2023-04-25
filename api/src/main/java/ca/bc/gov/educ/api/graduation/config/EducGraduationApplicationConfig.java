@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
-import java.util.TimeZone;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
 
@@ -37,11 +35,10 @@ public class EducGraduationApplicationConfig {
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
-        TimeZone defaultTimezone = TimeZone.getDefault();
-        String timeZoneId = Optional.ofNullable(System.getenv("TZ")).orElse(defaultTimezone.getID());
         LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT));
         return jacksonObjectMapperBuilder ->
-                jacksonObjectMapperBuilder.serializers(localDateTimeSerializer).timeZone(TimeZone.getTimeZone(timeZoneId));
+                jacksonObjectMapperBuilder
+                        .serializers(localDateTimeSerializer);
     }
 
 }
