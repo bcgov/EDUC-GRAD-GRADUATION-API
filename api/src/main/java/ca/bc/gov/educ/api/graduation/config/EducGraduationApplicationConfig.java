@@ -18,8 +18,6 @@ import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATE
 @Configuration
 public class EducGraduationApplicationConfig {
 
-    public static LocalDateTimeSerializer LOCAL_DATETIME_SERIALIZER = new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT));
-
     @Bean
     public ModelMapper modelMapper() {
 
@@ -41,8 +39,9 @@ public class EducGraduationApplicationConfig {
     public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
         TimeZone defaultTimezone = TimeZone.getDefault();
         String timeZoneId = Optional.ofNullable(System.getenv("TZ")).orElse(defaultTimezone.getID());
+        LocalDateTimeSerializer localDateTimeSerializer = new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT));
         return jacksonObjectMapperBuilder ->
-                jacksonObjectMapperBuilder.serializers(LOCAL_DATETIME_SERIALIZER).timeZone(TimeZone.getTimeZone(timeZoneId));
+                jacksonObjectMapperBuilder.serializers(localDateTimeSerializer).timeZone(TimeZone.getTimeZone(timeZoneId));
     }
 
 }
