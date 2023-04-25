@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.BIRTHDATE_FORMAT;
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
+
 public class Student implements Comparable<Student>, Serializable {
 
     private Pen pen = new Pen();
@@ -92,7 +95,7 @@ public class Student implements Comparable<Student>, Serializable {
         this.citizenship = citizenship;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern=BIRTHDATE_FORMAT)
     public Date getBirthdate() {
         return birthdate;
     }
@@ -230,7 +233,7 @@ public class Student implements Comparable<Student>, Serializable {
         this.graduationStatus = graduationStatus;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern=DATETIME_FORMAT)
     public Date getLastUpdateDate() {
         return lastUpdateDate;
     }

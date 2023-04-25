@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
-
 
 import java.io.Serializable;
 import java.util.Date;
@@ -39,7 +39,7 @@ public class Transcript implements Serializable {
         this.transcriptTypeCode = code;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
     public Date getIssueDate() {
         return issueDate;
     }

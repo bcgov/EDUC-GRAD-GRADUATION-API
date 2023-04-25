@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -67,7 +68,7 @@ public class ReportData implements Serializable {
 	@JsonDeserialize(as = GraduationData.class)
 	private GraduationData graduationData;
 	private String gradMessage;
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
 	private String updateDate;
 	@JsonDeserialize(as = Certificate.class)
 	private Certificate certificate;

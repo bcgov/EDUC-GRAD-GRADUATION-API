@@ -1,14 +1,24 @@
 package ca.bc.gov.educ.api.graduation.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.TimeZone;
+
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
+
 @Configuration
 public class EducGraduationApplicationConfig {
+
+    public static LocalDateTimeSerializer LOCAL_DATETIME_SERIALIZER = new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DATETIME_FORMAT));
 
     @Bean
     public ModelMapper modelMapper() {
@@ -27,6 +37,12 @@ public class EducGraduationApplicationConfig {
         return builder.build();
     }
 
-    
+    @Bean
+    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
+        TimeZone defaultTimezone = TimeZone.getDefault();
+        String timeZoneId = Optional.ofNullable(System.getenv("TZ")).orElse(defaultTimezone.getID());
+        return jacksonObjectMapperBuilder ->
+                jacksonObjectMapperBuilder.serializers(LOCAL_DATETIME_SERIALIZER).timeZone(TimeZone.getTimeZone(timeZoneId));
+    }
 
 }
