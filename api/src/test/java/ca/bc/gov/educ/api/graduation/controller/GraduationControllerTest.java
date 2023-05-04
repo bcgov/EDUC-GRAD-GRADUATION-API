@@ -201,6 +201,16 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testStudentsForYearEndReports() {
+		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
+		ReportGradStudentData data = new ReportGradStudentData();
+		reportGradStudentData.add(data);
+		Mockito.when(reportService.getStudentsForSchoolYearEndReport("accessToken")).thenReturn(reportGradStudentData);
+		graduationController.getStudentsForYearEndReports("accessToken");
+		Mockito.verify(reportService).getStudentsForSchoolYearEndReport("accessToken");
+	}
+
+	@Test
 	void testCreateAndStoreDistrictSchoolYearEndNonGradReports() {
 		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
 		ReportGradStudentData data = new ReportGradStudentData();
