@@ -1,9 +1,10 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -26,5 +27,6 @@ public class GradAlgorithmGraduationStudentRecord {
     private String schoolAtGrad;
     private String consumerEducationRequirementMet;
     private String schoolAtGradName;
-    private Date adultStartDate;
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private LocalDate adultStartDate;
 }
