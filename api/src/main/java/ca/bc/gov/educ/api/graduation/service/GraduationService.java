@@ -183,7 +183,7 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate report for mincode: {} due to: {}", usl, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
             i++;
         }
@@ -229,7 +229,7 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate report for mincode: {} due to: {}", usl, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
             i++;
         }
