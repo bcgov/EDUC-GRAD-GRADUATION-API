@@ -239,14 +239,15 @@ public class GraduationService {
     private List<GraduationStudentRecord> filterStudentList(List<GraduationStudentRecord> stdList, String type) {
         stdList.removeIf(p -> !"CUR".equalsIgnoreCase(p.getStudentStatus()));
         switch (type) {
-            case GRADREG:
+            case GRADREG -> {
                 return stdList.stream().filter(c -> (c.getProgramCompletionDate() != null && !"SCCP".equalsIgnoreCase(c.getProgram()) && EducGraduationApiUtils.parsingTraxDate(c.getProgramCompletionDate()).after(schoolYearDates.getDateFrom()) && EducGraduationApiUtils.parsingTraxDate(c.getProgramCompletionDate()).before(schoolYearDates.getDateTo()))).toList();
-            case NONGRADREG:
+            }
+            case NONGRADREG, NONGRADPRJ -> {
                 return stdList.stream().filter(c -> c.getProgramCompletionDate() == null && ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).toList();
-            case NONGRADPRJ:
-                return stdList.stream().filter(c -> ("AD".equalsIgnoreCase(c.getStudentGrade()) || "12".equalsIgnoreCase(c.getStudentGrade()))).toList();
-            default:
+            }
+            default -> {
                 return stdList;
+            }
         }
     }
 

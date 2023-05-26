@@ -148,7 +148,7 @@ public class ReportService {
             data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
-            data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
+            data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
@@ -1045,7 +1045,7 @@ public class ReportService {
             data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
-            data.setNonGradReasons(getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), false, null, true));
+            data.setNonGradReasons(isGraduated(graduationDataStatus.getGradStatus().getProgramCompletionDate())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), false, null, true));
             data.setOptionalPrograms(getOptionalProgramAchvReport(data.getGradProgram().getCode().getCode(), optionalProgramList));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             return data;
@@ -1148,5 +1148,9 @@ public class ReportService {
 
         return exception;
 
+    }
+
+    private boolean isGraduated(String programCompletionDate) {
+        return programCompletionDate != null;
     }
 }
