@@ -484,9 +484,7 @@ public class SchoolReportsService {
             }
             school.getSchoolStatistic().setTotalCertificateCount(school.getSchoolStatistic().getTotalCertificateCount() + 1);
         }
-        if (StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
-            school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
-        }
+        school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
         return school;
     }
 
