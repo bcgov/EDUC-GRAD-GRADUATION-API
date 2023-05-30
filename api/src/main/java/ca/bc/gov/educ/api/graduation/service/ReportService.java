@@ -99,30 +99,30 @@ public class ReportService {
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
-        return webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block();
+                }).block());
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String accessToken) {
-        return webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block();
+                }).block());
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolReport(String accessToken) {
-        return webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block();
+                }).block());
     }
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
@@ -1151,5 +1151,14 @@ public class ReportService {
 
     private boolean isGraduated(String programCompletionDate) {
         return programCompletionDate != null;
+    }
+
+    List<ReportGradStudentData> sortReportGradStudentDataByMinCodeAndNames(List<ReportGradStudentData> students) {
+        students.sort(Comparator
+                .comparing(ReportGradStudentData::getMincode, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(ReportGradStudentData::getLastName, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(ReportGradStudentData::getFirstName, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(ReportGradStudentData::getMiddleName, Comparator.nullsLast(Comparator.naturalOrder())));
+        return students;
     }
 }

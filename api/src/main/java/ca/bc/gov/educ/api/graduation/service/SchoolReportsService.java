@@ -498,10 +498,7 @@ public class SchoolReportsService {
     }
 
     private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if (StringUtils.isNotBlank(reportGradStudentData.getTranscriptTypeCode())) {
-            return populateStudentObjectByReportGradStudentData(reportGradStudentData);
-        }
-        return null;
+        return populateStudentObjectByReportGradStudentData(reportGradStudentData);
     }
 
     private Student populateStudentObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
