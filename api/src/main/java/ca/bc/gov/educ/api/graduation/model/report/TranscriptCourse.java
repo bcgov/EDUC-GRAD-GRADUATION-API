@@ -4,16 +4,16 @@ import java.util.Objects;
 
 public class TranscriptCourse {
 
-    private String name;
-    private String code;
-    private String level;
-    private String credits;
-    private String sessionDate;
-    private String type;
-    private String relatedCourse;
-    private String relatedLevel;
+    private String name = "";
+    private String code = "";
+    private String level = "";
+    private String credits = "";
+    private String sessionDate = "";
+    private String type = "";
+    private String relatedCourse = "";
+    private String relatedLevel = "";
     //Grad2-1931
-    private String specialCase;
+    private String specialCase = "";
 
     public String getName() {
         return name;
