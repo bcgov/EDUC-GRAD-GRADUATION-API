@@ -5,14 +5,14 @@ import java.io.Serializable;
 public class Course implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private String name;
-    private String code;
-    private String level;
-    private String credits;
-    private String sessionDate;
-    private String type;
-    private String relatedCourse;
-    private String relatedLevel;
+    private String name = "";
+    private String code = "";
+    private String level = "";
+    private String credits = "";
+    private String sessionDate = "";
+    private String type = "";
+    private String relatedCourse = "";
+    private String relatedLevel = "";
 
     public String getName() {
         return name;
