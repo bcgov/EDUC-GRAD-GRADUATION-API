@@ -2062,9 +2062,11 @@ public class GraduationServiceTest {
 
 		StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
 		studentOptionalProgram1.setOptionalProgramCode(optionalStudentProgram1.getOptionalProgramCode());
+		studentOptionalProgram1.setGraduated(true);
 
 		StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
 		studentOptionalProgram2.setOptionalProgramCode(optionalStudentProgram2.getOptionalProgramCode());
+		studentOptionalProgram2.setGraduated(true);
 
 		ExceptionMessage exception = new ExceptionMessage();
 		Mockito.when(reportService.getCertificateList(gsr, graduationData, Arrays.asList(studentOptionalProgram1, studentOptionalProgram2), "accessToken", exception)).thenReturn(pList);
