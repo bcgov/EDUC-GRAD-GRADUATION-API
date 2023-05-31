@@ -145,6 +145,45 @@ public class GraduationService {
 
     }
 
+    /**
+     * Regenerate Student Certificates
+     *
+     * @param pen
+     * @param isOverwrite   true:  regenerate(delete and create) student certs
+     *                      false: create or update student certs
+     * @param accessToken
+     * @return the number of certificates created
+     */
+    public Integer createAndStoreStudentCertificates(String pen, boolean isOverwrite, String accessToken) {
+        int i = 0;
+        Pair<String, Long> token = getAccessToken(accessToken);
+        Pair<GraduationStudentRecord, GraduationData> pair = reportService.getGraduationStudentRecordAndGraduationData(pen, token.getLeft());
+        if (pair != null) {
+            GraduationStudentRecord graduationStudentRecord = pair.getLeft();
+            GraduationData graduationData = pair.getRight();
+
+            List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
+            for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
+                if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
+                    StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+                    studentOptionalProgram.setGraduated(true);
+                    studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
+                    studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
+                    projectedOptionalPrograms.add(studentOptionalProgram);
+                }
+            }
+            ExceptionMessage exception = new ExceptionMessage();
+            List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
+            token = checkAndGetAccessToken(token);
+            for (ProgramCertificateTranscript certType : certificateList) {
+                reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
+                i++;
+                logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+            }
+        }
+        return i;
+    }
+
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
         byte[] result = new byte[0];
         Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
