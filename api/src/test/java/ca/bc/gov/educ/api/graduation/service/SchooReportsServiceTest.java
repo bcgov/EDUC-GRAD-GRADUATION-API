@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -142,6 +143,12 @@ public class SchooReportsServiceTest {
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
+		assertTrue(reportsCount > 0);
+
+		List<School> schools = new ArrayList<>();
+		schools.add(school);
+
+		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, schools);
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC);

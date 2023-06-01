@@ -212,6 +212,19 @@ public class GraduationController {
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictYearEndReports(accessToken.replace(BEARER, ""), slrt, drt, srt));
     }
 
+    @PostMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolDistrictYearEndReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt,
+            @RequestBody List<School> schools) {
+        return response.GET(schoolReportsService.createAndStoreSchoolDistrictYearEndReports(accessToken.replace(BEARER, ""), slrt, drt, srt, schools));
+    }
+
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_MONTH)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })
