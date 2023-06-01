@@ -117,6 +117,7 @@ public class SchoolReportsService {
         return mergeDocuments(pdfs);
     }
 
+    @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
@@ -139,6 +140,7 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
+    @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
@@ -177,6 +179,7 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
+    @Generated
     public Integer createAndStoreSchoolDistrictReports(String accessToken, List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
         int schoolLabelsCount = 0;
