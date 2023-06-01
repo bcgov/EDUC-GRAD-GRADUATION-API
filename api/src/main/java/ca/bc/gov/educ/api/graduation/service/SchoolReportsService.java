@@ -36,6 +36,10 @@ public class SchoolReportsService {
     public static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
     public static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
 
+    private static final String SCHOOL_REPORTS_CREATED = "***** {} of School Reports Created *****";
+    private static final String SCHOOL_DISTRICT_REPORTS_CREATED = "***** {} of School Districts Reports Created *****";
+    private static final String SCHOOL_LABEL_REPORTS_CREATED = "***** {} of School Labels Reports Created *****";
+
     @Autowired
     WebClient webClient;
     @Autowired
@@ -120,17 +124,17 @@ public class SchoolReportsService {
         int schoolLabelsCount = 0;
         if(ADDRESS_LABEL_YE.equalsIgnoreCase(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
+            logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
         }
         int districtReportsCount = 0;
         if(DISTREP_YE_SD.equalsIgnoreCase(drt)) {
             districtReportsCount += createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Districts Reports Created *****", districtReportsCount);
+            logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
         }
         int schoolReportsCount = 0;
         if(DISTREP_YE_SC.equalsIgnoreCase(srt)) {
             schoolReportsCount += createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
+            logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
@@ -158,17 +162,17 @@ public class SchoolReportsService {
         int schoolLabelsCount = 0;
         if(ADDRESS_LABEL_YE.equalsIgnoreCase(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
+            logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
         }
         int districtReportsCount = 0;
         if(DISTREP_YE_SD.equalsIgnoreCase(drt)) {
             districtReportsCount += createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Districts Reports Created *****", districtReportsCount);
+            logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
         }
         int schoolReportsCount = 0;
         if(DISTREP_YE_SC.equalsIgnoreCase(srt)) {
             schoolReportsCount += createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
+            logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
@@ -178,17 +182,17 @@ public class SchoolReportsService {
         int schoolLabelsCount = 0;
         if(ADDRESS_LABEL_SCHL.equalsIgnoreCase(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_SCHL, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Labels Reports Created *****", schoolLabelsCount);
+            logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
         }
         int districtReportsCount = 0;
         if(DISTREP_SD.equalsIgnoreCase(drt)) {
             districtReportsCount += createAndStoreDistrictReports(DISTREP_SD, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Districts Reports Created *****", districtReportsCount);
+            logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
         }
         int schoolReportsCount = 0;
         if(DISTREP_SC.equalsIgnoreCase(srt)) {
             schoolReportsCount += createAndStoreSchoolReports(DISTREP_SC, reportGradStudentDataList, accessToken, null);
-            logger.debug("***** {} of School Reports Created *****", schoolReportsCount);
+            logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
