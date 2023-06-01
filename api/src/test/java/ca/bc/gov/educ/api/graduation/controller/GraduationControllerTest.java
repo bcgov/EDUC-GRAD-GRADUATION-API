@@ -173,8 +173,8 @@ class GraduationControllerTest {
 		ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
 		school.setMincode("005994567");
 		school.setName("Test School Name");
-		List<ca.bc.gov.educ.api.graduation.model.report.School> schools = new ArrayList<>();
-		schools.add(school);
+		List<String> schools = new ArrayList<>();
+		schools.add(school.getMincode());
 
 		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, schools)).thenReturn(1);
 		graduationController.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, schools);

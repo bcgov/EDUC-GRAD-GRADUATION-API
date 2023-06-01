@@ -145,8 +145,8 @@ public class SchooReportsServiceTest {
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertTrue(reportsCount > 0);
 
-		List<School> schools = new ArrayList<>();
-		schools.add(school);
+		List<String> schools = new ArrayList<>();
+		schools.add(school.getMincode());
 
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, schools);
 		assertTrue(reportsCount > 0);

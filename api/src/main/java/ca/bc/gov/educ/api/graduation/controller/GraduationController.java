@@ -221,7 +221,7 @@ public class GraduationController {
             @RequestParam(required = false) String slrt,
             @RequestParam(required = false) String drt,
             @RequestParam(required = false) String srt,
-            @RequestBody List<School> schools) {
+            @RequestBody List<String> schools) {
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictYearEndReports(accessToken.replace(BEARER, ""), slrt, drt, srt, schools));
     }
 

@@ -135,16 +135,16 @@ public class SchoolReportsService {
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
-    public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<School> schools) {
+    public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         if(schools != null && !schools.isEmpty()) {
-            boolean isDistrictSchool = schools.get(0).getMincode().length() == 3;
-            boolean isSchoolSchool = schools.get(0).getMincode().length() > 3;
-            Iterator it = reportGradStudentDataList.iterator();
+            boolean isDistrictSchool = schools.get(0).length() == 3;
+            boolean isSchoolSchool = schools.get(0).length() > 3;
+            Iterator<ReportGradStudentData> it = reportGradStudentDataList.iterator();
             while(it.hasNext()) {
-                ReportGradStudentData reportGradStudentData = (ReportGradStudentData) it.next();
+                ReportGradStudentData reportGradStudentData = it.next();
                 String mincode = reportGradStudentData.getMincode();
                 String distcode = StringUtils.substring(mincode, 0, 3);
                 if(isDistrictSchool && !schools.contains(distcode)) {
