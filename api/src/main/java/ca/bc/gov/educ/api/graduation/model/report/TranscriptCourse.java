@@ -75,11 +75,11 @@ public class TranscriptCourse {
         this.relatedCourse = value;
     }
 
+    @JsonSerialize(using = JSonNullStringSerializer.class)
     public String getRelatedLevel() {
         return relatedLevel;
     }
 
-    @JsonSerialize(using = JSonNullStringSerializer.class)
     public void setRelatedLevel(String value) {
         this.relatedLevel = value;
     }
