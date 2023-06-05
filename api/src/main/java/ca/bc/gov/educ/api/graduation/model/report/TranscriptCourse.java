@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.util.JSonNullStringSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.Objects;
 
 public class TranscriptCourse {
@@ -63,6 +66,7 @@ public class TranscriptCourse {
         this.type = value;
     }
 
+    @JsonSerialize(using = JSonNullStringSerializer.class)
     public String getRelatedCourse() {
         return relatedCourse;
     }
@@ -75,10 +79,12 @@ public class TranscriptCourse {
         return relatedLevel;
     }
 
+    @JsonSerialize(using = JSonNullStringSerializer.class)
     public void setRelatedLevel(String value) {
         this.relatedLevel = value;
     }
 
+    @JsonSerialize(using = JSonNullStringSerializer.class)
     public String getSpecialCase() { return specialCase; }
 
     public void setSpecialCase(String specialCase) { this.specialCase = specialCase; }
