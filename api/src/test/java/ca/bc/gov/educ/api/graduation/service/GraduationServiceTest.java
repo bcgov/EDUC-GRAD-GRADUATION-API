@@ -27,14 +27,10 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -47,19 +43,19 @@ public class GraduationServiceTest {
 
 	@Autowired
 	private GraduationService graduationService;
-	
+
 	@MockBean
 	private GradStatusService gradStatusService;
-	
+
 	@MockBean
 	private GradAlgorithmService gradAlgorithmService;
-	
+
 	@MockBean
 	private OptionalProgramService optionalProgramService;
 
 	@MockBean
 	RESTService restService;
-	
+
 	@MockBean
 	private ReportService reportService;
 
@@ -80,7 +76,7 @@ public class GraduationServiceTest {
 
 	@Autowired
 	GradValidation validation;
-	
+
 	@MockBean
 	WebClient webClient;
 
@@ -102,7 +98,7 @@ public class GraduationServiceTest {
 
 	@Autowired
 	private EducGraduationApiConstants constants;
-	
+
 	@Test
 	public void testGraduateStudent() {
 		String studentID = new UUID(1, 1).toString();
@@ -1008,7 +1004,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,false);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		doNothing().when(this.tokenUtils).setAccessToken(any());
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
@@ -1617,7 +1613,7 @@ public class GraduationServiceTest {
 		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
 		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
 		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,false);
 		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
 		doNothing().when(this.tokenUtils).setAccessToken(any());
 		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
@@ -2016,6 +2012,69 @@ public class GraduationServiceTest {
 		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
 		assertEquals(2,numberOfRecord);
+	}
+
+	@Test
+	public void testCreateAndStoreStudentCertificates() {
+		UUID studentID = UUID.randomUUID();
+		String pen = "123456789";
+
+		GraduationStudentRecord gsr = new GraduationStudentRecord();
+		gsr.setStudentID(studentID);
+		gsr.setPen(pen);
+		gsr.setLegalFirstName("My First Name");
+		gsr.setLegalMiddleNames("My Middle Name");
+		gsr.setLegalLastName("My Last Name");
+		gsr.setStudentGrade("12");
+		gsr.setStudentStatus("CUR");
+		gsr.setProgramCompletionDate("10/20/2020");
+
+		GradAlgorithmOptionalStudentProgram optionalStudentProgram1 = new GradAlgorithmOptionalStudentProgram();
+		optionalStudentProgram1.setOptionalProgramCode("FI");
+		optionalStudentProgram1.setStudentID(studentID);
+		optionalStudentProgram1.setOptionalProgramID(UUID.randomUUID());
+		optionalStudentProgram1.setPen(pen);
+
+		GradAlgorithmOptionalStudentProgram optionalStudentProgram2 = new GradAlgorithmOptionalStudentProgram();
+		optionalStudentProgram2.setOptionalProgramCode("DD");
+		optionalStudentProgram2.setStudentID(studentID);
+		optionalStudentProgram2.setOptionalProgramID(UUID.randomUUID());
+		optionalStudentProgram2.setPen(pen);
+
+		ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = new ca.bc.gov.educ.api.graduation.model.dto.GraduationData();
+		graduationData.setOptionalGradStatus(Arrays.asList(optionalStudentProgram1, optionalStudentProgram2));
+
+		try {
+			gsr.setStudentGradData(new ObjectMapper().writeValueAsString(graduationData));
+		} catch (JsonProcessingException e) {
+			e.getMessage();
+		}
+
+		when(reportService.getGraduationStudentRecordAndGraduationData(pen, "accessToken")).thenReturn(Pair.of(gsr, graduationData));
+		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+		when(this.tokenUtils.checkAndGetAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+
+		List<ProgramCertificateTranscript> pList = new ArrayList<>();
+		ProgramCertificateTranscript pcr = new ProgramCertificateTranscript();
+		pcr.setSchoolCategoryCode("01");
+		pcr.setCertificateTypeCode("E");
+		pList.add(pcr);
+
+		StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+		studentOptionalProgram1.setOptionalProgramCode(optionalStudentProgram1.getOptionalProgramCode());
+		studentOptionalProgram1.setGraduated(true);
+
+		StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+		studentOptionalProgram2.setOptionalProgramCode(optionalStudentProgram2.getOptionalProgramCode());
+		studentOptionalProgram2.setGraduated(true);
+
+		ExceptionMessage exception = new ExceptionMessage();
+		Mockito.when(reportService.getCertificateList(gsr, graduationData, Arrays.asList(studentOptionalProgram1, studentOptionalProgram2), "accessToken", exception)).thenReturn(pList);
+
+		var result = graduationService.createAndStoreStudentCertificates(pen, true, "accessToken"); // isOverwrite = true -> regenerate(delete and create certs)
+		assertNotNull(result);
+		assertEquals(Integer.valueOf(1), result);
+
 	}
 
 	@Test

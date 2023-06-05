@@ -11,8 +11,10 @@ import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ReportService {
 
@@ -970,7 +973,7 @@ public class ReportService {
     }
 
     public void saveStudentCertificateReportJasper(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken,
-                                                   ProgramCertificateTranscript certType) {
+                                                   ProgramCertificateTranscript certType, boolean isOverwrite) {
         ReportData certData = prepareCertificateData(gradResponse, graduationDataStatus, certType, accessToken);
         String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData, accessToken);
         GradStudentCertificates requestObj = new GradStudentCertificates();
@@ -979,6 +982,7 @@ public class ReportService {
         requestObj.setCertificate(encodedPdfReportCertificate);
         requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
         requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
+        requestObj.setOverwrite(isOverwrite);
         webClient.post().uri(educGraduationApiConstants.getUpdateGradStudentCertificate())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
@@ -1054,6 +1058,17 @@ public class ReportService {
             ReportData dR = new ReportData();
             dR.setException(exception);
             return dR;
+        }
+    }
+
+    public Pair<GraduationStudentRecord, ca.bc.gov.educ.api.graduation.model.dto.GraduationData> getGraduationStudentRecordAndGraduationData(String pen, String accessToken) {
+        try {
+            GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
+            return Pair.of(graduationStudentRecord, graduationData);
+        } catch (Exception e) {
+            log.error("GraduationData unmarshal error: {}", e.getLocalizedMessage());
+            return null;
         }
     }
 

@@ -342,6 +342,16 @@ public class GraduationController {
         return handleBinaryResponse(resultBinary, String.format("%sSchoolReport.pdf", type), MediaType.APPLICATION_PDF);
     }
 
+    @GetMapping(EducGraduationApiConstants.GRADUATE_CERTIFICATE_REPORT)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "Student Certificate Creation", description = "When triggered, Student Certificates are created for a given student", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreStudentCertificate(@PathVariable @NotNull String pen,
+                                                                    @RequestParam(name="isOverwrite", required=false, defaultValue="N") String isOverwrite,
+                                                                    @RequestHeader(name="Authorization") String accessToken) {
+        return response.GET(gradService.createAndStoreStudentCertificates(pen, "Y".equalsIgnoreCase(isOverwrite), accessToken.replace(BEARER, "")));
+    }
+
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
         ResponseEntity<byte[]> responseEntity = null;
 

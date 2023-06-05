@@ -234,7 +234,7 @@ public class ReportServiceTest {
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(GradStudentCertificates.class)).thenReturn(Mono.just(rep));
 
-		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc);
+		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, accessToken,pc,false);
         assertThat(exception.getExceptionName()).isNull();
 	}
 	
@@ -2143,6 +2143,47 @@ public class ReportServiceTest {
 		assertNull(data.getStudent());
 		assertNull(data.getTranscript());
 
+	}
+
+	@Test
+	public void testGetGraduationStudentRecordAndGraduationData() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+
+		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
+		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
+		graduationStudentRecord.setUpdateDate(new Date(System.currentTimeMillis()));
+
+		String studentGradData = readFile("json/gradstatus.json");
+		assertNotNull(studentGradData);
+		graduationStudentRecord.setStudentGradData(studentGradData);
+
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
+
+		var result = reportService.getGraduationStudentRecordAndGraduationData(pen, "123");
+		assertNotNull(result);
+		assertNotNull(result.getLeft());
+		assertNotNull(result.getRight());
 	}
 
 	@Test

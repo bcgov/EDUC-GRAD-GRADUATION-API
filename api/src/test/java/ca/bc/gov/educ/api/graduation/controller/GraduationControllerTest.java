@@ -325,5 +325,13 @@ class GraduationControllerTest {
 		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADPRJ");
 		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken");
 	}
+
+	@Test
+	void testCreateAndStoreStudentCertificate() {
+
+		Mockito.when(graduationService.createAndStoreStudentCertificates("123456789", true, "accessToken")).thenReturn(1);
+		graduationController.createAndStoreStudentCertificate("123456789", "Y", "accessToken");
+		Mockito.verify(graduationService).createAndStoreStudentCertificates("123456789", true, "accessToken");
+	}
 	
 }
