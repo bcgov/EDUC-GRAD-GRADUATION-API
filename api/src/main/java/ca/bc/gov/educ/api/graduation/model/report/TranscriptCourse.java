@@ -66,7 +66,7 @@ public class TranscriptCourse {
         this.type = value;
     }
 
-    @JsonSerialize(using = JSonNullStringSerializer.class)
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
     public String getRelatedCourse() {
         return relatedCourse;
     }
@@ -75,7 +75,7 @@ public class TranscriptCourse {
         this.relatedCourse = value;
     }
 
-    @JsonSerialize(using = JSonNullStringSerializer.class)
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
     public String getRelatedLevel() {
         return relatedLevel;
     }
@@ -84,7 +84,7 @@ public class TranscriptCourse {
         this.relatedLevel = value;
     }
 
-    @JsonSerialize(using = JSonNullStringSerializer.class)
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
     public String getSpecialCase() { return specialCase; }
 
     public void setSpecialCase(String specialCase) { this.specialCase = specialCase; }
