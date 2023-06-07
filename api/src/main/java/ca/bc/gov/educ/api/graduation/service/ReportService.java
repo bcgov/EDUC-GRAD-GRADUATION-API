@@ -568,12 +568,10 @@ public class ReportService {
                         //skip
                         break;
                     case "DD":
-                        //Replace (ON HOLD till June)
-                        /**data.getProgramCodes().add("PDF");**/
+                        data.getProgramCodes().add("PDF");
                         break;
                     case "FI":
-                        //Replace (ON HOLD till June)
-                        /**data.getProgramCodes().add("FIP");**/
+                        data.getProgramCodes().add("FIP");
                         break;
                     case "CP":
                         setGraduationDataSpecialPrograms(data, graduationStudentRecord);
