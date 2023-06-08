@@ -1659,7 +1659,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("DD");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -1936,7 +1936,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("FI");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -2072,7 +2072,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("CP");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -2300,7 +2300,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("FR");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
