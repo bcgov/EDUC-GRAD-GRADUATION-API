@@ -960,11 +960,8 @@ public class ReportService {
         data.setCertificate(getCertificateData(gradResponse, certType));
         data.getStudent().setGraduationData(graduationData);
         switch (certType.getCertificateTypeCode()) {
-            case "F", "SCF", "S":
-                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-                break;
-            default:
-                data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+            case "F", "SCF", "S" -> data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+            default -> data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
         }
         return data;
     }
