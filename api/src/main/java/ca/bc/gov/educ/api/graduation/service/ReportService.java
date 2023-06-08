@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -424,13 +423,13 @@ public class ReportService {
 
     public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList, boolean xml) {
         if (studentAssessmentList == null) {
-            return new ArrayList<StudentAssessment>();
+            return new ArrayList<>();
         }
         return studentAssessmentList.stream()
                 .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
                 .distinct()
                 .map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken) {
@@ -439,13 +438,13 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).toList();
                 if (!provinciallyExaminable.isEmpty()) {
                     sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
+                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).toList();
                 if (!nonExaminable.isEmpty()) {
                     sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
@@ -739,11 +738,11 @@ public class ReportService {
         List<StudentCourse> studentExamList = sCList
                 .stream()
                 .filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentCourse> studentCourseList = sCList
                 .stream()
                 .filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
         List<AchievementCourse> sCourseList = new ArrayList<>();
         List<Exam> sExamList = new ArrayList<>();
@@ -960,9 +959,7 @@ public class ReportService {
         data.setCertificate(getCertificateData(gradResponse, certType));
         data.getStudent().setGraduationData(graduationData);
         switch (certType.getCertificateTypeCode()) {
-            case "F":
-            case "SCF":
-            case "S":
+            case "F", "SCF", "S":
                 data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
                 break;
             default:
@@ -1120,7 +1117,7 @@ public class ReportService {
                 List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
                         .stream()
                         .filter(sc -> gr.getTranscriptRule() != null && sc.getGradReqMet().contains(gr.getTranscriptRule()))
-                        .collect(Collectors.toList());
+                        .toList();
                 List<AchievementCourse> cdList = new ArrayList<>();
                 scList.forEach(sc -> {
                     AchievementCourse cD = new AchievementCourse();
