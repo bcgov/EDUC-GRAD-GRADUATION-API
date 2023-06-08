@@ -102,30 +102,30 @@ public class ReportService {
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block());
+                }).block()));
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block());
+                }).block()));
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
+        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block());
+                }).block()));
     }
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
