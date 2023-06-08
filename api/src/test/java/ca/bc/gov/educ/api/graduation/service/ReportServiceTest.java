@@ -2204,6 +2204,36 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testGetGraduationStudentRecordAndGraduationData_Exception() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+		String studentID = gradStatus.getGradStudent().getStudentID();
+
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn((null));
+
+		var result = reportService.getGraduationStudentRecordAndGraduationData(pen, "123");
+		assertNull(result);
+	}
+
+	@Test
 	public void testReportDataByGraduationData_StudentNull() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
