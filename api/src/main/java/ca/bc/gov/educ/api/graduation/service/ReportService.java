@@ -551,14 +551,14 @@ public class ReportService {
             if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
                 if (graduationDataStatus.getGradStatus().getProgramCompletionDate() != null) {
                     if (graduationDataStatus.getGradStatus().getProgramCompletionDate().length() > 7) {
-                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
                     } else {
-                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
+                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
                     }
                 }
                 data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
             } else {
-                data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
+                data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
         }
         List<StudentOptionalProgram> optionalPrograms = optionalProgramService.getStudentOptionalPrograms(graduationStudentRecord.getStudentID(), accessToken);
