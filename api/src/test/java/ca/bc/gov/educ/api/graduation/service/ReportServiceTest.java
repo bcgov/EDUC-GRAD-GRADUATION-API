@@ -137,6 +137,22 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testGetStudentsForSchoolReport() {
+		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		ParameterizedTypeReference<List<ReportGradStudentData>> reportGradStudentDataType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(constants.getSchoolStudents())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(reportGradStudentDataType)).thenReturn(Mono.just(gradStudentDataList));
+
+		var result = reportService.getStudentsForSchoolReport("accessToken");
+		assertNotNull(result);
+	}
+
+	@Test
 	public void testSaveStudentCertificateReport() {
 		UUID studentID = new UUID(1, 1);
 		ExceptionMessage exception = new ExceptionMessage();
@@ -1704,7 +1720,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("DD");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -1981,7 +1997,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("FI");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -2117,7 +2133,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("CP");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
@@ -2233,6 +2249,36 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testGetGraduationStudentRecordAndGraduationData_Exception() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+		String studentID = gradStatus.getGradStudent().getStudentID();
+
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),studentID))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn((null));
+
+		var result = reportService.getGraduationStudentRecordAndGraduationData(pen, "123");
+		assertNull(result);
+	}
+
+	@Test
 	public void testReportDataByGraduationData_StudentNull() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
@@ -2345,7 +2391,7 @@ public class ReportServiceTest {
 		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("AD");
+		studentOptionalProgram.setOptionalProgramCode("FR");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 

@@ -426,7 +426,7 @@ public class ReportService {
 
     public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList, boolean xml) {
         if (studentAssessmentList == null) {
-            return new ArrayList<StudentAssessment>();
+            return new ArrayList<>();
         }
         return studentAssessmentList.stream()
                 .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
@@ -571,12 +571,10 @@ public class ReportService {
                         //skip
                         break;
                     case "DD":
-                        //Replace (ON HOLD till June)
-                        /**data.getProgramCodes().add("PDF");**/
+                        data.getProgramCodes().add("PDF");
                         break;
                     case "FI":
-                        //Replace (ON HOLD till June)
-                        /**data.getProgramCodes().add("FIP");**/
+                        data.getProgramCodes().add("FIP");
                         break;
                     case "CP":
                         setGraduationDataSpecialPrograms(data, graduationStudentRecord);
@@ -964,13 +962,8 @@ public class ReportService {
         data.setCertificate(getCertificateData(gradResponse, certType));
         data.getStudent().setGraduationData(graduationData);
         switch (certType.getCertificateTypeCode()) {
-            case "F":
-            case "SCF":
-            case "S":
-                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-                break;
-            default:
-                data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+            case "F", "SCF", "S" -> data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+            default -> data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
         }
         return data;
     }
