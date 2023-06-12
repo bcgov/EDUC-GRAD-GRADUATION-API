@@ -1433,6 +1433,51 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testIsGraduatedForSCCPWithNullDate() {
+		String programCompletionDate = null; // null or empty
+		String gradProgram = "SCCP";
+
+		var result = reportService.isGraduated(programCompletionDate, gradProgram);
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testIsGraduatedForSCCPWithFutureDate() {
+		String programCompletionDate = "2900/09"; // future date: 2900 Sept.
+		String gradProgram = "SCCP";
+
+		var result = reportService.isGraduated(programCompletionDate, gradProgram);
+		assertThat(result).isFalse();
+	}
+
+	@Test
+	public void testIsGraduatedForSCCPWithPastDate() {
+		String programCompletionDate = "2002/09"; // past date: 2002 Sept.
+		String gradProgram = "SCCP";
+
+		var result = reportService.isGraduated(programCompletionDate, gradProgram);
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	public void testIsGraduatedForSCCPWithFullDateFormat() {
+		String programCompletionDate = "2002-09-01"; // past date: 2002 Sept. 01
+		String gradProgram = "SCCP";
+
+		var result = reportService.isGraduated(programCompletionDate, gradProgram);
+		assertThat(result).isTrue();
+	}
+
+	@Test
+	public void testIsGraduatedForSCCPWithWrongDateFormat() {
+		String programCompletionDate = "2002/09/01"; // past date: 2002 Sept. 01
+		String gradProgram = "SCCP";
+
+		var result = reportService.isGraduated(programCompletionDate, gradProgram);
+		assertThat(result).isFalse();
+	}
+
+	@Test
 	public void testSaveStudentAchievementReport() throws Exception {
 		String studentID = new UUID(1, 1).toString();
 		String accessToken = "accessToken";
