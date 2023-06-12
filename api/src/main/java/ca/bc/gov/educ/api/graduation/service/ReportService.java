@@ -24,6 +24,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -151,7 +153,7 @@ public class ReportService {
             data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
-            data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
+            data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate(), graduationDataStatus.getGradStatus().getProgram())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
@@ -1049,7 +1051,7 @@ public class ReportService {
             data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
             getStudentCoursesAssessmentsNExams(data, graduationDataStatus, accessToken);
-            data.setNonGradReasons(isGraduated(graduationDataStatus.getGradStatus().getProgramCompletionDate())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), false, null, true));
+            data.setNonGradReasons(isGraduated(graduationDataStatus.getGradStatus().getProgramCompletionDate(), graduationDataStatus.getGradStatus().getProgram())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), false, null, true));
             data.setOptionalPrograms(getOptionalProgramAchvReport(data.getGradProgram().getCode().getCode(), optionalProgramList));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             return data;
@@ -1165,7 +1167,30 @@ public class ReportService {
 
     }
 
-    private boolean isGraduated(String programCompletionDate) {
+    public boolean isGraduated(String programCompletionDate, String gradProgram) {
+        if ("SCCP".equalsIgnoreCase(gradProgram)) {
+            return isGradDatePast(programCompletionDate);
+        }
         return programCompletionDate != null;
+    }
+
+    private boolean isGradDatePast(String programCompletionDate) {
+        if (StringUtils.isBlank(programCompletionDate)) {
+            return false;
+        }
+        String gradDateStr = programCompletionDate.length() < 10? programCompletionDate + "/01" : programCompletionDate;
+        log.debug("GradMessageRequest: Grad Date = {}", gradDateStr);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(programCompletionDate.length() < 10? EducGraduationApiConstants.SECONDARY_DATE_FORMAT : EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+        try {
+            Date dt = dateFormat.parse(gradDateStr);
+            Calendar calGradDate = Calendar.getInstance();
+            calGradDate.setTime(dt);
+            Calendar now = Calendar.getInstance();
+            now.setTime(new Date());
+            return calGradDate.before(now);
+        } catch (ParseException e) {
+            log.error("Date Parse Exception: gradDate = {}. format = {}", gradDateStr, dateFormat.toPattern());
+            return false;
+        }
     }
 }
