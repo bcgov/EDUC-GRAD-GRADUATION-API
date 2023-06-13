@@ -161,6 +161,11 @@ public class ReportService {
             }
             data.getStudent().setGraduationData(graduationData);
             data.getStudent().setGraduationStatus(graduationStatus);
+            List<OtherProgram> otherPrograms = Objects.requireNonNullElse(data.getStudent().getOtherProgramParticipation(), new ArrayList<>());
+            for(String programCode: graduationData.getProgramCodes()) {
+                otherPrograms.add(new OtherProgram(programCode, ""));
+            }
+            data.getStudent().setOtherProgramParticipation(otherPrograms);
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -569,7 +574,7 @@ public class ReportService {
                         //skip
                         break;
                     case "DD":
-                        data.getProgramCodes().add("PDF");
+                        data.getProgramCodes().add("PFD");
                         break;
                     case "FI":
                         data.getProgramCodes().add("FIP");
