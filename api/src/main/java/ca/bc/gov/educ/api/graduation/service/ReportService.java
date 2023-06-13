@@ -574,7 +574,7 @@ public class ReportService {
                         //skip
                         break;
                     case "DD":
-                        data.getProgramCodes().add("PDF");
+                        data.getProgramCodes().add("PFD");
                         break;
                     case "FI":
                         data.getProgramCodes().add("FIP");
