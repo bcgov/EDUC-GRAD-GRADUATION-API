@@ -27,6 +27,4 @@ public class EducGraduationApplicationConfig {
         return builder.build();
     }
 
-    
-
 }
