@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.graduation.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
@@ -23,6 +24,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,30 +105,30 @@ public class ReportService {
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
+        return webClient.get().uri(educGraduationApiConstants.getSchoolYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block()));
+                }).block();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
+        return webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block()));
+                }).block();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolReport(String accessToken) {
-        return sortReportGradStudentDataByMinCodeAndNames(Objects.requireNonNull(webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
+        return webClient.get().uri(educGraduationApiConstants.getSchoolStudents())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
-                }).block()));
+                }).block();
     }
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
@@ -150,7 +153,7 @@ public class ReportService {
             data.setGraduationData(graduationData);
             data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, accessToken, exception));
-            data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
+            data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate(), graduationDataStatus.getGradStatus().getProgram())? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, accessToken, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
             if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
@@ -160,6 +163,11 @@ public class ReportService {
             }
             data.getStudent().setGraduationData(graduationData);
             data.getStudent().setGraduationStatus(graduationStatus);
+            List<OtherProgram> otherPrograms = Objects.requireNonNullElse(data.getStudent().getOtherProgramParticipation(), new ArrayList<>());
+            for(String programCode: graduationData.getProgramCodes()) {
+                otherPrograms.add(new OtherProgram(programCode, ""));
+            }
+            data.getStudent().setOtherProgramParticipation(otherPrograms);
             return data;
         } catch (Exception e) {
             exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
@@ -423,7 +431,7 @@ public class ReportService {
 
     public List<StudentAssessment> removeDuplicatedAssessmentsForTranscript(List<StudentAssessment> studentAssessmentList, boolean xml) {
         if (studentAssessmentList == null) {
-            return new ArrayList<StudentAssessment>();
+            return new ArrayList<>();
         }
         return studentAssessmentList.stream()
                 .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
@@ -568,7 +576,7 @@ public class ReportService {
                         //skip
                         break;
                     case "DD":
-                        data.getProgramCodes().add("PDF");
+                        data.getProgramCodes().add("PFD");
                         break;
                     case "FI":
                         data.getProgramCodes().add("FIP");
@@ -1162,8 +1170,31 @@ public class ReportService {
 
     }
 
-    private boolean isGraduated(String programCompletionDate) {
+    public boolean isGraduated(String programCompletionDate, String gradProgram) {
+        if ("SCCP".equalsIgnoreCase(gradProgram)) {
+            return isGradDatePast(programCompletionDate);
+        }
         return programCompletionDate != null;
+    }
+
+    private boolean isGradDatePast(String programCompletionDate) {
+        if (StringUtils.isBlank(programCompletionDate)) {
+            return false;
+        }
+        String gradDateStr = programCompletionDate.length() < 10? programCompletionDate + "/01" : programCompletionDate;
+        log.debug("GradMessageRequest: Grad Date = {}", gradDateStr);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(programCompletionDate.length() < 10? EducGraduationApiConstants.SECONDARY_DATE_FORMAT : EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+        try {
+            Date dt = dateFormat.parse(gradDateStr);
+            Calendar calGradDate = Calendar.getInstance();
+            calGradDate.setTime(dt);
+            Calendar now = Calendar.getInstance();
+            now.setTime(new Date());
+            return calGradDate.before(now);
+        } catch (ParseException e) {
+            log.error("Date Parse Exception: gradDate = {}. format = {}", gradDateStr, dateFormat.toPattern());
+            return false;
+        }
     }
 
     List<ReportGradStudentData> sortReportGradStudentDataByMinCodeAndNames(List<ReportGradStudentData> students) {
