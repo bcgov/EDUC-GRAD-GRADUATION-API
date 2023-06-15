@@ -58,7 +58,7 @@ public class SchoolReportsService {
     public byte[] getSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
-        processAndSaveReports(reportGradStudentDataList, accessToken, slrt, drt, srt, pdfs);
+        createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, pdfs);
         return mergeDocuments(pdfs);
     }
 
@@ -114,23 +114,23 @@ public class SchoolReportsService {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
-        return processAndSaveReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
+        return createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
     }
 
-    private Integer processAndSaveReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, String slrt, String drt, String srt, List<InputStream> pdfs) {
+    private Integer createAndStoreReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, String slrt, String drt, String srt, List<InputStream> pdfs) {
         int schoolLabelsCount = 0;
         if(StringUtils.isNotBlank(slrt)) {
-            schoolLabelsCount += createAndStoreSchoolLabelsReports(slrt, reportGradStudentDataList, accessToken, null);
+            schoolLabelsCount += createAndStoreSchoolLabelsReports(slrt, reportGradStudentDataList, accessToken, pdfs);
             logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
         }
         int districtReportsCount = 0;
         if(StringUtils.isNotBlank(drt)) {
-            districtReportsCount += createAndStoreDistrictReports(drt, reportGradStudentDataList, accessToken, null);
+            districtReportsCount += createAndStoreDistrictReports(drt, reportGradStudentDataList, accessToken, pdfs);
             logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
         }
         int schoolReportsCount = 0;
         if(StringUtils.isNotBlank(srt)) {
-            schoolReportsCount += createAndStoreSchoolReports(srt, reportGradStudentDataList, accessToken, null);
+            schoolReportsCount += createAndStoreSchoolReports(srt, reportGradStudentDataList, accessToken, pdfs);
             logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
@@ -157,13 +157,13 @@ public class SchoolReportsService {
                 }
             }
         }
-        return processAndSaveReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
+        return createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
     }
 
     @Generated
     public Integer createAndStoreSchoolDistrictReports(String accessToken, List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
-        return processAndSaveReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
+        return createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
     }
 
     public Integer createAndStoreSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
