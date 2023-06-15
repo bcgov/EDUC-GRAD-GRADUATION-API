@@ -58,15 +58,7 @@ public class SchoolReportsService {
     public byte[] getSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
-        if(ADDRESS_LABEL_YE.equalsIgnoreCase(slrt)) {
-            createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, pdfs);
-        }
-        if(DISTREP_YE_SD.equalsIgnoreCase(drt)) {
-            createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, pdfs);
-        }
-        if(DISTREP_YE_SC.equalsIgnoreCase(srt)) {
-            createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, pdfs);
-        }
+        processAndSaveYearEndReports(reportGradStudentDataList, accessToken, ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, pdfs);
         return mergeDocuments(pdfs);
     }
 
@@ -122,6 +114,10 @@ public class SchoolReportsService {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        return processAndSaveYearEndReports(reportGradStudentDataList, accessToken, ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, null);
+    }
+
+    private Integer processAndSaveYearEndReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, String slrt, String drt, String srt, List<InputStream> pdfs) {
         int schoolLabelsCount = 0;
         if(ADDRESS_LABEL_YE.equalsIgnoreCase(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
@@ -161,27 +157,16 @@ public class SchoolReportsService {
                 }
             }
         }
-        int schoolLabelsCount = 0;
-        if(ADDRESS_LABEL_YE.equalsIgnoreCase(slrt)) {
-            schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_YE, reportGradStudentDataList, accessToken, null);
-            logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
-        }
-        int districtReportsCount = 0;
-        if(DISTREP_YE_SD.equalsIgnoreCase(drt)) {
-            districtReportsCount += createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, null);
-            logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
-        }
-        int schoolReportsCount = 0;
-        if(DISTREP_YE_SC.equalsIgnoreCase(srt)) {
-            schoolReportsCount += createAndStoreSchoolReports(DISTREP_YE_SC, reportGradStudentDataList, accessToken, null);
-            logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
-        }
-        return schoolLabelsCount + districtReportsCount + schoolReportsCount;
+        return processAndSaveYearEndReports(reportGradStudentDataList, accessToken, ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, null);
     }
 
     @Generated
     public Integer createAndStoreSchoolDistrictReports(String accessToken, List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
+        return processAndSaveMonthlyReports(reportGradStudentDataList, accessToken, ADDRESS_LABEL_SCHL, DISTREP_SD, DISTREP_SC, null);
+    }
+
+    private Integer processAndSaveMonthlyReports(List<ReportGradStudentData> reportGradStudentDataList, String accessToken, String slrt, String drt, String srt, List<InputStream> pdfs) {
         int schoolLabelsCount = 0;
         if(ADDRESS_LABEL_SCHL.equalsIgnoreCase(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(ADDRESS_LABEL_SCHL, reportGradStudentDataList, accessToken, null);

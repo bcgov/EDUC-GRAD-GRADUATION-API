@@ -30,7 +30,7 @@ public class EducGraduationApiUtils {
 
 	public static String formatDate(Date date, String dateFormat) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
-		return simpleDateFormat.format(date);
+		return simpleDateFormat.format(date == null ? new Date() : date);
 	}
 
 	public static Date parseDate(String dateString) {
@@ -178,9 +178,6 @@ public class EducGraduationApiUtils {
 				LocalDate.parse(date2).withDayOfMonth(1));
 		int monthsYear = diff.getYears() * 12;
 		int months = diff.getMonths();
-
-
-
 		return monthsYear + months;
 	}
 }
