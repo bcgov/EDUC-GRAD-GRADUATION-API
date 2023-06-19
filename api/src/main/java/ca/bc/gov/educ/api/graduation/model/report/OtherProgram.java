@@ -9,6 +9,14 @@ public class OtherProgram implements Serializable {
     private String programCode;
     private String programName;
 
+    public OtherProgram() {
+    }
+
+    public OtherProgram(String programCode, String programName) {
+        this.programCode = programCode;
+        this.programName = programName;
+    }
+
     public String getProgramCode() {
         return programCode;
     }
