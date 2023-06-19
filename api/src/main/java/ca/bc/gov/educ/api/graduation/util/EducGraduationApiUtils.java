@@ -53,6 +53,10 @@ public class EducGraduationApiUtils {
 		return date;
 	}
 
+	public static LocalDate parseDateLocalDate(String dateString) {
+		return DateUtils.toLocalDate(parseDate(dateString));
+	}
+
 	public static Date parseDate(String dateString, String dateFormat) {
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
 		Date date = new Date();
@@ -136,7 +140,14 @@ public class EducGraduationApiUtils {
 			logger.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return null;
+	}
 
+	public static LocalDate formatIssueDateForReportJasperLocalDate(String updatedTimestamp) {
+		Date date = formatIssueDateForReportJasper(updatedTimestamp);
+		if (date != null) {
+			return DateUtils.toLocalDate(date);
+		}
+		return null;
 	}
 
 	public static String parsingDateForCertificate(String sessionDate) {
@@ -156,6 +167,10 @@ public class EducGraduationApiUtils {
 		return sDate;
 	}
 
+	public static LocalDate parsingTraxDateLocalDate(String sessionDate) {
+		return DateUtils.toLocalDate(parsingTraxDate(sessionDate));
+	}
+
 	public static String parsingNFormating(String inDate) {
 		String actualDate = StringUtils.countMatches(inDate, "/") == 2 ? inDate : inDate + "/01";
 		String sDates = null;
@@ -170,6 +185,14 @@ public class EducGraduationApiUtils {
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return formatter.format(date);
+	}
+
+	public static String getSimpleDateFormat(LocalDate date) {
+		if(date == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+		return formatter.format(DateUtils.toDate(date));
 	}
 
 	public static int getDifferenceInMonths(String date1, String date2) {
