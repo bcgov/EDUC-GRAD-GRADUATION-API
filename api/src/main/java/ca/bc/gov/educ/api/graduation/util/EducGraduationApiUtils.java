@@ -29,8 +29,8 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String formatDate(Date date, String dateFormat) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
-		return simpleDateFormat.format(date == null ? new Date() : date);
+		if(date == null) return null;
+		return new SimpleDateFormat(dateFormat).format(date);
 	}
 
 	public static Date parseDate(String dateString) {
@@ -173,6 +173,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static int getDifferenceInMonths(String date1, String date2) {
+		if(StringUtils.isAnyBlank(date1, date2)) return 0;
 		Period diff = Period.between(
 				LocalDate.parse(date1).withDayOfMonth(1),
 				LocalDate.parse(date2).withDayOfMonth(1));
