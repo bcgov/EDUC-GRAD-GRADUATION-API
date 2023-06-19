@@ -1,29 +1,28 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class GraduationData implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private Date graduationDate;
+    private LocalDate graduationDate;
     private boolean honorsFlag;
     private boolean dogwoodFlag;
     private List<String> programCodes;
     private List<String> programNames;
     private String totalCreditsUsedForGrad;
 
-    @JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
-    public Date getGraduationDate() {
+    @JsonFormat(pattern="yyyy-MM-dd")
+    public LocalDate getGraduationDate() {
         return graduationDate;
     }
 
-    public void setGraduationDate(Date value) {
+    public void setGraduationDate(LocalDate value) {
         this.graduationDate = value;
     }
 
