@@ -351,7 +351,7 @@ public class GraduationService {
                     .build());
             if (type.equalsIgnoreCase(REGALG)) {
                 ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
-                gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDateLocalDate(gsr.getProgramCompletionDate()) : null);
+                gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDate(gsr.getProgramCompletionDate()) : null);
                 gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
                 std.setGraduationData(gradData);
                 std.setNonGradReasons(getNonGradReasons(gsr.getNonGradReasons()));
@@ -396,6 +396,7 @@ public class GraduationService {
                 accessToken);
 
     }
+
 
     private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
 
