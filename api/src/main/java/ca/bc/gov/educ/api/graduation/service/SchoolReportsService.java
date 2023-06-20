@@ -519,7 +519,7 @@ public class SchoolReportsService {
         student.setGraduationStatus(gradStatus);
 
         ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
-        gradData.setGraduationDate(EducGraduationApiUtils.parseDateLocalDate(reportGradStudentData.getProgramCompletionDate()));
+        gradData.setGraduationDate(EducGraduationApiUtils.parseDate(reportGradStudentData.getProgramCompletionDate()));
         gradData.setProgramCodes(List.of(reportGradStudentData.getProgramCode()));
         gradData.setProgramNames(List.of(reportGradStudentData.getProgramName()));
         student.setGraduationData(gradData);
