@@ -188,6 +188,9 @@ public class SchooReportsServiceTest {
 		result = schoolReportsService.getDistrictYearEndReports("accessToken");
 		assertNotNull(result);
 
+		result = schoolReportsService.getDistrictYearEndNonGradReports("accessToken");
+		assertNotNull(result);
+
 		result = schoolReportsService.getDistrictReports("accessToken");
 		assertNotNull(result);
 
