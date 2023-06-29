@@ -36,9 +36,9 @@ public class StudentAssessmentDuplicatesWrapper {
         return Objects.equals(other.studentAssessment.getAssessmentCode(), studentAssessment.getAssessmentCode())
                 && (
                         !xml && (
-                            Objects.equals(studentAssessment.isUsed(), other.studentAssessment.isProjected())
+                            Objects.equals(studentAssessment.isUsed(), other.studentAssessment.isUsed())
                                     ||
-                            Objects.equals(studentAssessment.isProjected(), other.studentAssessment.isUsed())
+                            Objects.equals(studentAssessment.isProjected(), other.studentAssessment.isProjected())
                         )
                 )
                ;
