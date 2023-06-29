@@ -31,8 +31,10 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_REPORTS_YEAR_END_PDF = "/report/schoolyearendpdf";
     public static final String SCHOOL_REPORTS_MONTH_PDF = "/report/schoolmonthpdf";
     public static final String DISTRICT_REPORTS_YEAR_END = "/report/districtyearend";
+    public static final String DISTRICT_REPORTS_YEAR_END_NONGRAD = "/report/districtyearendnongrad";
     public static final String DISTRICT_REPORTS_MONTH = "/report/districtmonth";
     public static final String DISTRICT_REPORTS_YEAR_END_PDF = "/report/districtyearendpdf";
+    public static final String DISTRICT_REPORTS_YEAR_END_NONGRAD_PDF = "/report/districtyearendnongradpdf";
     public static final String DISTRICT_REPORTS_MONTH_PDF = "/report/districtmonthpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END = "/report/schooldistrictyearend";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH = "/report/schooldistrictmonth";
@@ -91,6 +93,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.report-api.district_distribution_year_end}")
     private String districtDistributionYearEnd;
+
+    @Value("${endpoint.report-api.district_distribution_year_end_nongrad}")
+    private String districtDistributionYearEndNonGrad;
 
     @Value("${endpoint.report-api.school_labels}")
     private String schoolLabels;

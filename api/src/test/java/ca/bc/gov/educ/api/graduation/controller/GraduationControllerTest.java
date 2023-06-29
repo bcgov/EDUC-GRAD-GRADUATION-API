@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.NONGRADDISTREP_SD;
+
 
 @ExtendWith(MockitoExtension.class)
 class GraduationControllerTest {
@@ -152,6 +154,13 @@ class GraduationControllerTest {
 		Mockito.when(schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken")).thenReturn(1);
 		graduationController.createAndStoreDistrictYearEndReports("accessToken");
 		Mockito.verify(schoolReportsService).createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictYearEndNonGradReports() {
+		Mockito.when(schoolReportsService.createAndStoreDistrictReports(NONGRADDISTREP_SD, "accessToken")).thenReturn(1);
+		graduationController.createAndStoreDistrictYearEndNonGradReports("accessToken");
+		Mockito.verify(schoolReportsService).createAndStoreDistrictReports(NONGRADDISTREP_SD, "accessToken");
 	}
 
 	@Test
@@ -302,6 +311,13 @@ class GraduationControllerTest {
 		Mockito.when(schoolReportsService.getDistrictYearEndReports("accessToken")).thenReturn(new byte[0]);
 		graduationController.getDistrictYearEndReports("accessToken");
 		Mockito.verify(schoolReportsService).getDistrictYearEndReports("accessToken");
+	}
+
+	@Test
+	void testCreateAndStoreDistrictYearEndNonGradPdfReports() {
+		Mockito.when(schoolReportsService.getDistrictYearEndNonGradReports("accessToken")).thenReturn(new byte[0]);
+		graduationController.getDistrictYearEndNonGradReports("accessToken");
+		Mockito.verify(schoolReportsService).getDistrictYearEndNonGradReports("accessToken");
 	}
 
 	@Test

@@ -111,6 +111,7 @@ endpoint:
   school_non_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolnongraduation
   school_distribution_year_end: ${GRAD_REPORT_API}api/v1/reports/schooldistributionyearend
   district_distribution_year_end: ${GRAD_REPORT_API}api/v1/reports/districtdistributionyearend
+  district_distribution_year_end_nongrad: ${GRAD_REPORT_API}api/v1/reports/districtdistributionyearendnongrad
   school_labels: ${GRAD_REPORT_API}api/v1/reports/schoollabel
  grad-student-graduation-api:
   get-special-cases: 

@@ -2,8 +2,6 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 import java.io.Serializable;
@@ -43,9 +41,4 @@ public class ReportRequest implements Serializable {
 		this.options = options;
 	}
 
-	@Override
-	@SneakyThrows
-	public String toString() {
-		return new ObjectMapper().writeValueAsString(this);
-	}
 }

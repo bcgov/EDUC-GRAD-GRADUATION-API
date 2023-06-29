@@ -31,6 +31,7 @@ public class SchoolReportsService {
 
     public static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     public static final String DISTREP_YE_SD = "DISTREP_YE_SD";
+    public static final String NONGRADDISTREP_SD = "NONGRADDISTREP_SD";
     public static final String DISTREP_SC = "DISTREP_SC";
     public static final String DISTREP_SD = "DISTREP_SD";
     public static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
@@ -99,6 +100,13 @@ public class SchoolReportsService {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         List<InputStream> pdfs = new ArrayList<>();
         createAndStoreDistrictReports(DISTREP_YE_SD, reportGradStudentDataList, accessToken, pdfs);
+        return mergeDocuments(pdfs);
+    }
+
+    public byte[] getDistrictYearEndNonGradReports(String accessToken) {
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken);
+        List<InputStream> pdfs = new ArrayList<>();
+        createAndStoreDistrictReports(NONGRADDISTREP_SD, reportGradStudentDataList, accessToken, pdfs);
         return mergeDocuments(pdfs);
     }
 
@@ -176,7 +184,9 @@ public class SchoolReportsService {
         List<ReportGradStudentData> reportGradStudentDataList;
         if(DISTREP_YE_SD.equalsIgnoreCase(reportType)) {
             reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
-        } else {
+        } else if(NONGRADDISTREP_SD.equalsIgnoreCase(reportType)) {
+            reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken);
+        } else{
             reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
         }
         return createAndStoreDistrictReports(reportType, reportGradStudentDataList, accessToken, null);
@@ -312,7 +322,12 @@ public class SchoolReportsService {
             ReportRequest reportRequest = buildDistrictYearEndReportRequest(district);
             reportRequest.getData().getSchools().addAll(schools);
             accessToken = getAccessToken(accessToken).getLeft();
-            byte[] reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
+            byte[] reportAsBytes;
+            if(DISTREP_YE_SD.equalsIgnoreCase(reportType)) {
+                reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
+            } else {
+                reportAsBytes = getDistrictYearEndNonGradReportJasper(reportRequest, accessToken);
+            }
             if (reportAsBytes != null && pdfs != null) {
                 ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
                 pdfs.add(is);
@@ -354,6 +369,16 @@ public class SchoolReportsService {
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
         logger.debug("getDistrictYearEndReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
+                .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }
+                ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest, String accessToken) {
+        logger.debug("getDistrictYearEndNonGradReportJasper(ReportRequest): {}", reportRequest);
+        return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
                             h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
