@@ -78,6 +78,8 @@ endpoint:
   update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
   student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
   school-nongrad-year-end-students: ${GRAD_STUDENT_API}api/v1/student/studentschoolreportdata
+  student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
+  student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s

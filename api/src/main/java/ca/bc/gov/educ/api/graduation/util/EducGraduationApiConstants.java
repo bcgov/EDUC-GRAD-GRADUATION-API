@@ -142,6 +142,12 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.school-nongrad-year-end-students}")
     private String schoolNonGradYearEndStudents;
 
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data}")
+    private String studentNonGradReportData;
+
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data-mincode}")
+    private String studentNonGradReportDataMincode;
+
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 

@@ -113,7 +113,16 @@ public class ReportService {
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String accessToken) {
-        return webClient.get().uri(educGraduationApiConstants.getSchoolNonGradYearEndStudents())
+        return webClient.get().uri(educGraduationApiConstants.getStudentNonGradReportData())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
+                }).block();
+    }
+
+    public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String mincode, String accessToken) {
+        return webClient.get().uri(String.format(educGraduationApiConstants.getStudentNonGradReportDataMincode(), mincode))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());

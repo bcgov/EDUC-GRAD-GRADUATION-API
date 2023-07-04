@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
@@ -291,6 +292,24 @@ public class GraduationController {
     ) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken.replace(BEARER, ""));
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt));
+    }
+
+    @PostMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreSchoolDistrictYearEndNonGradReports(
+            @RequestHeader(name="Authorization") String accessToken,
+            @RequestParam(required = false) String slrt,
+            @RequestParam(required = false) String drt,
+            @RequestParam(required = false) String srt,
+            @RequestBody List<String> schools) {
+        List<ReportGradStudentData> reportGradStudentDataTotalList = new ArrayList<>();
+        for(String mincode: schools) {
+            List<ReportGradStudentData> sd = reportService.getStudentsForSchoolNonGradYearEndReport(mincode, accessToken.replace(BEARER, ""));
+            reportGradStudentDataTotalList.addAll(sd);
+        }
+        return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataTotalList, slrt, drt, srt));
     }
 
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END_PDF)
