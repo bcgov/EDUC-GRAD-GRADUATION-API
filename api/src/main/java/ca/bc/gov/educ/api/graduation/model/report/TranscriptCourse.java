@@ -17,6 +17,9 @@ public class TranscriptCourse {
     private String relatedLevel = "";
     //Grad2-1931
     private String specialCase = "";
+    //Grad2-2182
+    private boolean isUsed;
+    private double proficiencyScore;
 
     public String getName() {
         return name;
@@ -88,6 +91,22 @@ public class TranscriptCourse {
     public String getSpecialCase() { return specialCase; }
 
     public void setSpecialCase(String specialCase) { this.specialCase = specialCase; }
+
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
+    public boolean getUsed() { return isUsed; }
+
+    public void setUsed(boolean used) { isUsed = used; }
+
+
+    //Grad2-2182 - mchintha
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
+    public double getProficiencyScore() {
+        return proficiencyScore;
+    }
+
+    public void setProficiencyScore(double proficiencyScore) {
+        this.proficiencyScore = proficiencyScore;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -144,9 +144,10 @@ public class ReportService {
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
+            graduationStatus.setSchoolOfRecord(gradResponse.getSchoolOfRecord()); //Grad2-2182
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
-            data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+            data.setStudent(getStudentData(graduationDataStatus.getGradStudent(), gradResponse)); //Grad2-2182
             data.setGradMessage(graduationStatus.getGraduationMessage());
             data.setGraduationStatus(graduationStatus);
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
@@ -323,6 +324,8 @@ public class ReportService {
         crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
         //Grad2-1931
         crse.setSpecialCase(sc.getSpecialCase());
+        crse.setUsed(sc.isUsed()); //Grad2-2182
+        crse.setProficiencyScore(sc.getProficiencyScore()); //Grad2-2182
         return crse;
     }
 
@@ -630,7 +633,7 @@ public class ReportService {
                 .retrieve().bodyToMono(responseType).block();
     }
 
-    private Student getStudentData(GradSearchStudent gradStudent) {
+    private Student getStudentData(GradSearchStudent gradStudent, GraduationStudentRecord gradResponse) {
         Student std = new Student();
         std.setBirthdate(EducGraduationApiUtils.parseDate(gradStudent.getDob()));
         std.setGrade(gradStudent.getStudentGrade());
@@ -640,6 +643,7 @@ public class ReportService {
         std.setLastName(gradStudent.getLegalLastName());
         std.setGender(gradStudent.getGenderCode());
         std.setCitizenship(gradStudent.getStudentCitizenship());
+        std.setConsumerEducReqt(gradResponse.getConsumerEducationRequirementMet()); //Grad2-2182
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
         pen.setEntityID(gradStudent.getStudentID());
@@ -960,7 +964,7 @@ public class ReportService {
             certificateSchool = getSchoolData(graduationDataStatus.getSchool());
         }
         data.setSchool(certificateSchool);
-        data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+        data.setStudent(getStudentData(graduationDataStatus.getGradStudent(), gradResponse)); //Grad2-2182
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
         data.setGraduationData(graduationData);
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
