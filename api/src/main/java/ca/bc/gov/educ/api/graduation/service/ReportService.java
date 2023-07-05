@@ -324,8 +324,13 @@ public class ReportService {
         crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
         //Grad2-1931
         crse.setSpecialCase(sc.getSpecialCase());
-        crse.setUsed(sc.isUsed()); //Grad2-2182
-        crse.setProficiencyScore(sc.getProficiencyScore()); //Grad2-2182
+        //Grad2-2182
+        crse.setUsed(sc.isUsed());
+        crse.setProficiencyScore(sc.getProficiencyScore());
+        crse.setCustomizedCourseName(sc.getCustomizedCourseName());
+        crse.setOriginalCredits(sc.getOriginalCredits());
+        crse.setGenericCourseType(sc.getGenericCourseType());
+        crse.setCredit(sc.getCredits());
         return crse;
     }
 
@@ -337,6 +342,8 @@ public class ReportService {
         mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
         mrk.setInterimPercent(getValue(sc.getInterimPercent()));
         mrk.setSchoolPercent(getSchoolPercent(sc.getBestSchoolPercent(), program, sc.getCourseLevel(), sc.getSessionDate(), sc.getSchoolPercent()));
+        //Grad2-2182
+        mrk.setCompletedCoursePercentage(sc.getCompletedCoursePercentage());
         return mrk;
     }
 
@@ -410,6 +417,9 @@ public class ReportService {
                     crse.setName(sc.getAssessmentName());
                     crse.setType("3");
                     crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
+                    crse.setUsed(sc.isUsed()); //Grad2-2182
+                    crse.setProficiencyScore(sc.getProficiencyScore()); //Grad2-2182
+
                     result.setCourse(crse);
 
                     Mark mrk = new Mark();
@@ -419,7 +429,6 @@ public class ReportService {
                     mrk.setInterimLetterGrade("");
                     mrk.setInterimPercent("");
                     mrk.setSchoolPercent("");
-                    mrk.setFinalLetterGrade("NA");
                     mrk.setFinalPercent(getAssessmentFinalPercentTranscript(sc, accessToken));
                     result.setMark(mrk);
                     result.setRequirement(sc.getGradReqMet());
