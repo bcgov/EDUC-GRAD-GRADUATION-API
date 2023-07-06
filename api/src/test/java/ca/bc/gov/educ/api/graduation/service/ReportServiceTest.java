@@ -126,7 +126,7 @@ public class ReportServiceTest {
 		};
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(constants.getSchoolNonGradYearEndStudents())).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersUriMock.uri(constants.getStudentNonGradReportData())).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(reportGradStudentDataType)).thenReturn(Mono.just(gradStudentDataList));
@@ -1734,6 +1734,12 @@ public class ReportServiceTest {
 		assertNotNull(transcriptData.getStudent());
 		assertNotNull(transcriptData.getTranscript());
 		assertEquals("1950", transcriptData.getGradProgram().getCode().getCode());
+
+		transcriptData = reportService.prepareTranscriptData(pen, false, "accessToken", exception);
+		assertNotNull(transcriptData);
+		assertNotNull(transcriptData.getStudent());
+		assertNotNull(transcriptData.getTranscript());
+		assertEquals("false", transcriptData.getTranscript().getInterim());
 
 		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
 			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(), "3, 4"));

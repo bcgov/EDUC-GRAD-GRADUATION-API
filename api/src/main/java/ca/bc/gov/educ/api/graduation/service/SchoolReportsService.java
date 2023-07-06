@@ -234,6 +234,7 @@ public class SchoolReportsService {
         return createAndStoreSchoolLabelsReportsFromSchools(reportType, schools, accessToken, pdfs);
     }
 
+    @Generated
     private Integer createAndStoreSchoolReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<String, School> newCredentialsSchoolMap = new HashMap<>();
@@ -308,7 +309,7 @@ public class SchoolReportsService {
         return reportsCount;
     }
 
-    @SneakyThrows
+    @Generated
     private Integer createAndStoreDistrictReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<School, List<School>> districtSchoolsMap = new HashMap<>();
