@@ -221,6 +221,7 @@ public class ReportService {
         return errorData;
     }
 
+    @Generated
     private GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken) {
         List<GradSearchStudent> stuDataList = webClient.get().uri(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(), pen))
                 .headers(h -> {
@@ -235,6 +236,7 @@ public class ReportService {
                 ReportService.class, String.format("Student with PEN %s value not exists in PEN system", pen));
     }
 
+    @Generated
     private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID, String accessToken) {
         GraduationStudentRecord graduationStudentRecord = webClient.get().uri(String.format(educGraduationApiConstants.getReadGradStudentRecord(), studentID))
                 .headers(h -> {
@@ -248,6 +250,7 @@ public class ReportService {
                 ReportService.class, String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
     }
 
+    @Generated
     private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons, boolean xml, String accessToken, boolean applyFilters) {
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
@@ -268,6 +271,7 @@ public class ReportService {
         return nList;
     }
 
+    @Generated
     private void populateTraxReqCodesMap(List<ProgramRequirementCode> programReqCodes, Map<String, String> traxReqCodes) {
         for (ProgramRequirementCode code : programReqCodes) {
             traxReqCodes.put(code.getProReqCode(), code.getTraxReqChar());

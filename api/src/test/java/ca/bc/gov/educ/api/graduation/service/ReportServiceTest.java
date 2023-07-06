@@ -136,6 +136,22 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testGetStudentsForSchoolYearEndNonGradReportWithMincode() {
+		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		ParameterizedTypeReference<List<ReportGradStudentData>> reportGradStudentDataType = new ParameterizedTypeReference<>() {
+		};
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getStudentNonGradReportDataMincode(), "02396738"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(reportGradStudentDataType)).thenReturn(Mono.just(gradStudentDataList));
+
+		var result = reportService.getStudentsForSchoolNonGradYearEndReport("02396738", "accessToken");
+		assertNotNull(result);
+	}
+
+	@Test
 	public void testGetStudentsForSchoolReport() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 		ParameterizedTypeReference<List<ReportGradStudentData>> reportGradStudentDataType = new ParameterizedTypeReference<>() {
