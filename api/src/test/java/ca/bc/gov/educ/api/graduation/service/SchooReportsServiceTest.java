@@ -149,7 +149,13 @@ public class SchooReportsServiceTest {
 		Integer reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken");
 		assertTrue(reportsCount > 0);
 
+		reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_SC, "accessToken");
+		assertTrue(reportsCount > 0);
+
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
+		assertTrue(reportsCount > 0);
+
+		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_SD, "accessToken");
 		assertTrue(reportsCount > 0);
 
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(NONGRADDISTREP_SD, "accessToken");
