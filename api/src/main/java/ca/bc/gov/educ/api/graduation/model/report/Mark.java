@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.util.JSonNullStringSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.io.Serializable;
 
 public class Mark implements Serializable {
@@ -11,6 +14,7 @@ public class Mark implements Serializable {
     private String finalLetterGrade;
     private String interimPercent;
     private String interimLetterGrade;
+    private Double completedCoursePercentage;
 
     public String getSchoolPercent() {
         return schoolPercent;
@@ -58,5 +62,13 @@ public class Mark implements Serializable {
 
     public void setInterimLetterGrade(String value) {
         this.interimLetterGrade = value;
+    }
+
+    public Double getCompletedCoursePercentage() {
+        return completedCoursePercentage;
+    }
+
+    public void setCompletedCoursePercentage(Double completedCoursePercentage) {
+        this.completedCoursePercentage = completedCoursePercentage;
     }
 }

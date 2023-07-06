@@ -144,9 +144,10 @@ public class ReportService {
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
+            graduationStatus.setSchoolOfRecord(gradResponse.getSchoolOfRecord()); //Grad2-2182
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
-            data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+            data.setStudent(getStudentData(graduationDataStatus.getGradStudent(), gradResponse)); //Grad2-2182
             data.setGradMessage(graduationStatus.getGraduationMessage());
             data.setGraduationStatus(graduationStatus);
             data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
@@ -323,6 +324,13 @@ public class ReportService {
         crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
         //Grad2-1931
         crse.setSpecialCase(sc.getSpecialCase());
+        //Grad2-2182
+        crse.setUsed(sc.isUsed());
+        crse.setProficiencyScore(sc.getProficiencyScore());
+        crse.setCustomizedCourseName(sc.getCustomizedCourseName());
+        crse.setOriginalCredits(sc.getOriginalCredits());
+        crse.setGenericCourseType(sc.getGenericCourseType());
+        crse.setCredit(sc.getCredits());
         return crse;
     }
 
@@ -334,6 +342,8 @@ public class ReportService {
         mrk.setInterimLetterGrade(sc.getInterimLetterGrade());
         mrk.setInterimPercent(getValue(sc.getInterimPercent()));
         mrk.setSchoolPercent(getSchoolPercent(sc.getBestSchoolPercent(), program, sc.getCourseLevel(), sc.getSessionDate(), sc.getSchoolPercent()));
+        //Grad2-2182
+        mrk.setCompletedCoursePercentage(sc.getCompletedCoursePercentage());
         return mrk;
     }
 
@@ -407,6 +417,9 @@ public class ReportService {
                     crse.setName(sc.getAssessmentName());
                     crse.setType("3");
                     crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
+                    crse.setUsed(sc.isUsed()); //Grad2-2182
+                    crse.setProficiencyScore(sc.getProficiencyScore()); //Grad2-2182
+
                     result.setCourse(crse);
 
                     Mark mrk = new Mark();
@@ -416,7 +429,6 @@ public class ReportService {
                     mrk.setInterimLetterGrade("");
                     mrk.setInterimPercent("");
                     mrk.setSchoolPercent("");
-                    mrk.setFinalLetterGrade("NA");
                     mrk.setFinalPercent(getAssessmentFinalPercentTranscript(sc, accessToken));
                     result.setMark(mrk);
                     result.setRequirement(sc.getGradReqMet());
@@ -558,14 +570,14 @@ public class ReportService {
             if (!graduationDataStatus.getGradStatus().getProgram().equalsIgnoreCase("SCCP")) {
                 if (graduationDataStatus.getGradStatus().getProgramCompletionDate() != null) {
                     if (graduationDataStatus.getGradStatus().getProgramCompletionDate().length() > 7) {
-                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
                     } else {
-                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
+                        data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
                     }
                 }
                 data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
             } else {
-                data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
+                data.setGraduationDate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(EducGraduationApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
             }
         }
         List<StudentOptionalProgram> optionalPrograms = optionalProgramService.getStudentOptionalPrograms(graduationStudentRecord.getStudentID(), accessToken);
@@ -630,7 +642,7 @@ public class ReportService {
                 .retrieve().bodyToMono(responseType).block();
     }
 
-    private Student getStudentData(GradSearchStudent gradStudent) {
+    private Student getStudentData(GradSearchStudent gradStudent, GraduationStudentRecord gradResponse) {
         Student std = new Student();
         std.setBirthdate(EducGraduationApiUtils.parseDate(gradStudent.getDob()));
         std.setGrade(gradStudent.getStudentGrade());
@@ -640,6 +652,7 @@ public class ReportService {
         std.setLastName(gradStudent.getLegalLastName());
         std.setGender(gradStudent.getGenderCode());
         std.setCitizenship(gradStudent.getStudentCitizenship());
+        std.setConsumerEducReqt(gradResponse.getConsumerEducationRequirementMet()); //Grad2-2182
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
         pen.setEntityID(gradStudent.getStudentID());
@@ -960,7 +973,7 @@ public class ReportService {
             certificateSchool = getSchoolData(graduationDataStatus.getSchool());
         }
         data.setSchool(certificateSchool);
-        data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
+        data.setStudent(getStudentData(graduationDataStatus.getGradStudent(), gradResponse)); //Grad2-2182
         data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
         data.setGraduationData(graduationData);
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
