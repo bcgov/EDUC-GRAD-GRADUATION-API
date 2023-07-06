@@ -374,8 +374,7 @@ public class ReportServiceTest {
 
 		var results = reportService.getCertificateList(gradResponse, graduationDataStatus, list,accessToken,exception);
 		assertNotNull(results);
-		assertThat(results.isEmpty()).isTrue();
-
+		assertThat(results).isEmpty();
 		assertNotNull(exception);
 		assertThat(exception.getExceptionName()).isEqualTo("GRAD-GRADUATION-REPORT-API IS DOWN");
 	}
