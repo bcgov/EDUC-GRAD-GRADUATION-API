@@ -342,12 +342,14 @@ public class SchoolReportsService {
         return reportsCount;
     }
 
+    @Generated
     private void saveDistrictOrSchoolOrLabelsReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
         SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
         updateSchoolReport(accessToken, schoolReports);
     }
 
+    @Generated
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
         logger.debug("getSchoolYearEndReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
@@ -358,6 +360,7 @@ public class SchoolReportsService {
                 ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
     }
 
+    @Generated
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest, String accessToken) {
         logger.debug("getSchoolLabelsReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getSchoolLabels())
@@ -368,6 +371,7 @@ public class SchoolReportsService {
                 ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
     }
 
+    @Generated
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
         logger.debug("getDistrictYearEndReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
@@ -378,6 +382,7 @@ public class SchoolReportsService {
                 ).body(BodyInserters.fromValue(reportRequest)).retrieve().bodyToMono(byte[].class).block();
     }
 
+    @Generated
     private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest, String accessToken) {
         logger.debug("getDistrictYearEndNonGradReportJasper(ReportRequest): {}", reportRequest);
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad())
