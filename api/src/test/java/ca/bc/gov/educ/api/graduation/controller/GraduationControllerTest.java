@@ -21,19 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.NONGRADDISTREP_SD;
+import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
 
 
 @ExtendWith(MockitoExtension.class)
 class GraduationControllerTest {
-
-	private static final String DISTREP_YE_SD = "DISTREP_YE_SD";
-	private static final String DISTREP_YE_SC = "DISTREP_YE_SC";
-	private static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
-	private static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
-	private static final String ADDRESS_LABEL_PSI = "ADDRESS_LABEL_PSI";
-	private static final String DISTREP_SD = "DISTREP_SD";
-	private static final String DISTREP_SC = "DISTREP_SC";
 
 	@Mock
 	private GraduationService graduationService;
@@ -240,6 +232,18 @@ class GraduationControllerTest {
 		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport("accessToken")).thenReturn(reportGradStudentData);
 		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, SchoolReportsService.ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(1);
 		graduationController.createAndStoreSchoolDistrictYearEndNonGradReports("accessToken", ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
+	}
+
+	@Test
+	void testCreateAndStoreDistrictSchoolYearEndNonGradReportsWithSchools() {
+		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
+		ReportGradStudentData data = new ReportGradStudentData();
+		data.setMincode("1234567");
+		reportGradStudentData.add(data);
+		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport(data.getMincode(),"accessToken")).thenReturn(reportGradStudentData);
+		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, SchoolReportsService.ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(1);
+		graduationController.createAndStoreSchoolDistrictYearEndNonGradReports("accessToken", ADDRESS_LABEL_SCHL, null, DISTREP_SC, List.of(data.getMincode()));
 		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports("accessToken", reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
 	}
 

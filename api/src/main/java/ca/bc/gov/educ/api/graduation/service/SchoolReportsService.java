@@ -36,6 +36,7 @@ public class SchoolReportsService {
     public static final String DISTREP_SD = "DISTREP_SD";
     public static final String ADDRESS_LABEL_YE = "ADDRESS_LABEL_YE";
     public static final String ADDRESS_LABEL_SCHL = "ADDRESS_LABEL_SCHL";
+    public static final String ADDRESS_LABEL_PSI = "ADDRESS_LABEL_PSI";
 
     private static final String SCHOOL_REPORTS_CREATED = "***** {} of School Reports Created *****";
     private static final String SCHOOL_DISTRICT_REPORTS_CREATED = "***** {} of School Districts Reports Created *****";
