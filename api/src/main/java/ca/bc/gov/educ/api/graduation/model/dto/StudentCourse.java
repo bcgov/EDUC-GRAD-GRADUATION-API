@@ -61,6 +61,7 @@ public class StudentCourse {
     private boolean isValidationCourse;
     private boolean isCutOffCourse;
     private boolean isGrade10Course;
+    private double proficiencyScore; //Grad2-2182
 
     public Integer getCreditsUsedForGrad() {
         if (creditsUsedForGrad == null)
