@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 import java.io.Serializable;
 

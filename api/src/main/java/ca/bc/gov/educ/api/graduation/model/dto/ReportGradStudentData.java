@@ -31,6 +31,7 @@ public class ReportGradStudentData implements Serializable {
     private String programCompletionDate;
     private String graduated;
     private String transcriptTypeCode;
+    private String paperType;
     private List<GradCertificateType> certificateTypes;
 
     @Override
