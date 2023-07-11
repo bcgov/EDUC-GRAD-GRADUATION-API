@@ -13,6 +13,7 @@
     "programCompletionDate": "2012/02",
     "graduated": "true",
     "transcriptTypeCode": "SCCP-EN",
+    "certificateTypeCode": "SCI",
     "certificateTypes": [
       {
         "code": "SCI",
@@ -35,6 +36,7 @@
     "programCompletionDate": "2020-06-01",
     "graduated": "true",
     "transcriptTypeCode": "BC2018-IND",
+    "certificateTypeCode": "EI",
     "certificateTypes": [
       {
         "code": "EI",
@@ -57,6 +59,7 @@
     "programCompletionDate": "2010/03",
     "graduated": "true",
     "transcriptTypeCode": "SCCP-EN",
+    "certificateTypeCode": "SC",
     "certificateTypes": [
       {
         "code": "SC",
@@ -127,6 +130,7 @@
     "programCompletionDate": "2020-06-01",
     "graduated": "true",
     "transcriptTypeCode": "BC2018-PUB",
+    "certificateTypeCode": "FN",
     "certificateTypes": [
       {
         "code": "FN",
