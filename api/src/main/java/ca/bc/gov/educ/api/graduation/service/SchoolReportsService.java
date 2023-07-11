@@ -522,7 +522,13 @@ public class SchoolReportsService {
                 case "SC", "SCF", "SCI" -> school.getSchoolStatistic().setEvergreenCount(school.getSchoolStatistic().getEvergreenCount() + 1);
                 default -> school.setTypeIndicator(null);
             }
-            school.getSchoolStatistic().setTotalCertificateCount(school.getSchoolStatistic().getTotalCertificateCount() + 1);
+            school.getSchoolStatistic().setTotalCertificateCount(
+                            school.getSchoolStatistic().getDogwoodCount() +
+                            school.getSchoolStatistic().getAdultDogwoodCount() +
+                            school.getSchoolStatistic().getFrenchImmersionCount() +
+                            school.getSchoolStatistic().getProgramFrancophoneCount() +
+                            school.getSchoolStatistic().getEvergreenCount()
+            );
         }
         school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
         return school;
