@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateType;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolReports;
 import ca.bc.gov.educ.api.graduation.model.report.*;
@@ -148,7 +147,7 @@ public class SchoolReportsService {
     @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken, schools);
         logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         if(schools != null && !schools.isEmpty()) {
             boolean isDistrictSchool = schools.get(0).length() == 3;
@@ -514,16 +513,14 @@ public class SchoolReportsService {
     }
 
     private School processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
-        if (reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
-            for (GradCertificateType certType : reportGradStudentData.getCertificateTypes()) {
-                switch (certType.getCode()) {
-                    case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
-                    case "A", "AI" -> school.getSchoolStatistic().setAdultDogwoodCount(school.getSchoolStatistic().getAdultDogwoodCount() + 1);
-                    case "F" -> school.getSchoolStatistic().setFrenchImmersionCount(school.getSchoolStatistic().getFrenchImmersionCount() + 1);
-                    case "S" -> school.getSchoolStatistic().setProgramFrancophoneCount(school.getSchoolStatistic().getProgramFrancophoneCount() + 1);
-                    case "SC", "SCF", "SCI" -> school.getSchoolStatistic().setEvergreenCount(school.getSchoolStatistic().getEvergreenCount() + 1);
-                    default -> school.setTypeIndicator(null);
-                }
+        if (StringUtils.isNotBlank(reportGradStudentData.getCertificateTypeCode())) {
+            switch (reportGradStudentData.getCertificateTypeCode()) {
+                case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
+                case "A", "AI" -> school.getSchoolStatistic().setAdultDogwoodCount(school.getSchoolStatistic().getAdultDogwoodCount() + 1);
+                case "F" -> school.getSchoolStatistic().setFrenchImmersionCount(school.getSchoolStatistic().getFrenchImmersionCount() + 1);
+                case "S" -> school.getSchoolStatistic().setProgramFrancophoneCount(school.getSchoolStatistic().getProgramFrancophoneCount() + 1);
+                case "SC", "SCF", "SCI" -> school.getSchoolStatistic().setEvergreenCount(school.getSchoolStatistic().getEvergreenCount() + 1);
+                default -> school.setTypeIndicator(null);
             }
             school.getSchoolStatistic().setTotalCertificateCount(school.getSchoolStatistic().getTotalCertificateCount() + 1);
         }
@@ -532,7 +529,7 @@ public class SchoolReportsService {
     }
 
     private Student processNewCredentialsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if (reportGradStudentData.getCertificateTypes() != null && !reportGradStudentData.getCertificateTypes().isEmpty()) {
+        if (StringUtils.isNotBlank(reportGradStudentData.getCertificateTypeCode())) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
         return null;
