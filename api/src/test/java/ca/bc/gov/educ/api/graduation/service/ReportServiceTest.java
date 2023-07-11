@@ -2761,6 +2761,21 @@ public class ReportServiceTest {
 		assertThat(result).isNotNull();
 
 	}
+
+	@Test
+	public void testGetSchoolCategoryCodeNull() {
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.empty());
+
+		var result = reportService.getSchoolCategoryCode("accessToken", "09323027");
+		assertThat(result).isNull();
+
+	}
+
 	protected GraduationData createGraduationData(String jsonPath) throws Exception {
 		File file = new File(Objects.requireNonNull(ReportServiceTest.class.getClassLoader().getResource(jsonPath)).getFile());
 		return new ObjectMapper().readValue(file, GraduationData.class);
