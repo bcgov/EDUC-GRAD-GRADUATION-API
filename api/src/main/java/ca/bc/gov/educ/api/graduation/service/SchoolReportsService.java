@@ -530,7 +530,9 @@ public class SchoolReportsService {
                             school.getSchoolStatistic().getEvergreenCount()
             );
         }
-        school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
+        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType())) {
+            school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
+        }
         return school;
     }
 
