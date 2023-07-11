@@ -544,7 +544,10 @@ public class SchoolReportsService {
     }
 
     private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        return populateStudentObjectByReportGradStudentData(reportGradStudentData);
+        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType())) {
+            return populateStudentObjectByReportGradStudentData(reportGradStudentData);
+        }
+        return null;
     }
 
     private Student populateStudentObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
