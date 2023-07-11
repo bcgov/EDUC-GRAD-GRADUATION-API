@@ -5,9 +5,7 @@ import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.bind.annotation.XmlType;
@@ -32,10 +30,6 @@ import java.util.Map;
 		NonGradReason.class,
 		Certificate.class
 })
-@JsonSerialize()
-//@JsonPropertyOrder(alphabetic = true)
-//@JsonRootName("generateReport")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Student.class),
 		@JsonSubTypes.Type(value = School.class),
