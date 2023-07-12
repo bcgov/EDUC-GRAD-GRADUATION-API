@@ -544,7 +544,7 @@ public class SchoolReportsService {
     }
 
     private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType())) {
+        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType()) || StringUtils.isBlank(reportGradStudentData.getCertificateTypeCode())) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
         return null;
