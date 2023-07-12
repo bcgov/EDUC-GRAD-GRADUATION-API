@@ -513,6 +513,10 @@ public class SchoolReportsService {
     }
 
     private School processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
+        String paperType = reportGradStudentData.getPaperType();
+        String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
+        String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
+        logger.debug("Processing district school {} student {} for transcript {} & certificate {} and paper type {}", school.getMincode(), reportGradStudentData.getPen(), transcriptTypeCode, certificateTypeCode);
         if (StringUtils.isNotBlank(reportGradStudentData.getCertificateTypeCode())) {
             switch (reportGradStudentData.getCertificateTypeCode()) {
                 case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
@@ -530,7 +534,7 @@ public class SchoolReportsService {
                             school.getSchoolStatistic().getEvergreenCount()
             );
         }
-        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType()) || StringUtils.isBlank(reportGradStudentData.getCertificateTypeCode())) {
+        if("YED4".equalsIgnoreCase(paperType) || StringUtils.isBlank(certificateTypeCode)) {
             school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
         }
         return school;
@@ -544,7 +548,11 @@ public class SchoolReportsService {
     }
 
     private Student processIssuedTranscriptsSchoolMap(ReportGradStudentData reportGradStudentData) {
-        if("YED4".equalsIgnoreCase(reportGradStudentData.getPaperType()) || StringUtils.isBlank(reportGradStudentData.getCertificateTypeCode())) {
+        String paperType = reportGradStudentData.getPaperType();
+        String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
+        String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
+        logger.debug("Processing school {} transcript {} for student {} and paper type {}", reportGradStudentData.getMincode(), transcriptTypeCode, reportGradStudentData.getPen(), paperType);
+        if("YED4".equalsIgnoreCase(paperType) || StringUtils.isBlank(certificateTypeCode)) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
         return null;
