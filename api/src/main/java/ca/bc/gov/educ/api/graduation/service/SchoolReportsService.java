@@ -516,7 +516,7 @@ public class SchoolReportsService {
         String paperType = reportGradStudentData.getPaperType();
         String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
         String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
-        logger.debug("Processing district school {} student {} for transcript {} & certificate {} and paper type {}", school.getMincode(), reportGradStudentData.getPen(), transcriptTypeCode, certificateTypeCode);
+        logger.debug("Processing district school {} student {} for transcript {} & certificate {} and paper type {}", school.getMincode(), reportGradStudentData.getPen(), transcriptTypeCode, certificateTypeCode, paperType);
         if (StringUtils.isNotBlank(certificateTypeCode)) {
             switch (certificateTypeCode) {
                 case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
