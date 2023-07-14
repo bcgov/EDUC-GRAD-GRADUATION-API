@@ -331,6 +331,8 @@ public class ReportService {
         crse.setOriginalCredits(sc.getOriginalCredits());
         crse.setGenericCourseType(sc.getGenericCourseType());
         crse.setCredit(sc.getCredits());
+        //Grad2-2205
+        crse.setFineArtsAppliedSkills(sc.getFineArtsAppliedSkills());
         return crse;
     }
 
@@ -419,6 +421,7 @@ public class ReportService {
                     crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate().replace("/", "") : "");
                     crse.setUsed(sc.isUsed()); //Grad2-2182
                     crse.setProficiencyScore(sc.getProficiencyScore()); //Grad2-2182
+                    crse.setSpecialCase(sc.getSpecialCase()); //Grad2-2205
 
                     result.setCourse(crse);
 
@@ -653,6 +656,7 @@ public class ReportService {
         std.setGender(gradStudent.getGenderCode());
         std.setCitizenship(gradStudent.getStudentCitizenship());
         std.setConsumerEducReqt(gradResponse.getConsumerEducationRequirementMet()); //Grad2-2182
+        std.setLocalId(gradStudent.getLocalID()); //Grad2-2205
         Pen pen = new Pen();
         pen.setPen(gradStudent.getPen());
         pen.setEntityID(gradStudent.getStudentID());
