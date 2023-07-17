@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +20,7 @@ public class Student implements Comparable<Student>, Serializable {
     private String lastName = "";
     private String gender = "";
     private String citizenship = "";
-    private Date birthdate;
+    private LocalDate birthdate;
     private Address address = new Address();
     private String grade = "";
     private String gradProgram = "";
@@ -34,7 +34,7 @@ public class Student implements Comparable<Student>, Serializable {
 
     private String localId = "";
     private String hasOtherProgram = "";
-    private Date lastUpdateDate;
+    private LocalDate lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
     private List<CertificateType> certificateTypes = new ArrayList<>();
@@ -96,11 +96,11 @@ public class Student implements Comparable<Student>, Serializable {
     }
 
     @JsonFormat(pattern=BIRTHDATE_FORMAT)
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date value) {
+    public void setBirthdate(LocalDate value) {
         this.birthdate = value;
     }
 
@@ -234,11 +234,11 @@ public class Student implements Comparable<Student>, Serializable {
     }
 
     @JsonFormat(pattern=DATETIME_FORMAT)
-    public Date getLastUpdateDate() {
+    public LocalDate getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(LocalDate lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

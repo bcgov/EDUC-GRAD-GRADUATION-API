@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -297,7 +298,7 @@ public class ReportService {
             code.setCode(pcObj.getTranscriptTypeCode());
             transcriptData.setTranscriptTypeCode(code);
         }
-        transcriptData.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
+        transcriptData.setIssueDate(LocalDate.now());
         transcriptData.setResults(getTranscriptResults(graduationDataStatus, xml, accessToken));
         return transcriptData;
     }
@@ -683,7 +684,7 @@ public class ReportService {
 
     private Student getStudentData(GradSearchStudent gradStudent, GraduationStudentRecord gradResponse) {
         Student std = new Student();
-        std.setBirthdate(EducGraduationApiUtils.parseDate(gradStudent.getDob()));
+        std.setBirthdate(EducGraduationApiUtils.parseDateLocalDate(gradStudent.getDob()));
         std.setGrade(gradStudent.getStudentGrade());
         std.setStudStatus(gradStudent.getStudentStatus());
         std.setFirstName(gradStudent.getLegalFirstName());
@@ -776,7 +777,7 @@ public class ReportService {
         studObj.setPen(pen);
         studObj.setLocalId(studentObj.getLocalID());
         studObj.setGradProgram(studentObj.getProgram());
-        studObj.setBirthdate(EducGraduationApiUtils.formatIssueDateForReportJasper(studentObj.getDob()));
+        studObj.setBirthdate(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(studentObj.getDob()));
         List<OtherProgram> otherProgramParticipation = new ArrayList<>();
         for (StudentOptionalProgram sp : optionalStudentProgram) {
             OtherProgram op = new OtherProgram();
@@ -808,7 +809,7 @@ public class ReportService {
         List<Exam> sExamList = new ArrayList<>();
         data.setStudentCourses(processStudentCourses(sCourseList, studentCourseList));
         Assessment achv = new Assessment();
-        achv.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.getSimpleDateFormat(new Date())));
+        achv.setIssueDate(LocalDate.now());
         achv.setResults(getAssessmentResults(studentAssessmentList, graduationDataStatus.getGradProgram(), accessToken));
         data.setAssessment(achv);
         data.setStudentExams(processStudentExams(sExamList, studentExamList));
@@ -1049,7 +1050,7 @@ public class ReportService {
 
     private Certificate getCertificateData(GraduationStudentRecord gradResponse, ProgramCertificateTranscript certData) {
         Certificate cert = new Certificate();
-        cert.setIssued(EducGraduationApiUtils.formatIssueDateForReportJasper(EducGraduationApiUtils.parsingDateForCertificate(gradResponse.getProgramCompletionDate())));
+        cert.setIssued(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate((gradResponse.getProgramCompletionDate())));
         OrderType orTy = new OrderType();
         orTy.setName("Certificate");
         CertificateType certType = new CertificateType();

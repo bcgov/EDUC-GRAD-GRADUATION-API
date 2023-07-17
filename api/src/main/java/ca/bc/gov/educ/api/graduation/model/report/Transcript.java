@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -17,7 +17,7 @@ public class Transcript implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private String interim;
-    private Date issueDate;
+    private LocalDate issueDate;
     private Code transcriptTypeCode;
     private List<TranscriptResult> results;
 
@@ -40,11 +40,11 @@ public class Transcript implements Serializable {
     }
 
     @JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
-    public Date getIssueDate() {
+    public LocalDate getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(Date value) {
+    public void setIssueDate(LocalDate value) {
         this.issueDate = value;
     }
 

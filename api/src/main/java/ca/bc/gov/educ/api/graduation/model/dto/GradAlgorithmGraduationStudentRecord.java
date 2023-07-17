@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DEFAULT_DATE_FORMAT;
@@ -30,5 +30,5 @@ public class GradAlgorithmGraduationStudentRecord {
     private String consumerEducationRequirementMet;
     private String schoolAtGradName;
     @JsonFormat(pattern=DEFAULT_DATE_FORMAT)
-    private Date adultStartDate;
+    private LocalDate adultStartDate;
 }

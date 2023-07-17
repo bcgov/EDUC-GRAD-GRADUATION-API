@@ -75,7 +75,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String parseTraxDate(String sessionDate) {
-		if (sessionDate == null)
+		if (StringUtils.isBlank(sessionDate))
 			return null;
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);

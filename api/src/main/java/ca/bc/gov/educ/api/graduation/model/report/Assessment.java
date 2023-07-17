@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -14,15 +14,15 @@ public class Assessment implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
-    private Date issueDate;
+    private LocalDate issueDate;
     private List<AssessmentResult> results;
 
     @JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
-    public Date getIssueDate() {
+    public LocalDate getIssueDate() {
         return issueDate;
     }
 
-    public void setIssueDate(Date value) {
+    public void setIssueDate(LocalDate value) {
         this.issueDate = value;
     }
 
