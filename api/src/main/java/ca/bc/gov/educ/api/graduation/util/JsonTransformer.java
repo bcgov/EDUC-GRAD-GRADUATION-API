@@ -29,6 +29,7 @@ public class JsonTransformer implements Transformer {
                     .findAndRegisterModules()
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                     .disable(SerializationFeature.INDENT_OUTPUT)
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                     .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
                     .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
                     .enable(JsonGenerator.Feature.ESCAPE_NON_ASCII)

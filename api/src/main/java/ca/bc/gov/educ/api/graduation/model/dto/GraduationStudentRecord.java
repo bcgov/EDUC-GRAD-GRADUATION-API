@@ -6,11 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DEFAULT_DATE_FORMAT;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -41,8 +39,8 @@ public class GraduationStudentRecord extends BaseModel{
     private String consumerEducationRequirementMet;
     private String studentCitizenship;
 	private ExceptionMessage exception;
-    @JsonFormat(pattern=DEFAULT_DATE_FORMAT)
-    private LocalDate adultStartDate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime adultStartDate;
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;

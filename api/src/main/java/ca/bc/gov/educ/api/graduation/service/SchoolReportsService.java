@@ -565,6 +565,7 @@ public class SchoolReportsService {
         student.setMiddleName(reportGradStudentData.getMiddleName());
         student.setLastName(reportGradStudentData.getLastName());
         student.setGradProgram(reportGradStudentData.getProgramCode());
+        student.setLastUpdateDate(reportGradStudentData.getUpdateDate());
 
         GraduationStatus gradStatus = new GraduationStatus();
         gradStatus.setProgramCompletionDate(reportGradStudentData.getProgramCompletionDate());

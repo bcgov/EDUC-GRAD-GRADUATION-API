@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -246,7 +246,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("A");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 
 		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
 		};
@@ -911,7 +911,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1094,7 +1094,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		
 		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception);
 		assertThat(dta).isNotNull();
@@ -1186,7 +1186,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception);
 		assertThat(dta).isNotNull();
 	}
@@ -1291,7 +1291,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		
 		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception);
 		assertThat(dta).isNotNull();
@@ -1398,7 +1398,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		
 		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception);
 		assertThat(dta).isNotNull();
@@ -1478,7 +1478,7 @@ public class ReportServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		gradResponse.setUpdateDate(LocalDate.now());
+		gradResponse.setUpdateDate(LocalDateTime.now());
 		
 		ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception);
 		assertThat(dta).isNotNull();
@@ -1632,7 +1632,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
@@ -1678,7 +1678,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
 
 		GradProgram gradProgram = new GradProgram();
@@ -1859,7 +1859,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = null;
 		assertNull(studentGradData);
@@ -1911,7 +1911,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -1989,7 +1989,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
@@ -2127,7 +2127,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2306,7 +2306,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2391,7 +2391,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2454,7 +2454,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2612,7 +2612,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setPen(pen);
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDate.now());
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
