@@ -123,21 +123,25 @@ public class ReportService {
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String accessToken) {
-        return webClient.get().uri(educGraduationApiConstants.getStudentNonGradReportData())
+        List<ReportGradStudentData> result = webClient.get().uri(educGraduationApiConstants.getStudentNonGradReportData())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
                 }).block();
+        filterCredentialsNonGradYearEndReport(result);
+        return result;
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String mincode, String accessToken) {
-        return webClient.get().uri(String.format(educGraduationApiConstants.getStudentNonGradReportDataMincode(), mincode))
+        List<ReportGradStudentData> result = webClient.get().uri(String.format(educGraduationApiConstants.getStudentNonGradReportDataMincode(), mincode))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(new ParameterizedTypeReference<List<ReportGradStudentData>>() {
                 }).block();
+        filterCredentialsNonGradYearEndReport(result);
+        return result;
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolReport(String accessToken) {
@@ -1259,5 +1263,11 @@ public class ReportService {
                 .thenComparing(ReportGradStudentData::getFirstName, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(ReportGradStudentData::getMiddleName, Comparator.nullsLast(Comparator.naturalOrder())));
         return students;
+    }
+
+    void filterCredentialsNonGradYearEndReport(List<ReportGradStudentData> students) {
+        students.removeIf(s->"SCCP".equalsIgnoreCase(s.getProgramCode()));
+        students.removeIf(s->"1950".equalsIgnoreCase(s.getProgramCode()) && !"AD".equalsIgnoreCase(s.getStudentGrade()));
+        students.removeIf(s->!"1950".equalsIgnoreCase(s.getProgramCode()) && !"12".equalsIgnoreCase(s.getStudentGrade()));
     }
 }
