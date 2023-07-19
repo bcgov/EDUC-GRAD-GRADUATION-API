@@ -24,6 +24,8 @@ public class TranscriptCourse {
     private Integer originalCredits;
     private String genericCourseType;
     private Integer credit;
+    //Grad2-2205
+    private String fineArtsAppliedSkills;
 
 
 
@@ -148,6 +150,13 @@ public class TranscriptCourse {
 
     public void setCredit(Integer credits) {
         credit = credits;
+    }
+
+    @JsonSerialize(nullsUsing = JSonNullStringSerializer.class)
+    public String getFineArtsAppliedSkills() { return fineArtsAppliedSkills; }
+
+    public void setFineArtsAppliedSkills(String fineArtsAppliedSkills) {
+        this.fineArtsAppliedSkills = fineArtsAppliedSkills;
     }
 
     @Override
