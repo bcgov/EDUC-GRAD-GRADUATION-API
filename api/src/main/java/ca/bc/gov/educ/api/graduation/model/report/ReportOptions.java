@@ -2,13 +2,11 @@ package ca.bc.gov.educ.api.graduation.model.report;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 
 import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class ReportOptions implements Serializable {
 
 	private static final long serialVersionUID = 2L;

@@ -31,8 +31,10 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_REPORTS_YEAR_END_PDF = "/report/schoolyearendpdf";
     public static final String SCHOOL_REPORTS_MONTH_PDF = "/report/schoolmonthpdf";
     public static final String DISTRICT_REPORTS_YEAR_END = "/report/districtyearend";
+    public static final String DISTRICT_REPORTS_YEAR_END_NONGRAD = "/report/districtyearendnongrad";
     public static final String DISTRICT_REPORTS_MONTH = "/report/districtmonth";
     public static final String DISTRICT_REPORTS_YEAR_END_PDF = "/report/districtyearendpdf";
+    public static final String DISTRICT_REPORTS_YEAR_END_NONGRAD_PDF = "/report/districtyearendnongradpdf";
     public static final String DISTRICT_REPORTS_MONTH_PDF = "/report/districtmonthpdf";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_YEAR_END = "/report/schooldistrictyearend";
     public static final String SCHOOL_AND_DISTRICT_REPORTS_MONTH = "/report/schooldistrictmonth";
@@ -45,6 +47,7 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     public static final String SCHOOL_REPORTS_LABELS = "/report/school/labels";
     public static final String SCHOOL_REPORTS_LABELS_PDF = "/report/school/labels/pdf";
+    public static final String STUDENT_FOR_YEAR_END_REPORT = "/report/studentsforyearend";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;
@@ -91,6 +94,9 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.report-api.district_distribution_year_end}")
     private String districtDistributionYearEnd;
 
+    @Value("${endpoint.report-api.district_distribution_year_end_nongrad}")
+    private String districtDistributionYearEndNonGrad;
+
     @Value("${endpoint.report-api.school_labels}")
     private String schoolLabels;
     
@@ -136,6 +142,12 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.school-nongrad-year-end-students}")
     private String schoolNonGradYearEndStudents;
 
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data}")
+    private String studentNonGradReportData;
+
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data-mincode}")
+    private String studentNonGradReportDataMincode;
+
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
@@ -172,9 +184,9 @@ public class EducGraduationApiConstants {
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-
     public static final String SECONDARY_DATE_FORMAT = "yyyy/MM/dd";
-    
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String BIRTHDATE_FORMAT = DEFAULT_DATE_FORMAT;
 	
 }

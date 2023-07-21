@@ -29,8 +29,8 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String formatDate(Date date, String dateFormat) {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
-		return simpleDateFormat.format(date);
+		if(date == null) return null;
+		return new SimpleDateFormat(dateFormat).format(date);
 	}
 
 	public static Date parseDate(String dateString) {
@@ -75,7 +75,7 @@ public class EducGraduationApiUtils {
 	}
 
 	public static String parseTraxDate(String sessionDate) {
-		if (sessionDate == null)
+		if (StringUtils.isBlank(sessionDate))
 			return null;
 
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -196,14 +196,12 @@ public class EducGraduationApiUtils {
 	}
 
 	public static int getDifferenceInMonths(String date1, String date2) {
+		if(StringUtils.isAnyBlank(date1, date2)) return 0;
 		Period diff = Period.between(
 				LocalDate.parse(date1).withDayOfMonth(1),
 				LocalDate.parse(date2).withDayOfMonth(1));
 		int monthsYear = diff.getYears() * 12;
 		int months = diff.getMonths();
-
-
-
 		return monthsYear + months;
 	}
 }

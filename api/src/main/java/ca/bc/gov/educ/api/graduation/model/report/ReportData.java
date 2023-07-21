@@ -1,16 +1,15 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.bind.annotation.XmlType;
 import lombok.Data;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -31,10 +30,6 @@ import java.util.Map;
 		NonGradReason.class,
 		Certificate.class
 })
-@JsonSerialize()
-//@JsonPropertyOrder(alphabetic = true)
-//@JsonRootName("generateReport")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Student.class),
 		@JsonSubTypes.Type(value = School.class),
@@ -67,7 +62,7 @@ public class ReportData implements Serializable {
 	@JsonDeserialize(as = GraduationData.class)
 	private GraduationData graduationData;
 	private String gradMessage;
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
 	private String updateDate;
 	@JsonDeserialize(as = Certificate.class)
 	private Certificate certificate;

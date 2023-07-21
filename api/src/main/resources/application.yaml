@@ -78,6 +78,8 @@ endpoint:
   update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
   student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
   school-nongrad-year-end-students: ${GRAD_STUDENT_API}api/v1/student/studentschoolreportdata
+  student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
+  student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
  grad-program-api: 
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
@@ -111,6 +113,7 @@ endpoint:
   school_non_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolnongraduation
   school_distribution_year_end: ${GRAD_REPORT_API}api/v1/reports/schooldistributionyearend
   district_distribution_year_end: ${GRAD_REPORT_API}api/v1/reports/districtdistributionyearend
+  district_distribution_year_end_nongrad: ${GRAD_REPORT_API}api/v1/reports/districtdistributionyearendnongrad
   school_labels: ${GRAD_REPORT_API}api/v1/reports/schoollabel
  grad-student-graduation-api:
   get-special-cases: 

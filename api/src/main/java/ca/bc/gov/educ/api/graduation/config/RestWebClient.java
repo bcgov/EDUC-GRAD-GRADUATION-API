@@ -21,6 +21,9 @@ public class RestWebClient {
     @Autowired
     EducGraduationApiConstants constants;
 
+    @Autowired
+    LogHelper logHelper;
+
     private final HttpClient httpClient;
 
     public RestWebClient() {
@@ -43,7 +46,7 @@ public class RestWebClient {
     private ExchangeFilterFunction log() {
         return (clientRequest, next) -> next
                 .exchange(clientRequest)
-                .doOnNext((clientResponse -> LogHelper.logClientHttpReqResponseDetails(
+                .doOnNext((clientResponse -> logHelper.logClientHttpReqResponseDetails(
                         clientRequest.method(),
                         clientRequest.url().toString(),
                         clientResponse.statusCode().value(),

@@ -1,24 +1,25 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Certificate implements Serializable {
     private static final long serialVersionUID = 2L;
 
-    private Date issued;
+    private LocalDate issued;
     private String certStyle;
     private OrderType orderType;
     private boolean isOrigin;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
-    public Date getIssued() {
+    @JsonFormat(pattern= EducGraduationApiConstants.DEFAULT_DATE_FORMAT)
+    public LocalDate getIssued() {
         return issued;
     }
 
-    public void setIssued(Date value) {
+    public void setIssued(LocalDate value) {
         this.issued = value;
     }
 

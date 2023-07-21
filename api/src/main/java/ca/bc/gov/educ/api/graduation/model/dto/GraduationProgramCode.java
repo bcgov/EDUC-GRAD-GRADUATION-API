@@ -17,5 +17,6 @@ public class GraduationProgramCode {
 	private int displayOrder; 
 	private Date effectiveDate;
 	private Date expiryDate;
+	private Date assessmentReleaseDate;
 
 }

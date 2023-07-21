@@ -1,29 +1,33 @@
 package ca.bc.gov.educ.api.graduation.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Component
 public final class LogHelper {
-  private static final ObjectMapper mapper = new ObjectMapper();
+  JsonTransformer jsonTransformer;
+
   private static final String EXCEPTION = "Exception ";
 
-  private LogHelper() {
-
+  @Autowired
+  public LogHelper(JsonTransformer jsonTransformer) {
+    this.jsonTransformer = jsonTransformer;
   }
 
-  public static void logServerHttpReqResponseDetails(@NonNull final HttpServletRequest request, final HttpServletResponse response, final boolean logging) {
+  public void logServerHttpReqResponseDetails(@NonNull final HttpServletRequest request, final HttpServletResponse response, final boolean logging) {
     if (!logging) return;
     try {
       final int status = response.getStatus();
@@ -40,7 +44,7 @@ public final class LogHelper {
       httpMap.put("server_http_request_processing_time_ms", totalTime);
       httpMap.put("server_http_request_payload", String.valueOf(request.getAttribute("payload")));
       httpMap.put("server_http_request_remote_address", request.getRemoteAddr());
-      MDC.putCloseable("httpEvent", mapper.writeValueAsString(httpMap));
+      MDC.putCloseable("httpEvent", jsonTransformer.marshall(httpMap));
       log.info("");
       MDC.clear();
     } catch (final Exception exception) {
@@ -48,7 +52,7 @@ public final class LogHelper {
     }
   }
 
-  public static void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID, final boolean logging) {
+  public void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID, final boolean logging) {
     if (!logging) return;
     try {
       final Map<String, Object> httpMap = new HashMap<>();
@@ -58,7 +62,7 @@ public final class LogHelper {
       if (correlationID != null) {
         httpMap.put("correlation_id", String.join(",", correlationID));
       }
-      MDC.putCloseable("httpEvent", mapper.writeValueAsString(httpMap));
+      MDC.putCloseable("httpEvent", jsonTransformer.marshall(httpMap));
       log.info("");
       MDC.clear();
     } catch (final Exception exception) {

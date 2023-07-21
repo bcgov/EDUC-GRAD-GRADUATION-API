@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.BIRTHDATE_FORMAT;
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
 
 public class Student implements Comparable<Student>, Serializable {
 
@@ -17,7 +21,7 @@ public class Student implements Comparable<Student>, Serializable {
     private String lastName = "";
     private String gender = "";
     private String citizenship = "";
-    private Date birthdate;
+    private LocalDate birthdate;
     private Address address = new Address();
     private String grade = "";
     private String gradProgram = "";
@@ -31,7 +35,8 @@ public class Student implements Comparable<Student>, Serializable {
 
     private String localId = "";
     private String hasOtherProgram = "";
-    private Date lastUpdateDate;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
     private List<CertificateType> certificateTypes = new ArrayList<>();
@@ -92,12 +97,12 @@ public class Student implements Comparable<Student>, Serializable {
         this.citizenship = citizenship;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd")
-    public Date getBirthdate() {
+    @JsonFormat(pattern=BIRTHDATE_FORMAT)
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date value) {
+    public void setBirthdate(LocalDate value) {
         this.birthdate = value;
     }
 
@@ -230,12 +235,12 @@ public class Student implements Comparable<Student>, Serializable {
         this.graduationStatus = graduationStatus;
     }
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    public Date getLastUpdateDate() {
+    @JsonFormat(pattern=DATETIME_FORMAT)
+    public LocalDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(Date lastUpdateDate) {
+    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

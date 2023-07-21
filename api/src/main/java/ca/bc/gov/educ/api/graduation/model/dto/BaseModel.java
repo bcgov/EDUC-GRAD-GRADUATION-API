@@ -1,13 +1,13 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import java.sql.Date;
-
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 public class BaseModel {
 	private String createUser;	
-	private Date createDate;	
+	private LocalDateTime createDate;
 	private String updateUser;	
-	private Date updateDate;
+	private LocalDateTime updateDate;
 }
