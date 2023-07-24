@@ -16,7 +16,7 @@ public class GradLocalDateSerializer extends StdSerializer<LocalDate> {
 
     @Override
     public void serialize(LocalDate localDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         if(localDate != null) {
             jsonGenerator.writeString(localDate.format(formatter));
         }
