@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.BIRTHDATE_FORMAT;
-import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
 
 public class Student implements Comparable<Student>, Serializable {
 
@@ -35,7 +34,6 @@ public class Student implements Comparable<Student>, Serializable {
 
     private String localId = "";
     private String hasOtherProgram = "";
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
@@ -235,7 +233,6 @@ public class Student implements Comparable<Student>, Serializable {
         this.graduationStatus = graduationStatus;
     }
 
-    @JsonFormat(pattern=DATETIME_FORMAT)
     public LocalDateTime getLastUpdateDate() {
         return lastUpdateDate;
     }
