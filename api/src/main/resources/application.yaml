@@ -108,6 +108,7 @@ endpoint:
   achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
   transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
   certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
+  student_non_grad_projected: ${GRAD_REPORT_API}api/v1/reports/studentnongradprojected
   student_non_grad: ${GRAD_REPORT_API}api/v1/reports/studentnongrad
   school_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolgraduation
   school_non_graduation: ${GRAD_REPORT_API}api/v1/reports/schoolnongraduation

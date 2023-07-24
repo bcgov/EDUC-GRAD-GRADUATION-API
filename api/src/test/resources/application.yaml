@@ -109,7 +109,8 @@ endpoint:
   achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
   transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
   certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
-  student_non_grad: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/studentnongrad
+  student_non_grad_projected: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/studentnongradprojected
+  student_non_grad: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/studentnongradprojected
   school_graduation: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/schoolgraduation
   school_non_graduation: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/schoolnongraduation
   school_distribution_year_end: https://educ-grad-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/reports/schooldistributionyearend
