@@ -9,10 +9,7 @@ import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
-import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import ca.bc.gov.educ.api.graduation.util.TokenUtils;
+import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
@@ -320,12 +317,13 @@ public class GraduationService {
         return numberOfReports;
     }
 
+    /**
     private int processStudentNonGradReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
         ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
         createAndSaveSchoolReportStudentNonGradReport(nongradProjected, mincode, accessToken);
         numberOfReports++;
         return numberOfReports;
-    }
+    }**/
 
     @SneakyThrows
     private List<Student> processStudentList(List<GraduationStudentRecord> gradStudList, String type) {
@@ -473,6 +471,7 @@ public class GraduationService {
                 accessToken);
     }
 
+    @Generated
     private byte[] getSchoolReportStudentNonGradReport(ReportData data, String mincode, String accessToken) {
         data.setReportTitle("Graduation Records and Achievement Data");
         data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
