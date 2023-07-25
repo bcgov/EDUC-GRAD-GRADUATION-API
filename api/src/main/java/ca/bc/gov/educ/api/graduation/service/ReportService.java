@@ -1058,7 +1058,8 @@ public class ReportService {
 
     private Certificate getCertificateData(GraduationStudentRecord gradResponse, ProgramCertificateTranscript certData) {
         Certificate cert = new Certificate();
-        cert.setIssued(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate((gradResponse.getProgramCompletionDate())));
+        cert.setIssued(EducGraduationApiUtils.formatIssueDateForReportJasperLocalDate(EducGraduationApiUtils.parsingDateForCertificate(gradResponse.getProgramCompletionDate())));
+
         OrderType orTy = new OrderType();
         orTy.setName("Certificate");
         CertificateType certType = new CertificateType();
