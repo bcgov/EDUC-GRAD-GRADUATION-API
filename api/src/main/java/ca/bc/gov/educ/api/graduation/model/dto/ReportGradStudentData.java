@@ -41,6 +41,10 @@ public class ReportGradStudentData implements Serializable {
     private List<GradCertificateType> certificateTypes;
     private List<NonGradReason> nonGradReasons;
 
+    public LocalDateTime getUpdateDate() {
+        return updateDate == null ? LocalDateTime.now() : updateDate;
+    }
+
     @Override
     public String toString() {
         return "ReportGradStudentData{" +

@@ -187,7 +187,10 @@ public class EducGraduationApiConstants {
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String SECONDARY_DATE_FORMAT = "yyyy/MM/dd";
+    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String SECOND_DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
+    public static final String SECOND_DEFAULT_DATE_TIME_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    public static final String SECONDARY_DATE_FORMAT = SECOND_DEFAULT_DATE_FORMAT;
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String BIRTHDATE_FORMAT = DEFAULT_DATE_FORMAT;

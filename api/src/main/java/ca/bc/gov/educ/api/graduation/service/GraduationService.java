@@ -24,7 +24,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -340,7 +342,7 @@ public class GraduationService {
             std.setPen(pen);
             std.setGrade(gsr.getStudentGrade());
             std.setGradProgram(gsr.getProgram());
-            std.setLastUpdateDate(gsr.getUpdateDate());
+            std.setLastUpdateDate(Date.from(gsr.getUpdateDate().atZone(ZoneId.systemDefault()).toInstant()));
             //Grad2-1931 - mchintha
             std.setConsumerEducReqt(gsr.getConsumerEducationRequirementMet());
             std.setGraduationStatus(GraduationStatus.builder()
