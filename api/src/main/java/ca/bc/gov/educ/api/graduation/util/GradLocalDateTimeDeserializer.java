@@ -50,7 +50,7 @@ public class GradLocalDateTimeDeserializer extends StdDeserializer<LocalDateTime
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 10 && dateAsString.length() <= 19 && dateAsString.contains("/") && dateAsString.contains(" ")) {
             formatter = DateTimeFormatter.ofPattern(SECOND_DEFAULT_DATE_TIME_FORMAT);
             return LocalDateTime.parse(dateAsString, formatter);
-        } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 10 && dateAsString.contains("-") && dateAsString.contains(" ")) {
+        } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 10 && dateAsString.length() <= 19 && dateAsString.contains("-") && dateAsString.contains(" ")) {
             formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
             return LocalDateTime.parse(dateAsString, formatter);
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 19 && dateAsString.contains("/") && dateAsString.contains("T")) {
