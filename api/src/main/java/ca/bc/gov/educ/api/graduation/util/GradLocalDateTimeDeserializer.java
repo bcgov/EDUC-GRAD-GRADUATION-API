@@ -54,11 +54,11 @@ public class GradLocalDateTimeDeserializer extends StdDeserializer<LocalDateTime
             formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
             return LocalDateTime.parse(dateAsString, formatter);
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 19 && dateAsString.contains("/") && dateAsString.contains("T")) {
-            formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.000+00:00");
-            return LocalDateTime.parse(StringUtils.replace(dateAsString, "T", " "), formatter);
+            formatter = DateTimeFormatter.ofPattern(SECOND_DEFAULT_DATE_TIME_FORMAT);
+            return LocalDateTime.parse(StringUtils.replace(StringUtils.substringBefore(dateAsString, "."), "T", " "), formatter);
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() > 19 && dateAsString.contains("-") && dateAsString.contains("T")) {
-            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.000+00:00");
-            return LocalDateTime.parse(StringUtils.replace(dateAsString, "T", " "), formatter);
+            formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
+            return LocalDateTime.parse(StringUtils.replace(StringUtils.substringBefore(dateAsString, "."), "T", " "), formatter);
         } else if(StringUtils.isNotBlank(dateAsString)) {
             return LocalDateTime.parse(dateAsString, formatter);
         }
