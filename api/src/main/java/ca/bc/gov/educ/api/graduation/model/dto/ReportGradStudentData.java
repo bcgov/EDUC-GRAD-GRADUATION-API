@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
 import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -38,10 +37,13 @@ public class ReportGradStudentData implements Serializable {
     private String transcriptTypeCode;
     private String certificateTypeCode;
     private String paperType;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateDate;
     private List<GradCertificateType> certificateTypes;
     private List<NonGradReason> nonGradReasons;
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate == null ? LocalDateTime.now() : updateDate;
+    }
 
     @Override
     public String toString() {

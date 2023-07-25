@@ -14,7 +14,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = false)
 @Component
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GraduationStudentRecord extends BaseModel{
+public class GraduationStudentRecord extends BaseModel {
 
     private String studentGradData;
     private String studentProjectedGradData;

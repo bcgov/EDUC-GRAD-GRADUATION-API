@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.BIRTHDATE_FORMAT;
-import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DATETIME_FORMAT;
 
 public class Student implements Comparable<Student>, Serializable {
 
@@ -35,8 +34,7 @@ public class Student implements Comparable<Student>, Serializable {
 
     private String localId = "";
     private String hasOtherProgram = "";
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime lastUpdateDate;
+    private Date lastUpdateDate;
     private List<OtherProgram> otherProgramParticipation = new ArrayList<>();
     private List<NonGradReason> nonGradReasons = new ArrayList<>();
     private List<CertificateType> certificateTypes = new ArrayList<>();
@@ -235,12 +233,12 @@ public class Student implements Comparable<Student>, Serializable {
         this.graduationStatus = graduationStatus;
     }
 
-    @JsonFormat(pattern=DATETIME_FORMAT)
-    public LocalDateTime getLastUpdateDate() {
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    public Date getLastUpdateDate() {
         return lastUpdateDate;
     }
 
-    public void setLastUpdateDate(LocalDateTime lastUpdateDate) {
+    public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
     }
 

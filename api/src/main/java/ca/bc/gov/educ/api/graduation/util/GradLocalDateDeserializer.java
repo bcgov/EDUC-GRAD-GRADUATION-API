@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.SECOND_DEFAULT_DATE_FORMAT;
+
 public class GradLocalDateDeserializer extends StdDeserializer<LocalDate> {
 
     public GradLocalDateDeserializer() {
@@ -30,7 +32,7 @@ public class GradLocalDateDeserializer extends StdDeserializer<LocalDate> {
                 dateAsString = dateAsString + "/01";
             }
             if(slashCount > 0) {
-                formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+                formatter = DateTimeFormatter.ofPattern(SECOND_DEFAULT_DATE_FORMAT);
             }
             return LocalDate.parse(dateAsString, formatter);
         } else if(jsonParser.hasToken(JsonToken.VALUE_NUMBER_INT)) {
@@ -39,7 +41,7 @@ public class GradLocalDateDeserializer extends StdDeserializer<LocalDate> {
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() == 10 && dateAsString.contains("-")) {
             return LocalDate.parse(dateAsString, formatter);
         } else if(StringUtils.isNotBlank(dateAsString) && dateAsString.length() == 10 && dateAsString.contains("/")) {
-            formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+            formatter = DateTimeFormatter.ofPattern(SECOND_DEFAULT_DATE_FORMAT);
             return LocalDate.parse(dateAsString, formatter);
         } else if(StringUtils.isNotBlank(dateAsString)) {
             return LocalDate.parse(dateAsString, formatter);
