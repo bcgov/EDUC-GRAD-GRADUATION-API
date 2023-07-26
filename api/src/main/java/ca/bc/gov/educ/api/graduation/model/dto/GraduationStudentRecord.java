@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,12 +38,12 @@ public class GraduationStudentRecord extends BaseModel {
     private String consumerEducationRequirementMet;
     private String studentCitizenship;
 	private ExceptionMessage exception;
-    private LocalDateTime adultStartDate;
+    private LocalDate adultStartDate;
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;
 
-    public LocalDateTime getAdultStartDate() {
-        return adultStartDate == null ? LocalDateTime.now() : adultStartDate;
+    public LocalDate getAdultStartDate() {
+        return adultStartDate == null ? LocalDate.now() : adultStartDate;
     }
 }
