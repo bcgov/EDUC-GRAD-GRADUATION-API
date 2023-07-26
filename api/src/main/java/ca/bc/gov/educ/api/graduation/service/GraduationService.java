@@ -51,9 +51,10 @@ public class GraduationService {
     RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
     SchoolYearDates schoolYearDates;
+    ObjectMapper objectMapper;
 
     @Autowired
-    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates) {
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, ObjectMapper objectMapper) {
         this.webClient = webClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
@@ -63,6 +64,7 @@ public class GraduationService {
         this.restService = restService;
         this.educGraduationApiConstants = educGraduationApiConstants;
         this.schoolYearDates = schoolYearDates;
+        this.objectMapper = objectMapper;
     }
 
     public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
@@ -366,7 +368,7 @@ public class GraduationService {
             } else {
                 std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
                 if (gsr.getStudentProjectedGradData() != null) {
-                    ProjectedRunClob projectedClob = new ObjectMapper().readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
+                    ProjectedRunClob projectedClob = objectMapper.readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
                     std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
                     if (!projectedClob.isGraduated())
                         stdPrjList.add(std);
