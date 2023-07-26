@@ -5,9 +5,8 @@ import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmOptionalStudentProgr
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.StudentOptionalProgram;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -23,6 +22,9 @@ public class OptionalProgramService {
 
 	@Autowired
     WebClient webClient;
+
+	@Autowired
+	JsonTransformer jsonTransformer;
 	
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
@@ -49,12 +51,7 @@ public class OptionalProgramService {
 				gradOptionalProgram.setOptionalProgramID(optionalPrograms.getOptionalProgramID());
 				gradOptionalProgram.setStudentID(optionalPrograms.getStudentID());
 				gradOptionalProgram.setOptionalProgramCompletionDate(optionalPrograms.getOptionalProgramCompletionDate());
-				try {
-					gradOptionalProgram.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(optionalPrograms));
-				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				gradOptionalProgram.setStudentOptionalProgramData(jsonTransformer.marshall(optionalPrograms));
 				optionalProgramCode.setCode(gradOptionalProgram.getOptionalProgramCode());
 				optionalProgramCode.setName(gradOptionalProgram.getOptionalProgramName());
 				//Save Optional Grad Status
@@ -85,11 +82,7 @@ public class OptionalProgramService {
 					graduationDataStatus.setDualDogwood(true);
 				}
 				optionalProgramProjectedObj.setOptionalProgramCompletionDate(optionalPrograms.getOptionalProgramCompletionDate());
-				try {
-					optionalProgramProjectedObj.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(optionalPrograms));
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
+				optionalProgramProjectedObj.setStudentOptionalProgramData(jsonTransformer.marshall(optionalPrograms));
 				optionalProgramProjectedObj.setOptionalProgramID(gradOptionalProgram.getOptionalProgramID());
 				optionalProgramProjectedObj.setStudentID(gradOptionalProgram.getStudentID());
 				optionalProgramProjectedObj.setId(gradOptionalProgram.getId());

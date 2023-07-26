@@ -9,8 +9,6 @@ import ca.bc.gov.educ.api.graduation.model.report.GraduationStatus;
 import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -1128,12 +1126,14 @@ public class ReportService {
     }
 
     public Pair<GraduationStudentRecord, ca.bc.gov.educ.api.graduation.model.dto.GraduationData> getGraduationStudentRecordAndGraduationData(String pen, String accessToken) {
+        String graduationDataJson = "{}";
         try {
             GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen, accessToken);
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
+            graduationDataJson = graduationStudentRecord.getStudentGradData();
+            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationDataJson, ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return Pair.of(graduationStudentRecord, graduationData);
         } catch (Exception e) {
-            log.error("model.dto.GraduationData unmarshal error for student {}: {}", pen, e.getLocalizedMessage());
+            log.error("GraduationData {} unmarshal error for student {}: {}", graduationDataJson, pen, e.getLocalizedMessage());
             return null;
         }
     }
@@ -1157,12 +1157,7 @@ public class ReportService {
             op.setOptionalProgramName(sPO.getOptionalProgramName());
             op.setProgramCompletionDate(sPO.getOptionalProgramCompletionDate());
 
-            GradAlgorithmOptionalStudentProgram existingData = null;
-            try {
-                existingData = new ObjectMapper().readValue(sPO.getStudentOptionalProgramData(), GradAlgorithmOptionalStudentProgram.class);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            GradAlgorithmOptionalStudentProgram existingData = (GradAlgorithmOptionalStudentProgram)jsonTransformer.unmarshall(sPO.getStudentOptionalProgramData(), GradAlgorithmOptionalStudentProgram.class);
             if (existingData != null && existingData.getOptionalNonGradReasons() != null) {
                 op.setNonGradReasons(getNonGradReasons(gradProgramCode, existingData.getOptionalNonGradReasons(), false, null, false));
             }

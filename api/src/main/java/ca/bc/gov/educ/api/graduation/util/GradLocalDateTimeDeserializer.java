@@ -3,8 +3,10 @@ package ca.bc.gov.educ.api.graduation.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -15,11 +17,9 @@ import java.time.format.DateTimeFormatter;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.*;
 
-public class GradLocalDateTimeDeserializer extends StdDeserializer<LocalDateTime> {
+public class GradLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
-    public GradLocalDateTimeDeserializer() {
-        super(LocalDateTime.class);
-    }
+    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateTimeDeserializer.class);
 
     @Override
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {

@@ -62,7 +62,7 @@ public class GradStatusService {
 
 	@SneakyThrows
 	public void prepareGraduationStatusData(GraduationStudentRecord obj, GraduationData graduationDataStatus) {
-		obj.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+		obj.setStudentGradData(objectMapper.writeValueAsString(graduationDataStatus));
 	}
 	
 	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
@@ -106,7 +106,7 @@ public class GradStatusService {
 	@SneakyThrows
 	public GraduationStudentRecord processProjectedResults(GraduationStudentRecord gradResponse, GraduationData graduationDataStatus)  {
 
-		gradResponse.setStudentGradData(new ObjectMapper().writeValueAsString(graduationDataStatus));
+		gradResponse.setStudentGradData(objectMapper.writeValueAsString(graduationDataStatus));
 		gradResponse.setProgramCompletionDate(graduationDataStatus.getGradStatus().getProgramCompletionDate());
 		gradResponse.setGpa(graduationDataStatus.getGradStatus().getGpa());
 		gradResponse.setHonoursStanding(graduationDataStatus.getGradStatus().getHonoursStanding());
