@@ -1133,7 +1133,7 @@ public class ReportService {
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             return Pair.of(graduationStudentRecord, graduationData);
         } catch (Exception e) {
-            log.error("GraduationData unmarshal error: {}", e.getLocalizedMessage());
+            log.error("model.dto.GraduationData unmarshal error for student {}: {}", pen, e.getLocalizedMessage());
             return null;
         }
     }
