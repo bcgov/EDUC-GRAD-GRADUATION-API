@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,9 +38,12 @@ public class GraduationStudentRecord extends BaseModel {
     private String consumerEducationRequirementMet;
     private String studentCitizenship;
 	private ExceptionMessage exception;
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime adultStartDate;
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;
+
+    public LocalDateTime getAdultStartDate() {
+        return adultStartDate == null ? LocalDateTime.now() : adultStartDate;
+    }
 }
