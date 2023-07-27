@@ -47,11 +47,13 @@ public class ReportGradStudentData implements Serializable {
 
     @Override
     public String toString() {
-        return "ReportGradStudentData{" +
-                "mincode='" + mincode + '\'' +
+        return "ReportGradStudentData {" +
+                "graduationStudentRecordId=" + graduationStudentRecordId +
                 ", pen='" + pen + '\'' +
-                ", districtName='" + districtName + '\'' +
-                ", schoolName='" + schoolName + '\'' +
+                ", mincode='" + mincode + '\'' +
+                ", programCode='" + programCode + '\'' +
+                ", certificateTypeCode='" + certificateTypeCode + '\'' +
+                ", paperType='" + paperType + '\'' +
                 '}';
     }
 }
