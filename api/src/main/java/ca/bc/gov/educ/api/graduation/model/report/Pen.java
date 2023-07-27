@@ -1,13 +1,9 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
+import java.util.Objects;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class Pen implements Serializable {
+public class Pen implements Comparable<Pen>, Serializable {
 
     private static final long serialVersionUID = 2L;
 
@@ -28,5 +24,23 @@ public class Pen implements Serializable {
 
     public void setEntityID(Object value) {
         this.entityID = value;
+    }
+
+    @Override
+    public int compareTo(Pen o) {
+        return pen.compareTo(o.pen);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pen other = (Pen) o;
+        return Objects.equals(pen, other.pen);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pen);
     }
 }
