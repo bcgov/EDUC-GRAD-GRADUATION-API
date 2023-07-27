@@ -129,4 +129,8 @@ public class JsonTransformer implements Transformer {
     public String getContentType() {
         return "application/json";
     }
+
+    public <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) throws IllegalArgumentException {
+        return objectMapper.convertValue(fromValue, toValueTypeRef);
+    }
 }
