@@ -149,22 +149,12 @@ public class SchoolReportsService {
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken, schools);
-        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+       logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         if(schools != null && !schools.isEmpty()) {
             boolean isDistrictSchool = schools.get(0).length() == 3;
             boolean isSchoolSchool = schools.get(0).length() > 3;
-            Iterator<ReportGradStudentData> it = reportGradStudentDataList.iterator();
-            while(it.hasNext()) {
-                ReportGradStudentData reportGradStudentData = it.next();
-                String mincode = reportGradStudentData.getMincode();
-                String distcode = StringUtils.substring(mincode, 0, 3);
-                if(isDistrictSchool && !schools.contains(distcode)) {
-                    it.remove();
-                }
-                if(isSchoolSchool && !schools.contains(mincode)) {
-                    it.remove();
-                }
-            }
+            reportGradStudentDataList.removeIf(st->isDistrictSchool && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3)));
+            reportGradStudentDataList.removeIf(st->isSchoolSchool && !schools.contains(st.getMincode()));
         }
         return createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
     }
@@ -242,7 +232,7 @@ public class SchoolReportsService {
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             School school = populateSchoolObjectByReportGradStudentData(newCredentialsSchoolMap, reportGradStudentData);
             Student student = processNewCredentialsSchoolMap(reportGradStudentData);
-            if (student != null) {
+            if (student != null && !school.getStudents().contains(student)) {
                 school.getStudents().add(student);
             }
         }
@@ -250,7 +240,7 @@ public class SchoolReportsService {
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             School school = populateSchoolObjectByReportGradStudentData(issuedTranscriptsSchoolMap, reportGradStudentData);
             Student student = processIssuedTranscriptsSchoolMap(reportGradStudentData);
-            if (student != null) {
+            if (student != null && !school.getStudents().contains(student)) {
                 school.getStudents().add(student);
             }
         }
@@ -569,7 +559,10 @@ public class SchoolReportsService {
 
     private Student populateStudentObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
         Student student = new Student();
-        student.setPen(new Pen(reportGradStudentData.getPen(), reportGradStudentData.getGraduationStudentRecordId().toString()));
+        Pen pen = new Pen();
+        pen.setPen(reportGradStudentData.getPen());
+        pen.setEntityID(reportGradStudentData.getGraduationStudentRecordId().toString());
+        student.setPen(pen);
         student.setFirstName(reportGradStudentData.getFirstName());
         student.setMiddleName(reportGradStudentData.getMiddleName());
         student.setLastName(reportGradStudentData.getLastName());

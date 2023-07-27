@@ -48,7 +48,7 @@ public class Student implements Comparable<Student>, Serializable {
 
     @JsonDeserialize(as = Pen.class)
     public Pen getPen() {
-        return pen;
+        return pen == null ? new Pen() : pen;
     }
 
     public void setPen(Pen value) {
@@ -56,7 +56,7 @@ public class Student implements Comparable<Student>, Serializable {
     }
 
     public String getFirstName() {
-        return firstName;
+        return firstName == null ? "" : firstName;
     }
 
     public void setFirstName(String value) {
@@ -64,7 +64,7 @@ public class Student implements Comparable<Student>, Serializable {
     }
 
     public String getMiddleName() {
-        return middleName;
+        return middleName == null ? "" : middleName;
     }
 
     public void setMiddleName(String middleName) {
@@ -72,7 +72,7 @@ public class Student implements Comparable<Student>, Serializable {
     }
 
     public String getLastName() {
-        return lastName;
+        return lastName == null ? "" : lastName;
     }
 
     public void setLastName(String value) {
@@ -258,9 +258,9 @@ public class Student implements Comparable<Student>, Serializable {
                 = student.firstName;
         String middleNameSt
                 = student.middleName;
-        String gradProgramSt = student.gradProgram;
-        return "".concat(gradProgramSt).concat(getLastName()).concat(getFirstName()).concat(getMiddleName())
-                .compareTo("".concat(getGradProgram()).concat(lastNameSt).concat(firstNameSt).concat(middleNameSt));
+        String pen = student.pen.getPen();
+        return "".concat(getPen().getPen()).concat(getLastName()).concat(getFirstName()).concat(getMiddleName())
+                .compareTo("".concat(pen).concat(lastNameSt).concat(firstNameSt).concat(middleNameSt));
     }
 
     @Override
