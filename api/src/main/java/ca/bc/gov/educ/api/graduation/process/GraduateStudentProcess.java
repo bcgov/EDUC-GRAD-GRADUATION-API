@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,7 @@ public class GraduateStudentProcess extends BaseProcess {
 			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
 			logger.debug("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
+			toBeSaved.setUpdateUser(StringUtils.isEmpty(gradResponse.getUpdateUser()) ? "" : gradResponse.getUpdateUser());
 			if(checkExceptions(exception,algorithmResponse,processorData)) {
 				return processorData;
 			}
@@ -64,14 +66,15 @@ public class GraduateStudentProcess extends BaseProcess {
 				}
 				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
 				tokenUtils.checkAndSetAccessToken(processorData);
-				gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
+				GraduationStudentRecord gradstudStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
 				if (checkExceptions(exception,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.debug("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
 				logger.debug("**** Saved Grad Status: ****");
-				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
+				//algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
+				algorithmResponse.setGraduationStudentRecord(gradstudStatusResponse);
 				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
 		} else {
