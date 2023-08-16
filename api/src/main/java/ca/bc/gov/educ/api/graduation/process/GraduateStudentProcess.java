@@ -65,8 +65,6 @@ public class GraduateStudentProcess extends BaseProcess {
 					return processorData;
 				}
 				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
-				tokenUtils.checkAndSetAccessToken(processorData);
-				GraduationStudentRecord gradstudStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), graduationStatusResponse, exception);
 				if (checkExceptions(exception,algorithmResponse,processorData)) {
 					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
 					logger.debug("**** Record Restored Due to Error: ****");
@@ -74,7 +72,7 @@ public class GraduateStudentProcess extends BaseProcess {
 				}
 				logger.debug("**** Saved Grad Status: ****");
 				//algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
-				algorithmResponse.setGraduationStudentRecord(gradstudStatusResponse);
+				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
 		} else {
