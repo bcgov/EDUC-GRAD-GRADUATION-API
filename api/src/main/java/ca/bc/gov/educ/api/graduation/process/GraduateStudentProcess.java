@@ -64,14 +64,7 @@ public class GraduateStudentProcess extends BaseProcess {
 					logger.debug("**** Record Restored Due to Error: ****");
 					return processorData;
 				}
-				gradStatusService.prepareGraduationStatusData(graduationStatusResponse, graduationDataStatus);
-				if (checkExceptions(exception,algorithmResponse,processorData)) {
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
-					logger.debug("**** Record Restored Due to Error: ****");
-					return processorData;
-				}
 				logger.debug("**** Saved Grad Status: ****");
-				//algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 				algorithmResponse.setGraduationStudentRecord(graduationStatusResponse);
 				algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 			}
