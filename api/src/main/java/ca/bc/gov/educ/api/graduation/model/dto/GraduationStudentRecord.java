@@ -46,8 +46,4 @@ public class GraduationStudentRecord extends BaseModel {
 
     private List<GradRequirement> nonGradReasons;
     private List<StudentCareerProgram> careerPrograms;
-
-    public LocalDate getAdultStartDate() {
-        return adultStartDate == null ? LocalDate.now() : adultStartDate;
-    }
 }
