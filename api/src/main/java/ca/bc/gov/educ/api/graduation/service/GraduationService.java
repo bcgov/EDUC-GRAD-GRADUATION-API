@@ -10,9 +10,9 @@ import ca.bc.gov.educ.api.graduation.process.AlgorithmProcess;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
 import ca.bc.gov.educ.api.graduation.util.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -24,9 +24,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,10 +49,10 @@ public class GraduationService {
     RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
     SchoolYearDates schoolYearDates;
-    ObjectMapper objectMapper;
+    JsonTransformer jsonTransformer;
 
     @Autowired
-    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, ObjectMapper objectMapper) {
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
         this.webClient = webClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
@@ -64,7 +62,7 @@ public class GraduationService {
         this.restService = restService;
         this.educGraduationApiConstants = educGraduationApiConstants;
         this.schoolYearDates = schoolYearDates;
-        this.objectMapper = objectMapper;
+        this.jsonTransformer = jsonTransformer;
     }
 
     public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
@@ -78,8 +76,8 @@ public class GraduationService {
             aR.setException(exception);
             return aR;
         }
-        logger.debug("**** Fetched Student Information: ****");
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
+            logger.debug("**** Fetched Student Information: {} ****", gradResponse.getStudentID());
             ProcessorData data = new ProcessorData(gradResponse, null, accessToken, studentID, batchId, exception);
             AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
             data = process.fire(data);
@@ -245,6 +243,11 @@ public class GraduationService {
 
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
+                if(logger.isDebugEnabled()) {
+                    int totalStudents = ObjectUtils.defaultIfNull(stdList.size(), 0);
+                    String listOfStudents = jsonTransformer.marshall(stdList);
+                    logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
+                }
                 SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
                 if (schoolDetails != null) {
                     logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
@@ -344,7 +347,7 @@ public class GraduationService {
             std.setPen(pen);
             std.setGrade(gsr.getStudentGrade());
             std.setGradProgram(gsr.getProgram());
-            std.setLastUpdateDate(Date.from(gsr.getUpdateDate().atZone(ZoneId.systemDefault()).toInstant()));
+            std.setLastUpdateDate(gsr.getUpdateDate());
             //Grad2-1931 - mchintha
             std.setConsumerEducReqt(gsr.getConsumerEducationRequirementMet());
             std.setGraduationStatus(GraduationStatus.builder()
@@ -368,7 +371,7 @@ public class GraduationService {
             } else {
                 std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
                 if (gsr.getStudentProjectedGradData() != null) {
-                    ProjectedRunClob projectedClob = objectMapper.readValue(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
+                    ProjectedRunClob projectedClob = (ProjectedRunClob)jsonTransformer.unmarshall(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
                     std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
                     if (!projectedClob.isGraduated())
                         stdPrjList.add(std);

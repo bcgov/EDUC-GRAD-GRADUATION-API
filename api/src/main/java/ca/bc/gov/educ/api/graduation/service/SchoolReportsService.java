@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -567,7 +566,7 @@ public class SchoolReportsService {
         student.setMiddleName(reportGradStudentData.getMiddleName());
         student.setLastName(reportGradStudentData.getLastName());
         student.setGradProgram(reportGradStudentData.getProgramCode());
-        student.setLastUpdateDate(Date.from(reportGradStudentData.getUpdateDate().atZone(ZoneId.systemDefault()).toInstant()));
+        student.setLastUpdateDate(reportGradStudentData.getUpdateDate());
 
         GraduationStatus gradStatus = new GraduationStatus();
         gradStatus.setProgramCompletionDate(reportGradStudentData.getProgramCompletionDate());
