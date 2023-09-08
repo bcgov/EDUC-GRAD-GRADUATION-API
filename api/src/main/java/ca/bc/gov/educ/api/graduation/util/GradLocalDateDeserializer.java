@@ -18,7 +18,7 @@ import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.SECO
 
 public class GradLocalDateDeserializer extends JsonDeserializer<LocalDate> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateTimeDeserializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateDeserializer.class);
 
     @Override
     public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
