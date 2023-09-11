@@ -313,7 +313,7 @@ public class ReportService {
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
             int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
             boolean notCompletedCourse = xml && diff <= 0;
-            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
+            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isCutOffCourse() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
                 TranscriptResult result = new TranscriptResult();
                 String equivOrChallenge = "";
                 if (sc.getEquivOrChallenge() != null) {

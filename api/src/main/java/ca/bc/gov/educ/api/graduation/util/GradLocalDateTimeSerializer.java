@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 public class GradLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateTimeDeserializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateTimeSerializer.class);
 
     @Override
     public void serialize(LocalDateTime localDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
