@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -54,43 +55,48 @@ public class EdwSnapshotService {
         boolean isGraduated = StringUtils.isNotBlank(graduatedDate);
         if (isGraduated) {
             // retrieve honour_flag, gpa
-            snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y",
-                snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord);
+            snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y", snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord);
         } else {
-            log.debug("Hypothetical Grad Algorithm run for Student ID: {}", snapshotRequest.getStudentID());
-            GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(snapshotRequest.getStudentID().toString(), accessToken, new ExceptionMessage());
-            String gradProgramCode = null;
-            if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
-                gradProgramCode = gradResponse.getProgram();
-            }
-            boolean isHypotheticalPass = false;
-            GraduationData graduationData = null;
-            if (StringUtils.isNotBlank(gradProgramCode)) {
-                // run hypothetical grad algorithm
-                graduationData = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradProgramCode, gradYear.toString(), accessToken);
-                if (graduationData != null) {
-                    isHypotheticalPass = graduationData.isGraduated();
-                }
-            }
-            if (isHypotheticalPass) {
-                log.debug(" ==> Hypothetical Graduated!");
-                String gpaStr = graduationData.getGradStatus().getGpa();
-                BigDecimal gpa = NumberUtils.isCreatable(gpaStr)? new BigDecimal(gpaStr) : null;
-                String honoursStanding = graduationData.getGradStatus().getHonoursStanding();
-                snapshot = populateSnapshot(gradYear, pen, null, "Y", honoursStanding, gpa, schoolOfRecord);
-            } else {
-                // non-graduated student
-                log.debug(" ==> Not Graduated!");
-                List<ProgramRequirementCode> programRequirementCodes = getAllProgramRequirementCodeList(accessToken);
-                StudentNonGradReason studentNonGradReason = getStudentNonGradReason(pen, accessToken);
-                snapshot = populateSnapshot(gradYear, pen, null, "N", null, BigDecimal.ZERO, schoolOfRecord);
-                if (studentNonGradReason != null) {
-                    setNonGradReasons(snapshot, studentNonGradReason, programRequirementCodes);
-                }
-            }
+            snapshot = runHypotheticalGradAlgorithm(snapshotRequest.getStudentID(), pen, gradYear, schoolOfRecord, accessToken);
         }
         log.debug("Save EdwSnapshot for Student ID: {}", snapshotRequest.getStudentID());
         saveEdwSnapshotOfGraduationStatus(accessToken, snapshot);
+        return snapshot;
+    }
+
+    private EdwGraduationSnapshot runHypotheticalGradAlgorithm(UUID studentID, String pen, Integer gradYear, String schoolOfRecord, String accessToken) {
+        EdwGraduationSnapshot snapshot;
+        log.debug("Hypothetical Grad Algorithm run for Student ID: {}", studentID);
+        GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID.toString(), accessToken, new ExceptionMessage());
+        String gradProgramCode = null;
+        if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
+            gradProgramCode = gradResponse.getProgram();
+        }
+        boolean isHypotheticalPass = false;
+        GraduationData graduationData = null;
+        if (StringUtils.isNotBlank(gradProgramCode)) {
+            // run hypothetical grad algorithm
+            graduationData = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, gradProgramCode, gradYear.toString(), accessToken);
+            if (graduationData != null) {
+                isHypotheticalPass = graduationData.isGraduated();
+            }
+        }
+        if (isHypotheticalPass) {
+            log.debug(" ==> Hypothetical Graduated!");
+            String gpaStr = graduationData.getGradStatus().getGpa();
+            BigDecimal gpa = NumberUtils.isCreatable(gpaStr)? new BigDecimal(gpaStr) : null;
+            String honoursStanding = graduationData.getGradStatus().getHonoursStanding();
+            snapshot = populateSnapshot(gradYear, pen, null, "Y", honoursStanding, gpa, schoolOfRecord);
+        } else {
+            // non-graduated student
+            log.debug(" ==> Not Graduated!");
+            List<ProgramRequirementCode> programRequirementCodes = getAllProgramRequirementCodeList(accessToken);
+            StudentNonGradReason studentNonGradReason = getStudentNonGradReason(pen, accessToken);
+            snapshot = populateSnapshot(gradYear, pen, null, "N", null, BigDecimal.ZERO, schoolOfRecord);
+            if (studentNonGradReason != null) {
+                setNonGradReasons(snapshot, studentNonGradReason, programRequirementCodes);
+            }
+        }
         return snapshot;
     }
 
