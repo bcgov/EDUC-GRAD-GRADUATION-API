@@ -41,4 +41,12 @@ public class GradAlgorithmService {
 							h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
 						}).retrieve().bodyToMono(GraduationData.class).block();
 	}
+
+	public GraduationData runHypotheticalGraduatedAlgorithm(UUID studentID, String program, String hypothenticalGradYear, String accessToken) {
+		return webClient.get().uri(String.format(educGraduationApiConstants.getGradHypotheticalAlgorithmEndpoint(), studentID, program, hypothenticalGradYear))
+				.headers(h -> {
+					h.setBearerAuth(accessToken);
+					h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+				}).retrieve().bodyToMono(GraduationData.class).block();
+	}
 }
