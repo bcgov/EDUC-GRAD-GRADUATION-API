@@ -128,9 +128,14 @@ public class EdwSnapshotServiceTest {
         proReqCode2.setProReqCode("b");
         proReqCode2.setTraxReqChar("B");
 
+        GradSearchStudent penStudent = new GradSearchStudent();
+        penStudent.setPen(snapshotRequest.getPen());
+        penStudent.setStudentID(snapshotRequest.getStudentID().toString());
+
         when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), eq("123"), any())).thenReturn(gradResponse);
         when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString(), "123")).thenReturn(graduationData);
 
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class, "123")).thenReturn(List.of(penStudent));
         when(restService.get(String.format(constants.getStudentNonGradReasonByPenUrl(), snapshotRequest.getPen()), StudentNonGradReason.class, "123")).thenReturn(nonGradReason);
         when(restService.get(constants.getProgramRequirementsEndpoint(), List.class, "123")).thenReturn(Arrays.asList(proReqCode1, proReqCode2));
 
@@ -167,6 +172,11 @@ public class EdwSnapshotServiceTest {
         graduationData.setGraduated(true);
         graduationData.setGradStatus(gradStatus);
 
+        GradSearchStudent penStudent = new GradSearchStudent();
+        penStudent.setPen(snapshotRequest.getPen());
+        penStudent.setStudentID(snapshotRequest.getStudentID().toString());
+
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class, "123")).thenReturn(List.of(penStudent));
         when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), eq("123"), any())).thenReturn(gradResponse);
         when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString(), "123")).thenReturn(graduationData);
 
