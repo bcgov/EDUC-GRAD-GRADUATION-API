@@ -57,14 +57,19 @@ public class EdwSnapshotService {
             // retrieve honour_flag, gpa
             snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y", snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord);
         } else {
-            snapshot = runHypotheticalGradAlgorithm(snapshotRequest.getStudentID(), pen, gradYear, schoolOfRecord, accessToken);
+            snapshot = runHypotheticalGradAlgorithm(pen, gradYear, schoolOfRecord, accessToken);
         }
-        log.debug("Save EdwSnapshot for Student ID: {}", snapshotRequest.getStudentID());
+        log.debug("Save EdwSnapshot for Student pen# {}", snapshotRequest.getPen());
         saveEdwSnapshotOfGraduationStatus(accessToken, snapshot);
         return snapshot;
     }
 
-    private EdwGraduationSnapshot runHypotheticalGradAlgorithm(UUID studentID, String pen, Integer gradYear, String schoolOfRecord, String accessToken) {
+    private EdwGraduationSnapshot runHypotheticalGradAlgorithm(String pen, Integer gradYear, String schoolOfRecord, String accessToken) {
+        UUID studentID = getStudentID(pen, accessToken);
+        if (studentID == null) {
+            return null;
+        }
+
         EdwGraduationSnapshot snapshot;
         log.debug("Hypothetical Grad Algorithm run for Student ID: {}", studentID);
         GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID.toString(), accessToken, new ExceptionMessage());
@@ -122,9 +127,28 @@ public class EdwSnapshotService {
     @SuppressWarnings("rawtypes")
     public List<ProgramRequirementCode> getAllProgramRequirementCodeList(String accessToken) {
         List response = this.restService.get(constants.getProgramRequirementsEndpoint(),
-                List.class,
-                accessToken);
+                List.class, accessToken);
         return jsonTransformer.convertValue(response, new TypeReference<>(){});
+    }
+
+    public UUID getStudentID(String pen, String accessToken) {
+        GradSearchStudent penStudent = getStudentByPenFromStudentApi(pen, accessToken);
+        if (penStudent != null) {
+            return UUID.fromString(penStudent.getStudentID());
+        } else {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken) {
+        List response = this.restService.get(String.format(constants.getPenStudentApiByPenUrl(), pen),
+                List.class, accessToken);
+        if (response != null && !response.isEmpty()) {
+            List<GradSearchStudent> studentList = jsonTransformer.convertValue(response.get(0), new TypeReference<>(){});
+            return studentList.get(0);
+        }
+        return null;
     }
 
     private EdwGraduationSnapshot populateSnapshot(Integer gradYear, String pen, String graduatedDate, String gradFlag, String honourFlag, BigDecimal gpa, String schoolOfRecord) {
@@ -194,5 +218,4 @@ public class EdwSnapshotService {
         return programRequirementCodes.stream().filter(c -> gradRule.equalsIgnoreCase(c.getProReqCode())).findAny()
                 .map(ProgramRequirementCode::getTraxReqChar).orElse(null);
     }
-
 }

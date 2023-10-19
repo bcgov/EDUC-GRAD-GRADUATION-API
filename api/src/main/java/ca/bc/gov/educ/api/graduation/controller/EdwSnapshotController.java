@@ -42,7 +42,7 @@ public class EdwSnapshotController {
     @Operation(summary = "Run a Graduation snapshot for EDW", description = "Run a Graduation snapshot for EDW", tags = { "EDW Snapshot" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<EdwGraduationSnapshot> snapshotGraduationStatus(@RequestBody EdwGraduationSnapshot snapshotRequest, @RequestHeader(name="Authorization") String accessToken) {
-        LOGGER.debug("Snapshot Graduation Status for Student ID: {}", snapshotRequest.getStudentID());
+        LOGGER.debug("Snapshot Graduation Status for Student - pen# {}", snapshotRequest.getPen());
         return response.GET(edwSnapshotService.processSnapshot(snapshotRequest, accessToken.replace(BEARER, "")));
     }
 
