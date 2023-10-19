@@ -48,12 +48,16 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_REPORTS_LABELS = "/report/school/labels";
     public static final String SCHOOL_REPORTS_LABELS_PDF = "/report/school/labels/pdf";
     public static final String STUDENT_FOR_YEAR_END_REPORT = "/report/studentsforyearend";
+    public static final String EDW_GRADUATION_SNAPSHOT = "/edw/snapshot";
     
     @Value("${endpoint.gradalgorithm-api.gradalgorithm}")
     private String gradAlgorithmEndpoint;
     
     @Value("${endpoint.gradalgorithm-api.projectedgradalgorithm}")
     private String gradProjectedAlgorithmEndpoint;
+
+    @Value("${endpoint.gradalgorithm-api.hypotheticalgradalgorithm}")
+    private String gradHypotheticalAlgorithmEndpoint;
     
     @Value("${endpoint.grad-student-api.update-grad-status}")
     private String updateGradStatus;
@@ -150,6 +154,12 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.grad-student-api.student-nongrad-report-data-mincode}")
     private String studentNonGradReportDataMincode;
+
+    @Value("${endpoint.grad-student-api.edw-snapshot-of-grad-status}")
+    private String edwSnapshotOfGraduationStatus;
+
+    @Value("${endpoint.grad-student-api.get-student-nongrad-reason-by-pen}")
+    private String studentNonGradReasonByPenUrl;
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
