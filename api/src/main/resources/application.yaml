@@ -81,8 +81,7 @@ endpoint:
   student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
   student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
   edw-snapshot-of-grad-status: ${GRAD_STUDENT_API}api/v1/student/edw/snapshot
-  get-student-nongrad-reason-by-pen: ${GRAD_STUDENT_API}api/v1/student/pen/%s/nongrad-reason
- grad-program-api: 
+ grad-program-api:
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
   program_requirement_codes:

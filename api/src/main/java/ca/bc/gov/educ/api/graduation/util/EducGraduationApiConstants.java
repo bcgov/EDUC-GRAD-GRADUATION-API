@@ -158,9 +158,6 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.edw-snapshot-of-grad-status}")
     private String edwSnapshotOfGraduationStatus;
 
-    @Value("${endpoint.grad-student-api.get-student-nongrad-reason-by-pen}")
-    private String studentNonGradReasonByPenUrl;
-
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
