@@ -28,19 +28,6 @@ public class EdwGraduationSnapshot {
     private BigDecimal gpa;
     private String graduatedDate;
 
-    private String nonGradReason1;
-    private String nonGradReason2;
-    private String nonGradReason3;
-    private String nonGradReason4;
-    private String nonGradReason5;
-    private String nonGradReason6;
-    private String nonGradReason7;
-    private String nonGradReason8;
-    private String nonGradReason9;
-    private String nonGradReason10;
-    private String nonGradReason11;
-    private String nonGradReason12;
-
     @JsonFormat(pattern=DEFAULT_DATE_FORMAT)
     private LocalDate runDate;
     @JsonFormat(pattern=DEFAULT_DATE_FORMAT)

@@ -104,30 +104,6 @@ public class EdwSnapshotServiceTest {
         GraduationData graduationData = new GraduationData();
         graduationData.setGraduated(false);
 
-        StudentNonGradReason nonGradReason = new StudentNonGradReason();
-        nonGradReason.setPen(snapshotRequest.getPen());
-        nonGradReason.setGraduationStudentRecordId(snapshotRequest.getStudentID());
-        nonGradReason.setGradRule1("a");
-        nonGradReason.setGradRule2("b");
-        nonGradReason.setGradRule3("a");
-        nonGradReason.setGradRule4("b");
-        nonGradReason.setGradRule5("a");
-        nonGradReason.setGradRule6("b");
-        nonGradReason.setGradRule7("a");
-        nonGradReason.setGradRule8("b");
-        nonGradReason.setGradRule9("a");
-        nonGradReason.setGradRule10("b");
-        nonGradReason.setGradRule11("a");
-        nonGradReason.setGradRule12("b");
-
-        ProgramRequirementCode proReqCode1 = new ProgramRequirementCode();
-        proReqCode1.setProReqCode("a");
-        proReqCode1.setTraxReqChar("A");
-
-        ProgramRequirementCode proReqCode2 = new ProgramRequirementCode();
-        proReqCode2.setProReqCode("b");
-        proReqCode2.setTraxReqChar("B");
-
         GradSearchStudent penStudent = new GradSearchStudent();
         penStudent.setPen(snapshotRequest.getPen());
         penStudent.setStudentID(snapshotRequest.getStudentID().toString());
@@ -136,15 +112,12 @@ public class EdwSnapshotServiceTest {
         when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString(), "123")).thenReturn(graduationData);
 
         when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class, "123")).thenReturn(List.of(penStudent));
-        when(restService.get(String.format(constants.getStudentNonGradReasonByPenUrl(), snapshotRequest.getPen()), StudentNonGradReason.class, "123")).thenReturn(nonGradReason);
-        when(restService.get(constants.getProgramRequirementsEndpoint(), List.class, "123")).thenReturn(Arrays.asList(proReqCode1, proReqCode2));
 
         var result = edwSnapshotService.processSnapshot(snapshotRequest, "123");
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
         assertThat(result.getGraduationFlag()).isEqualTo("N");
-        assertThat(result.getNonGradReason1()).isEqualTo("A");
     }
 
     @Test

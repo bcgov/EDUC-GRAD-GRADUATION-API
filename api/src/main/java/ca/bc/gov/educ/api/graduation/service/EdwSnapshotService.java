@@ -95,26 +95,9 @@ public class EdwSnapshotService {
         } else {
             // non-graduated student
             log.debug(" ==> Not Graduated!");
-            List<ProgramRequirementCode> programRequirementCodes = getAllProgramRequirementCodeList(accessToken);
-            StudentNonGradReason studentNonGradReason = getStudentNonGradReason(pen, accessToken);
             snapshot = populateSnapshot(gradYear, pen, null, "N", null, BigDecimal.ZERO, schoolOfRecord);
-            if (studentNonGradReason != null) {
-                setNonGradReasons(snapshot, studentNonGradReason, programRequirementCodes);
-            }
         }
         return snapshot;
-    }
-
-    public StudentNonGradReason getStudentNonGradReason(String pen, String accessToken) {
-        StudentNonGradReason response = null;
-        try {
-            response = this.restService.get(String.format(constants.getStudentNonGradReasonByPenUrl(), pen),
-                    StudentNonGradReason.class,
-                    accessToken);
-        } catch (Exception e) {
-            log.error("StudentNonGradReason is not found for pen # = {}", pen);
-        }
-        return response;
     }
 
     public void saveEdwSnapshotOfGraduationStatus(String accessToken, EdwGraduationSnapshot requestObj) {
@@ -122,13 +105,6 @@ public class EdwSnapshotService {
                 requestObj,
                 EdwGraduationSnapshot.class,
                 accessToken);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List<ProgramRequirementCode> getAllProgramRequirementCodeList(String accessToken) {
-        List response = this.restService.get(constants.getProgramRequirementsEndpoint(),
-                List.class, accessToken);
-        return jsonTransformer.convertValue(response, new TypeReference<>(){});
     }
 
     public UUID getStudentID(String pen, String accessToken) {
@@ -161,61 +137,5 @@ public class EdwSnapshotService {
         obj.setGraduatedDate(graduatedDate);
         obj.setSchoolOfRecord(schoolOfRecord);
         return obj;
-    }
-
-    private void setNonGradReasons(EdwGraduationSnapshot snapshot, StudentNonGradReason studentNonGradReason, List<ProgramRequirementCode> programRequirementCodes) {
-        // nonGradReason1
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule1())) {
-            snapshot.setNonGradReason1(getTraxRequirementCode(studentNonGradReason.getGradRule1(), programRequirementCodes));
-        }
-        // nonGradReason2
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule2())) {
-            snapshot.setNonGradReason2(getTraxRequirementCode(studentNonGradReason.getGradRule2(), programRequirementCodes));
-        }
-        // nonGradReason3
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule3())) {
-            snapshot.setNonGradReason3(getTraxRequirementCode(studentNonGradReason.getGradRule3(), programRequirementCodes));
-        }
-        // nonGradReason4
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule4())) {
-            snapshot.setNonGradReason4(getTraxRequirementCode(studentNonGradReason.getGradRule4(), programRequirementCodes));
-        }
-        // nonGradReason5
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule5())) {
-            snapshot.setNonGradReason5(getTraxRequirementCode(studentNonGradReason.getGradRule5(), programRequirementCodes));
-        }
-        // nonGradReason6
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule6())) {
-            snapshot.setNonGradReason6(getTraxRequirementCode(studentNonGradReason.getGradRule6(), programRequirementCodes));
-        }
-        // nonGradReason7
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule7())) {
-            snapshot.setNonGradReason7(getTraxRequirementCode(studentNonGradReason.getGradRule7(), programRequirementCodes));
-        }
-        // nonGradReason8
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule8())) {
-            snapshot.setNonGradReason8(getTraxRequirementCode(studentNonGradReason.getGradRule8(), programRequirementCodes));
-        }
-        // nonGradReason9
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule9())) {
-            snapshot.setNonGradReason9(getTraxRequirementCode(studentNonGradReason.getGradRule9(), programRequirementCodes));
-        }
-        // nonGradReason10
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule10())) {
-            snapshot.setNonGradReason10(getTraxRequirementCode(studentNonGradReason.getGradRule10(), programRequirementCodes));
-        }
-        // nonGradReason11
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule11())) {
-            snapshot.setNonGradReason11(getTraxRequirementCode(studentNonGradReason.getGradRule11(), programRequirementCodes));
-        }
-        // nonGradReason12
-        if (StringUtils.isNotBlank(studentNonGradReason.getGradRule12())) {
-            snapshot.setNonGradReason12(getTraxRequirementCode(studentNonGradReason.getGradRule12(), programRequirementCodes));
-        }
-    }
-
-    private String getTraxRequirementCode(String gradRule, List<ProgramRequirementCode> programRequirementCodes) {
-        return programRequirementCodes.stream().filter(c -> gradRule.equalsIgnoreCase(c.getProReqCode())).findAny()
-                .map(ProgramRequirementCode::getTraxReqChar).orElse(null);
     }
 }
