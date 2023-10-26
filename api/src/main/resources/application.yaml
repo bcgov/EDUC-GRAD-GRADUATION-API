@@ -80,7 +80,8 @@ endpoint:
   school-nongrad-year-end-students: ${GRAD_STUDENT_API}api/v1/student/studentschoolreportdata
   student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
   student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
- grad-program-api: 
+  edw-snapshot-of-grad-status: ${GRAD_STUDENT_API}api/v1/student/edw/snapshot
+ grad-program-api:
   program_name_by_program_code: 
    url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
   program_requirement_codes:
@@ -88,6 +89,7 @@ endpoint:
  gradalgorithm-api: 
   gradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s
   projectedgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
+  hypotheticalgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
  grad-graduation-report-api: 
   update-grad-student-report: 
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s

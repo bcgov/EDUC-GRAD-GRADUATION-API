@@ -79,7 +79,8 @@ endpoint:
   school-nongrad-year-end-students: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentschoolreportdata
   student-nongrad-report-data: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnongradreportdata
   student-nongrad-report-data-mincode: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnongradreportdata/%s
- grad-program-api: 
+  edw-snapshot-of-grad-status: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/edw/snapshot
+ grad-program-api:
   program_name_by_program_code: 
    url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s
   program_requirement_codes:
@@ -87,6 +88,7 @@ endpoint:
  gradalgorithm-api: 
   gradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s
   projectedgradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
+  hypotheticalgradalgorithm: https://educ-grad-algorithm-api-e8a97a-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
  grad-graduation-report-api: 
   update-grad-student-report: 
    url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentreport?isGraduated=%s
