@@ -308,12 +308,16 @@ public class ReportService {
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+
         for (StudentCourse sc : studentCourseList) {
             Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
             int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
             boolean notCompletedCourse = xml && diff <= 0;
-            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isCutOffCourse() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
+            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
+                if (sc.isCutOffCourse() && !isValidCutOffCourse(studentCourseList, sc, xml)) {
+                    continue;
+                }
                 TranscriptResult result = new TranscriptResult();
                 String equivOrChallenge = "";
                 if (sc.getEquivOrChallenge() != null) {
@@ -333,6 +337,27 @@ public class ReportService {
                 tList.add(result);
             }
         }
+    }
+
+    /**
+     * check if the given cutoff course is the highest mark among the same courses, then it should be in transcript even though it is duplicate
+     * @param studentCourseList
+     * @param cutOffCourse
+     * @return
+     */
+    private boolean isValidCutOffCourse(List<StudentCourse> studentCourseList, StudentCourse cutOffCourse, boolean xml) {
+        xml = false;
+        if (!xml) {
+            List<StudentCourse> dups = studentCourseList.stream().filter(sc ->
+                    StringUtils.equalsIgnoreCase(sc.getCourseCode(), cutOffCourse.getCourseCode()) && StringUtils.equalsIgnoreCase(sc.getCourseLevel(), cutOffCourse.getCourseLevel())
+            ).sorted(Comparator.comparing(StudentCourse::getCompletedCoursePercentage, Comparator.nullsLast(Double::compareTo)).reversed()).collect(Collectors.toList());
+
+            if (!dups.isEmpty()) {
+                StudentCourse topMarkCourse = dups.get(0);
+                return StringUtils.equalsIgnoreCase(topMarkCourse.getSessionDate(), cutOffCourse.getSessionDate());
+            }
+        }
+        return false;
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
