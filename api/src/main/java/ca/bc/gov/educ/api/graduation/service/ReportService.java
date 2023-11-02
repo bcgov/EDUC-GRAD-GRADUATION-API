@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
@@ -15,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -908,28 +911,29 @@ public class ReportService {
     public void saveStudentTranscriptReportJasper(ReportData sample, String accessToken, UUID studentID, ExceptionMessage exception, boolean isGraduated, boolean overwrite) {
 
         String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken, exception);
-        GradStudentTranscripts requestObj = new GradStudentTranscripts();
-        requestObj.setTranscript(encodedPdfReportTranscript);
-        requestObj.setStudentID(studentID);
-        requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
-        requestObj.setDocumentStatusCode("IP");
-        requestObj.setOverwrite(overwrite);
-        if (isGraduated)
-            requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
+        if(encodedPdfReportTranscript != null) {
+            GradStudentTranscripts requestObj = new GradStudentTranscripts();
+            requestObj.setTranscript(encodedPdfReportTranscript);
+            requestObj.setStudentID(studentID);
+            requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
+            requestObj.setDocumentStatusCode("IP");
+            requestObj.setOverwrite(overwrite);
+            if (isGraduated)
+                requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
-        try {
-            webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentTranscript(), isGraduated))
-                    .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
-        } catch (Exception e) {
-            if (exception.getExceptionName() == null) {
-                exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
-                exception.setExceptionDetails(e.getLocalizedMessage());
+            try {
+                webClient.post().uri(String.format(educGraduationApiConstants.getUpdateGradStudentTranscript(), isGraduated))
+                        .headers(h -> {
+                            h.setBearerAuth(accessToken);
+                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentReports.class).block();
+            } catch (Exception e) {
+                if (exception.getExceptionName() == null) {
+                    exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
+                    exception.setExceptionDetails(e.getLocalizedMessage());
+                }
             }
         }
-
     }
 
     private String generateStudentTranscriptReportJasper(ReportData sample,
@@ -941,21 +945,35 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(sample);
         try {
-            byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+            byte[] bytes = webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
                     .headers(h -> {
-                        h.setBearerAuth(accessToken);
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
-            return getEncodedStringFromBytes(bytesSAR);
-        } catch (Exception e) {
+                                h.setBearerAuth(accessToken);
+                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                            }
+                    ).body(BodyInserters.fromValue(reportParams))
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is5xxServerError,
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
+                    .onStatus(
+                            HttpStatus.BAD_REQUEST::equals,
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("BAD_REQUEST", response.statusCode().value()))
+                    )
+                    .onStatus(
+                            HttpStatus.NO_CONTENT::equals,
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                    )
+                    .bodyToMono(byte[].class).block();
+            return getEncodedStringFromBytes(bytes);
+        } catch (ServiceException ex) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
-            exception.setExceptionDetails(e.getLocalizedMessage());
+            exception.setExceptionDetails(ex.getLocalizedMessage());
             return null;
         }
     }
 
-    private String getEncodedStringFromBytes(byte[] bytesSAR) {
-        byte[] encoded = Base64.encodeBase64(bytesSAR);
+    private String getEncodedStringFromBytes(byte[] bytes) {
+        if(bytes == null) return null;
+        byte[] encoded = Base64.encodeBase64(bytes);
         return new String(encoded, StandardCharsets.US_ASCII);
     }
 
