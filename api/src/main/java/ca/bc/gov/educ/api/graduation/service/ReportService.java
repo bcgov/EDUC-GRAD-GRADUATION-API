@@ -520,13 +520,13 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).toList();
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
                 if (!provinciallyExaminable.isEmpty()) {
                     sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).toList();
+                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
                 if (!nonExaminable.isEmpty()) {
                     sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
