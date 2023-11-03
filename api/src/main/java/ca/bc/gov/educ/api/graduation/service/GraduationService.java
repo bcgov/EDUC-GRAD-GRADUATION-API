@@ -148,10 +148,6 @@ public class GraduationService {
                             }
                     ).body(BodyInserters.fromValue(reportParams)).retrieve()
                     .onStatus(
-                            HttpStatus.BAD_REQUEST::equals,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("BAD_REQUEST", response.statusCode().value()))
-                    )
-                    .onStatus(
                             HttpStatus.NO_CONTENT::equals,
                             response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
                     )
