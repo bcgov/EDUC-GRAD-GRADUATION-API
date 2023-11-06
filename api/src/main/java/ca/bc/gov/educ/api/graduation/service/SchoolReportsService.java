@@ -229,7 +229,9 @@ public class SchoolReportsService {
         Integer reportsCount = 0;
         Map<String, School> newCredentialsSchoolMap = new HashMap<>();
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
-            logger.debug("Process student for report {}: {} - {}", reportType, reportGradStudentData.getPen(), reportGradStudentData.getCertificateTypeCode());
+            if(logger.isDebugEnabled()) {
+                logger.debug("Process student for report {}: {} - {}", reportType, reportGradStudentData.getPen(), reportGradStudentData.getCertificateTypeCode());
+            }
             School school = populateSchoolObjectByReportGradStudentData(newCredentialsSchoolMap, reportGradStudentData);
             Student student = processNewCredentialsSchoolMap(reportGradStudentData);
             if (student != null && !school.getStudents().contains(student)) {
