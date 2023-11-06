@@ -229,6 +229,7 @@ public class SchoolReportsService {
         Integer reportsCount = 0;
         Map<String, School> newCredentialsSchoolMap = new HashMap<>();
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
+            logger.debug("Process student for report {}: {} - {}", reportType, reportGradStudentData.getPen(), reportGradStudentData.getCertificateTypeCode());
             School school = populateSchoolObjectByReportGradStudentData(newCredentialsSchoolMap, reportGradStudentData);
             Student student = processNewCredentialsSchoolMap(reportGradStudentData);
             if (student != null && !school.getStudents().contains(student)) {
@@ -572,6 +573,7 @@ public class SchoolReportsService {
         gradStatus.setProgramCompletionDate(reportGradStudentData.getProgramCompletionDate());
         gradStatus.setSchoolAtGrad(reportGradStudentData.getMincode());
         gradStatus.setProgramName(reportGradStudentData.getProgramCode());
+        gradStatus.setCertificates(reportGradStudentData.getCertificateTypeCode());
         student.setGraduationStatus(gradStatus);
 
         ca.bc.gov.educ.api.graduation.model.report.GraduationData gradData = new ca.bc.gov.educ.api.graduation.model.report.GraduationData();
