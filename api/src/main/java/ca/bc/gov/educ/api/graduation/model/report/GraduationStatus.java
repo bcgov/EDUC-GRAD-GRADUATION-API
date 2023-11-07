@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.model.report;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 
@@ -94,7 +95,9 @@ public class GraduationStatus implements Serializable {
     }
 
     public void setCertificates(String certificates) {
-        this.certificates = certificates;
+        String nextSeparator = StringUtils.isNotBlank(this.certificates) ? "," : "";
+        String nextCertificate = StringUtils.isNotBlank(certificates) ? nextSeparator + certificates : "";
+        this.certificates = StringUtils.defaultIfBlank(this.certificates, "") + nextCertificate;
     }
 
     public String getGraduationMessage() {
