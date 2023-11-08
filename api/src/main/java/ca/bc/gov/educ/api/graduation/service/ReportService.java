@@ -311,12 +311,16 @@ public class ReportService {
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+
         for (StudentCourse sc : studentCourseList) {
             Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
             int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
             boolean notCompletedCourse = xml && diff <= 0;
-            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && !sc.isCutOffCourse() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
+            if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected()) && !sc.isValidationCourse()) {
+                if (sc.isCutOffCourse() && !isValidCutOffCourse(studentCourseList, sc)) {
+                    continue;
+                }
                 TranscriptResult result = new TranscriptResult();
                 String equivOrChallenge = "";
                 if (sc.getEquivOrChallenge() != null) {
@@ -336,6 +340,24 @@ public class ReportService {
                 tList.add(result);
             }
         }
+    }
+
+    /**
+     * check if the given cutoff course is the highest mark among the same courses, then it should be in transcript even though it is duplicate
+     * @param studentCourseList
+     * @param cutOffCourse
+     * @return
+     */
+    private boolean isValidCutOffCourse(List<StudentCourse> studentCourseList, StudentCourse cutOffCourse) {
+        List<StudentCourse> dups = studentCourseList.stream().filter(sc ->
+                StringUtils.equalsIgnoreCase(sc.getCourseCode(), cutOffCourse.getCourseCode()) && StringUtils.equalsIgnoreCase(sc.getCourseLevel(), cutOffCourse.getCourseLevel())
+        ).sorted(Comparator.comparing(StudentCourse::getCompletedCoursePercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+
+        if (!dups.isEmpty()) {
+            StudentCourse topMarkCourse = dups.get(0);
+            return StringUtils.equalsIgnoreCase(topMarkCourse.getSessionDate(), cutOffCourse.getSessionDate());
+        }
+        return false;
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
@@ -492,7 +514,7 @@ public class ReportService {
                 .map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, xml))
                 .distinct()
                 .map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken) {
@@ -808,11 +830,11 @@ public class ReportService {
         List<StudentCourse> studentExamList = sCList
                 .stream()
                 .filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentCourse> studentCourseList = sCList
                 .stream()
                 .filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
         List<AchievementCourse> sCourseList = new ArrayList<>();
         List<Exam> sExamList = new ArrayList<>();
@@ -1039,12 +1061,10 @@ public class ReportService {
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
         data.setCertificate(getCertificateData(gradResponse, certType));
         data.getStudent().setGraduationData(graduationData);
-        switch (certType.getCertificateTypeCode()) {
-            case "F", "SCF", "S":
-                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-                break;
-            default:
-                data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+        if (certType.getCertificateTypeCode().equals("F") || certType.getCertificateTypeCode().equals("SCF") || certType.getCertificateTypeCode().equals("S")) {
+            data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+        } else {
+            data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
         }
         return data;
     }
@@ -1196,7 +1216,7 @@ public class ReportService {
                 List<StudentCourse> scList = optionalStudentCourses.getStudentCourseList()
                         .stream()
                         .filter(sc -> gr.getTranscriptRule() != null && sc.getGradReqMet().contains(gr.getTranscriptRule()))
-                        .collect(Collectors.toList());
+                        .toList();
                 List<AchievementCourse> cdList = new ArrayList<>();
                 scList.forEach(sc -> {
                     AchievementCourse cD = new AchievementCourse();
