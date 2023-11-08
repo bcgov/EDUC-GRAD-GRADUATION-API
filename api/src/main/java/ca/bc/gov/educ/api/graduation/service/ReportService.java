@@ -311,7 +311,6 @@ public class ReportService {
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-
         for (StudentCourse sc : studentCourseList) {
             Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -830,11 +829,11 @@ public class ReportService {
         List<StudentCourse> studentExamList = sCList
                 .stream()
                 .filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
-                .toList();
+                .collect(Collectors.toList());
         List<StudentCourse> studentCourseList = sCList
                 .stream()
                 .filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
-                .toList();
+                .collect(Collectors.toList());
         List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
         List<AchievementCourse> sCourseList = new ArrayList<>();
         List<Exam> sExamList = new ArrayList<>();
@@ -1061,10 +1060,12 @@ public class ReportService {
         data.setUpdateDate(EducGraduationApiUtils.formatDateForReportJasper(gradResponse.getUpdateDate().toString()));
         data.setCertificate(getCertificateData(gradResponse, certType));
         data.getStudent().setGraduationData(graduationData);
-        if (certType.getCertificateTypeCode().equals("F") || certType.getCertificateTypeCode().equals("SCF") || certType.getCertificateTypeCode().equals("S")) {
-            data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
-        } else {
-            data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
+        switch (certType.getCertificateTypeCode()) {
+            case "F", "SCF", "S":
+                data.getStudent().setFrenchCert(certType.getCertificateTypeCode());
+                break;
+            default:
+                data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
         }
         return data;
     }

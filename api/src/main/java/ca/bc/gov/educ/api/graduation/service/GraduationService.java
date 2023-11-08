@@ -153,7 +153,7 @@ public class GraduationService {
                     )
                     .bodyToMono(byte[].class).block();
         } catch (ServiceException ex) {
-            if(HttpStatus.BAD_REQUEST.value() == ex.getStatusCode() || HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
+            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
                 return new byte[0];
             } else {
                 throw ex;
