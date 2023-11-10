@@ -37,6 +37,8 @@ public class ReportService {
     private static final String GRAD_REPORT_API_DOWN = "GRAD-REPORT-API IS DOWN";
     private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
     private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
+    private static final String NO_CONTENT = "NO_CONTENT";
+    private static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
     @Autowired
     WebClient webClient;
@@ -974,10 +976,10 @@ public class ReportService {
                     ).body(BodyInserters.fromValue(reportParams))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
                     .onStatus(
                             HttpStatus.NO_CONTENT::equals,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
                     )
                     .bodyToMono(byte[].class).block();
             return getEncodedStringFromBytes(bytes);
@@ -1124,10 +1126,10 @@ public class ReportService {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(reportParams)).retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
                     .onStatus(
                             HttpStatus.NO_CONTENT::equals,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
                     )
                     .bodyToMono(byte[].class).block();
             return getEncodedStringFromBytes(bytesSAR);
@@ -1154,10 +1156,10 @@ public class ReportService {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                     }).body(BodyInserters.fromValue(reportParams)).retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
                     .onStatus(
                             HttpStatus.NO_CONTENT::equals,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
                     )
                     .bodyToMono(byte[].class).block();
             return getEncodedStringFromBytes(bytesSAR);

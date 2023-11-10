@@ -30,8 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -2199,6 +2198,20 @@ public class GraduationServiceTest {
 		assertNotNull(result);
 		result = graduationService.getSchoolReports(uniqueList,"NONGRADPRJ","accessToken");
 		assertNotNull(result);
+	}
+
+	@Test
+	public void testGetSchoolReportsException() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
+
+		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		assertNotNull(result);
+		assertTrue(result.length == 0);
 	}
 
 	@Test
