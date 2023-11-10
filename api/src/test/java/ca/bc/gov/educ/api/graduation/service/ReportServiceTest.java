@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -2154,6 +2155,46 @@ public class ReportServiceTest {
 		assertNotEquals(0, result.length);
 
 	}
+
+	@Test
+	public void testTranscriptReportByPenEmpty() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getTranscriptReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenThrow(new ServiceException("NO_CONTENT", 204));
+
+		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
+		assertNotNull(result);
+		assertEquals(0, result.length);
+
+	}
+
+	@Test(expected = ServiceException.class)
+	public void testTranscriptReportByPenException() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getTranscriptReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenThrow(new ServiceException("INTERNAL_SERVER_ERROR", 500));
+
+		graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
+	}
+
 
 	@Test
 	public void testReportDataByGraduationData() throws Exception {
