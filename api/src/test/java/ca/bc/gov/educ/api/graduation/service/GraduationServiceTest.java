@@ -30,7 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -2211,7 +2212,7 @@ public class GraduationServiceTest {
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
 		assertNotNull(result);
-		assertTrue(result.length == 0);
+		assertEquals(result.length, 0);
 	}
 
 	@Test

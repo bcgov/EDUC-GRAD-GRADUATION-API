@@ -1654,6 +1654,40 @@ public class ReportServiceTest {
 		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, "accessToken", new ExceptionMessage());
 		assertNotNull(result);
 	}
+
+	@Test
+	public void testGetTranscriptException() throws Exception {
+
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("09323027");
+		commSch.setSchoolCategoryCode("02");
+
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
+		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		ExceptionMessage message = new ExceptionMessage();
+
+		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, "accessToken", message);
+		assertNull(result);
+		assertEquals("GRAD-GRADUATION-REPORT-API IS DOWN", message.getExceptionName());
+	}
+
 	@Test
 	public void testReportDataByPen() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
