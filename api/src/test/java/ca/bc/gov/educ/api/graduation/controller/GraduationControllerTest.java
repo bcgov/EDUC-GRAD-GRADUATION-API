@@ -99,6 +99,14 @@ class GraduationControllerTest {
 	}
 
 	@Test
+	void testReportTranscriptByPen_empty() {
+		byte[] bytesSAR = new byte[0];
+		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim",null,"accessToken")).thenReturn(bytesSAR);
+		graduationController.reportTranscriptByPen("12312312312","Interim",null,"accessToken");
+		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim",null,"accessToken");
+	}
+
+	@Test
 	void testReportTranscriptByPen_null() {
 		byte[] bytesSAR = null;
 		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim",null,"accessToken")).thenReturn(bytesSAR);
