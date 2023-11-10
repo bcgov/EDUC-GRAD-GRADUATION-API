@@ -63,7 +63,7 @@ public class TranscriptResult {
     }
 
     public Double getCompletedPercentage() {
-        return this.mark.getCompletedCoursePercentage();
+        return this.mark != null? this.mark.getCompletedCoursePercentage() : null;
     }
 
     @Override
