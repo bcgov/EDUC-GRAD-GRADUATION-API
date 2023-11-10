@@ -372,7 +372,7 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = true) String type ) {
         byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, ""));
-        if(resultBinary == null) {
+        if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return handleBinaryResponse(resultBinary, String.format("%sSchoolReport.pdf", type), MediaType.APPLICATION_PDF);

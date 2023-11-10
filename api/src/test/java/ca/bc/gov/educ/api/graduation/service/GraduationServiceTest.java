@@ -2212,7 +2212,7 @@ public class GraduationServiceTest {
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
 		assertNotNull(result);
-		assertEquals(result.length, 0);
+		assertEquals(0, result.length);
 	}
 
 	@Test
