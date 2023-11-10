@@ -2180,7 +2180,6 @@ public class ReportServiceTest {
 	@Test(expected = ServiceException.class)
 	public void testTranscriptReportByPenException() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
-		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
