@@ -296,6 +296,7 @@ public class ReportService {
         }
     }
 
+    @Generated
     private Transcript getTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, String accessToken, ExceptionMessage exception) {
         Transcript transcriptData = new Transcript();
         transcriptData.setInterim(xml ? "true" : "false");
@@ -310,6 +311,7 @@ public class ReportService {
         return transcriptData;
     }
 
+    @Generated
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -349,6 +351,7 @@ public class ReportService {
      * @param cutOffCourse
      * @return
      */
+    @Generated
     private boolean isValidCutOffCourse(List<StudentCourse> studentCourseList, StudentCourse cutOffCourse) {
         List<StudentCourse> dups = studentCourseList.stream().filter(sc ->
                 StringUtils.equalsIgnoreCase(sc.getCourseCode(), cutOffCourse.getCourseCode()) && StringUtils.equalsIgnoreCase(sc.getCourseLevel(), cutOffCourse.getCourseLevel())
@@ -361,6 +364,7 @@ public class ReportService {
         return false;
     }
 
+    @Generated
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
         TranscriptCourse crse = new TranscriptCourse();
         crse.setCode(sc.getCourseCode());
@@ -386,6 +390,7 @@ public class ReportService {
         return crse;
     }
 
+    @Generated
     private Mark setMarkObjForTranscript(StudentCourse sc, String program, String provincially) {
         Mark mrk = new Mark();
         mrk.setExamPercent(getExamPercent(sc.getBestExamPercent(), program, sc.getCourseLevel(), sc.getSpecialCase(), sc.getSessionDate(), sc.getExamPercent()));
@@ -399,6 +404,7 @@ public class ReportService {
         return mrk;
     }
 
+    @Generated
     private String getExamPercent(Double bestExamPercent, String program, String courseLevel, String specialCase, String sDate, Double examPercent) {
         String res = checkCutOffCourseDate(sDate, examPercent);
         if (res == null) {
@@ -414,6 +420,7 @@ public class ReportService {
         return res;
     }
 
+    @Generated
     private String checkCutOffCourseDate(String sDate, Double value) {
         String cutoffDate = "1991-11-01";
         String sessionDate = sDate + "/01";
@@ -429,6 +436,7 @@ public class ReportService {
         }
     }
 
+    @Generated
     private String getSchoolPercent(Double bestSchoolPercent, String program, String courseLevel, String sDate, Double schoolPercent) {
 
         String res = checkCutOffCourseDate(sDate, schoolPercent);
@@ -443,6 +451,7 @@ public class ReportService {
         return res;
     }
 
+    @Generated
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml, String accessToken) {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -518,6 +527,7 @@ public class ReportService {
                 .toList();
     }
 
+    @Generated
     private List<TranscriptResult> getTranscriptResults(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, boolean xml, String accessToken) {
         List<TranscriptResult> tList = new ArrayList<>();
         String program = graduationDataStatus.getGradStatus().getProgram();
@@ -593,6 +603,7 @@ public class ReportService {
         return finalPercent;
     }
 
+    @Generated
     private String getSpecialCase(StudentAssessment sA, String accessToken) {
         String finalPercent;
         SpecialCase spC = webClient.get().uri(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase()))
@@ -608,6 +619,7 @@ public class ReportService {
         return finalPercent;
     }
 
+    @Generated
     private String getAssessmentFinalPercentTranscript(StudentAssessment sA, String accessToken) {
         String finalPercent = getValue(sA.getProficiencyScore());
         if ((sA.getAssessmentCode().equalsIgnoreCase("LTE10") || sA.getAssessmentCode().equalsIgnoreCase("LTP10")) && (sA.getSpecialCase() == null || StringUtils.isBlank(sA.getSpecialCase().trim())) && StringUtils.isNotBlank(finalPercent)) {
@@ -619,6 +631,7 @@ public class ReportService {
         return finalPercent;
     }
 
+    @Generated
     private String getCourseNameLogic(StudentCourse sc) {
         if (sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
             return "IDS " + sc.getRelatedCourseName();
@@ -633,6 +646,7 @@ public class ReportService {
         return value != null && value != 0.0 ? new DecimalFormat("#").format(value) : "";
     }
 
+    @Generated
     private ca.bc.gov.educ.api.graduation.model.report.GraduationData getGraduationData(
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord graduationStudentRecord, String accessToken) {
         GraduationData data = new GraduationData();
@@ -959,6 +973,7 @@ public class ReportService {
         }
     }
 
+    @Generated
     private String generateStudentTranscriptReportJasper(ReportData sample,
                                                          String accessToken, ExceptionMessage exception) {
         ReportOptions options = new ReportOptions();
