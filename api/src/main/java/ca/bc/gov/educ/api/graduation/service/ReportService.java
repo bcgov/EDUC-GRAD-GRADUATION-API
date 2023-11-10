@@ -27,6 +27,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+
 @Slf4j
 @Service
 public class ReportService {
@@ -334,7 +336,7 @@ public class ReportService {
                 }
                 result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
                 result.setEquivalency(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("C") == 0 ? "C" : equivOrChallenge);
-                tList.add(result);
+                addIntoTranscriptList(result, tList);
             }
         }
     }
@@ -355,6 +357,25 @@ public class ReportService {
             return StringUtils.equalsIgnoreCase(topMarkCourse.getSessionDate(), cutOffCourse.getSessionDate());
         }
         return false;
+    }
+
+    private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList) {
+        List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
+                                !tr.getCourse().equals(transcriptResult.getCourse())
+        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+
+        // Handling duplicates
+        if (!dups.isEmpty()) {
+            TranscriptResult tr = dups.get(0);
+            // GRAD2-2394: only if a course taken previously was not used for grad(= requirementMet is blank), then the highest course will be taken
+            if (StringUtils.isBlank(tr.getRequirement()) && tr.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
+                // replace
+                tList.remove(tr);
+                tList.add(transcriptResult);
+                return;
+            }
+        }
+        tList.add(transcriptResult);
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
