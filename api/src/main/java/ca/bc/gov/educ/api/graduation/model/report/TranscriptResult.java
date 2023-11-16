@@ -62,6 +62,10 @@ public class TranscriptResult {
         this.usedForGrad = value;
     }
 
+    public Double getCompletedPercentage() {
+        return this.mark != null? this.mark.getCompletedCoursePercentage() : null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
