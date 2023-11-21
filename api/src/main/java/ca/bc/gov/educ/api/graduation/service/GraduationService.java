@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -138,10 +140,25 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(reportData);
 
-        return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-                .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); }
-                ).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
-
+        try {
+            return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+                    .headers(h -> {
+                                h.setBearerAuth(accessToken);
+                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                            }
+                    ).body(BodyInserters.fromValue(reportParams)).retrieve()
+                    .onStatus(
+                            HttpStatus.NO_CONTENT::equals,
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                    )
+                    .bodyToMono(byte[].class).block();
+        } catch (ServiceException ex) {
+            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
+                return new byte[0];
+            } else {
+                throw ex;
+            }
+        }
     }
 
     /**

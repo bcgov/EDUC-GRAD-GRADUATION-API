@@ -2202,6 +2202,20 @@ public class GraduationServiceTest {
 	}
 
 	@Test
+	public void testGetSchoolReportsException() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
+
+		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		assertNotNull(result);
+		assertEquals(0, result.length);
+	}
+
+	@Test
 	public void testCreateAndStoreSchoolReports_TVR() {
 		ExceptionMessage exception = new ExceptionMessage();
 		String mincode = "1231231231";

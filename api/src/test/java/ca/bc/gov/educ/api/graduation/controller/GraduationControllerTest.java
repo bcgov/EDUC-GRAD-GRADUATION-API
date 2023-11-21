@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -93,6 +94,14 @@ class GraduationControllerTest {
 	void testReportTranscriptByPen() {
 		byte[] bytesSAR = "Any String you want".getBytes();
 		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim", null,"accessToken")).thenReturn(bytesSAR);
+		graduationController.reportTranscriptByPen("12312312312","Interim",null,"accessToken");
+		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim",null,"accessToken");
+	}
+
+	@Test
+	void testReportTranscriptByPen_empty() {
+		byte[] bytesSAR = new byte[0];
+		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim",null,"accessToken")).thenReturn(bytesSAR);
 		graduationController.reportTranscriptByPen("12312312312","Interim",null,"accessToken");
 		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim",null,"accessToken");
 	}
@@ -332,16 +341,48 @@ class GraduationControllerTest {
 	}
 
 	@Test
-	void testGetSchoolReports() {
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG","accessToken")).thenReturn(new byte[0]);
+	void testGetSchoolReports() throws Exception {
+		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG","accessToken")).thenReturn(bytesSAR1);
 		graduationController.getSchoolReports(List.of("12321312"),"accessToken","GRADREG");
 		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG","accessToken");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken")).thenReturn(new byte[0]);
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken")).thenReturn(bytesSAR1);
 		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADREG");
 		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken")).thenReturn(new byte[0]);
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADPRJ");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken");
+	}
+
+	@Test
+	void testGetSchoolReportsEmpty() throws Exception {
+		byte[] bytesSAR1 = new byte[0];
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG","accessToken")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","GRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG","accessToken");
+
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken");
+
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADPRJ");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken");
+	}
+
+	@Test
+	void testGetSchoolReportsNull() {
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG","accessToken")).thenReturn(null);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","GRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG","accessToken");
+
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken")).thenReturn(null);
+		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG","accessToken");
+
+		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken")).thenReturn(null);
 		graduationController.getSchoolReports(List.of("12321312"),"accessToken","NONGRADPRJ");
 		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ","accessToken");
 	}
@@ -353,5 +394,10 @@ class GraduationControllerTest {
 		graduationController.createAndStoreStudentCertificate("123456789", "Y", "accessToken");
 		Mockito.verify(graduationService).createAndStoreStudentCertificates("123456789", true, "accessToken");
 	}
-	
+
+	private byte[] readBinaryFile(String path) throws Exception {
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream(path);
+		return inputStream.readAllBytes();
+	}
 }
