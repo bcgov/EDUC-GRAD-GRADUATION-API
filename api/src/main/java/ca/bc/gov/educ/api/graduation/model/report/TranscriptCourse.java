@@ -159,16 +159,25 @@ public class TranscriptCourse {
         this.fineArtsAppliedSkills = fineArtsAppliedSkills;
     }
 
+    public boolean isDuplicate(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TranscriptCourse that = (TranscriptCourse) o;
+        return Objects.equals(getCode(), that.getCode()) && Objects.equals(getLevel(), that.getLevel());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TranscriptCourse that = (TranscriptCourse) o;
-        return Objects.equals(code, that.code);
+        return Objects.equals(getCode(), that.getCode()) && Objects.equals(getLevel(), that.getLevel()) && Objects.equals(getSessionDate(), that.getSessionDate());
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(code);
+        return Objects.hash(getCode(), getLevel(), getSessionDate());
     }
+
 }

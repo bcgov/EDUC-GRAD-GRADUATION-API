@@ -340,7 +340,7 @@ public class ReportService {
                 }
                 result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
                 result.setEquivalency(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("C") == 0 ? "C" : equivOrChallenge);
-                tList.add(result);
+                addIntoTranscriptList(result, tList);
             }
         }
     }
@@ -365,6 +365,25 @@ public class ReportService {
     }
 
     @Generated
+    private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList) {
+        List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
+                                !tr.getCourse().equals(transcriptResult.getCourse())
+        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+
+        // Handling duplicates
+        if (!dups.isEmpty()) {
+            TranscriptResult tr = dups.get(0);
+            // GRAD2-2394: only if a course taken previously was not used for grad(= requirementMet is blank), then the highest course will be taken
+            if (StringUtils.isBlank(tr.getRequirement()) && tr.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
+                // replace
+                tList.remove(tr);
+                tList.add(transcriptResult);
+                return;
+            }
+        }
+        tList.add(transcriptResult);
+    }
+
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
         TranscriptCourse crse = new TranscriptCourse();
         crse.setCode(sc.getCourseCode());
@@ -567,7 +586,7 @@ public class ReportService {
     }
 
     private String getCredits(String program, String courseCode, Integer totalCredits, boolean isRestricted) {
-        if (((program.contains("2004") || program.contains("2018")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
+        if (((program.contains("2004") || program.contains("2018") || program.contains("2023")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
             return String.format("(%s)", totalCredits);
         }
         return String.valueOf(totalCredits);
