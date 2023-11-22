@@ -182,9 +182,10 @@ public class GraduationService {
             for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
                 if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
                     StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-                    studentOptionalProgram.setGraduated(true);
+                    studentOptionalProgram.setGraduated(optionalPrograms.getOptionalProgramCompletionDate() != null);
                     studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
                     studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
+                    studentOptionalProgram.setStudentOptionalProgramData(optionalPrograms.getStudentOptionalProgramData());
                     projectedOptionalPrograms.add(studentOptionalProgram);
                 }
             }
