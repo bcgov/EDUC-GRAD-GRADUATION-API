@@ -37,7 +37,7 @@ public class RestWebClient {
         return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
-                        .maxInMemorySize(100 * 1024 * 1024))  // 100MB
+                        .maxInMemorySize(300 * 1024 * 1024))  // 100MB
                     .build())
                 .filter(this.log())
                 .build();
