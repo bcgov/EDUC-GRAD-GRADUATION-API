@@ -2053,12 +2053,14 @@ public class GraduationServiceTest {
 		optionalStudentProgram1.setStudentID(studentID);
 		optionalStudentProgram1.setOptionalProgramID(UUID.randomUUID());
 		optionalStudentProgram1.setPen(pen);
+		optionalStudentProgram1.setOptionalProgramCompletionDate("10/20/2020");
 
 		GradAlgorithmOptionalStudentProgram optionalStudentProgram2 = new GradAlgorithmOptionalStudentProgram();
 		optionalStudentProgram2.setOptionalProgramCode("DD");
 		optionalStudentProgram2.setStudentID(studentID);
 		optionalStudentProgram2.setOptionalProgramID(UUID.randomUUID());
 		optionalStudentProgram2.setPen(pen);
+		optionalStudentProgram2.setOptionalProgramCompletionDate("10/20/2020");
 
 		ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = new ca.bc.gov.educ.api.graduation.model.dto.GraduationData();
 		graduationData.setOptionalGradStatus(Arrays.asList(optionalStudentProgram1, optionalStudentProgram2));
