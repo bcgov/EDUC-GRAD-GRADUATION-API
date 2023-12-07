@@ -90,7 +90,7 @@ public class GraduationController {
                                                         @RequestHeader(name="Authorization") String accessToken) {
         LOGGER.debug("Report Data By Student Pen: {}", pen);
         byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview, accessToken.replace(BEARER, ""));
-        if(resultBinary == null) {
+        if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         byte[] encoded = Base64.encodeBase64(resultBinary);
@@ -372,7 +372,7 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = true) String type ) {
         byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, ""));
-        if(resultBinary == null) {
+        if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return handleBinaryResponse(resultBinary, String.format("%sSchoolReport.pdf", type), MediaType.APPLICATION_PDF);

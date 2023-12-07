@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -278,7 +279,8 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
         
         when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentCertificate(),pen))).thenReturn(this.requestBodyUriMock);
@@ -326,6 +328,7 @@ public class ReportServiceTest {
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
         
         when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -1556,6 +1559,7 @@ public class ReportServiceTest {
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
@@ -1651,6 +1655,40 @@ public class ReportServiceTest {
 		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, "accessToken", new ExceptionMessage());
 		assertNotNull(result);
 	}
+
+	@Test
+	public void testGetTranscriptException() throws Exception {
+
+		CommonSchool commSch = new CommonSchool();
+		commSch.setSchlNo("09323027");
+		commSch.setSchoolCategoryCode("02");
+
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
+		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
+
+		ExceptionMessage message = new ExceptionMessage();
+
+		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, "accessToken", message);
+		assertNull(result);
+		assertEquals("GRAD-GRADUATION-REPORT-API IS DOWN", message.getExceptionName());
+	}
+
 	@Test
 	public void testReportDataByPen() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
@@ -2109,6 +2147,7 @@ public class ReportServiceTest {
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
 
 		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
@@ -2116,6 +2155,45 @@ public class ReportServiceTest {
 		assertNotEquals(0, result.length);
 
 	}
+
+	@Test
+	public void testTranscriptReportByPenEmpty() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getTranscriptReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenThrow(new ServiceException("NO_CONTENT", 204));
+
+		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
+		assertNotNull(result);
+		assertEquals(0, result.length);
+
+	}
+
+	@Test(expected = ServiceException.class)
+	public void testTranscriptReportByPenException() throws Exception {
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		String pen = gradStatus.getGradStudent().getPen();
+
+		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(constants.getTranscriptReport())).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(byte[].class)).thenThrow(new ServiceException("INTERNAL_SERVER_ERROR", 500));
+
+		graduationService.prepareTranscriptReport(pen, "Interim", "true", "accessToken");
+	}
+
 
 	@Test
 	public void testReportDataByGraduationData() throws Exception {

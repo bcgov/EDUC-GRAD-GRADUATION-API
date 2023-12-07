@@ -2053,12 +2053,14 @@ public class GraduationServiceTest {
 		optionalStudentProgram1.setStudentID(studentID);
 		optionalStudentProgram1.setOptionalProgramID(UUID.randomUUID());
 		optionalStudentProgram1.setPen(pen);
+		optionalStudentProgram1.setOptionalProgramCompletionDate("10/20/2020");
 
 		GradAlgorithmOptionalStudentProgram optionalStudentProgram2 = new GradAlgorithmOptionalStudentProgram();
 		optionalStudentProgram2.setOptionalProgramCode("DD");
 		optionalStudentProgram2.setStudentID(studentID);
 		optionalStudentProgram2.setOptionalProgramID(UUID.randomUUID());
 		optionalStudentProgram2.setPen(pen);
+		optionalStudentProgram2.setOptionalProgramCompletionDate("10/20/2020");
 
 		ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = new ca.bc.gov.educ.api.graduation.model.dto.GraduationData();
 		graduationData.setOptionalGradStatus(Arrays.asList(optionalStudentProgram1, optionalStudentProgram2));
@@ -2199,6 +2201,20 @@ public class GraduationServiceTest {
 		assertNotNull(result);
 		result = graduationService.getSchoolReports(uniqueList,"NONGRADPRJ","accessToken");
 		assertNotNull(result);
+	}
+
+	@Test
+	public void testGetSchoolReportsException() {
+		ExceptionMessage exception = new ExceptionMessage();
+		String mincode = "1231231231";
+		List<String> uniqueList = new ArrayList<>();
+		uniqueList.add(mincode);
+
+		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		assertNotNull(result);
+		assertEquals(0, result.length);
 	}
 
 	@Test
