@@ -384,13 +384,13 @@ public class GraduationService {
                 gradData.setGraduationDate(gsr.getProgramCompletionDate() != null ? EducGraduationApiUtils.parsingTraxDateLocalDate(gsr.getProgramCompletionDate()) : null);
                 gradData.setHonorsFlag(gsr.getHonoursStanding() != null && gsr.getHonoursStanding().equalsIgnoreCase("Y"));
                 std.setGraduationData(gradData);
-                std.setNonGradReasons(getNonGradReasons(gsr.getNonGradReasons()));
+                std.setNonGradReasons(getNonGradReasons(gsr.getProgram(), gsr.getNonGradReasons()));
                 stdPrjList.add(std);
             } else {
                 std.setGraduationData(new ca.bc.gov.educ.api.graduation.model.report.GraduationData());
                 if (gsr.getStudentProjectedGradData() != null) {
                     ProjectedRunClob projectedClob = (ProjectedRunClob)jsonTransformer.unmarshall(gsr.getStudentProjectedGradData(), ProjectedRunClob.class);
-                    std.setNonGradReasons(getNonGradReasons(projectedClob.getNonGradReasons()));
+                    std.setNonGradReasons(getNonGradReasons(gsr.getProgram(), projectedClob.getNonGradReasons()));
                     if (!projectedClob.isGraduated())
                         stdPrjList.add(std);
                 }
@@ -399,7 +399,8 @@ public class GraduationService {
         return stdPrjList;
     }
 
-    private List<NonGradReason> getNonGradReasons(List<GradRequirement> nonGradReasons) {
+    private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<GradRequirement> nonGradReasons) {
+        nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
