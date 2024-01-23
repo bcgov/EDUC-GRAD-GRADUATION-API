@@ -469,16 +469,12 @@ public class GraduationService {
 
     }
 
+    @Generated
     private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
-
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
-
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
-
         updateSchoolReport(accessToken, requestObj);
-
     }
 
     private byte[] getSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, String accessToken) {
