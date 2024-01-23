@@ -400,7 +400,7 @@ public class GraduationService {
     }
 
     private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<GradRequirement> nonGradReasons) {
-        nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
+        nonGradReasons.removeIf(a -> ("506".equalsIgnoreCase(a.getTranscriptRule()) || "506".equalsIgnoreCase(a.getRule())) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
@@ -469,16 +469,12 @@ public class GraduationService {
 
     }
 
+    @Generated
     private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
-
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
-
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
-
         updateSchoolReport(accessToken, requestObj);
-
     }
 
     private byte[] getSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, String accessToken) {

@@ -278,7 +278,7 @@ public class ReportService {
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
             nonGradReasons.removeIf(a -> applyFilters && "505".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
-            nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
+            nonGradReasons.removeIf(a -> ("506".equalsIgnoreCase(a.getTranscriptRule()) || "506".equalsIgnoreCase(a.getRule())) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
                 String code = xml ? traxReqCodes.get(gR.getRule()) : gR.getTranscriptRule();
                 NonGradReason obj = new NonGradReason();
