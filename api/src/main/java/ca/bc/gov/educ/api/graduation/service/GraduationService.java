@@ -400,7 +400,7 @@ public class GraduationService {
     }
 
     private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<GradRequirement> nonGradReasons) {
-        nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
+        nonGradReasons.removeIf(a -> ("506".equalsIgnoreCase(a.getTranscriptRule()) || "506".equalsIgnoreCase(a.getRule())) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             for (GradRequirement gR : nonGradReasons) {
