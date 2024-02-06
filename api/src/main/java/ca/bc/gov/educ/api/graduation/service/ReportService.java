@@ -278,6 +278,7 @@ public class ReportService {
                 populateTraxReqCodesMap(programReqCodes, traxReqCodes);
             }
             nonGradReasons.removeIf(a -> applyFilters && "505".equalsIgnoreCase(a.getTranscriptRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
+            nonGradReasons.removeIf(a -> ("506".equalsIgnoreCase(a.getTranscriptRule()) || "506".equalsIgnoreCase(a.getRule())) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
             for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gR : nonGradReasons) {
                 String code = xml ? traxReqCodes.get(gR.getRule()) : gR.getTranscriptRule();
                 NonGradReason obj = new NonGradReason();
@@ -1269,14 +1270,14 @@ public class ReportService {
             op.setHasRequirementMet(" Check with School");
             if (existingData != null && existingData.getOptionalRequirementsMet() != null) {
                 op.setHasRequirementMet("The Following Requirements Are Met");
-                op.setRequirementMet(getRequirementsMetAchvReport(existingData.getOptionalRequirementsMet(), existingData.getOptionalStudentCourses(), op.getNonGradReasons()));
+                op.setRequirementMet(getRequirementsMetAchvReport(gradProgramCode, existingData.getOptionalRequirementsMet(), existingData.getOptionalStudentCourses(), op.getNonGradReasons()));
             }
             opList.add(op);
         }
         return opList;
     }
 
-    private List<GradRequirement> getRequirementsMetAchvReport(List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses, List<NonGradReason> nonGradReasons) {
+    private List<GradRequirement> getRequirementsMetAchvReport(String gradProgramCode, List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> optionalRequirementsMet, StudentCourses optionalStudentCourses, List<NonGradReason> nonGradReasons) {
         List<GradRequirement> grList = new ArrayList<>();
         for (ca.bc.gov.educ.api.graduation.model.dto.GradRequirement gr : optionalRequirementsMet) {
             if (!gr.isProjected()) {
@@ -1306,6 +1307,7 @@ public class ReportService {
                 nonGradReasons.add(obj);
             }
         }
+        nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getCode()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
         return grList;
     }
 
