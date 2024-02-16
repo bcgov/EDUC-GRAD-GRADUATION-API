@@ -1262,6 +1262,7 @@ public class ReportService {
             op.setOptionalProgramCode(sPO.getOptionalProgramCode());
             op.setOptionalProgramName(sPO.getOptionalProgramName());
             op.setProgramCompletionDate(sPO.getOptionalProgramCompletionDate());
+            op.setNonGradReasons(new ArrayList<>());
 
             GradAlgorithmOptionalStudentProgram existingData = (GradAlgorithmOptionalStudentProgram)jsonTransformer.unmarshall(sPO.getStudentOptionalProgramData(), GradAlgorithmOptionalStudentProgram.class);
             if (existingData != null && existingData.getOptionalNonGradReasons() != null) {
