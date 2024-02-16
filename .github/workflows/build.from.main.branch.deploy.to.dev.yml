@@ -139,4 +139,4 @@ jobs:
       - name: ZAP Scan
         uses: zaproxy/action-api-scan@v0.1.0
         with:
-          target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
+          target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
