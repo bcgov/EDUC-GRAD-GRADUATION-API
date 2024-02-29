@@ -723,14 +723,15 @@ public class ReportService {
         GradProgram gPgm = new GradProgram();
         Code code = new Code();
         if (graduationDataStatus.getGradStatus().getProgram() != null) {
-            ca.bc.gov.educ.api.graduation.model.dto.GradProgram gradProgram = webClient.get().uri(String.format(educGraduationApiConstants.getProgramNameEndpoint(), graduationDataStatus.getGradStatus().getProgram()))
+            GraduationProgramCode gradProgram = webClient.get().uri(String.format(educGraduationApiConstants.getProgramNameEndpoint(), graduationDataStatus.getGradStatus().getProgram()))
                     .headers(h -> {
                         h.setBearerAuth(accessToken);
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                    }).retrieve().bodyToMono(ca.bc.gov.educ.api.graduation.model.dto.GradProgram.class).block();
+                    }).retrieve().bodyToMono(GraduationProgramCode.class).block();
             if (gradProgram != null) {
                 code.setDescription(gradProgram.getProgramName());
                 code.setName(gradProgram.getProgramName());
+                gPgm.setExpiryDate(EducGraduationApiUtils.formatDate(gradProgram.getExpiryDate()));
             }
         }
         code.setCode(graduationDataStatus.getGradStatus().getProgram());
