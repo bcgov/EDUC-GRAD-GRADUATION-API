@@ -263,7 +263,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(optionalProgramsResponseType)).thenReturn(Mono.just(List.of(studentOptionalProgram)));
 
-		GradProgram gP = new GradProgram();
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 
@@ -271,7 +271,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getCertificateReport())).thenReturn(this.requestBodyUriMock);
@@ -876,8 +876,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);		
 		graduationDataStatus.setGradStudent(stuObj);
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -895,7 +895,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
@@ -1053,8 +1053,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);
 		graduationDataStatus.setGradStudent(stuObj);
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -1072,7 +1072,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
@@ -1145,8 +1145,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setStudentAssessments(sAssessments);
 		graduationDataStatus.setStudentExams(eCourses);
 		graduationDataStatus.setGradStudent(stuObj);
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode(program);
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -1164,7 +1164,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("06011033");
@@ -1260,8 +1260,8 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -1269,7 +1269,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
@@ -1357,8 +1357,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -1376,7 +1376,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
@@ -1457,8 +1457,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
 		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
-		
-		GradProgram gP = new GradProgram();
+
+		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 		
@@ -1466,7 +1466,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gP));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gP));
 		
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1579,7 +1579,7 @@ public class ReportServiceTest {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		List<StudentOptionalProgram> optionalProgram = createStudentOptionalProgramData("json/optionalprograms.json");
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -1587,7 +1587,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		SpecialCase spc = new SpecialCase();
 		spc.setLabel("dfsdgs");
@@ -1615,7 +1615,7 @@ public class ReportServiceTest {
 		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("1950");
 		gradProgram.setProgramName("1950 Adult Graduation Program");
 
@@ -1719,7 +1719,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("1950");
 		gradProgram.setProgramName("1950 Adult Graduation Program");
 
@@ -1745,7 +1745,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradProgram.getProgramCode()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -1903,7 +1903,7 @@ public class ReportServiceTest {
 		assertNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(null);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -1911,7 +1911,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -1955,7 +1955,7 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -1963,7 +1963,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -2031,7 +2031,7 @@ public class ReportServiceTest {
 
 		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2039,7 +2039,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -2211,7 +2211,7 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2219,7 +2219,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -2327,7 +2327,7 @@ public class ReportServiceTest {
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2335,7 +2335,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()))).thenReturn(this.requestHeadersMock);
@@ -2475,7 +2475,7 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2483,7 +2483,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -2538,7 +2538,7 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2546,7 +2546,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
@@ -2619,7 +2619,7 @@ public class ReportServiceTest {
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2627,7 +2627,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()))).thenReturn(this.requestHeadersMock);
@@ -2696,7 +2696,7 @@ public class ReportServiceTest {
 		assertNotNull(studentGradData);
 		graduationStudentRecord.setStudentGradData(studentGradData);
 
-		GradProgram gradProgram = new GradProgram();
+		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
@@ -2704,7 +2704,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(gradProgram));
+		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
