@@ -79,7 +79,7 @@ public class EdwSnapshotService {
         }
         boolean isHypotheticalPass = false;
         GraduationData graduationData = null;
-        if (StringUtils.isNotBlank(gradProgramCode)) {
+        if (StringUtils.isNotBlank(gradProgramCode) && !"SCCP".equalsIgnoreCase(gradProgramCode)) {
             // run hypothetical grad algorithm
             graduationData = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, gradProgramCode, gradYear.toString(), accessToken);
             if (graduationData != null) {
