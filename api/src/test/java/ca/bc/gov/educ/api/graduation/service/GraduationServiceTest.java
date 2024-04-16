@@ -2028,7 +2028,7 @@ public class GraduationServiceTest {
 		when(this.tokenUtils.checkAndGetAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
 		assertEquals(2,numberOfRecord);
 	}
@@ -2192,7 +2192,7 @@ public class GraduationServiceTest {
 		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR3);
 
 		when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
@@ -2266,7 +2266,7 @@ public class GraduationServiceTest {
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
+		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN","accessToken");
 		assertEquals(1,numberOfRecord);
 	}

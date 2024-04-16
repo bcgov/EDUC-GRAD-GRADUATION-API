@@ -215,7 +215,7 @@ public class GraduationService {
 
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
-                SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, new ExceptionMessage());
+                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, accessToken, new ExceptionMessage());
                 if (schoolDetails != null) {
                     School schoolObj = new School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
@@ -266,7 +266,7 @@ public class GraduationService {
                     String listOfStudents = jsonTransformer.marshall(stdList);
                     logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
-                SchoolTrax schoolDetails = schoolService.getSchoolDetails(usl, accessToken, exception);
+                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, accessToken, exception);
                 if (schoolDetails != null) {
                     logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
                     if (stdList != null && !stdList.isEmpty()) {

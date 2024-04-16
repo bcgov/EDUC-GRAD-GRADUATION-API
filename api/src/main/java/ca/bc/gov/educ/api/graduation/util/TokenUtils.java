@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.graduation.util;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ProcessorData;
 import ca.bc.gov.educ.api.graduation.model.dto.ResponseObj;
+import ca.bc.gov.educ.api.graduation.model.dto.ResponseObjCache;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,15 +17,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class TokenUtils {
-    private static Logger logger = LoggerFactory.getLogger(TokenUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TokenUtils.class);
 
+    private ResponseObjCache responseObjCache;
     private final EducGraduationApiConstants constants;
     private final WebClient webClient;
 
     @Autowired
-    public TokenUtils(final EducGraduationApiConstants constants, final WebClient webClient) {
+    public TokenUtils(final EducGraduationApiConstants constants, final WebClient webClient, final ResponseObjCache responseObjCache) {
         this.constants = constants;
         this.webClient = webClient;
+        this.responseObjCache = responseObjCache;
     }
 
     public Pair<String, Long> checkAndGetAccessToken(Pair<String, Long> req) {
@@ -32,9 +35,9 @@ public class TokenUtils {
         long startTime = req.getRight();
         long diff = (currentTime - startTime)/1000;
 
-        logger.debug("=========> Check Duration: {} sec <===========", diff);
+        LOGGER.debug("=========> Check Duration: {} sec <===========", diff);
         if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
-            logger.debug("=========> Getting the new Access Token after 2 minutes <===========");
+            LOGGER.debug("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 return Pair.of(responseObj.getAccess_token(), currentTime);
@@ -52,13 +55,16 @@ public class TokenUtils {
         return Pair.of(accessToken, startTime);
     }
 
+    public String getAccessToken() {
+        return this.getTokenResponseObject().getAccess_token();
+    }
+
     public void checkAndSetAccessToken(ProcessorData processorData) {
         long currentTime = System.currentTimeMillis();
         long diff = (currentTime - processorData.getStartTime())/1000;
-
-        logger.debug("=========> Check Duration: {} sec <===========", diff);
+        LOGGER.debug("=========> Check Duration: {} sec <===========", diff);
         if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
-            logger.debug("=========> Getting the new Access Token after 2 minutes <===========");
+            LOGGER.debug("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
                 processorData.setAccessToken(responseObj.getAccess_token());
@@ -76,7 +82,15 @@ public class TokenUtils {
         }
     }
 
-    private ResponseObj getTokenResponseObject() {
+    public ResponseObj getTokenResponseObject() {
+        if(responseObjCache.isExpired()){
+            responseObjCache.setResponseObj(getResponseObj());
+        }
+        return responseObjCache.getResponseObj();
+    }
+
+    public ResponseObj getResponseObj() {
+        LOGGER.debug("Fetch token");
         HttpHeaders httpHeadersKC = EducGraduationApiUtils.getHeaders(
                 constants.getUserName(), constants.getPassword());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
