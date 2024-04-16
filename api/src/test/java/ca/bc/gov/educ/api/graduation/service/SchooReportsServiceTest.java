@@ -151,10 +151,6 @@ public class SchooReportsServiceTest {
 
 		mockTokenResponseObject();
 
-		School school = new School();
-		school.setMincode("005994567");
-		school.setName("Test School Name");
-
 		Integer reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_YE_SC, "accessToken");
 		assertTrue(reportsCount > 0);
 
@@ -173,8 +169,13 @@ public class SchooReportsServiceTest {
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		assertTrue(reportsCount > 0);
 
+		School school = new School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+
 		List<String> schools = new ArrayList<>();
 		schools.add(school.getMincode());
+		schools.add("005");
 
 		reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports("accessToken", ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, schools);
 		assertTrue(reportsCount > 0);

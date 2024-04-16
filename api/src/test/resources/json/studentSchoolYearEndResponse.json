@@ -2,6 +2,7 @@
   {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a1f06df5d06",
     "mincode": "02396738",
+    "mincodeAtGrad": "12345678",
     "pen": "118701325",
     "firstName": "ROBERT",
     "middleName": "LYNNEA",
@@ -25,6 +26,7 @@
   {
     "graduationStudentRecordId": "ac339d70-7649-1a2e-8176-4a3356591819",
     "mincode": "02396738",
+    "mincodeAtGrad": "02396738",
     "pen": "128320223",
     "firstName": "MARVIN",
     "middleName": "RICHARD",
