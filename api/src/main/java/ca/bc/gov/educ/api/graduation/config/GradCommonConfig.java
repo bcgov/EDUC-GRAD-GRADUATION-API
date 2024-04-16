@@ -27,6 +27,6 @@ public class GradCommonConfig implements WebMvcConfigurer {
 
 	@Bean
 	public ResponseObjCache createResponseObjCache() {
-		return new ResponseObjCache(30);
+		return new ResponseObjCache(60);
 	}
 }
