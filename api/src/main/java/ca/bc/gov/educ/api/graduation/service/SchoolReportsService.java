@@ -240,6 +240,12 @@ public class SchoolReportsService {
             Student student = processNewCredentialsSchoolMap(reportGradStudentData);
             if (student != null && !school.getStudents().contains(student)) {
                 school.getStudents().add(student);
+            } else if (student != null) {
+                for(Student st: school.getStudents()) {
+                    if(st.getPen().equals(student.getPen())) {
+                        st.getGraduationStatus().setCertificates(reportGradStudentData.getCertificateTypeCode());
+                    }
+                }
             }
         }
         Map<String, School> issuedTranscriptsSchoolMap = new HashMap<>();
