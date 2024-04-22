@@ -1802,6 +1802,17 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolTrax.class)).thenReturn(Mono.just(schtrax));
 
+		DistrictTrax disttrax = new DistrictTrax();
+		disttrax.setDistrictNumber("005");
+		disttrax.setDistrictName("My District");
+		disttrax.setAddress1("My Address");
+
+		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+		when(this.requestHeadersUriMock.uri(String.format(constants.getDistrictDetails(),schtrax.getMinCode()))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+		when(this.responseMock.bodyToMono(DistrictTrax.class)).thenReturn(Mono.just(disttrax));
+
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
 		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();

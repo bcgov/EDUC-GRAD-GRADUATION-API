@@ -60,6 +60,9 @@ public class SchooReportsServiceTest {
 	RESTService restService;
 
 	@MockBean
+	SchoolService schoolService;
+
+	@MockBean
 	private TokenUtils tokenUtils;
 
 	@Autowired
@@ -148,6 +151,7 @@ public class SchooReportsServiceTest {
 		traxSchool.setAddress1("1231");
 
 		when(this.restService.get(any(String.class), any(), any())).thenReturn(traxSchool);
+		when(this.schoolService.getTraxSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
 
 		mockTokenResponseObject();
 
@@ -156,6 +160,14 @@ public class SchooReportsServiceTest {
 
 		reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_SC, "accessToken");
 		assertTrue(reportsCount > 0);
+
+		DistrictTrax disttrax = new DistrictTrax();
+		disttrax.setDistrictNumber("005");
+		disttrax.setDistrictName("My District");
+		disttrax.setAddress1("My Address");
+
+		when(this.schoolService.getTraxSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
+		when(this.schoolService.getTraxDistrictDetails(disttrax.getDistrictNumber())).thenReturn(disttrax);
 
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
 		assertTrue(reportsCount > 0);

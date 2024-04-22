@@ -483,19 +483,22 @@ public class SchoolReportsService {
         String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
         SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(mincode);
         School school = new School();
-        school.setDistno(StringUtils.substring(traxSchool.getMinCode(), 0, 3));
-        school.setMincode(traxSchool.getMinCode());
-        school.setName(traxSchool.getSchoolName());
-        school.setTypeBanner("Principal");
-        Address address = new Address();
-        address.setStreetLine1(traxSchool.getAddress1());
-        address.setStreetLine2(traxSchool.getAddress2());
-        address.setCity(traxSchool.getCity());
-        address.setRegion(traxSchool.getProvCode());
-        address.setCountry(traxSchool.getCountryName());
-        address.setCode(traxSchool.getPostal());
-        school.setAddress(address);
         school.setStudents(new ArrayList<>());
+        if(traxSchool != null) {
+            school.setDistno(StringUtils.substring(traxSchool.getMinCode(), 0, 3));
+            school.setMincode(traxSchool.getMinCode());
+            school.setName(traxSchool.getSchoolName());
+            school.setTypeBanner("Principal");
+            Address address = new Address();
+            address.setStreetLine1(traxSchool.getAddress1());
+            address.setStreetLine2(traxSchool.getAddress2());
+            address.setCity(traxSchool.getCity());
+            address.setRegion(traxSchool.getProvCode());
+            address.setCountry(traxSchool.getCountryName());
+            address.setCode(traxSchool.getPostal());
+            school.setAddress(address);
+            return school;
+        }
         return school;
     }
 
