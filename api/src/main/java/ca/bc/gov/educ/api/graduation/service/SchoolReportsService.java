@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.model.dto.DistrictTrax;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolReports;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolTrax;
@@ -149,7 +150,7 @@ public class SchoolReportsService {
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken, schools);
-       logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         if(schools != null && !schools.isEmpty()) {
             boolean isDistrictSchool = schools.get(0).length() == 3;
             if(isDistrictSchool) {
@@ -468,10 +469,11 @@ public class SchoolReportsService {
             }
         }
         if (addNewDistrict) {
+            DistrictTrax districtTrax = schoolService.getTraxDistrictDetails(distcode);
             district = new School();
             district.setDistno(distcode);
             district.setMincode(distcode);
-            district.setName(reportGradStudentData.getDistrictName());
+            district.setName(districtTrax != null ? districtTrax.getDistrictName() : reportGradStudentData.getDistrictName());
             districtSchoolsMap.put(district, new ArrayList<>());
         }
         return district;
@@ -481,19 +483,22 @@ public class SchoolReportsService {
         String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
         SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(mincode);
         School school = new School();
-        school.setDistno(StringUtils.substring(traxSchool.getMinCode(), 0, 3));
-        school.setMincode(traxSchool.getMinCode());
-        school.setName(traxSchool.getSchoolName());
-        school.setTypeBanner("Principal");
-        Address address = new Address();
-        address.setStreetLine1(traxSchool.getAddress1());
-        address.setStreetLine2(traxSchool.getAddress2());
-        address.setCity(traxSchool.getCity());
-        address.setRegion(traxSchool.getProvCode());
-        address.setCountry(traxSchool.getCountryName());
-        address.setCode(traxSchool.getPostal());
-        school.setAddress(address);
         school.setStudents(new ArrayList<>());
+        if(traxSchool != null) {
+            school.setDistno(StringUtils.substring(traxSchool.getMinCode(), 0, 3));
+            school.setMincode(traxSchool.getMinCode());
+            school.setName(traxSchool.getSchoolName());
+            school.setTypeBanner("Principal");
+            Address address = new Address();
+            address.setStreetLine1(traxSchool.getAddress1());
+            address.setStreetLine2(traxSchool.getAddress2());
+            address.setCity(traxSchool.getCity());
+            address.setRegion(traxSchool.getProvCode());
+            address.setCountry(traxSchool.getCountryName());
+            address.setCode(traxSchool.getPostal());
+            school.setAddress(address);
+            return school;
+        }
         return school;
     }
 
@@ -509,18 +514,20 @@ public class SchoolReportsService {
 
     private void processDistrictSchoolMap(List<School> schools, ReportGradStudentData reportGradStudentData) {
         boolean addNewSchool = true;
-        String distNo = StringUtils.substring(reportGradStudentData.getMincode(), 0, 3);
+        String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+        String distNo = StringUtils.substring(mincode, 0, 3);
         for (School school : schools) {
-            if (StringUtils.equals(school.getMincode(), reportGradStudentData.getMincode())) {
+            if (StringUtils.equals(school.getMincode(), mincode)) {
                 addNewSchool = false;
                 processDistrictSchool(school, reportGradStudentData);
             }
         }
         if (addNewSchool) {
+            SchoolTrax schoolTrax = schoolService.getTraxSchoolDetails(mincode);
             School school = new School();
             school.setDistno(distNo);
-            school.setMincode(reportGradStudentData.getMincode());
-            school.setName(reportGradStudentData.getSchoolName());
+            school.setMincode(mincode);
+            school.setName(schoolTrax != null ? schoolTrax.getSchoolName() : reportGradStudentData.getSchoolName());
             school.setTypeBanner("Principal");
             schools.add(processDistrictSchool(school, reportGradStudentData));
         }

@@ -133,6 +133,8 @@ endpoint:
  grad-trax-api:
    school-by-min-code:
      url: ${GRAD_TRAX_API}api/v1/trax/school/%s
+   district-by-min-code:
+     url: ${GRAD_TRAX_API}api/v1/trax/district/%s
 
 #Splunk LogHelper
 splunk:

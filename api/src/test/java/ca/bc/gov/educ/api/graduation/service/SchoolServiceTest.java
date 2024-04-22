@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
-import ca.bc.gov.educ.api.graduation.model.dto.GraduationStudentRecord;
-import ca.bc.gov.educ.api.graduation.model.dto.ResponseObj;
-import ca.bc.gov.educ.api.graduation.model.dto.SchoolTrax;
+import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import org.junit.After;
@@ -96,6 +93,19 @@ public class SchoolServiceTest {
         SchoolTrax res = schoolService.getTraxSchoolDetails(mincode);
         assertNotNull(res);
         assertEquals(res.getMinCode(),mincode);
+    }
+
+    @Test
+    public void testGetDistrictDetailsNoToken() {
+        String mincode = "213";
+        DistrictTrax schtrax = new DistrictTrax();
+        schtrax.setDistrictNumber(mincode);
+        schtrax.setAddress1("1231");
+        mockTokenResponseObject();
+        when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
+        DistrictTrax res = schoolService.getTraxDistrictDetails(mincode);
+        assertNotNull(res);
+        assertEquals(res.getDistrictNumber(),mincode);
     }
 
     private String mockTokenResponseObject() {
