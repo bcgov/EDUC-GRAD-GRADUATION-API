@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.model.dto.DistrictTrax;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolTrax;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
@@ -30,6 +31,13 @@ public class SchoolService {
 		String accessToken = tokenUtils.getAccessToken();
 		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode, accessToken),
 				SchoolTrax.class,
+				accessToken);
+	}
+
+	public DistrictTrax getTraxDistrictDetails(String districtCode) {
+		String accessToken = tokenUtils.getAccessToken();
+		return this.restService.get(String.format(educGraduationApiConstants.getDistrictDetails(), districtCode, accessToken),
+				DistrictTrax.class,
 				accessToken);
 	}
 
