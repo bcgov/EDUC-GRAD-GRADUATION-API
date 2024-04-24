@@ -164,7 +164,7 @@ public class ReportService {
             SchoolTrax traxSchool = null;
             if(schoolAtGrad != null) {
                 String mincode = schoolAtGrad.getMincode();
-                traxSchool = schoolService.getSchoolDetails(mincode, accessToken, exception);
+                traxSchool = schoolService.getTraxSchoolDetails(mincode, accessToken, exception);
             }
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
@@ -769,7 +769,7 @@ public class ReportService {
 
     private School getSchoolAtGradData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         if (graduationDataStatus.getGradStatus() != null && !StringUtils.isBlank(graduationDataStatus.getGradStatus().getSchoolAtGrad())) {
-            SchoolTrax schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
+            SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), accessToken, exception);
             if (schoolDetails != null) {
                 return getSchoolData(schoolDetails);
             }

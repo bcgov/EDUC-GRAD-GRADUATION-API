@@ -1,10 +1,9 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.ResponseObj;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import org.junit.After;
-import org.junit.Before;
+import ca.bc.gov.educ.api.graduation.util.TokenUtils;
+import lombok.val;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -19,33 +18,24 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class SchoolServiceTest {
-	
-	@Autowired
-	private SchoolService schoolService;
-	
-	@Autowired
-	GradValidation validation;
-	
-	@MockBean
+public class TokenUtilsTest {
+
+    @Autowired
+    TokenUtils restUtils;
+
+    @MockBean
     WebClient webClient;
 
     @Autowired
-    private EducGraduationApiConstants constants;
+    EducGraduationApiConstants educDistributionApiConstants;
 
-	@MockBean
-	RESTService restService;
-    
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
     @Mock
@@ -56,56 +46,14 @@ public class SchoolServiceTest {
     private WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock
     private WebClient.ResponseSpec responseMock;
-    @Mock
-    private Mono<GraduationStudentRecord> monoResponse;
-	
-    @Before
-    public void setUp() {
-        openMocks(this);
-    }    
-
-	@After
-    public void tearDown() {
-
-    }
-
-	@Test
-	public void testGetSchoolDetails() {
-		String mincode = "213123131";
-		String accessToken = "accessToken";
-		SchoolTrax schtrax = new SchoolTrax();
-		schtrax.setMinCode(mincode);
-		schtrax.setAddress1("1231");
-		when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
-		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, accessToken, new ExceptionMessage());
-		assertNotNull(res);
-		assertEquals(res.getMinCode(),mincode);
-	}
 
     @Test
-    public void testGetSchoolDetailsNoToken() {
-        String mincode = "213123131";
-        SchoolTrax schtrax = new SchoolTrax();
-        schtrax.setMinCode(mincode);
-        schtrax.setAddress1("1231");
-        mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
-        SchoolTrax res = schoolService.getTraxSchoolDetails(mincode);
-        assertNotNull(res);
-        assertEquals(res.getMinCode(),mincode);
-    }
-
-    @Test
-    public void testGetDistrictDetailsNoToken() {
-        String mincode = "213";
-        DistrictTrax schtrax = new DistrictTrax();
-        schtrax.setDistrictNumber(mincode);
-        schtrax.setAddress1("1231");
-        mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
-        DistrictTrax res = schoolService.getTraxDistrictDetails(mincode);
-        assertNotNull(res);
-        assertEquals(res.getDistrictNumber(),mincode);
+    public void testGetTokenResponseObject_returnsToken_with_APICallSuccess() {
+        String mockToken = mockTokenResponseObject();
+        val result = this.restUtils.getTokenResponseObject();
+        assertThat(result).isNotNull();
+        assertThat(result.getAccess_token()).isEqualTo(mockToken);
+        assertThat(result.getRefresh_token()).isEqualTo("456");
     }
 
     private String mockTokenResponseObject() {
@@ -115,7 +63,7 @@ public class SchoolServiceTest {
         tokenObject.setRefresh_token("456");
 
         when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(constants.getTokenUrl())).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(educDistributionApiConstants.getTokenUrl())).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
