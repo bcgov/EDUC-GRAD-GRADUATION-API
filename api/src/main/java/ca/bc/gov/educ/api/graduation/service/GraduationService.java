@@ -248,17 +248,8 @@ public class GraduationService {
 
     public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
         int numberOfReports = 0;
-        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
         ExceptionMessage exception = new ExceptionMessage();
-        int i = 0;
         for (String usl : uniqueSchoolList) {
-            if (i == 0) {
-                res = getAccessToken(accessToken);
-            } else {
-                res = checkAndGetAccessToken(res);
-            }
-            accessToken = res.getLeft();
-
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
                 if(logger.isDebugEnabled()) {
@@ -281,8 +272,6 @@ public class GraduationService {
                             List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
                             logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
-                            res = checkAndGetAccessToken(res);
-                            accessToken = res.getLeft();
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                             logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
@@ -292,7 +281,6 @@ public class GraduationService {
             } catch (Exception e) {
                 logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
-            i++;
         }
         return numberOfReports;
     }
@@ -423,8 +411,7 @@ public class GraduationService {
 
         return this.restService.post(educGraduationApiConstants.getSchoolGraduation(),
                 reportParams,
-                byte[].class,
-                accessToken);
+                byte[].class);
 
     }
 
@@ -445,8 +432,7 @@ public class GraduationService {
     private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
         this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
                 requestObj,
-                SchoolReports.class,
-                accessToken);
+                SchoolReports.class);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -489,8 +475,7 @@ public class GraduationService {
 
         return this.restService.post(educGraduationApiConstants.getStudentNonGradProjected(),
                 reportParams,
-                byte[].class,
-                accessToken);
+                byte[].class);
     }
 
     @Generated
