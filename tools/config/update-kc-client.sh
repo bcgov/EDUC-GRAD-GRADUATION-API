@@ -1,4 +1,6 @@
 # IAC script for KC Client
+# ENVS
+CLIENT_SECRET_NAME=grad-graduation-api-client-secret
 ENV=$1
 COMMON_NAMESPACE=$2
 SOAM_KC_REALM_ID=$3
@@ -32,7 +34,7 @@ function fetchClientCredentials() {
 # Creates the oc client secret
 function createClientSecret() {
       echo Creating secret for client
-      oc create secret generic grad-graduation-api-client-secret \
+      oc create secret generic $CLIENT_SECRET_NAME \
         --from-literal=GRAD_GRADUATION_API_CLIENT_NAME=$CLIENT_ID \
         --from-literal=GRAD_GRADUATION_API_CLIENT_SECRET=$SERVICE_CLIENT_SECRET \
         --dry-run=client -o yaml | oc apply -f -
