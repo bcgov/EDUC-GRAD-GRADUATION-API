@@ -76,7 +76,7 @@ public class SchoolServiceTest {
 		SchoolTrax schtrax = new SchoolTrax();
 		schtrax.setMinCode(mincode);
 		schtrax.setAddress1("1231");
-		when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
+		when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
 		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, accessToken, new ExceptionMessage());
 		assertNotNull(res);
 		assertEquals(res.getMinCode(),mincode);

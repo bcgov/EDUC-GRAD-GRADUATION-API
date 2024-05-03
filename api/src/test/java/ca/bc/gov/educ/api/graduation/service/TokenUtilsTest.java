@@ -8,8 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserter;
@@ -31,7 +36,21 @@ public class TokenUtilsTest {
     TokenUtils restUtils;
 
     @MockBean
+    @Qualifier("graduationClient")
     WebClient webClient;
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public ClientRegistrationRepository clientRegistrationRepository() {
+            return new ClientRegistrationRepository() {
+                @Override
+                public ClientRegistration findByRegistrationId(String registrationId) {
+                    return null;
+                }
+            };
+        }
+    }
 
     @Autowired
     EducGraduationApiConstants educDistributionApiConstants;
