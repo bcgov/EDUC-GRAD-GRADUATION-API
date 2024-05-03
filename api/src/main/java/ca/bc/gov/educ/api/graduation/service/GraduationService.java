@@ -424,12 +424,12 @@ public class GraduationService {
 
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, GRADREG);
 
-        updateSchoolReport(accessToken, requestObj);
+        updateSchoolReport(requestObj);
 
         return bytesSAR;
     }
 
-    private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
+    private void updateSchoolReport(SchoolReports requestObj) {
         this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
                 requestObj,
                 SchoolReports.class);
@@ -460,7 +460,7 @@ public class GraduationService {
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
-        updateSchoolReport(accessToken, requestObj);
+        updateSchoolReport(requestObj);
     }
 
     private byte[] getSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, String accessToken) {
@@ -499,7 +499,7 @@ public class GraduationService {
         byte[] bytesSAR = getSchoolReportStudentNonGradPrjReport(data, mincode, accessToken);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADPRJ);
-        updateSchoolReport(accessToken, requestObj);
+        updateSchoolReport(requestObj);
     }
 
     /**

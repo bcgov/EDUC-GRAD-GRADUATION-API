@@ -43,20 +43,25 @@ public class SchoolReportsService {
     private static final String SCHOOL_DISTRICT_REPORTS_CREATED = "***** {} of School Districts Reports Created *****";
     private static final String SCHOOL_LABEL_REPORTS_CREATED = "***** {} of School Labels Reports Created *****";
 
-    @Autowired
+
     WebClient webClient;
-    @Autowired
     ReportService reportService;
-    @Autowired
     SchoolService schoolService;
-    @Autowired
     TokenUtils tokenUtils;
-
-    @Autowired
     EducGraduationApiConstants educGraduationApiConstants;
+    RESTService restService;
+    JsonTransformer jsonTransformer;
 
     @Autowired
-    JsonTransformer jsonTransformer;
+    public SchoolReportsService(WebClient webClient, ReportService reportService, SchoolService schoolService, TokenUtils tokenUtils, EducGraduationApiConstants educGraduationApiConstants, RESTService restService, JsonTransformer jsonTransformer) {
+        this.webClient = webClient;
+        this.reportService = reportService;
+        this.schoolService = schoolService;
+        this.tokenUtils = tokenUtils;
+        this.educGraduationApiConstants = educGraduationApiConstants;
+        this.restService = restService;
+        this.jsonTransformer = jsonTransformer;
+    }
 
     public byte[] getSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt) {
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
@@ -349,7 +354,7 @@ public class SchoolReportsService {
     private void saveDistrictOrSchoolOrLabelsReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
         SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
-        updateSchoolReport(accessToken, schoolReports);
+        updateSchoolReport(schoolReports);
     }
 
     @Generated
@@ -608,13 +613,10 @@ public class SchoolReportsService {
         return student;
     }
 
-    private void updateSchoolReport(String accessToken, SchoolReports requestObj) {
-        webClient.post().uri(educGraduationApiConstants.getUpdateSchoolReport())
-                .headers(h -> {
-                            h.setBearerAuth(accessToken);
-                            h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        }
-                ).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(SchoolReports.class).block();
+    private void updateSchoolReport(SchoolReports requestObj) {
+        this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
+                requestObj,
+                SchoolReports.class);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
