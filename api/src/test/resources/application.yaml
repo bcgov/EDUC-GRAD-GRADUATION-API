@@ -25,6 +25,16 @@ spring:
         jwt:
           issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
           jwk-set-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/certs
+      client:
+        registration:
+          graduationclient:
+            client-id: my-client
+            client-secret: 123abc
+            authorization-grant-type: client_credentials
+        provider:
+          graduationclient:
+            issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
+            token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
 
 #Logging properties
 logging:
