@@ -17,8 +17,8 @@ spring:
       client:
         registration:
           graduationclient:
-            client-id: ${GRAD_GRADUATION_API_SERVICE_CLIENT_NAME}
-            client-secret: ${GRAD_GRADUATION_API_SERVICE_CLIENT_SECRET}
+            client-id: ${GRAD_GRADUATION_API_CLIENT_NAME}
+            client-secret: ${GRAD_GRADUATION_API_CLIENT_SECRET}
             authorization-grant-type: client_credentials
         provider:
           graduationclient:
