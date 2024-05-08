@@ -14,6 +14,16 @@ spring:
         jwt:
           issuer-uri: ${TOKEN_ISSUER_URL}
           jwk-set-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/certs
+      client:
+        registration:
+          graduationclient:
+            client-id: ${GRAD_GRADUATION_API_SERVICE_CLIENT_NAME}
+            client-secret: ${GRAD_GRADUATION_API_SERVICE_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          graduationclient:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
 #Logging properties
 logging:

@@ -23,8 +23,7 @@ public class SchoolService {
 
 	public SchoolTrax getTraxSchoolDetails(String mincode, String accessToken, ExceptionMessage message) {
 		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode, accessToken),
-				SchoolTrax.class,
-				accessToken);
+				SchoolTrax.class);
 	}
 
 	public SchoolTrax getTraxSchoolDetails(String mincode) {

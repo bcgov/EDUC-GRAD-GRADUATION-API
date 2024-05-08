@@ -374,7 +374,7 @@ public class GradStatusServiceTest {
 		};
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
 		gsr.setLegalLastName("qweqw");
-		when(this.restService.get(any(String.class), any(), any())).thenReturn(List.of(gsr));
+		when(this.restService.get(any(String.class), any())).thenReturn(List.of(gsr));
 
 		List<GraduationStudentRecord> res = gradStatusService.getStudentListByMinCode(mincode,"accessToken");
 		assertThat(res).isNotEmpty().hasSize(1);
