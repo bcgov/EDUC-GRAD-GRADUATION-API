@@ -55,7 +55,7 @@ fetchClientUUID
 if [ "$CLIENT_UUID" = "" ]
 then
   # Client not found
-  echo "$CLIENT_ID DOES NOT EXIST IN KEYCLOAK! A new client with be created with a new access key. Creating..."
+  echo "$CLIENT_ID DOES NOT EXIST IN KEYCLOAK! A new client with be created with a new access key. MAKE SURE TO ADD GRAD_SYSTEM_COORDINATOR Role to new client! Creating..."
   # Retrieve json, remove secret field if exists (shouldn't)
   CLIENT_JSON=$(curl -s https://raw.githubusercontent.com/bcgov/$REPO_NAME/$BRANCH/tools/config/$CLIENT_ID.json | jq -c 'del(.secret)')
   # Create client
@@ -74,18 +74,21 @@ else
   fetchClientCredentials
   # Ensure secret
   createClientSecret
+  ##### IMPORTANT
+  ## No longer removing old client until clients can be freed from roles
+
   # Turf the old client
-  echo Removing existing client...
-  curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$CLIENT_UUID" \
-    -H "Authorization: Bearer $TKN"
+  #echo Removing existing client...
+  #curl -sX DELETE "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients/$CLIENT_UUID" \
+  #  -H "Authorization: Bearer $TKN"
   # Recreate the client wth updated info
-  echo Creating new client with credentials
+  #echo Creating new client with credentials
   # Get JSON and inject secret
-  CLIENT_JSON=$(curl -s https://raw.githubusercontent.com/bcgov/$REPO_NAME/$BRANCH/tools/config/$CLIENT_ID.json | jq -c --arg secret "$SERVICE_CLIENT_SECRET" '.secret = $secret')
-  curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer $TKN" \
-    -d "$CLIENT_JSON"
+  #CLIENT_JSON=$(curl -s https://raw.githubusercontent.com/bcgov/$REPO_NAME/$BRANCH/tools/config/$CLIENT_ID.json | jq -c --arg secret "$SERVICE_CLIENT_SECRET" '.secret = $secret')
+  #curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/clients" \
+  #  -H "Content-Type: application/json" \
+  #  -H "Authorization: Bearer $TKN" \
+  #  -d "$CLIENT_JSON"
 fi
 
 
