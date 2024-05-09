@@ -121,8 +121,7 @@ endpoint:
  grad-student-graduation-api:
   get-special-cases: 
     url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
- educ-school-api:
-   url: ${EDUC_SCHOOL_API}api/v1/schools/%s
+
  pen-student-api:
    by-studentid:
      url: ${PEN_API}api/v1/student/%s
@@ -130,7 +129,11 @@ endpoint:
      url: ${PEN_API}api/v1/student/paginated
    by-pen:
      url: ${PEN_API}api/v1/student?pen=%s
+
+
  grad-trax-api:
+   commonschool-by-mincode:
+     url: ${GRAD_TRAX_API}api/v1/trax/school/common/%s
    school-by-min-code:
      url: ${GRAD_TRAX_API}api/v1/trax/school/%s
    district-by-min-code:
