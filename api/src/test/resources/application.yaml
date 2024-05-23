@@ -25,6 +25,16 @@ spring:
         jwt:
           issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
           jwk-set-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/certs
+      client:
+        registration:
+          graduationclient:
+            client-id: my-client
+            client-secret: 123abc
+            authorization-grant-type: client_credentials
+        provider:
+          graduationclient:
+            issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
+            token-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
 
 #Logging properties
 logging:
@@ -105,8 +115,7 @@ endpoint:
   get-certificate-name: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s
   get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
   get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
- educ-school-api:
-   url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
+
  report-api: 
   achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
   transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
@@ -130,6 +139,8 @@ endpoint:
   by-pen:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
  grad-trax-api:
+  commonschool-by-mincode:
+     url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/common/%s
   school-by-min-code:
     url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/%s
   district-by-min-code:

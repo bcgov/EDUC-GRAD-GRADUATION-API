@@ -140,7 +140,7 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
     private String specialCase;
 
-    @Value("${endpoint.educ-school-api.url}")
+    @Value("${endpoint.grad-trax-api.commonschool-by-mincode.url}")
     private String schoolCategoryCode;
 
     @Value("${endpoint.grad-student-api.update-grad-status-projected}")

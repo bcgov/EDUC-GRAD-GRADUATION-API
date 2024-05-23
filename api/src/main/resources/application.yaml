@@ -14,6 +14,16 @@ spring:
         jwt:
           issuer-uri: ${TOKEN_ISSUER_URL}
           jwk-set-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/certs
+      client:
+        registration:
+          graduationclient:
+            client-id: ${GRAD_GRADUATION_API_CLIENT_NAME}
+            client-secret: ${GRAD_GRADUATION_API_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          graduationclient:
+            issuer-uri: ${TOKEN_ISSUER_URL}
+            token-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/token
 
 #Logging properties
 logging:
@@ -121,8 +131,7 @@ endpoint:
  grad-student-graduation-api:
   get-special-cases: 
     url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
- educ-school-api:
-   url: ${EDUC_SCHOOL_API}api/v1/schools/%s
+
  pen-student-api:
    by-studentid:
      url: ${PEN_API}api/v1/student/%s
@@ -130,7 +139,11 @@ endpoint:
      url: ${PEN_API}api/v1/student/paginated
    by-pen:
      url: ${PEN_API}api/v1/student?pen=%s
+
+
  grad-trax-api:
+   commonschool-by-mincode:
+     url: ${GRAD_TRAX_API}api/v1/trax/school/common/%s
    school-by-min-code:
      url: ${GRAD_TRAX_API}api/v1/trax/school/%s
    district-by-min-code:

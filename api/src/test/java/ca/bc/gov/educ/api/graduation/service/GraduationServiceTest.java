@@ -11,12 +11,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserter;
@@ -40,6 +46,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
 public class GraduationServiceTest {
 
 	@Autowired
@@ -75,11 +82,20 @@ public class GraduationServiceTest {
 	@MockBean
 	private TokenUtils tokenUtils;
 
+	@MockBean
+	private ClientRegistrationRepository clientRegistrationRepository;
+
+	@MockBean
+	private OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
+
 	@Autowired
 	GradValidation validation;
 
-	@MockBean
+	@MockBean(name = "webClient")
 	WebClient webClient;
+
+	@MockBean(name = "graduationServiceWebClient")
+	WebClient graduationServiceWebClient;
 
 	@Autowired
 	JsonTransformer jsonTransformer;
@@ -1998,23 +2014,17 @@ public class GraduationServiceTest {
 		byte[] bytesSAR1 = "Any String you want".getBytes();
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.graduationServiceWebClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolGraduation()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR1));
 
-		byte[] bytesSAR2 = "Just another string".getBytes();
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
-
-		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR2);
+		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR1);
+		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
@@ -2155,33 +2165,18 @@ public class GraduationServiceTest {
 		byte[] bytesSAR1 = "Any String you want".getBytes();
 
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.graduationServiceWebClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getStudentNonGradProjected()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolGraduation()))).thenReturn(this.requestBodyUriMock);
+		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR1));
 
-		byte[] bytesSAR2 = "Any String you want".getBytes();
-
 		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolGraduation()))).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR2));
-
-		byte[] bytesSAR3 = "Just another string".getBytes();
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.uri(String.format(constants.getSchoolNonGraduation()))).thenReturn(this.requestBodyUriMock);
-		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-		when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR3));
-
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.graduationServiceWebClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
@@ -2189,7 +2184,8 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
-		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR3);
+		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR1);
+		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
 		when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
@@ -2253,9 +2249,9 @@ public class GraduationServiceTest {
 
 		byte[] bytesSAR = "Any String you want".getBytes();
 
-		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR);
+		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR);
 
-		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+		when(this.graduationServiceWebClient.post()).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.uri(String.format(constants.getUpdateSchoolReport()))).thenReturn(this.requestBodyUriMock);
 		when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
 		when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);

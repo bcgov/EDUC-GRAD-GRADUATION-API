@@ -131,8 +131,7 @@ public class GradStatusService {
 
 	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord, String accessToken) {
 		List<Map> response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord),
-				List.class,
-				accessToken);
+				List.class);
 		return jsonTransformer.convertValue(response, new TypeReference<>(){});
 	}
 
