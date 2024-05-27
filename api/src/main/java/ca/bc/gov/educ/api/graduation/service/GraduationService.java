@@ -178,7 +178,7 @@ public class GraduationService {
             GraduationStudentRecord graduationStudentRecord = pair.getLeft();
             GraduationData graduationData = pair.getRight();
 
-            if (graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null) {
+            if (isGraduated(graduationStudentRecord, graduationData)) {
                 List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
                 for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
                     if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
@@ -201,6 +201,10 @@ public class GraduationService {
             }
         }
         return i;
+    }
+
+    private boolean isGraduated(GraduationStudentRecord graduationStudentRecord, GraduationData graduationData) {
+        return graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null;
     }
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
