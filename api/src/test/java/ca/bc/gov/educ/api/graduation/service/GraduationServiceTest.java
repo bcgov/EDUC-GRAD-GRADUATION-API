@@ -2074,6 +2074,7 @@ public class GraduationServiceTest {
 
 		ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = new ca.bc.gov.educ.api.graduation.model.dto.GraduationData();
 		graduationData.setOptionalGradStatus(Arrays.asList(optionalStudentProgram1, optionalStudentProgram2));
+		graduationData.setGraduated(true);
 
 		try {
 			gsr.setStudentGradData(new ObjectMapper().writeValueAsString(graduationData));
