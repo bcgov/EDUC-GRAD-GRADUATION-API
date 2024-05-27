@@ -178,27 +178,33 @@ public class GraduationService {
             GraduationStudentRecord graduationStudentRecord = pair.getLeft();
             GraduationData graduationData = pair.getRight();
 
-            List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
-            for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
-                if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
-                    StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-                    studentOptionalProgram.setGraduated(optionalPrograms.getOptionalProgramCompletionDate() != null);
-                    studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
-                    studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
-                    studentOptionalProgram.setStudentOptionalProgramData(optionalPrograms.getStudentOptionalProgramData());
-                    projectedOptionalPrograms.add(studentOptionalProgram);
+            if (isGraduated(graduationStudentRecord, graduationData)) {
+                List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
+                for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
+                    if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
+                        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+                        studentOptionalProgram.setGraduated(optionalPrograms.getOptionalProgramCompletionDate() != null);
+                        studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
+                        studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
+                        studentOptionalProgram.setStudentOptionalProgramData(optionalPrograms.getStudentOptionalProgramData());
+                        projectedOptionalPrograms.add(studentOptionalProgram);
+                    }
                 }
-            }
-            ExceptionMessage exception = new ExceptionMessage();
-            List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
-            token = checkAndGetAccessToken(token);
-            for (ProgramCertificateTranscript certType : certificateList) {
-                reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
-                i++;
-                logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                ExceptionMessage exception = new ExceptionMessage();
+                List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
+                token = checkAndGetAccessToken(token);
+                for (ProgramCertificateTranscript certType : certificateList) {
+                    reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
+                    i++;
+                    logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                }
             }
         }
         return i;
+    }
+
+    private boolean isGraduated(GraduationStudentRecord graduationStudentRecord, GraduationData graduationData) {
+        return graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null;
     }
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
