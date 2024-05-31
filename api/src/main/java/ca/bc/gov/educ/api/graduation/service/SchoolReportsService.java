@@ -322,9 +322,14 @@ public class SchoolReportsService {
     private Integer createAndStoreDistrictReports(String reportType, List<ReportGradStudentData> reportGradStudentDataList, String accessToken, List<InputStream> pdfs) {
         Integer reportsCount = 0;
         Map<School, List<School>> districtSchoolsMap = new HashMap<>();
+        boolean isDistrictReport = DISTREP_YE_SD.equalsIgnoreCase(reportType);
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
-            School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
-            processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+            String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+            String schoolCategoryCode = reportService.getSchoolCategoryCode(accessToken, mincode);
+            if(!StringUtils.equalsAnyIgnoreCase(schoolCategoryCode, "02")) {
+                School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
+                processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+            }
         }
         for (var entry : districtSchoolsMap.entrySet()) {
             School district = entry.getKey();
@@ -333,7 +338,7 @@ public class SchoolReportsService {
             reportRequest.getData().getSchools().addAll(schools);
             accessToken = getAccessToken(accessToken).getLeft();
             byte[] reportAsBytes;
-            if(DISTREP_YE_SD.equalsIgnoreCase(reportType)) {
+            if(isDistrictReport) {
                 reportAsBytes = getDistrictYearEndReportJasper(reportRequest, accessToken);
             } else {
                 reportAsBytes = getDistrictYearEndNonGradReportJasper(reportRequest, accessToken);
