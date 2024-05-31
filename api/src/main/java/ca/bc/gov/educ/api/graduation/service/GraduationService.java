@@ -456,8 +456,7 @@ public class GraduationService {
 
         return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(),
                 reportParams,
-                byte[].class,
-                accessToken);
+                byte[].class);
 
     }
 
