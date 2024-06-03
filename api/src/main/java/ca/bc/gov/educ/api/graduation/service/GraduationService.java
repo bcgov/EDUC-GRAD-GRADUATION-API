@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -39,6 +41,8 @@ public class GraduationService {
     private static final String REGALG = "REGALG";
     private static final String TVRRUN = "TVRRUN";
 
+
+    WebClient webClient;
     AlgorithmProcessFactory algorithmProcessFactory;
     GradStatusService gradStatusService;
     SchoolService schoolService;
@@ -50,7 +54,8 @@ public class GraduationService {
     JsonTransformer jsonTransformer;
 
     @Autowired
-    public GraduationService(AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
+        this.webClient = webClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
         this.schoolService = schoolService;
@@ -136,7 +141,17 @@ public class GraduationService {
         reportParams.setData(reportData);
 
         try {
-            return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class, accessToken);
+            return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+                    .headers(h -> {
+                                h.setBearerAuth(accessToken);
+                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                            }
+                    ).body(BodyInserters.fromValue(reportParams)).retrieve()
+                    .onStatus(
+                            HttpStatus.NO_CONTENT::equals,
+                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                    )
+                    .bodyToMono(byte[].class).block();
         } catch (ServiceException ex) {
             if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
                 return new byte[0];
