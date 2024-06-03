@@ -247,6 +247,7 @@ public class GraduationService {
             } catch (Exception e) {
                 logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
+            i++;
         }
         return result;
     }
