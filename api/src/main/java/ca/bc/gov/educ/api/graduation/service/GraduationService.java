@@ -209,16 +209,8 @@ public class GraduationService {
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
         byte[] result = new byte[0];
-        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
-        int i = 0;
         for (String usl : uniqueSchoolList) {
-            if (i == 0) {
-                res = getAccessToken(accessToken);
-            } else {
-                res = checkAndGetAccessToken(res);
-            }
-            accessToken = res.getLeft();
-
+            accessToken = tokenUtils.getAccessToken(accessToken).getLeft();
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
                 SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, accessToken, new ExceptionMessage());
@@ -247,7 +239,6 @@ public class GraduationService {
             } catch (Exception e) {
                 logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
-            i++;
         }
         return result;
     }
