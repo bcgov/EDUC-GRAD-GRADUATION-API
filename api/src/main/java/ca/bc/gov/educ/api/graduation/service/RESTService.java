@@ -158,8 +158,4 @@ public class RESTService {
     private String getErrorMessage(String url, String errorMessage) {
         return "Service failed to process at url: " + url + " due to: " + errorMessage;
     }
-
-    private String getAccessToken() {
-        return tokenUtils.getAccessToken();
-    }
 }
