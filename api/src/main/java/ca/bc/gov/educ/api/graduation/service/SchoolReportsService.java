@@ -619,9 +619,11 @@ public class SchoolReportsService {
     }
 
     private void updateSchoolReport(SchoolReports requestObj) {
+        String accessToken = getAccessToken();
         this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
                 requestObj,
-                SchoolReports.class);
+                SchoolReports.class,
+                accessToken);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -639,6 +641,10 @@ public class SchoolReportsService {
 
     private Pair<String, Long> getAccessToken(String accessToken) {
         return tokenUtils.getAccessToken(accessToken);
+    }
+
+    private String getAccessToken() {
+        return tokenUtils.getAccessToken();
     }
 
     @SneakyThrows
