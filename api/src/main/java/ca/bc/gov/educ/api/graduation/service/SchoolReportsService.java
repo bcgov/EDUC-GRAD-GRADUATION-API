@@ -363,9 +363,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getSchoolYearEndReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -376,9 +373,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getSchoolLabelsReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getSchoolLabels())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -389,9 +383,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getDistrictYearEndReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -402,9 +393,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getDistrictYearEndNonGradReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
