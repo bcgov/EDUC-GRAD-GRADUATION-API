@@ -178,27 +178,33 @@ public class GraduationService {
             GraduationStudentRecord graduationStudentRecord = pair.getLeft();
             GraduationData graduationData = pair.getRight();
 
-            List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
-            for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
-                if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
-                    StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-                    studentOptionalProgram.setGraduated(optionalPrograms.getOptionalProgramCompletionDate() != null);
-                    studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
-                    studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
-                    studentOptionalProgram.setStudentOptionalProgramData(optionalPrograms.getStudentOptionalProgramData());
-                    projectedOptionalPrograms.add(studentOptionalProgram);
+            if (isGraduated(graduationStudentRecord, graduationData)) {
+                List<StudentOptionalProgram> projectedOptionalPrograms = new ArrayList<>();
+                for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationData.getOptionalGradStatus()) {
+                    if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
+                        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+                        studentOptionalProgram.setGraduated(optionalPrograms.getOptionalProgramCompletionDate() != null);
+                        studentOptionalProgram.setOptionalProgramCode(optionalPrograms.getOptionalProgramCode());
+                        studentOptionalProgram.setProgramCode(graduationStudentRecord.getProgram());
+                        studentOptionalProgram.setStudentOptionalProgramData(optionalPrograms.getStudentOptionalProgramData());
+                        projectedOptionalPrograms.add(studentOptionalProgram);
+                    }
                 }
-            }
-            ExceptionMessage exception = new ExceptionMessage();
-            List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
-            token = checkAndGetAccessToken(token);
-            for (ProgramCertificateTranscript certType : certificateList) {
-                reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
-                i++;
-                logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                ExceptionMessage exception = new ExceptionMessage();
+                List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
+                token = checkAndGetAccessToken(token);
+                for (ProgramCertificateTranscript certType : certificateList) {
+                    reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
+                    i++;
+                    logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                }
             }
         }
         return i;
+    }
+
+    private boolean isGraduated(GraduationStudentRecord graduationStudentRecord, GraduationData graduationData) {
+        return graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null;
     }
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
@@ -229,7 +235,7 @@ public class GraduationService {
                         case NONGRADREG:
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
                             gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
-                            return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                            return getSchoolReportNonGradRegReport(gradReport, schoolObj.getMincode());
                         case NONGRADPRJ:
                             List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
                             gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
@@ -274,7 +280,7 @@ public class GraduationService {
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                             logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
-                            numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, accessToken, numberOfReports);
+                            numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, numberOfReports);
                         }
                     }
                 }
@@ -307,9 +313,9 @@ public class GraduationService {
         return numberOfReports;
     }
 
-    private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
+    private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
         ReportData gradReport = getReportDataObj(schoolObj, stdList);
-        createAndSaveSchoolReportNonGradRegReport(gradReport, mincode, accessToken);
+        createAndSaveSchoolReportNonGradRegReport(gradReport, mincode);
         numberOfReports++;
         return numberOfReports;
     }
@@ -440,7 +446,7 @@ public class GraduationService {
         return new String(encoded, StandardCharsets.US_ASCII);
     }
 
-    private byte[] getSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
+    private byte[] getSchoolReportNonGradRegReport(ReportData data, String mincode) {
         ReportOptions options = new ReportOptions();
         options.setReportFile(String.format("%s_%s00_NONGRADREG", mincode, LocalDate.now().getYear()));
         options.setReportName(String.format("%s_%s00_NONGRADREG.pdf", mincode, LocalDate.now().getYear()));
@@ -450,14 +456,13 @@ public class GraduationService {
 
         return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(),
                 reportParams,
-                byte[].class,
-                accessToken);
+                byte[].class);
 
     }
 
     @Generated
-    private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode, String accessToken) {
-        byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode, accessToken);
+    private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode) {
+        byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
         updateSchoolReport(requestObj);
