@@ -324,10 +324,13 @@ public class SchoolReportsService {
         Map<School, List<School>> districtSchoolsMap = new HashMap<>();
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
             String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+            String districtCode = StringUtils.substring(mincode, 0, 3);
             String schoolCategoryCode = reportService.getSchoolCategoryCode(accessToken, mincode);
             if(!StringUtils.equalsAnyIgnoreCase(schoolCategoryCode, "02")) {
                 School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
                 processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+            } else {
+                logger.debug("Skip {} independent school {} for district {}", schoolCategoryCode, mincode, districtCode);
             }
         }
         for (var entry : districtSchoolsMap.entrySet()) {
