@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import ca.bc.gov.educ.api.graduation.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -21,16 +20,14 @@ public class RESTService {
 
     private final WebClient webClient;
     private final WebClient graduationServiceWebClient;
-    private final TokenUtils tokenUtils;
 
     private static final String ERROR_5xx = "5xx error.";
     private static final String SERVICE_FAILED_ERROR = "Service failed to process after max retries.";
 
     @Autowired
-    public RESTService(@Qualifier("graduationClient") WebClient graduationServiceWebClient, WebClient webClient, TokenUtils tokenUtils) {
+    public RESTService(@Qualifier("graduationClient") WebClient graduationServiceWebClient, WebClient webClient) {
         this.webClient = webClient;
         this.graduationServiceWebClient = graduationServiceWebClient;
-        this.tokenUtils = tokenUtils;
     }
 
     /**

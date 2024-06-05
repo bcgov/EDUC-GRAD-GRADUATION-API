@@ -222,7 +222,7 @@ public class SchoolReportsService {
         }
         if (pdfs == null) {
             String schoolLabelMinCode = (schools != null && schools.size() == 1) ? schools.get(0).getMincode() : "000000000";
-            saveDistrictOrSchoolOrLabelsReport(accessToken, schoolLabelMinCode, reportType, reportAsBytes);
+            saveDistrictOrSchoolOrLabelsReport(schoolLabelMinCode, reportType, reportAsBytes);
         }
         reportsCount++;
         return reportsCount;
@@ -284,7 +284,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -310,7 +310,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -350,7 +350,7 @@ public class SchoolReportsService {
                 pdfs.add(is);
             }
             if (pdfs == null) {
-                saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
             }
             reportsCount++;
         }
@@ -358,7 +358,7 @@ public class SchoolReportsService {
     }
 
     @Generated
-    private void saveDistrictOrSchoolOrLabelsReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
+    private void saveDistrictOrSchoolOrLabelsReport(String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
         SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
         updateSchoolReport(schoolReports);
@@ -609,11 +609,9 @@ public class SchoolReportsService {
     }
 
     private void updateSchoolReport(SchoolReports requestObj) {
-        String accessToken = getAccessToken();
         this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
                 requestObj,
-                SchoolReports.class,
-                accessToken);
+                SchoolReports.class);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -631,10 +629,6 @@ public class SchoolReportsService {
 
     private Pair<String, Long> getAccessToken(String accessToken) {
         return tokenUtils.getAccessToken(accessToken);
-    }
-
-    private String getAccessToken() {
-        return tokenUtils.getAccessToken();
     }
 
     @SneakyThrows
