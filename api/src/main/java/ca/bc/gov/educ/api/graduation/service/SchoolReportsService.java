@@ -222,7 +222,7 @@ public class SchoolReportsService {
         }
         if (pdfs == null) {
             String schoolLabelMinCode = (schools != null && schools.size() == 1) ? schools.get(0).getMincode() : "000000000";
-            saveDistrictOrSchoolOrLabelsReport(accessToken, schoolLabelMinCode, reportType, reportAsBytes);
+            saveDistrictOrSchoolOrLabelsReport(schoolLabelMinCode, reportType, reportAsBytes);
         }
         reportsCount++;
         return reportsCount;
@@ -284,7 +284,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -310,7 +310,7 @@ public class SchoolReportsService {
                     pdfs.add(is);
                 }
                 if (pdfs == null) {
-                    saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                    saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
                 }
                 reportsCount++;
             }
@@ -323,8 +323,15 @@ public class SchoolReportsService {
         Integer reportsCount = 0;
         Map<School, List<School>> districtSchoolsMap = new HashMap<>();
         for (ReportGradStudentData reportGradStudentData : reportGradStudentDataList) {
-            School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
-            processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+            String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+            String districtCode = StringUtils.substring(mincode, 0, 3);
+            String schoolCategoryCode = reportService.getSchoolCategoryCode(accessToken, mincode);
+            if(!StringUtils.equalsAnyIgnoreCase(schoolCategoryCode, "02")) {
+                School district = populateDistrictObjectByReportGradStudentData(districtSchoolsMap, reportGradStudentData);
+                processDistrictSchoolMap(districtSchoolsMap.get(district), reportGradStudentData);
+            } else {
+                logger.debug("Skip {} independent school {} for district {}", schoolCategoryCode, mincode, districtCode);
+            }
         }
         for (var entry : districtSchoolsMap.entrySet()) {
             School district = entry.getKey();
@@ -343,7 +350,7 @@ public class SchoolReportsService {
                 pdfs.add(is);
             }
             if (pdfs == null) {
-                saveDistrictOrSchoolOrLabelsReport(accessToken, reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
+                saveDistrictOrSchoolOrLabelsReport(reportRequest.getData().getSchool().getMincode(), reportType, reportAsBytes);
             }
             reportsCount++;
         }
@@ -351,7 +358,7 @@ public class SchoolReportsService {
     }
 
     @Generated
-    private void saveDistrictOrSchoolOrLabelsReport(String accessToken, String mincode, String reportType, byte[] reportAsBytes) {
+    private void saveDistrictOrSchoolOrLabelsReport(String mincode, String reportType, byte[] reportAsBytes) {
         String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
         SchoolReports schoolReports = getSchoolReports(mincode, encodedPdf, reportType);
         updateSchoolReport(schoolReports);
@@ -359,9 +366,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getSchoolYearEndReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getSchoolDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -372,9 +376,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getSchoolLabelsReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getSchoolLabels())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -385,9 +386,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getDistrictYearEndReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEnd())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);
@@ -398,9 +396,6 @@ public class SchoolReportsService {
 
     @Generated
     private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest, String accessToken) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("getDistrictYearEndNonGradReportJasper(ReportRequest): {}", jsonTransformer.marshall(reportRequest));
-        }
         return webClient.post().uri(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad())
                 .headers(h -> {
                             h.setBearerAuth(accessToken);

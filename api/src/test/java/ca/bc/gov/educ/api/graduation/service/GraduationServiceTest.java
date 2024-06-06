@@ -13,12 +13,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -2040,7 +2038,11 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
-		assertEquals(2,numberOfRecord);
+		assertEquals(1,numberOfRecord);
+
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(List.of());
+		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
+		assertEquals(0,numberOfRecord);
 	}
 
 	@Test

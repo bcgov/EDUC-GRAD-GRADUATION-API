@@ -69,9 +69,6 @@ public class GradStatusService {
 	}
 	
 	public GraduationStudentRecord saveStudentGradStatus(String studentID,Long batchId,String accessToken, GraduationStudentRecord toBeSaved, ExceptionMessage exception) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("saveStudentGradStatus {}", jsonTransformer.marshall(toBeSaved));
-		}
 		try {
 			String url = educGraduationApiConstants.getUpdateGradStatus();
 			if(batchId != null) {
