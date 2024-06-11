@@ -159,13 +159,24 @@ public class SchoolReportsService {
         if(schools != null && !schools.isEmpty()) {
             boolean isDistrictSchool = schools.get(0).length() == 3;
             if(isDistrictSchool) {
+                //--> Revert code back to school of record GRAD2-2758
+                /**
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3))));
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincodeAtGrad(), 0, 3))));
+                 **/
+                reportGradStudentDataList.removeIf(st->!schools.contains(StringUtils.substring(st.getMincode(), 0, 3)));
+                //<--
+
             }
             boolean isSchoolSchool = schools.get(0).length() > 3;
             if(isSchoolSchool) {
+                //--> Revert code back to school of record GRAD2-2758
+                /**
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincode()))));
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincodeAtGrad()))));
+                 **/
+                reportGradStudentDataList.removeIf(st->!schools.contains(st.getMincode()));
+                //<--
             }
         }
         return createAndStoreReports(reportGradStudentDataList, accessToken, slrt, drt, srt, null);
@@ -462,7 +473,10 @@ public class SchoolReportsService {
 
     private School populateDistrictObjectByReportGradStudentData(Map<School, List<School>> districtSchoolsMap, ReportGradStudentData reportGradStudentData) {
         //district data, not school
-        String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+        //--> Revert code back to school of record GRAD2-2758
+        /** String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();**/
+        String mincode = reportGradStudentData.getMincode();
+        //<--
         String distcode = StringUtils.substring(mincode, 0, 3);
         boolean addNewDistrict = true;
         School district = null;
@@ -485,7 +499,10 @@ public class SchoolReportsService {
     }
 
     private School populateSchoolObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
-        String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+        //--> Revert code back to school of record GRAD2-2758
+        /** String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();**/
+        String mincode = reportGradStudentData.getMincode();
+        //<--
         SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(mincode);
         School school = new School();
         school.setStudents(new ArrayList<>());
@@ -508,7 +525,10 @@ public class SchoolReportsService {
     }
 
     private School populateSchoolObjectByReportGradStudentData(Map<String, School> schoolMap, ReportGradStudentData reportGradStudentData) {
-        String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+        //--> Revert code back to school of record GRAD2-2758
+        /** String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();**/
+        String mincode = reportGradStudentData.getMincode();
+        //<--
         School school = schoolMap.get(mincode);
         if (school == null) {
             school = populateSchoolObjectByReportGradStudentData(reportGradStudentData);
@@ -519,7 +539,10 @@ public class SchoolReportsService {
 
     private void processDistrictSchoolMap(List<School> schools, ReportGradStudentData reportGradStudentData) {
         boolean addNewSchool = true;
-        String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();
+        //--> Revert code back to school of record GRAD2-2758
+        /** String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();**/
+        String mincode = reportGradStudentData.getMincode();
+        //<--
         String distNo = StringUtils.substring(mincode, 0, 3);
         for (School school : schools) {
             if (StringUtils.equals(school.getMincode(), mincode)) {
@@ -598,7 +621,10 @@ public class SchoolReportsService {
 
         GraduationStatus gradStatus = new GraduationStatus();
         gradStatus.setProgramCompletionDate(reportGradStudentData.getProgramCompletionDate());
-        gradStatus.setSchoolOfRecord(StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad());
+        //--> Revert code back to school of record GRAD2-2758
+        /** gradStatus.setSchoolOfRecord(StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad()); **/
+        gradStatus.setSchoolOfRecord(reportGradStudentData.getMincode());
+        //<--
         gradStatus.setSchoolAtGrad(reportGradStudentData.getMincodeAtGrad());
         gradStatus.setProgramName(reportGradStudentData.getProgramCode());
         gradStatus.setCertificates(reportGradStudentData.getCertificateTypeCode());
