@@ -160,12 +160,15 @@ public class ReportService {
         try {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, accessToken, exception);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
-            //GRAD2-1847
+            //--> Revert code back to school of record GRAD2-2758
+            /**
             SchoolTrax traxSchool = null;
             if(schoolAtGrad != null) {
                 String mincode = schoolAtGrad.getMincode();
                 traxSchool = schoolService.getTraxSchoolDetails(mincode, accessToken, exception);
-            }
+            } **/
+            SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(schoolOfRecord.getMincode(), accessToken, exception);
+            //<--
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse, accessToken);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
@@ -825,7 +828,10 @@ public class ReportService {
         if (schoolAtGrad != null
                 && schoolOfRecord != null
                 && !StringUtils.equalsIgnoreCase(schoolOfRecord.getMincode(), schoolAtGrad.getMincode())) {
-            gradMessage = StringUtils.replace(gradMessage, schoolOfRecord.getName(), schoolAtGrad.getName());
+            //--> Revert code back to school of record GRAD2-2758
+            /** gradMessage = StringUtils.replace(gradMessage, schoolOfRecord.getName(), schoolAtGrad.getName());**/
+            //<--
+            log.debug("Replace school of record {} to school at graduation {}", schoolOfRecord.getName(), schoolAtGrad.getName());
         }
         gradStatus.setGraduationMessage(gradMessage);
         return gradStatus;
