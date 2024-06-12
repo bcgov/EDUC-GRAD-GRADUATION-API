@@ -164,7 +164,7 @@ public class SchoolReportsService {
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3))));
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincodeAtGrad(), 0, 3))));
                  **/
-                reportGradStudentDataList.removeIf(st->!schools.contains(StringUtils.substring(st.getMincode(), 0, 3)));
+                reportGradStudentDataList.removeIf(st->schools != null && !schools.isEmpty() && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3)));
                 //<--
 
             }
@@ -175,7 +175,7 @@ public class SchoolReportsService {
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincode()))));
                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincodeAtGrad()))));
                  **/
-                reportGradStudentDataList.removeIf(st->!schools.contains(st.getMincode()));
+                reportGradStudentDataList.removeIf(st->schools != null && !schools.isEmpty() && !schools.contains(st.getMincode()));
                 //<--
             }
         }
