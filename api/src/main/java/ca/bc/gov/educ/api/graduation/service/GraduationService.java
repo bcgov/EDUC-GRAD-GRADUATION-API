@@ -307,16 +307,20 @@ public class GraduationService {
     }
 
     private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
-        ReportData gradReport = getReportDataObj(schoolObj, stdList);
-        createAndSaveSchoolReportGradRegReport(gradReport, mincode, accessToken);
-        numberOfReports++;
+        if(stdList != null && !stdList.isEmpty()) {
+            ReportData gradReport = getReportDataObj(schoolObj, stdList);
+            createAndSaveSchoolReportGradRegReport(gradReport, mincode, accessToken);
+            numberOfReports++;
+        }
         return numberOfReports;
     }
 
     private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
-        ReportData gradReport = getReportDataObj(schoolObj, stdList);
-        createAndSaveSchoolReportNonGradRegReport(gradReport, mincode);
-        numberOfReports++;
+        if(stdList != null && !stdList.isEmpty()) {
+            ReportData gradReport = getReportDataObj(schoolObj, stdList);
+            createAndSaveSchoolReportNonGradRegReport(gradReport, mincode);
+            numberOfReports++;
+        }
         return numberOfReports;
     }
 
@@ -330,9 +334,11 @@ public class GraduationService {
     }
 
     private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
-        ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
-        createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode, accessToken);
-        numberOfReports++;
+        if(stdList != null && !stdList.isEmpty()) {
+            ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
+            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode, accessToken);
+            numberOfReports++;
+        }
         return numberOfReports;
     }
 
@@ -421,7 +427,7 @@ public class GraduationService {
 
     }
 
-
+    @Generated
     private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
 
         byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode, accessToken);

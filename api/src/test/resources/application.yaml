@@ -39,9 +39,6 @@ spring:
 #Logging properties
 logging:
   file:
-    max-history: 1
-    clean-history-on-start: true
-    max-size: 20MB
     name: /logs/app.log
   #pattern:
   #  file: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
@@ -60,6 +57,11 @@ logging:
         boot:
           autoconfigure:
             logging: INFO
+  logback:
+    rollingpolicy:
+      max-history: 1
+      clean-history-on-start: true
+      max-file-size: 20MB
 
 authorization:
   user: batch-api
