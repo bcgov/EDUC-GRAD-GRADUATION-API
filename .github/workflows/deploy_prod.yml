@@ -87,7 +87,7 @@ jobs:
           # UPDATE KC Client
           curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-kc-client.sh \
           | bash /dev/stdin \
-          dev \
+          prod \
           ${{ env.COMMON_NAMESPACE }} \
           ${{ env.SOAM_KC_REALM_ID }} \
           ${{ secrets.CLIENT_ID }} \
