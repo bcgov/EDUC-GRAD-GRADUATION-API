@@ -128,16 +128,6 @@ jobs:
           ${{ env.BUSINESS_NAMESPACE }} \
           ${{ secrets.SPLUNK_TOKEN }} \
           ${{ vars.APP_LOG_LEVEL }}
-          
-          # UPDATE KC Client
-          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ env.BRANCH }}/tools/config/update-kc-client.sh \
-          | bash /dev/stdin \
-          dev \
-          ${{ env.COMMON_NAMESPACE }} \
-          ${{ env.SOAM_KC_REALM_ID }} \
-          ${{ secrets.CLIENT_ID }} \
-          ${{ env.BRANCH }} \
-          ${{ env.REPO_NAME }}
 
           # Start rollout (if necessary) and follow it
           oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
