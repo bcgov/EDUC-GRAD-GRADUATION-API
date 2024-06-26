@@ -320,7 +320,7 @@ public class ReportService {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         for (StudentCourse sc : studentCourseList) {
-            Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+            Date sessionDate = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
             int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
             boolean notCompletedCourse = xml && diff <= 0;
@@ -447,7 +447,7 @@ public class ReportService {
     private String checkCutOffCourseDate(String sDate, Double value) {
         String cutoffDate = "1991-11-01";
         String sessionDate = sDate + "/01";
-        Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+        Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
         sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
         int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
@@ -483,7 +483,7 @@ public class ReportService {
             boolean skipProcessing = false;
             boolean notCompletedCourse = false;
             if (sc.getSessionDate() != null) {
-                Date sessionDate = EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+                Date sessionDate = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
                 String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
                 int diff = EducGraduationApiUtils.getDifferenceInMonths(sDate, today);
                 notCompletedCourse = xml && diff <= 0;
@@ -497,7 +497,7 @@ public class ReportService {
                     String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
                     if(sc.getSessionDate() != null) {
                         String sessionDate = sc.getSessionDate() + "/01";
-                        Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+                        Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
                         sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
                         int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
@@ -602,7 +602,7 @@ public class ReportService {
         if (provincially.equalsIgnoreCase("provincially")) {
             return finalCompletedPercentage;
         }
-        Date temp = EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
+        Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
         sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
         int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
@@ -1356,7 +1356,7 @@ public class ReportService {
         log.debug("GradMessageRequest: Grad Date = {}", gradDateStr);
         SimpleDateFormat dateFormat = new SimpleDateFormat(programCompletionDate.length() < 10? EducGraduationApiConstants.SECONDARY_DATE_FORMAT : EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         try {
-            Date dt = dateFormat.parse(gradDateStr);
+            Date dt = toLastDayOfMonth(dateFormat.parse(gradDateStr));
             Calendar calGradDate = Calendar.getInstance();
             calGradDate.setTime(dt);
             Calendar now = Calendar.getInstance();
@@ -1381,5 +1381,12 @@ public class ReportService {
         students.removeIf(s->"SCCP".equalsIgnoreCase(s.getProgramCode()));
         students.removeIf(s->"1950".equalsIgnoreCase(s.getProgramCode()) && !"AD".equalsIgnoreCase(s.getStudentGrade()));
         students.removeIf(s->!"1950".equalsIgnoreCase(s.getProgramCode()) && !"12".equalsIgnoreCase(s.getStudentGrade()));
+    }
+
+    private Date toLastDayOfMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return cal.getTime();
     }
 }
