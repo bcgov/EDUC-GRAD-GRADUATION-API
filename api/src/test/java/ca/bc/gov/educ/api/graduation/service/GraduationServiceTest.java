@@ -2040,7 +2040,7 @@ public class GraduationServiceTest {
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
 		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
-		assertEquals(1,numberOfRecord);
+		assertEquals(2,numberOfRecord);
 
 		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(List.of());
 		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
