@@ -87,6 +87,7 @@ endpoint:
   update-grad-status-algo-error: ${GRAD_STUDENT_API}api/v1/student/algorithmerror/%s?isGraduated=%s
   update-grad-status-projected: ${GRAD_STUDENT_API}api/v1/student/projected/studentid/%s
   student-for-school-report: ${GRAD_STUDENT_API}api/v1/student/batch/schoolreport/%s
+  student-count-for-school-report: ${GRAD_STUDENT_API}api/v1/student/amalgamated/schoolreport/%s/count
   school-nongrad-year-end-students: ${GRAD_STUDENT_API}api/v1/student/studentschoolreportdata
   student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
   student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
