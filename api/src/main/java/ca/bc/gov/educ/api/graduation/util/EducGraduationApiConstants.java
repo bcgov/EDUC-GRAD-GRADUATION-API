@@ -67,6 +67,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.grad-student-api.student-for-school-report}")
     private String gradStudentListSchoolReport;
+
+    @Value("${endpoint.grad-student-api.student-count-for-school-report}")
+    private String gradStudentCountSchoolReport;
     
     @Value("${endpoint.grad-student-api.read-grad-student-record}")
     private String readGradStudentRecord;

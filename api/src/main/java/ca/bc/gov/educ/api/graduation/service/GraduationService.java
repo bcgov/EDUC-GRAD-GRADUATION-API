@@ -307,7 +307,8 @@ public class GraduationService {
     }
 
     private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
-        if(stdList != null && !stdList.isEmpty()) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+        if(studentsCount > 0) {
             ReportData gradReport = getReportDataObj(schoolObj, stdList);
             createAndSaveSchoolReportGradRegReport(gradReport, mincode, accessToken);
             numberOfReports++;
@@ -316,12 +317,27 @@ public class GraduationService {
     }
 
     private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
-        if(stdList != null && !stdList.isEmpty()) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+        if(studentsCount > 0) {
             ReportData gradReport = getReportDataObj(schoolObj, stdList);
             createAndSaveSchoolReportNonGradRegReport(gradReport, mincode);
             numberOfReports++;
         }
         return numberOfReports;
+    }
+
+    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+        if(studentsCount > 0) {
+            ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
+            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode, accessToken);
+            numberOfReports++;
+        }
+        return numberOfReports;
+    }
+
+    private int countStudentsForAmalgamatedSchoolReport(String mincode) {
+        return restService.get(String.format(educGraduationApiConstants.getGradStudentCountSchoolReport(), mincode), Integer.class);
     }
 
     private ReportData getReportDataObj(School schoolObj, List<Student> stdList) {
@@ -331,15 +347,6 @@ public class GraduationService {
         data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
         data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
         return data;
-    }
-
-    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
-        if(stdList != null && !stdList.isEmpty()) {
-            ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode, accessToken);
-            numberOfReports++;
-        }
-        return numberOfReports;
     }
 
     /**
