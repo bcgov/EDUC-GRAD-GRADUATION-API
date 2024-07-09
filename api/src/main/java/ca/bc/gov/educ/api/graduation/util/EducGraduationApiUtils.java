@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 public class EducGraduationApiUtils {
@@ -152,19 +153,15 @@ public class EducGraduationApiUtils {
 
 	public static String parsingDateForCertificate(String sessionDate) {
 		String actualSessionDate = sessionDate + "/01";
-		String sDates = null;
-		Date temp = parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-		sDates = formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-		return sDates;
+		Date temp = toLastDayOfMonth(parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
+		return formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 	}
 
 	public static Date parsingTraxDate(String sessionDate) {
 		String actualSessionDate = StringUtils.countMatches(sessionDate, "/") == 2 ? sessionDate : sessionDate + "/01";
-		Date sDate = null;
 		Date temp = EducGraduationApiUtils.parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
 		String sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-		sDate = EducGraduationApiUtils.parseDate(sDates, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-		return sDate;
+		return toLastDayOfMonth(EducGraduationApiUtils.parseDate(sDates, EducGraduationApiConstants.DEFAULT_DATE_FORMAT));
 	}
 
 	public static LocalDate parsingTraxDateLocalDate(String sessionDate) {
@@ -173,10 +170,8 @@ public class EducGraduationApiUtils {
 
 	public static String parsingNFormating(String inDate) {
 		String actualDate = StringUtils.countMatches(inDate, "/") == 2 ? inDate : inDate + "/01";
-		String sDates = null;
-		Date temp = EducGraduationApiUtils.parseDate(actualDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
-		sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-		return sDates;
+		Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(actualDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
+		return EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 	}
 
 	public static String getSimpleDateFormat(Date date) {
@@ -203,5 +198,15 @@ public class EducGraduationApiUtils {
 		int monthsYear = diff.getYears() * 12;
 		int months = diff.getMonths();
 		return monthsYear + months;
+	}
+
+	static Date toLastDayOfMonth(Date date) {
+		if(date != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+			return cal.getTime();
+		}
+		return null;
 	}
 }
