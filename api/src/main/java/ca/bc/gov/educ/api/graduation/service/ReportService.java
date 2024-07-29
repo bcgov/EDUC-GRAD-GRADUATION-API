@@ -55,6 +55,9 @@ public class ReportService {
     @Autowired
     OptionalProgramService optionalProgramService;
 
+    @Autowired
+    RESTService restService;
+
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
@@ -96,15 +99,9 @@ public class ReportService {
     }
 
     public String getSchoolCategoryCode(String accessToken, String mincode) {
-        CommonSchool commonSchoolObj = webClient.get().uri(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(CommonSchool.class).block();
-        if (commonSchoolObj != null) {
-            return commonSchoolObj.getSchoolCategoryCode();
-        }
-        return null;
+        // Send to restclient instead
+        CommonSchool commonSchool = this.restService.get(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode), CommonSchool.class);
+        return (commonSchool == null) ? null : commonSchool.getSchoolCategoryCode();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {

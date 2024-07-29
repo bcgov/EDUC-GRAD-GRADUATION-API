@@ -2843,16 +2843,9 @@ public class ReportServiceTest {
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
-
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
-
+		when(this.restService.get(String.format(constants.getSchoolCategoryCode(),"09323027"), CommonSchool.class)).thenReturn(commSch);
 		var result = reportService.getSchoolCategoryCode("accessToken", commSch.getSchlNo());
 		assertThat(result).isNotNull();
-
 	}
 
 	@Test
