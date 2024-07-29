@@ -22,7 +22,7 @@ public class RESTService {
     private final WebClient webClient;
     private final WebClient graduationServiceWebClient;
 
-    private static final String ERROR_5xx = "5xx error.";
+    private static final String SERVER_ERROR = "5xx error.";
     private static final String SERVICE_FAILED_ERROR = "Service failed to process after max retries.";
 
     @Autowired
@@ -54,7 +54,7 @@ public class RESTService {
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     // only does retry if initial error was 5xx as service may be temporarily down
                     // 4xx errors will always happen if 404, 401, 403 etc, so does not retry
@@ -77,11 +77,11 @@ public class RESTService {
             obj = graduationServiceWebClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     // only does retry if initial error was 5xx as service may be temporarily down
                     // 4xx errors will always happen if 404, 401, 403 etc, so does not retry
@@ -95,7 +95,7 @@ public class RESTService {
             // catches IOExceptions and the like
             throw new ServiceException(
                     getErrorMessage(url, e.getLocalizedMessage()),
-                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    (e instanceof WebClientResponseException exception) ? exception.getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
                     e);
         }
         return obj;
@@ -119,7 +119,7 @@ public class RESTService {
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                             .filter(ServiceException.class::isInstance)
@@ -130,7 +130,7 @@ public class RESTService {
         } catch (Exception e) {
             throw new ServiceException(
                     getErrorMessage(url, e.getLocalizedMessage()),
-                    (e instanceof WebClientResponseException) ? ((WebClientResponseException) e).getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
+                    (e instanceof WebClientResponseException exception) ? exception.getStatusCode().value() : HttpStatus.SERVICE_UNAVAILABLE.value(),
                     e);
         }
         return obj;
@@ -141,11 +141,11 @@ public class RESTService {
         try {
             obj = graduationServiceWebClient.post()
                     .uri(url)
-                    .headers(h -> { h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()))
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
-                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, ERROR_5xx), clientResponse.statusCode().value())))
+                            clientResponse -> Mono.error(new ServiceException(getErrorMessage(url, SERVER_ERROR), clientResponse.statusCode().value())))
                     .bodyToMono(clazz)
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                             .filter(ServiceException.class::isInstance)

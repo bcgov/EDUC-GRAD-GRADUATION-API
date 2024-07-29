@@ -40,23 +40,23 @@ public class ReportService {
     private static final String NO_CONTENT = "NO_CONTENT";
     private static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
-    @Autowired
+
     WebClient webClient;
-
-    @Autowired
     JsonTransformer jsonTransformer;
-
-    @Autowired
     EducGraduationApiConstants educGraduationApiConstants;
-
-    @Autowired
     SchoolService schoolService;
-
-    @Autowired
     OptionalProgramService optionalProgramService;
+    RESTService restService;
 
     @Autowired
-    RESTService restService;
+    public ReportService(WebClient webClient, JsonTransformer jsonTransformer, EducGraduationApiConstants educGraduationApiConstants, SchoolService schoolService, OptionalProgramService optionalProgramService, RESTService restService) {
+        this.webClient = webClient;
+        this.jsonTransformer = jsonTransformer;
+        this.educGraduationApiConstants = educGraduationApiConstants;
+        this.schoolService = schoolService;
+        this.optionalProgramService = optionalProgramService;
+        this.restService = restService;
+    }
 
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
