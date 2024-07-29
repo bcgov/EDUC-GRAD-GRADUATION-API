@@ -40,25 +40,28 @@ public class ReportService {
     private static final String NO_CONTENT = "NO_CONTENT";
     private static final String INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR";
 
-    @Autowired
+
     WebClient webClient;
-
-    @Autowired
     JsonTransformer jsonTransformer;
-
-    @Autowired
     EducGraduationApiConstants educGraduationApiConstants;
-
-    @Autowired
     SchoolService schoolService;
+    OptionalProgramService optionalProgramService;
+    RESTService restService;
 
     @Autowired
-    OptionalProgramService optionalProgramService;
+    public ReportService(WebClient webClient, JsonTransformer jsonTransformer, EducGraduationApiConstants educGraduationApiConstants, SchoolService schoolService, OptionalProgramService optionalProgramService, RESTService restService) {
+        this.webClient = webClient;
+        this.jsonTransformer = jsonTransformer;
+        this.educGraduationApiConstants = educGraduationApiConstants;
+        this.schoolService = schoolService;
+        this.optionalProgramService = optionalProgramService;
+        this.restService = restService;
+    }
 
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
-        req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
         try {
             return webClient.post().uri(educGraduationApiConstants.getTranscript())
                     .headers(h -> {
@@ -80,7 +83,7 @@ public class ReportService {
                 req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
             }
         }
-        req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
         try {
             return webClient.post().uri(educGraduationApiConstants.getCertList())
                     .headers(h -> {
@@ -95,16 +98,10 @@ public class ReportService {
         }
     }
 
-    public String getSchoolCategoryCode(String accessToken, String mincode) {
-        CommonSchool commonSchoolObj = webClient.get().uri(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(CommonSchool.class).block();
-        if (commonSchoolObj != null) {
-            return commonSchoolObj.getSchoolCategoryCode();
-        }
-        return null;
+    public String getSchoolCategoryCode(String mincode) {
+        // Send to restclient instead
+        CommonSchool commonSchool = this.restService.get(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode), CommonSchool.class);
+        return (commonSchool == null) ? null : commonSchool.getSchoolCategoryCode();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {

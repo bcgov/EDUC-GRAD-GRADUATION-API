@@ -1999,9 +1999,6 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-		};
-
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
 		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
@@ -2332,8 +2329,6 @@ public class ReportServiceTest {
 	public void testReportDataByGraduationData_GSRNULL() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
-		String pen = gradStatus.getGradStudent().getPen();
-
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2461,7 +2456,6 @@ public class ReportServiceTest {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		gradStatus.getGradStudent().setStudentID(null);
-		String pen = gradStatus.getGradStudent().getPen();
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, "accessToken", exception);
 		assertNotNull(data);
@@ -2624,8 +2618,6 @@ public class ReportServiceTest {
 	public void testPrepareCertificateData_GSRNULL() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
-		String pen = gradStatus.getGradStudent().getPen();
-
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2682,7 +2674,6 @@ public class ReportServiceTest {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		gradStatus.getGradStudent().setStudentID(null);
-		String pen = gradStatus.getGradStudent().getPen();
 
 		ReportData data = reportService.prepareCertificateData(gradStatus,  "accessToken", exception);
 		assertNotNull(data);
@@ -2843,16 +2834,9 @@ public class ReportServiceTest {
 		CommonSchool commSch = new CommonSchool();
 		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
-
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"09323027"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
-
-		var result = reportService.getSchoolCategoryCode("accessToken", commSch.getSchlNo());
+		when(this.restService.get(String.format(constants.getSchoolCategoryCode(),"09323027"), CommonSchool.class)).thenReturn(commSch);
+		var result = reportService.getSchoolCategoryCode(commSch.getSchlNo());
 		assertThat(result).isNotNull();
-
 	}
 
 	@Test
@@ -2864,7 +2848,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.empty());
 
-		var result = reportService.getSchoolCategoryCode("accessToken", "09323027");
+		var result = reportService.getSchoolCategoryCode("09323027");
 		assertThat(result).isNull();
 
 	}
