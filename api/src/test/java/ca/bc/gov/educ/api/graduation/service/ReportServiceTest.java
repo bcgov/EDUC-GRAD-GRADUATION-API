@@ -2844,7 +2844,7 @@ public class ReportServiceTest {
 		commSch.setSchlNo("09323027");
 		commSch.setSchoolCategoryCode("02");
 		when(this.restService.get(String.format(constants.getSchoolCategoryCode(),"09323027"), CommonSchool.class)).thenReturn(commSch);
-		var result = reportService.getSchoolCategoryCode("accessToken", commSch.getSchlNo());
+		var result = reportService.getSchoolCategoryCode(commSch.getSchlNo());
 		assertThat(result).isNotNull();
 	}
 
@@ -2857,7 +2857,7 @@ public class ReportServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.empty());
 
-		var result = reportService.getSchoolCategoryCode("accessToken", "09323027");
+		var result = reportService.getSchoolCategoryCode("09323027");
 		assertThat(result).isNull();
 
 	}

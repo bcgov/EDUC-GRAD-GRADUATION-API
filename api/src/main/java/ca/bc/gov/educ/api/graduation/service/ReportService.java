@@ -61,7 +61,7 @@ public class ReportService {
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, String accessToken, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
-        req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
         try {
             return webClient.post().uri(educGraduationApiConstants.getTranscript())
                     .headers(h -> {
@@ -83,7 +83,7 @@ public class ReportService {
                 req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
             }
         }
-        req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
         try {
             return webClient.post().uri(educGraduationApiConstants.getCertList())
                     .headers(h -> {
@@ -98,7 +98,7 @@ public class ReportService {
         }
     }
 
-    public String getSchoolCategoryCode(String accessToken, String mincode) {
+    public String getSchoolCategoryCode(String mincode) {
         // Send to restclient instead
         CommonSchool commonSchool = this.restService.get(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode), CommonSchool.class);
         return (commonSchool == null) ? null : commonSchool.getSchoolCategoryCode();
