@@ -77,7 +77,7 @@ public class SchoolServiceTest {
 		schtrax.setMinCode(mincode);
 		schtrax.setAddress1("1231");
 		when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, accessToken, new ExceptionMessage());
+		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, new ExceptionMessage());
 		assertNotNull(res);
 		assertEquals(res.getMinCode(),mincode);
 	}
@@ -89,7 +89,7 @@ public class SchoolServiceTest {
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
+        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
         SchoolTrax res = schoolService.getTraxSchoolDetails(mincode);
         assertNotNull(res);
         assertEquals(res.getMinCode(),mincode);
@@ -102,7 +102,7 @@ public class SchoolServiceTest {
         schtrax.setDistrictNumber(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any(), any())).thenReturn(schtrax);
+        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
         DistrictTrax res = schoolService.getTraxDistrictDetails(mincode);
         assertNotNull(res);
         assertEquals(res.getDistrictNumber(),mincode);

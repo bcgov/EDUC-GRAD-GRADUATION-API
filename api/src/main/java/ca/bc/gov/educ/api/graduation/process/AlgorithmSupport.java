@@ -46,7 +46,7 @@ public class AlgorithmSupport {
         if(graduationDataStatus != null) {
             try {
                 if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null && graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getCertificateEligibility().equalsIgnoreCase("Y")) {
-                    List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(), exception);
+                    List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, exception);
                     tokenUtils.checkAndSetAccessToken(processorData);
                     for (ProgramCertificateTranscript certType : certificateList) {
                         if("FMR".equalsIgnoreCase(processName)) {
@@ -61,7 +61,7 @@ public class AlgorithmSupport {
                                 }
                             }
                             if(createCertificate) {
-                                reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, false);
+                                reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, certType, false);
                                 graduationDataStatus.getSchool().setSchoolCategoryCode(certType.getSchoolCategoryCode());
                                 graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
                                         .code(certType.getCertificateTypeCode())
@@ -69,7 +69,7 @@ public class AlgorithmSupport {
                                         .build());
                             }
                         } else {
-                            reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, processorData.getAccessToken(), certType, false);
+                            reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, certType, false);
                             graduationDataStatus.getSchool().setSchoolCategoryCode(certType.getSchoolCategoryCode());
                             graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
                                     .code(certType.getCertificateTypeCode())
@@ -84,7 +84,7 @@ public class AlgorithmSupport {
                     logger.debug("**** No Transcript Generated: ****");
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
                     tokenUtils.checkAndSetAccessToken(processorData);
-                    reportService.saveStudentTranscriptReportJasper(data, processorData.getAccessToken(), graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
+                    reportService.saveStudentTranscriptReportJasper(data, graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
                     if(data.getTranscript() != null && data.getTranscript().getTranscriptTypeCode() != null) {
                         String transcriptTypeCode = ObjectUtils.defaultIfNull(data.getTranscript().getTranscriptTypeCode().getCode(), "");
                         graduationDataStatus.getStudentCertificatesTranscript().setTranscriptTypeCode(transcriptTypeCode);

@@ -31,28 +31,28 @@ public class GraduateStudentProcess extends BaseProcess {
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		if (gradResponse.getProgramCompletionDate() == null || gradResponse.getProgram().equalsIgnoreCase("SCCP") || gradResponse.getProgram().equalsIgnoreCase("NOPROG")) {
 			List<CodeDTO> optionalProgram = new ArrayList<>();
-			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(), exception);
+			GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception);
 			if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 				return processorData;
 			}
 			logger.debug("**** Grad Algorithm Completed:{} **** ",gradResponse.getStudentID());
 
-			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken(), optionalProgram);
+			List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, processorData.getStudentID(), optionalProgram);
 			logger.debug("**** Saved Optional Programs: ****");
 			GraduationStudentRecord toBeSaved = gradStatusService.prepareGraduationStatusObj(graduationDataStatus);
 			toBeSaved.setUpdateUser(StringUtils.isEmpty(gradResponse.getUpdateUser()) ? "" : gradResponse.getUpdateUser());
 			if(checkExceptions(exception,algorithmResponse,processorData)) {
 				return processorData;
 			}
-			logger.debug("**** Prepared Data for Reports: ****");
+			logger.debug("**** Prepared Data to Save Grad Status: ****");
 			if (toBeSaved != null && toBeSaved.getStudentID() != null) {
-				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), toBeSaved, exception);
+				GraduationStudentRecord graduationStatusResponse = gradStatusService.saveStudentGradStatus(processorData.getStudentID(), processorData.getBatchId(), toBeSaved, exception);
 				if (checkExceptions(graduationStatusResponse.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
 				logger.debug("**** Saved Grad Status: ****");
 				tokenUtils.checkAndSetAccessToken(processorData);
-				ReportData data = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, false, processorData.getAccessToken(),exception);
+				ReportData data = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, false, exception);
 				if(checkExceptions(data.getException(),algorithmResponse,processorData)) {
 					return processorData;
 				}
@@ -60,7 +60,7 @@ public class GraduateStudentProcess extends BaseProcess {
 				tokenUtils.checkAndSetAccessToken(processorData);
 				ExceptionMessage eMsg = algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,graduationStatusResponse,gradResponse,projectedOptionalGradResponse,exception,data,processorData, "GS");
 				if (checkExceptions(eMsg,algorithmResponse,processorData)) {
-					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), processorData.getAccessToken(), graduationDataStatus.isGraduated());
+					gradStatusService.restoreStudentGradStatus(processorData.getStudentID(), graduationDataStatus.isGraduated());
 					logger.debug("**** Record Restored Due to Error: ****");
 					return processorData;
 				}

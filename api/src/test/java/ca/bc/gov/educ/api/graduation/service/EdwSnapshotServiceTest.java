@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,7 +79,7 @@ public class EdwSnapshotServiceTest {
         snapshotRequest.setGraduatedDate("202306");
         snapshotRequest.setSchoolOfRecord("12345678");
 
-        var result = edwSnapshotService.processSnapshot(snapshotRequest, "123");
+        var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");
@@ -108,12 +107,12 @@ public class EdwSnapshotServiceTest {
         penStudent.setPen(snapshotRequest.getPen());
         penStudent.setStudentID(snapshotRequest.getStudentID().toString());
 
-        when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), eq("123"), any())).thenReturn(gradResponse);
-        when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString(), "123")).thenReturn(graduationData);
+        when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), any())).thenReturn(gradResponse);
+        when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString())).thenReturn(graduationData);
 
-        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class, "123")).thenReturn(List.of(penStudent));
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class)).thenReturn(List.of(penStudent));
 
-        var result = edwSnapshotService.processSnapshot(snapshotRequest, "123");
+        var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
@@ -149,11 +148,11 @@ public class EdwSnapshotServiceTest {
         penStudent.setPen(snapshotRequest.getPen());
         penStudent.setStudentID(snapshotRequest.getStudentID().toString());
 
-        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class, "123")).thenReturn(List.of(penStudent));
-        when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), eq("123"), any())).thenReturn(gradResponse);
-        when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString(), "123")).thenReturn(graduationData);
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class)).thenReturn(List.of(penStudent));
+        when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), any())).thenReturn(gradResponse);
+        when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString())).thenReturn(graduationData);
 
-        var result = edwSnapshotService.processSnapshot(snapshotRequest, "123");
+        var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");

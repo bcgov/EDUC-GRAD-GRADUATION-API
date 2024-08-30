@@ -96,7 +96,7 @@ public class SchooReportsServiceTest {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolData("json/studentSchoolYearEndResponse.json");
 		Mockito.when(reportService.getStudentsForSchoolYearEndReport("accessToken")).thenReturn(gradStudentDataList);
 		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport("accessToken")).thenReturn(gradStudentDataList);
-		Mockito.when(reportService.getStudentsForSchoolReport("accessToken")).thenReturn(gradStudentDataList);
+		Mockito.when(reportService.getStudentsForSchoolReport()).thenReturn(gradStudentDataList);
 
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
 

@@ -67,7 +67,7 @@ public class TokenUtils {
             LOGGER.debug("=========> Getting the new Access Token after 2 minutes <===========");
             ResponseObj responseObj = getTokenResponseObject();
             if (responseObj != null) {
-                processorData.setAccessToken(responseObj.getAccess_token());
+//                processorData.setAccessToken(responseObj.getAccess_token());
                 processorData.setStartTime(currentTime);
             }
         }
@@ -77,7 +77,7 @@ public class TokenUtils {
         long startTime = System.currentTimeMillis();
         ResponseObj responseObj = getTokenResponseObject();
         if (responseObj != null) {
-            processorData.setAccessToken(responseObj.getAccess_token());
+//            processorData.setAccessToken(responseObj.getAccess_token());
             processorData.setStartTime(startTime);
         }
     }

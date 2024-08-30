@@ -25,13 +25,13 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
-		GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken(), exception);
+		GraduationData graduationDataStatus = gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception);
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
 		logger.debug("**** Grad Algorithm Completed: ****");
 		gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
-		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
+		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID());
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 		algorithmResponse.setGraduationStudentRecord(gradResponse);
 

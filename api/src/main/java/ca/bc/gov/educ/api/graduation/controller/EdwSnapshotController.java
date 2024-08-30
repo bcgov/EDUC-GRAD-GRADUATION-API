@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class EdwSnapshotController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EdwSnapshotController.class);
-    private static final String BEARER = "Bearer ";
 
     @Autowired
     EdwSnapshotService edwSnapshotService;
@@ -41,9 +40,9 @@ public class EdwSnapshotController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "Run a Graduation snapshot for EDW", description = "Run a Graduation snapshot for EDW", tags = { "EDW Snapshot" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<EdwGraduationSnapshot> snapshotGraduationStatus(@RequestBody EdwGraduationSnapshot snapshotRequest, @RequestHeader(name="Authorization") String accessToken) {
+    public ResponseEntity<EdwGraduationSnapshot> snapshotGraduationStatus(@RequestBody EdwGraduationSnapshot snapshotRequest) {
         LOGGER.debug("Snapshot Graduation Status for Student - pen# {}", snapshotRequest.getPen());
-        return response.GET(edwSnapshotService.processSnapshot(snapshotRequest, accessToken.replace(BEARER, "")));
+        return response.GET(edwSnapshotService.processSnapshot(snapshotRequest));
     }
 
 }

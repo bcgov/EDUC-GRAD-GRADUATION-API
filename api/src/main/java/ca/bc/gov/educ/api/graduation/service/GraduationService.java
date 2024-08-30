@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
@@ -67,12 +66,12 @@ public class GraduationService {
         this.jsonTransformer = jsonTransformer;
     }
 
-    public AlgorithmResponse graduateStudent(String studentID, Long batchId, String accessToken, String projectedType) {
+    public AlgorithmResponse graduateStudent(String studentID, Long batchId, String projectedType) {
 
         ExceptionMessage exception = new ExceptionMessage();
         AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
         logger.debug("\n************* NEW STUDENT:***********************");
-        GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, accessToken, exception);
+        GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, exception);
         if (exception.getExceptionName() != null) {
             AlgorithmResponse aR = new AlgorithmResponse();
             aR.setException(exception);
@@ -80,7 +79,7 @@ public class GraduationService {
         }
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
             logger.debug("**** Fetched Student Information: {} ****", gradResponse.getStudentID());
-            ProcessorData data = new ProcessorData(gradResponse, null, accessToken, studentID, batchId, exception);
+            ProcessorData data = new ProcessorData(gradResponse, null, studentID, batchId, exception);
             AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
             data = process.fire(data);
             return data.getAlgorithmResponse();
@@ -94,43 +93,43 @@ public class GraduationService {
         }
     }
 
-    public ReportData prepareReportData(String pen, String type, String accessToken) {
+    public ReportData prepareReportData(String pen, String type) {
         type = Optional.ofNullable(type).orElse("");
         switch (type.toUpperCase()) {
             case "CERT":
-                return reportService.prepareCertificateData(pen, accessToken, new ExceptionMessage());
+                return reportService.prepareCertificateData(pen, new ExceptionMessage());
             case "ACHV":
                 ReportData reportData = new ReportData();
                 reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
                 return reportData;
             case "XML":
-                return reportService.prepareTranscriptData(pen, true, accessToken, new ExceptionMessage());
+                return reportService.prepareTranscriptData(pen, true, new ExceptionMessage());
             default:
-                return reportService.prepareTranscriptData(pen, false, accessToken, new ExceptionMessage());
+                return reportService.prepareTranscriptData(pen, false, new ExceptionMessage());
         }
     }
 
-    public ReportData prepareReportData(GraduationData graduationData, String type, String accessToken) {
+    public ReportData prepareReportData(GraduationData graduationData, String type) {
         type = Optional.ofNullable(type).orElse("");
         switch (type.toUpperCase()) {
             case "CERT":
-                return reportService.prepareCertificateData(graduationData, accessToken, new ExceptionMessage());
+                return reportService.prepareCertificateData(graduationData, new ExceptionMessage());
             case "ACHV":
                 ReportData reportData = new ReportData();
                 reportData.getParameters().put("NOT SUPPORTED", "ACHV Report Data type not supported yet");
                 return reportData;
             case "XML":
-                return reportService.prepareTranscriptData(graduationData, true, accessToken, new ExceptionMessage());
+                return reportService.prepareTranscriptData(graduationData, true, new ExceptionMessage());
             default:
-                return reportService.prepareTranscriptData(graduationData, false, accessToken, new ExceptionMessage());
+                return reportService.prepareTranscriptData(graduationData, false, new ExceptionMessage());
         }
     }
 
-    public byte[] prepareTranscriptReport(String pen, String interim, String preview, String accessToken) {
+    public byte[] prepareTranscriptReport(String pen, String interim, String preview) {
 
         boolean isInterim = StringUtils.trimToNull(Optional.ofNullable(interim).orElse("")) != null;
         boolean isPreview = StringUtils.trimToNull(Optional.ofNullable(preview).orElse("")) != null;
-        ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, accessToken, new ExceptionMessage());
+        ReportData reportData = reportService.prepareTranscriptData(pen, isInterim, new ExceptionMessage());
 
         ReportOptions options = new ReportOptions();
         options.setReportFile("transcript");
@@ -141,17 +140,18 @@ public class GraduationService {
         reportParams.setData(reportData);
 
         try {
-            return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-                    .headers(h -> {
-                                h.setBearerAuth(accessToken);
-                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                            }
-                    ).body(BodyInserters.fromValue(reportParams)).retrieve()
-                    .onStatus(
-                            HttpStatus.NO_CONTENT::equals,
-                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
-                    )
-                    .bodyToMono(byte[].class).block();
+//            return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
+//                    .headers(h -> {
+//                                h.setBearerAuth(accessToken);
+//                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+//                            }
+//                    ).body(BodyInserters.fromValue(reportParams)).retrieve()
+//                    .onStatus(
+//                            HttpStatus.NO_CONTENT::equals,
+//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+//                    )
+//                    .bodyToMono(byte[].class).block();
+            return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class);
         } catch (ServiceException ex) {
             if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
                 return new byte[0];
@@ -167,13 +167,11 @@ public class GraduationService {
      * @param pen
      * @param isOverwrite   true:  regenerate(delete and create) student certs
      *                      false: create or update student certs
-     * @param accessToken
      * @return the number of certificates created
      */
-    public Integer createAndStoreStudentCertificates(String pen, boolean isOverwrite, String accessToken) {
+    public Integer createAndStoreStudentCertificates(String pen, boolean isOverwrite) {
         int i = 0;
-        Pair<String, Long> token = getAccessToken(accessToken);
-        Pair<GraduationStudentRecord, GraduationData> pair = reportService.getGraduationStudentRecordAndGraduationData(pen, token.getLeft());
+        Pair<GraduationStudentRecord, GraduationData> pair = reportService.getGraduationStudentRecordAndGraduationData(pen);
         if (pair != null) {
             GraduationStudentRecord graduationStudentRecord = pair.getLeft();
             GraduationData graduationData = pair.getRight();
@@ -191,10 +189,9 @@ public class GraduationService {
                     }
                 }
                 ExceptionMessage exception = new ExceptionMessage();
-                List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, accessToken, exception);
-                token = checkAndGetAccessToken(token);
+                List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationStudentRecord, graduationData, projectedOptionalPrograms, exception);
                 for (ProgramCertificateTranscript certType : certificateList) {
-                    reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, token.getLeft(), certType, i == 0 && isOverwrite);
+                    reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, certType, i == 0 && isOverwrite);
                     i++;
                     logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
                 }
@@ -207,21 +204,21 @@ public class GraduationService {
         return graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null;
     }
 
-    public byte[] getSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
+    public byte[] getSchoolReports(List<String> uniqueSchoolList, String type) {
         byte[] result = new byte[0];
-        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
-        int i = 0;
+//        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
+//        int i = 0;
         for (String usl : uniqueSchoolList) {
-            if (i == 0) {
-                res = getAccessToken(accessToken);
-            } else {
-                res = checkAndGetAccessToken(res);
-            }
-            accessToken = res.getLeft();
+//            if (i == 0) {
+//                res = getAccessToken(accessToken);
+//            } else {
+//                res = checkAndGetAccessToken(res);
+//            }
+//            accessToken = res.getLeft();
 
             try {
-                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
-                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, accessToken, new ExceptionMessage());
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
+                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, new ExceptionMessage());
                 if (schoolDetails != null) {
                     School schoolObj = new School();
                     schoolObj.setMincode(schoolDetails.getMinCode());
@@ -231,7 +228,7 @@ public class GraduationService {
                         case GRADREG:
                             List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), REGALG);
                             gradReport = getReportDataObj(schoolObj, gradRegStudents);
-                            return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode(), accessToken);
+                            return getSchoolReportGradRegReport(gradReport, schoolObj.getMincode());
                         case NONGRADREG:
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), REGALG);
                             gradReport = getReportDataObj(schoolObj, nonGradRegStudents);
@@ -239,7 +236,7 @@ public class GraduationService {
                         case NONGRADPRJ:
                             List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), TVRRUN);
                             gradReport = getReportDataObj(schoolObj, nonGradPrjStudents);
-                            return getSchoolReportStudentNonGradPrjReport(gradReport, schoolObj.getMincode(), accessToken);
+                            return getSchoolReportStudentNonGradPrjReport(gradReport, schoolObj.getMincode());
                         default:
                             return result;
                     }
@@ -247,23 +244,22 @@ public class GraduationService {
             } catch (Exception e) {
                 logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
-            i++;
         }
         return result;
     }
 
-    public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList, String type, String accessToken) {
+    public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList, String type) {
         int numberOfReports = 0;
         ExceptionMessage exception = new ExceptionMessage();
         for (String usl : uniqueSchoolList) {
             try {
-                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl, accessToken);
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
                 if(logger.isDebugEnabled()) {
                     int totalStudents = ObjectUtils.defaultIfNull(stdList.size(), 0);
                     String listOfStudents = jsonTransformer.marshall(stdList);
                     logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
-                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, accessToken, exception);
+                SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, exception);
                 if (schoolDetails != null) {
                     logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
                     if (stdList != null && !stdList.isEmpty()) {
@@ -273,11 +269,11 @@ public class GraduationService {
                         if (TVRRUN.equalsIgnoreCase(type)) {
                             List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
                             logger.debug("*** Process processStudentNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
-                            numberOfReports = processStudentNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, accessToken, numberOfReports);
+                            numberOfReports = processStudentNonGradPrjReport(schoolObj, nonGradPrjStudents, usl, numberOfReports);
                         } else {
                             List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
                             logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
-                            numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, accessToken, numberOfReports);
+                            numberOfReports = processGradRegReport(schoolObj, gradRegStudents, usl, numberOfReports);
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
                             logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, usl, numberOfReports);
@@ -306,11 +302,11 @@ public class GraduationService {
         }
     }
 
-    private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
+    private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
         Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
         if(studentsCount > 0) {
             ReportData gradReport = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportGradRegReport(gradReport, mincode, accessToken);
+            createAndSaveSchoolReportGradRegReport(gradReport, mincode);
             numberOfReports++;
         }
         return numberOfReports;
@@ -326,11 +322,11 @@ public class GraduationService {
         return numberOfReports;
     }
 
-    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
+    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
         Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
         if(studentsCount > 0) {
             ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode, accessToken);
+            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode);
             numberOfReports++;
         }
         return numberOfReports;
@@ -420,7 +416,7 @@ public class GraduationService {
         return nList;
     }
 
-    private byte[] getSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
+    private byte[] getSchoolReportGradRegReport(ReportData data, String mincode) {
         ReportOptions options = new ReportOptions();
         options.setReportFile(String.format("%s_%s00_GRADREG", mincode, LocalDate.now().getYear()));
         options.setReportName(String.format("%s_%s00_GRADREG.pdf", mincode, LocalDate.now().getYear()));
@@ -435,9 +431,9 @@ public class GraduationService {
     }
 
     @Generated
-    private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, String accessToken) {
+    private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode) {
 
-        byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode, accessToken);
+        byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode);
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
 
@@ -481,7 +477,7 @@ public class GraduationService {
         updateSchoolReport(requestObj);
     }
 
-    private byte[] getSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, String accessToken) {
+    private byte[] getSchoolReportStudentNonGradPrjReport(ReportData data, String mincode) {
         data.setReportTitle("Graduation Records and Achievement Data");
         data.setReportSubTitle("Projected Non-Grad Report for Students in Grade 12 and Adult Students");
         ReportOptions options = new ReportOptions();
@@ -513,8 +509,8 @@ public class GraduationService {
                 accessToken);
     }
 
-    private void createAndSaveSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, String accessToken) {
-        byte[] bytesSAR = getSchoolReportStudentNonGradPrjReport(data, mincode, accessToken);
+    private void createAndSaveSchoolReportStudentNonGradPrjReport(ReportData data, String mincode) {
+        byte[] bytesSAR = getSchoolReportStudentNonGradPrjReport(data, mincode);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
         SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADPRJ);
         updateSchoolReport(requestObj);

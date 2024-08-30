@@ -54,8 +54,8 @@ public class EdwSnapshotControllerTest {
         snapshotResponse.setGraduatedDate("202306");
         snapshotResponse.setGpa(BigDecimal.valueOf(3.0));
 
-        Mockito.when(edwSnapshotService.processSnapshot(snapshotRequest,"accessToken")).thenReturn(snapshotResponse);
-        edwSnapshotController.snapshotGraduationStatus(snapshotRequest, "accessToken");
-        Mockito.verify(edwSnapshotService).processSnapshot(snapshotRequest,"accessToken");
+        Mockito.when(edwSnapshotService.processSnapshot(snapshotRequest)).thenReturn(snapshotResponse);
+        edwSnapshotController.snapshotGraduationStatus(snapshotRequest);
+        Mockito.verify(edwSnapshotService).processSnapshot(snapshotRequest);
     }
 }
