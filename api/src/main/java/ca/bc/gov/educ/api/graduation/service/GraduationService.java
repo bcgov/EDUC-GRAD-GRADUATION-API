@@ -206,16 +206,7 @@ public class GraduationService {
 
     public byte[] getSchoolReports(List<String> uniqueSchoolList, String type) {
         byte[] result = new byte[0];
-//        Pair<String, Long> res = Pair.of(accessToken, System.currentTimeMillis());
-//        int i = 0;
         for (String usl : uniqueSchoolList) {
-//            if (i == 0) {
-//                res = getAccessToken(accessToken);
-//            } else {
-//                res = checkAndGetAccessToken(res);
-//            }
-//            accessToken = res.getLeft();
-
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
                 SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(usl, new ExceptionMessage());
