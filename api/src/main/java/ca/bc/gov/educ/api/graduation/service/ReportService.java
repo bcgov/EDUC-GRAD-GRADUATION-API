@@ -126,7 +126,7 @@ public class ReportService {
             SchoolTrax traxSchool = null;
             if(schoolAtGrad != null) {
                 String mincode = schoolAtGrad.getMincode();
-                traxSchool = schoolService.getTraxSchoolDetails(mincode, accessToken, exception);
+                traxSchool = schoolService.getTraxSchoolDetails(mincode, exception);
             } **/
             SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(schoolOfRecord.getMincode(), exception);
             //<--
@@ -686,12 +686,6 @@ public class ReportService {
     }
 
     private List<ProgramRequirementCode> getAllProgramRequirementCodeList() {
-//        final ParameterizedTypeReference<List<ProgramRequirementCode>> responseType = new ParameterizedTypeReference<>() {
-//        };
-//        return this.webClient.get()
-//                .uri(educGraduationApiConstants.getProgramRequirementsEndpoint())
-//                .headers(h -> h.setBearerAuth(accessToken))
-//                .retrieve().bodyToMono(responseType).block();
         var response = this.restService.get(educGraduationApiConstants.getProgramRequirementsEndpoint(), List.class);
         return jsonTransformer.convertValue(response, new TypeReference<List<ProgramRequirementCode>>(){});
     }
@@ -950,20 +944,6 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(sample);
         try {
-//            byte[] bytes = webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-//                    .headers(h -> {
-//                                h.setBearerAuth(accessToken);
-//                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-//                            }
-//                    ).body(BodyInserters.fromValue(reportParams))
-//                    .retrieve()
-//                    .onStatus(HttpStatusCode::is5xxServerError,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
-//                    .onStatus(
-//                            HttpStatus.NO_CONTENT::equals,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
-//                    )
-//                    .bodyToMono(byte[].class).block();
             byte[] bytes = restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class);
             return getEncodedStringFromBytes(bytes);
         } catch (ServiceException ex) {
@@ -1099,18 +1079,6 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(sample);
         try {
-//            byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getCertificateReport())
-//                    .headers(h -> {
-//                        h.setBearerAuth(accessToken);
-//                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-//                    }).body(BodyInserters.fromValue(reportParams)).retrieve()
-//                    .onStatus(HttpStatusCode::is5xxServerError,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
-//                    .onStatus(
-//                            HttpStatus.NO_CONTENT::equals,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
-//                    )
-//                    .bodyToMono(byte[].class).block();
             byte[] bytesSAR = restService.post(educGraduationApiConstants.getCertificateReport(), reportParams, byte[].class);
             return getEncodedStringFromBytes(bytesSAR);
         } catch (ServiceException ex) {
@@ -1130,18 +1098,6 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(data);
         try {
-//            byte[] bytesSAR = webClient.post().uri(educGraduationApiConstants.getAchievementReport())
-//                    .headers(h -> {
-//                        h.setBearerAuth(accessToken);
-//                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-//                    }).body(BodyInserters.fromValue(reportParams)).retrieve()
-//                    .onStatus(HttpStatusCode::is5xxServerError,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(INTERNAL_SERVER_ERROR, response.statusCode().value())))
-//                    .onStatus(
-//                            HttpStatus.NO_CONTENT::equals,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException(NO_CONTENT, response.statusCode().value()))
-//                    )
-//                    .bodyToMono(byte[].class).block();
             byte[] bytesSAR = restService.post(educGraduationApiConstants.getAchievementReport(), reportParams, byte[].class);
             return getEncodedStringFromBytes(bytesSAR);
         } catch (ServiceException ex) {

@@ -47,7 +47,6 @@ public class AlgorithmSupport {
             try {
                 if (graduationDataStatus.isGraduated() && graduationStatusResponse.getProgramCompletionDate() != null && graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getCertificateEligibility().equalsIgnoreCase("Y")) {
                     List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(gradResponse, graduationDataStatus, projectedOptionalGradResponse, exception);
-                    tokenUtils.checkAndSetAccessToken(processorData);
                     for (ProgramCertificateTranscript certType : certificateList) {
                         if("FMR".equalsIgnoreCase(processName)) {
                             boolean createCertificate = false;
@@ -83,7 +82,6 @@ public class AlgorithmSupport {
                 if ((graduationDataStatus.getStudentCourses().getStudentCourseList() == null || graduationDataStatus.getStudentCourses().getStudentCourseList().isEmpty()) && (graduationDataStatus.getStudentAssessments().getStudentAssessmentList() == null || graduationDataStatus.getStudentAssessments().getStudentAssessmentList().isEmpty())) {
                     logger.debug("**** No Transcript Generated: ****");
                 } else if (graduationDataStatus.getSchool() != null && graduationDataStatus.getSchool().getTranscriptEligibility().equalsIgnoreCase("Y")) {
-                    tokenUtils.checkAndSetAccessToken(processorData);
                     reportService.saveStudentTranscriptReportJasper(data, graduationStatusResponse.getStudentID(), exception, graduationDataStatus.isGraduated(), "FMR".equalsIgnoreCase(processName));
                     if(data.getTranscript() != null && data.getTranscript().getTranscriptTypeCode() != null) {
                         String transcriptTypeCode = ObjectUtils.defaultIfNull(data.getTranscript().getTranscriptTypeCode().getCode(), "");

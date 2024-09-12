@@ -46,20 +46,18 @@ public class GraduationService {
     GradStatusService gradStatusService;
     SchoolService schoolService;
     ReportService reportService;
-    TokenUtils tokenUtils;
     RESTService restService;
     EducGraduationApiConstants educGraduationApiConstants;
     SchoolYearDates schoolYearDates;
     JsonTransformer jsonTransformer;
 
     @Autowired
-    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, TokenUtils tokenUtils, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
+    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
         this.webClient = webClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
         this.schoolService = schoolService;
         this.reportService = reportService;
-        this.tokenUtils = tokenUtils;
         this.restService = restService;
         this.educGraduationApiConstants = educGraduationApiConstants;
         this.schoolYearDates = schoolYearDates;
@@ -140,17 +138,6 @@ public class GraduationService {
         reportParams.setData(reportData);
 
         try {
-//            return webClient.post().uri(educGraduationApiConstants.getTranscriptReport())
-//                    .headers(h -> {
-//                                h.setBearerAuth(accessToken);
-//                                h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-//                            }
-//                    ).body(BodyInserters.fromValue(reportParams)).retrieve()
-//                    .onStatus(
-//                            HttpStatus.NO_CONTENT::equals,
-//                            response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
-//                    )
-//                    .bodyToMono(byte[].class).block();
             return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class);
         } catch (ServiceException ex) {
             if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
@@ -521,14 +508,6 @@ public class GraduationService {
         requestObj.setSchoolOfRecord(mincode);
         requestObj.setReportTypeCode(nongradreg);
         return requestObj;
-    }
-
-    private Pair<String, Long> checkAndGetAccessToken(Pair<String, Long> req) {
-        return tokenUtils.checkAndGetAccessToken(req);
-    }
-
-    private Pair<String, Long> getAccessToken(String accessToken) {
-        return tokenUtils.getAccessToken(accessToken);
     }
 
 }

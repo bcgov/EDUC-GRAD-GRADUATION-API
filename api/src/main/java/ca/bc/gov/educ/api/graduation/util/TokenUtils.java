@@ -59,29 +59,6 @@ public class TokenUtils {
         return this.getTokenResponseObject().getAccess_token();
     }
 
-    public void checkAndSetAccessToken(ProcessorData processorData) {
-        long currentTime = System.currentTimeMillis();
-        long diff = (currentTime - processorData.getStartTime())/1000;
-        LOGGER.debug("=========> Check Duration: {} sec <===========", diff);
-        if (diff > 120) { // if the previous step took more than 2 minutes, treat it as a long process, and get the new access token
-            LOGGER.debug("=========> Getting the new Access Token after 2 minutes <===========");
-            ResponseObj responseObj = getTokenResponseObject();
-            if (responseObj != null) {
-//                processorData.setAccessToken(responseObj.getAccess_token());
-                processorData.setStartTime(currentTime);
-            }
-        }
-    }
-
-    public void setAccessToken(ProcessorData processorData) {
-        long startTime = System.currentTimeMillis();
-        ResponseObj responseObj = getTokenResponseObject();
-        if (responseObj != null) {
-//            processorData.setAccessToken(responseObj.getAccess_token());
-            processorData.setStartTime(startTime);
-        }
-    }
-
     public ResponseObj getTokenResponseObject() {
         if(responseObjCache.isExpired()){
             responseObjCache.setResponseObj(getResponseObj());
