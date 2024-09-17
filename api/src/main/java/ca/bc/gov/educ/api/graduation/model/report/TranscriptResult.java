@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Objects;
 
@@ -63,7 +64,11 @@ public class TranscriptResult {
     }
 
     public Double getCompletedPercentage() {
-        return this.mark != null? this.mark.getCompletedCoursePercentage() : null;
+        return this.mark != null ? this.mark.getCompletedCoursePercentage() : null;
+    }
+
+    public Double getInterimPercentage() {
+        return this.mark != null && NumberUtils.isDigits(this.mark.getInterimPercent()) ? NumberUtils.createDouble(this.mark.getInterimPercent()) : 0d;
     }
 
     @Override
