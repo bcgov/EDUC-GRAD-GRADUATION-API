@@ -26,7 +26,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		logger.debug("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
-		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), processorData.getAccessToken());
+		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram());
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
@@ -36,14 +36,14 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 				.graduated(graduationDataStatus.isGraduated())
 				.nonGradReasons(graduationDataStatus.getNonGradReasons())
 				.build();
-		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), processorData.getAccessToken(), exception);
+		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), exception);
 		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
-		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID(), processorData.getAccessToken());
-		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, processorData.getAccessToken(),exception);
+		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID());
+		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, exception);
 		if (checkExceptions(data.getException(), algorithmResponse,processorData)) {
 			return processorData;
 		}
-		ExceptionMessage excp = reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, processorData.getAccessToken(), gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
+		ExceptionMessage excp = reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 		if (checkExceptions(excp,algorithmResponse,processorData)) {
 			logger.debug("**** Problem Generating TVR: ****");
 			return processorData;
