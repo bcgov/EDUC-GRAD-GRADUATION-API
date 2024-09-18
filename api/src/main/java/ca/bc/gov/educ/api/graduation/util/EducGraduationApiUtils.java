@@ -158,7 +158,13 @@ public class EducGraduationApiUtils {
 	}
 
 	public static Date parsingTraxDate(String sessionDate) {
-		String actualSessionDate = StringUtils.countMatches(sessionDate, "/") == 2 ? sessionDate : sessionDate + "/01";
+		int countMatches = StringUtils.countMatches(sessionDate, "/");
+		if(countMatches == 0) {
+			StringBuilder sb = new StringBuilder(sessionDate);
+			sessionDate = sb.insert(4, '/').toString();
+			countMatches = 1;
+		}
+		String actualSessionDate = countMatches == 2 ? sessionDate : sessionDate + "/01";
 		Date temp = EducGraduationApiUtils.parseDate(actualSessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT);
 		String sDates = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 		return toLastDayOfMonth(EducGraduationApiUtils.parseDate(sDates, EducGraduationApiConstants.DEFAULT_DATE_FORMAT));

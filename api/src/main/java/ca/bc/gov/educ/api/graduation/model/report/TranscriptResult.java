@@ -1,8 +1,12 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.util.EducGraduationApiUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class TranscriptResult {
@@ -63,12 +67,19 @@ public class TranscriptResult {
         this.usedForGrad = value;
     }
 
+    @JsonIgnore
     public Double getCompletedPercentage() {
         return this.mark != null ? this.mark.getCompletedCoursePercentage() : null;
     }
 
+    @JsonIgnore
     public Double getInterimPercentage() {
         return this.mark != null && NumberUtils.isDigits(this.mark.getInterimPercent()) ? NumberUtils.createDouble(this.mark.getInterimPercent()) : 0d;
+    }
+
+    @JsonIgnore
+    public Date getSessionDate() {
+        return this.course != null && StringUtils.isNotBlank(this.course.getSessionDate()) ? EducGraduationApiUtils.parsingTraxDate(this.course.getSessionDate()) : null;
     }
 
     @Override

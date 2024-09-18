@@ -371,7 +371,7 @@ public class ReportService {
                                 !tr.getCourse().equals(transcriptResult.getCourse())
         ).sorted(
                 Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()
-                .thenComparing(TranscriptResult::getInterimPercentage, Comparator.nullsLast(Double::compareTo)).reversed()
+                //.thenComparing(TranscriptResult::getInterimPercentage, Comparator.nullsLast(Double::compareTo)).reversed()
         ).toList();
 
         // Handling duplicates
@@ -384,12 +384,24 @@ public class ReportService {
                 tList.add(transcriptResult);
                 return;
             }
-            if (xml && (duplicatedTranscriptResult.getInterimPercentage() < transcriptResult.getInterimPercentage())) {
+            Date duplicatedTranscriptResultSessionDate = duplicatedTranscriptResult.getSessionDate();
+            Date transcriptResultSessionDate = transcriptResult.getSessionDate();
+            if (xml && (duplicatedTranscriptResult.getCompletedPercentage() < transcriptResult.getInterimPercentage())) {
+                // replace
+                tList.remove(duplicatedTranscriptResult);
+                tList.add(transcriptResult);
+                return;
+            } else if (xml &&
+                    duplicatedTranscriptResult.getCompletedPercentage() == 0 &&
+                    transcriptResultSessionDate != null &&
+                    duplicatedTranscriptResultSessionDate != null &&
+                    (duplicatedTranscriptResultSessionDate.before(transcriptResultSessionDate))) {
                 // replace
                 tList.remove(duplicatedTranscriptResult);
                 tList.add(transcriptResult);
                 return;
             }
+
         }
         tList.add(transcriptResult);
     }
