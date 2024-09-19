@@ -101,9 +101,9 @@ class GraduationControllerTest {
 	@Test
 	void testReportTranscriptPdfByPen() {
 		byte[] bytesSAR = "Any String you want".getBytes();
-		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim", null,"accessToken")).thenReturn(bytesSAR);
-		graduationController.reportTranscriptPdfByPen("12312312312","Interim",null,"accessToken");
-		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim",null,"accessToken");
+		Mockito.when(graduationService.prepareTranscriptReport("12312312312","Interim", null)).thenReturn(bytesSAR);
+		graduationController.reportTranscriptPdfByPen("12312312312","Interim",null);
+		Mockito.verify(graduationService).prepareTranscriptReport("12312312312","Interim",null);
 	}
 
 	@Test

@@ -100,10 +100,9 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> reportTranscriptPdfByPen(@PathVariable @NotNull String pen,
                                                         @RequestParam(required = false) String interim,
-                                                        @RequestParam(required = false) String preview,
-                                                        @RequestHeader(name="Authorization") String accessToken) {
+                                                        @RequestParam(required = false) String preview) {
         LOGGER.debug("Report Data By Student Pen: {}", pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview, accessToken.replace(BEARER, ""));
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview);
         return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim), MediaType.APPLICATION_PDF);
     }
 
