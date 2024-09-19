@@ -3,20 +3,16 @@ package ca.bc.gov.educ.api.graduation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,14 +21,13 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import ca.bc.gov.educ.api.graduation.model.dto.GradAlgorithmGraduationStudentRecord;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import reactor.core.publisher.Mono;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 @RunWith(SpringRunner.class)
@@ -49,9 +44,11 @@ public class GradAlgorithmServiceTest {
 	
 	@Autowired
 	private ExceptionMessage exception;
-	
+
 	@MockBean
-	@Qualifier("graduationClient")
+	RESTService restService;
+
+	@MockBean
 	WebClient webClient;
 
 	@TestConfiguration
@@ -69,19 +66,6 @@ public class GradAlgorithmServiceTest {
 
     @Autowired
     private EducGraduationApiConstants constants;
-    
-    @Mock
-    private WebClient.RequestHeadersSpec requestHeadersMock;
-    @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriMock;
-    @Mock
-    private WebClient.RequestBodySpec requestBodyMock;
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriMock;
-    @Mock
-    private WebClient.ResponseSpec responseMock;
-    @Mock
-    private Mono<GraduationData> monoResponseGraduationData;
 	
     @Before
     public void setUp() {
@@ -97,10 +81,9 @@ public class GradAlgorithmServiceTest {
 	public void testRunGradAlgorithm_whenAPIisDown_throwsException() {
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
-		String accessToken = "accessToken";
 
-		when(this.webClient.get()).thenThrow(new RuntimeException("Test - API is down"));
-		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,accessToken,exception);
+		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode), GraduationData.class)).thenThrow(new RuntimeException("Test - API is down"));
+		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,exception);
 		assertNull(res);
 
 		assertNotNull(exception);
@@ -112,8 +95,7 @@ public class GradAlgorithmServiceTest {
 		String pen = "12312123123";
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
-		String accessToken = "accessToken";
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -129,14 +111,9 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getGradAlgorithmEndpoint(), studentID,programCode))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GraduationData.class)).thenReturn(Mono.just(graduationDataStatus));
+		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode), GraduationData.class)).thenReturn(graduationDataStatus);
         
-		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,accessToken,exception);
+		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,exception);
 		assertNotNull(res);
        
 	}
@@ -146,8 +123,7 @@ public class GradAlgorithmServiceTest {
 		String pen = "12312123123";
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
-		String accessToken = "accessToken";
-		
+
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -164,14 +140,9 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getGradProjectedAlgorithmEndpoint(), studentID,programCode,true))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GraduationData.class)).thenReturn(monoResponseGraduationData);
-		when(this.monoResponseGraduationData.block()).thenReturn(graduationDataStatus); 
-		
-		GraduationData res = gradAlgorithmService.runProjectedAlgorithm(studentID, programCode,accessToken);
+		when(this.restService.get(String.format(constants.getGradProjectedAlgorithmEndpoint(),studentID,programCode, true), GraduationData.class)).thenReturn(graduationDataStatus);
+
+		GraduationData res = gradAlgorithmService.runProjectedAlgorithm(studentID, programCode);
 		assertNotNull(res);       
 	}
 
@@ -198,14 +169,9 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 
-		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-		when(this.requestHeadersUriMock.uri(String.format(constants.getGradHypotheticalAlgorithmEndpoint(), studentID, programCode, "2023"))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-		when(this.responseMock.bodyToMono(GraduationData.class)).thenReturn(monoResponseGraduationData);
-		when(this.monoResponseGraduationData.block()).thenReturn(graduationDataStatus);
+		when(this.restService.get(String.format(constants.getGradHypotheticalAlgorithmEndpoint(),studentID,programCode, "2023"), GraduationData.class)).thenReturn(graduationDataStatus);
 
-		GraduationData res = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, programCode, "2023", accessToken);
+		GraduationData res = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, programCode, "2023");
 		assertNotNull(res);
 	}
 		

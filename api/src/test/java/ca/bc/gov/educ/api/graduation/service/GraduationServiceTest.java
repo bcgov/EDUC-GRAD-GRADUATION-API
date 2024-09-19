@@ -78,9 +78,6 @@ public class GraduationServiceTest {
 	private SchoolService schoolService;
 
 	@MockBean
-	private TokenUtils tokenUtils;
-
-	@MockBean
 	private ClientRegistrationRepository clientRegistrationRepository;
 
 	@MockBean
@@ -165,14 +162,14 @@ public class GraduationServiceTest {
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram())).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID)).thenReturn(list);
 
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -183,7 +180,7 @@ public class GraduationServiceTest {
 		String accessToken="accessToken";
 		ExceptionMessage exception = new ExceptionMessage();
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken, exception)).thenCallRealMethod();
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenCallRealMethod();
 
 		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
 		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(), studentID))).thenReturn(this.requestHeadersMock);
@@ -191,7 +188,7 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenThrow(new RuntimeException("Unknown Exception"));
 
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 		assertNotNull(response.getException());
 	}
@@ -250,14 +247,14 @@ public class GraduationServiceTest {
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram())).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID)).thenReturn(list);
 
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -314,14 +311,14 @@ public class GraduationServiceTest {
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram())).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
-		Mockito.when(reportService.saveStudentAchivementReportJasper("123090109",data,accessToken,UUID.fromString(studentID),exception,false)).thenReturn(eM2);
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID)).thenReturn(list);
+		Mockito.when(reportService.saveStudentAchivementReportJasper("123090109",data,UUID.fromString(studentID),exception,false)).thenReturn(eM2);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -376,16 +373,16 @@ public class GraduationServiceTest {
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list,accessToken, exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.prepareAchievementReportData(graduationDataStatus, list, exception)).thenReturn(data);
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram())).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.processProjectedResults(gradResponse,graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID)).thenReturn(list);
 
 		try {
-			graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			graduationService.graduateStudent(studentID,null,projectedType);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
@@ -429,10 +426,10 @@ public class GraduationServiceTest {
 		Student std = new Student();
 		std.setFirstName("Sreepad");
 		data.setStudent(std);
-		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, accessToken, exception)).thenReturn(gradResponse);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, studentID, null, exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		try {
-			graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			graduationService.graduateStudent(studentID,null,projectedType);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
 			assertEquals(0, errors.size());
@@ -483,11 +480,11 @@ public class GraduationServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<>();
 		list.add(spgm);
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken)).thenReturn(graduationDataStatus);
-		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID, accessToken)).thenReturn(list);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram())).thenReturn(graduationDataStatus);
+		Mockito.when(optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID)).thenReturn(list);
 
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -552,14 +549,13 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -626,20 +622,19 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		data.setException(excep2);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		graduationDataStatus.setException(exception);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 
 		ExceptionMessage eM2 = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
-		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).exception(exception).build();
 		eM2.setExceptionName("RERE");
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -706,20 +701,19 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		graduationDataStatus.setException(exception);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 
 		ExceptionMessage eM2 = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
-		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).exception(exception).build();
 		eM2.setExceptionName("RERE");
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -785,22 +779,21 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).exception(exception).build();
 
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		graduationDataStatus.setException(exception);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		Mockito.when(algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,gradResponse,gradResponse,list,exception,data, pData, projectedType)).thenReturn(excep2);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
 		ExceptionMessage eM2 = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		eM2.setExceptionName("RERE");
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -867,15 +860,14 @@ public class GraduationServiceTest {
 		schoolObj.setIndependentDesignation("2");
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		graduationDataStatus.setException(exception);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -935,10 +927,9 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1013,16 +1004,15 @@ public class GraduationServiceTest {
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,false);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,exception)).thenReturn(certificateList);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,pc,false);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -1081,14 +1071,14 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1158,14 +1148,14 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1238,14 +1228,14 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1316,16 +1306,16 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).accessToken("accessToken").exception(exception).build();
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		ProcessorData pData = ProcessorData.builder().gradResponse(gradResponse).studentID(studentID).exception(exception).build();
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		Mockito.when(algorithmSupport.createStudentCertificateTranscriptReports(graduationDataStatus,gradResponse,gradResponse,list,exception,data, pData, "FMR")).thenReturn(em2);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1398,14 +1388,14 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		data.setException(em2);
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1471,10 +1461,9 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
 		try {
-			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+			AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 			assertNotNull(response);
 		} catch (GradBusinessRuleException e) {
 			List<String> errors = validation.getErrors();
@@ -1544,14 +1533,13 @@ public class GraduationServiceTest {
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -1622,16 +1610,15 @@ public class GraduationServiceTest {
 		pc.setCertificateTypeCode("E");
 		certificateList.add(pc);
 
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,accessToken,exception)).thenReturn(certificateList);
-		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,accessToken,pc,false);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(reportService.getCertificateList(gradResponse,graduationDataStatus,list,exception)).thenReturn(certificateList);
+		doNothing().when(reportService).saveStudentCertificateReportJasper(gradResponse,graduationDataStatus,pc,false);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -1715,14 +1702,13 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		doNothing().when(this.tokenUtils).setAccessToken(any());
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
 		Mockito.when(gradStatusService.prepareGraduationStatusObj(graduationDataStatus)).thenReturn(gradResponse);
-		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,accessToken,exception)).thenReturn(data);
-		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null, accessToken,gradResponse,exception)).thenReturn(gradResponse);
-		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,accessToken,new ArrayList<>())).thenReturn(list);
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(reportService.prepareTranscriptData(graduationDataStatus,gradResponse,false,exception)).thenReturn(data);
+		Mockito.when(gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception)).thenReturn(gradResponse);
+		Mockito.when(optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus,studentID,new ArrayList<>())).thenReturn(list);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -1791,9 +1777,9 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(gradStatusService.getGradStatus(studentID, accessToken,exception)).thenReturn(gradResponse);
-		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), accessToken,exception)).thenReturn(graduationDataStatus);
-		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,accessToken,projectedType);
+		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
+		Mockito.when(gradAlgorithmService.runGradAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram(), exception)).thenReturn(graduationDataStatus);
+		AlgorithmResponse response = graduationService.graduateStudent(studentID,null,projectedType);
 		assertNotNull(response);
 	}
 
@@ -1868,7 +1854,7 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, null, exception)).thenReturn(pList);
+		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, exception)).thenReturn(pList);
 
 		algorithmSupports.createStudentCertificateTranscriptReports(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData, "GS");
 		assertNotNull(data);
@@ -1949,7 +1935,7 @@ public class GraduationServiceTest {
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
-		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, null, exception)).thenReturn(pList);
+		Mockito.when(reportService.getCertificateList(gradResponse, graduationDataStatus, list, exception)).thenReturn(pList);
 
 		algorithmSupports.createStudentCertificateTranscriptReports(graduationDataStatus,gradResponse,gradResponse,list,exception,data,pData, "GS");
 		assertNotNull(data);
@@ -2032,18 +2018,15 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
-		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
-		when(this.tokenUtils.checkAndGetAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
-
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
-		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
+		Mockito.when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 		assertEquals(2,numberOfRecord);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(List.of());
-		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG","accessToken");
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(List.of());
+		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 		assertEquals(0,numberOfRecord);
 	}
 
@@ -2086,9 +2069,7 @@ public class GraduationServiceTest {
 			e.getMessage();
 		}
 
-		when(reportService.getGraduationStudentRecordAndGraduationData(pen, "accessToken")).thenReturn(Pair.of(gsr, graduationData));
-		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
-		when(this.tokenUtils.checkAndGetAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+		when(reportService.getGraduationStudentRecordAndGraduationData(pen)).thenReturn(Pair.of(gsr, graduationData));
 
 		List<ProgramCertificateTranscript> pList = new ArrayList<>();
 		ProgramCertificateTranscript pcr = new ProgramCertificateTranscript();
@@ -2105,9 +2086,9 @@ public class GraduationServiceTest {
 		studentOptionalProgram2.setGraduated(true);
 
 		ExceptionMessage exception = new ExceptionMessage();
-		Mockito.when(reportService.getCertificateList(gsr, graduationData, Arrays.asList(studentOptionalProgram1, studentOptionalProgram2), "accessToken", exception)).thenReturn(pList);
+		Mockito.when(reportService.getCertificateList(gsr, graduationData, Arrays.asList(studentOptionalProgram1, studentOptionalProgram2), exception)).thenReturn(pList);
 
-		var result = graduationService.createAndStoreStudentCertificates(pen, true, "accessToken"); // isOverwrite = true -> regenerate(delete and create certs)
+		var result = graduationService.createAndStoreStudentCertificates(pen, true); // isOverwrite = true -> regenerate(delete and create certs)
 		assertNotNull(result);
 		assertEquals(Integer.valueOf(1), result);
 
@@ -2192,15 +2173,14 @@ public class GraduationServiceTest {
 		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR1);
 		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
-		when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
-		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
+		when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
+		when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
 
-		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
-		result = graduationService.getSchoolReports(uniqueList,"NONGRADREG","accessToken");
+		result = graduationService.getSchoolReports(uniqueList,"NONGRADREG");
 		assertNotNull(result);
-		result = graduationService.getSchoolReports(uniqueList,"NONGRADPRJ","accessToken");
+		result = graduationService.getSchoolReports(uniqueList,"NONGRADPRJ");
 		assertNotNull(result);
 	}
 
@@ -2211,9 +2191,7 @@ public class GraduationServiceTest {
 		List<String> uniqueList = new ArrayList<>();
 		uniqueList.add(mincode);
 
-		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
-
-		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG","accessToken");
+		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
 		assertEquals(0, result.length);
 	}
@@ -2264,13 +2242,11 @@ public class GraduationServiceTest {
 		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 		when(this.responseMock.bodyToMono(SchoolReports.class)).thenReturn(Mono.just(new SchoolReports()));
 
-		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
-
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode, "accessToken")).thenReturn(sList);
-		Mockito.when(schoolService.getTraxSchoolDetails(mincode, "accessToken", exception)).thenReturn(sTrax);
-		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN","accessToken");
+		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
+		Mockito.when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
+		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
 		assertEquals(1,numberOfRecord);
 	}
 
@@ -2280,20 +2256,20 @@ public class GraduationServiceTest {
 		final String accessToken = "accessToken";
 
 		String type = "XML";
-		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "TRAN";
-		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "CERT";
-		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "ACHV";
-		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple(pen,type.equalsIgnoreCase("XML"),type);
 
 	}
 
-	private void testPrepateReportDataMultiple(String pen,boolean xml,String accessToken,String type) {
+	private void testPrepateReportDataMultiple(String pen,boolean xml,String type) {
 		ReportData data = new ReportData();
 		ca.bc.gov.educ.api.graduation.model.report.GradProgram prg = new ca.bc.gov.educ.api.graduation.model.report.GradProgram();
 		Code code = new Code();
@@ -2308,12 +2284,12 @@ public class GraduationServiceTest {
 		data.setParameters(new HashMap<>());
 
 		if(!type.equalsIgnoreCase("CERT") && !type.equalsIgnoreCase("ACHV")) {
-			Mockito.when(reportService.prepareTranscriptData(pen, xml, accessToken, new ExceptionMessage())).thenReturn(data);
+			Mockito.when(reportService.prepareTranscriptData(pen, xml, new ExceptionMessage())).thenReturn(data);
 		}
 		if(type.equalsIgnoreCase("CERT")) {
-			Mockito.when(reportService.prepareCertificateData(pen,accessToken, new ExceptionMessage())).thenReturn(data);
+			Mockito.when(reportService.prepareCertificateData(pen, new ExceptionMessage())).thenReturn(data);
 		}
-		ReportData res = graduationService.prepareReportData(pen,type,accessToken);
+		ReportData res = graduationService.prepareReportData(pen,type);
 		assertNotNull(res);
 	}
 
@@ -2323,19 +2299,19 @@ public class GraduationServiceTest {
 		final String accessToken = "accessToken";
 
 		String type = "XML";
-		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "CERT";
-		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "ACHV";
-		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),type);
 
 		type = "TRAN";
-		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),accessToken,type);
+		testPrepateReportDataMultiple_2(pen,type.equalsIgnoreCase("XML"),type);
 	}
 
-	private void testPrepateReportDataMultiple_2(String pen,boolean xml,String accessToken,String type) {
+	private void testPrepateReportDataMultiple_2(String pen,boolean xml,String type) {
 		ReportData data = new ReportData();
 		ca.bc.gov.educ.api.graduation.model.report.GradProgram prg = new ca.bc.gov.educ.api.graduation.model.report.GradProgram();
 		Code code = new Code();
@@ -2356,12 +2332,12 @@ public class GraduationServiceTest {
 		graduationData.setGraduated(true);
 
 		if(!type.equalsIgnoreCase("CERT") && !type.equalsIgnoreCase("ACHV")) {
-			Mockito.when(reportService.prepareTranscriptData(graduationData, xml, accessToken, new ExceptionMessage())).thenReturn(data);
+			Mockito.when(reportService.prepareTranscriptData(graduationData, xml, new ExceptionMessage())).thenReturn(data);
 		}
 		if(type.equalsIgnoreCase("CERT")) {
-			Mockito.when(reportService.prepareCertificateData(graduationData,accessToken, new ExceptionMessage())).thenReturn(data);
+			Mockito.when(reportService.prepareCertificateData(graduationData, new ExceptionMessage())).thenReturn(data);
 		}
-		ReportData res = graduationService.prepareReportData(graduationData,type,accessToken);
+		ReportData res = graduationService.prepareReportData(graduationData,type);
 		assertNotNull(res);
 	}
 

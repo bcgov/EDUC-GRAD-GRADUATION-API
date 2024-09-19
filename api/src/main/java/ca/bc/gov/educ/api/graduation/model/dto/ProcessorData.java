@@ -13,17 +13,15 @@ public class ProcessorData {
 
 	private GraduationStudentRecord gradResponse;
 	private AlgorithmResponse algorithmResponse;
-	private String accessToken;
 	private String studentID;
 	private Long batchId;
 	private ExceptionMessage exception;
 
 	private long startTime;
 
-	public ProcessorData(GraduationStudentRecord gradResponse, AlgorithmResponse algorithmResponse, String accessToken, String studentID, Long batchId, ExceptionMessage exception) {
+	public ProcessorData(GraduationStudentRecord gradResponse, AlgorithmResponse algorithmResponse, String studentID, Long batchId, ExceptionMessage exception) {
 		this.gradResponse = gradResponse;
 		this.algorithmResponse = algorithmResponse;
-		this.accessToken = accessToken;
 		this.studentID = studentID;
 		this.batchId = batchId;
 		this.exception = exception;

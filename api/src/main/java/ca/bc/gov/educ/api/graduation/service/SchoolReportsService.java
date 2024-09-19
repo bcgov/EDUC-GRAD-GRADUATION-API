@@ -85,7 +85,7 @@ public class SchoolReportsService {
     }
 
     public byte[] getSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         return getSchoolDistrictReports(accessToken, reportGradStudentDataList, slrt, drt, srt);
     }
 
@@ -97,7 +97,7 @@ public class SchoolReportsService {
     }
 
     public byte[] getSchoolReports(String accessToken) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         List<InputStream> pdfs = new ArrayList<>();
         createAndStoreSchoolReports(DISTREP_SC, reportGradStudentDataList, accessToken, pdfs);
         return mergeDocuments(pdfs);
@@ -118,7 +118,7 @@ public class SchoolReportsService {
     }
 
     public byte[] getDistrictReports(String accessToken) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         List<InputStream> pdfs = new ArrayList<>();
         createAndStoreDistrictReports(DISTREP_SD, reportGradStudentDataList, accessToken, pdfs);
         return mergeDocuments(pdfs);
@@ -154,7 +154,7 @@ public class SchoolReportsService {
     @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String accessToken, String slrt, String drt, String srt, List<String> schools) {
         logger.debug("***** Get Students for School Year End Reports Starts *****");
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken, schools);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(schools);
         logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         if(schools != null && !schools.isEmpty()) {
             boolean isDistrictSchool = schools.get(0).length() == 3;
@@ -190,7 +190,7 @@ public class SchoolReportsService {
 
     public Integer createAndStoreSchoolDistrictReports(String accessToken, String slrt, String drt, String srt) {
         logger.debug("***** Get Students for School Monthly Reports Starts *****");
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         return createAndStoreSchoolDistrictReports(accessToken, reportGradStudentDataList, slrt, drt, srt);
     }
 
@@ -201,7 +201,7 @@ public class SchoolReportsService {
         } else if(NONGRADDISTREP_SD.equalsIgnoreCase(reportType)) {
             reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken);
         } else{
-            reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+            reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         }
         return createAndStoreDistrictReports(reportType, reportGradStudentDataList, accessToken, null);
     }
@@ -211,7 +211,7 @@ public class SchoolReportsService {
         if(DISTREP_YE_SC.equalsIgnoreCase(reportType)) {
             reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(accessToken);
         } else {
-            reportGradStudentDataList = reportService.getStudentsForSchoolReport(accessToken);
+            reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         }
         return createAndStoreSchoolReports(reportType, reportGradStudentDataList, accessToken, null);
     }

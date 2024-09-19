@@ -21,23 +21,19 @@ public class SchoolService {
 		this.tokenUtils = tokenUtils;
 	}
 
-	public SchoolTrax getTraxSchoolDetails(String mincode, String accessToken, ExceptionMessage message) {
-		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode, accessToken),
+	public SchoolTrax getTraxSchoolDetails(String mincode, ExceptionMessage message) {
+		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode),
 				SchoolTrax.class);
 	}
 
 	public SchoolTrax getTraxSchoolDetails(String mincode) {
-		String accessToken = tokenUtils.getAccessToken();
-		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode, accessToken),
-				SchoolTrax.class,
-				accessToken);
+		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode),
+				SchoolTrax.class);
 	}
 
 	public DistrictTrax getTraxDistrictDetails(String districtCode) {
-		String accessToken = tokenUtils.getAccessToken();
-		return this.restService.get(String.format(educGraduationApiConstants.getDistrictDetails(), districtCode, accessToken),
-				DistrictTrax.class,
-				accessToken);
+		return this.restService.get(String.format(educGraduationApiConstants.getDistrictDetails(), districtCode),
+				DistrictTrax.class);
 	}
 
 }

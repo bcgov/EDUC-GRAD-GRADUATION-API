@@ -45,7 +45,7 @@ public class EdwSnapshotService {
         this.jsonTransformer = jsonTransformer;
     }
 
-    public EdwGraduationSnapshot processSnapshot(EdwGraduationSnapshot snapshotRequest, String accessToken) {
+    public EdwGraduationSnapshot processSnapshot(EdwGraduationSnapshot snapshotRequest) {
         Integer gradYear = snapshotRequest.getGradYear(); // yyyy
         String pen = snapshotRequest.getPen();
         String graduatedDate = snapshotRequest.getGraduatedDate(); // yyyyMM
@@ -57,22 +57,22 @@ public class EdwSnapshotService {
             // retrieve honour_flag, gpa
             snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y", snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord);
         } else {
-            snapshot = runHypotheticalGradAlgorithm(pen, gradYear, schoolOfRecord, accessToken);
+            snapshot = runHypotheticalGradAlgorithm(pen, gradYear, schoolOfRecord);
         }
         log.debug("Save EdwSnapshot for Student pen# {}", snapshotRequest.getPen());
-        saveEdwSnapshotOfGraduationStatus(accessToken, snapshot);
+        saveEdwSnapshotOfGraduationStatus(snapshot);
         return snapshot;
     }
 
-    private EdwGraduationSnapshot runHypotheticalGradAlgorithm(String pen, Integer gradYear, String schoolOfRecord, String accessToken) {
-        UUID studentID = getStudentID(pen, accessToken);
+    private EdwGraduationSnapshot runHypotheticalGradAlgorithm(String pen, Integer gradYear, String schoolOfRecord) {
+        UUID studentID = getStudentID(pen);
         if (studentID == null) {
             return null;
         }
 
         EdwGraduationSnapshot snapshot;
         log.debug("Hypothetical Grad Algorithm run for Student ID: {}", studentID);
-        GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID.toString(), accessToken, new ExceptionMessage());
+        GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID.toString(), new ExceptionMessage());
         String gradProgramCode = null;
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
             gradProgramCode = gradResponse.getProgram();
@@ -81,7 +81,7 @@ public class EdwSnapshotService {
         GraduationData graduationData = null;
         if (StringUtils.isNotBlank(gradProgramCode) && !"SCCP".equalsIgnoreCase(gradProgramCode)) {
             // run hypothetical grad algorithm
-            graduationData = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, gradProgramCode, gradYear.toString(), accessToken);
+            graduationData = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, gradProgramCode, gradYear.toString());
             if (graduationData != null) {
                 isHypotheticalPass = graduationData.isGraduated();
             }
@@ -100,15 +100,14 @@ public class EdwSnapshotService {
         return snapshot;
     }
 
-    public void saveEdwSnapshotOfGraduationStatus(String accessToken, EdwGraduationSnapshot requestObj) {
+    public void saveEdwSnapshotOfGraduationStatus(EdwGraduationSnapshot requestObj) {
         this.restService.post(constants.getEdwSnapshotOfGraduationStatus(),
                 requestObj,
-                EdwGraduationSnapshot.class,
-                accessToken);
+                EdwGraduationSnapshot.class);
     }
 
-    public UUID getStudentID(String pen, String accessToken) {
-        GradSearchStudent penStudent = getStudentByPenFromStudentApi(pen, accessToken);
+    public UUID getStudentID(String pen) {
+        GradSearchStudent penStudent = getStudentByPenFromStudentApi(pen);
         if (penStudent != null) {
             return UUID.fromString(penStudent.getStudentID());
         } else {
@@ -116,12 +115,11 @@ public class EdwSnapshotService {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public GradSearchStudent getStudentByPenFromStudentApi(String pen, String accessToken) {
-        List response = this.restService.get(String.format(constants.getPenStudentApiByPenUrl(), pen),
-                List.class, accessToken);
+    public GradSearchStudent getStudentByPenFromStudentApi(String pen) {
+        var response = this.restService.get(String.format(constants.getPenStudentApiByPenUrl(), pen),
+                List.class);
         if (response != null && !response.isEmpty()) {
-            List<GradSearchStudent> studentList = jsonTransformer.convertValue(response.get(0), new TypeReference<>(){});
+            List<GradSearchStudent> studentList = jsonTransformer.convertValue(response, new TypeReference<>(){});
             return studentList.get(0);
         }
         return null;
