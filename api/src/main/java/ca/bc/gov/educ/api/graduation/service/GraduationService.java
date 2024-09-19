@@ -134,7 +134,7 @@ public class GraduationService {
 
         ReportOptions options = new ReportOptions();
         options.setReportFile("transcript");
-        options.setReportName(String.format("%sTranscript%sReport.pdf", pen, interim));
+        options.setReportName("Transcript Report.pdf");
         options.setPreview(isPreview);
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);

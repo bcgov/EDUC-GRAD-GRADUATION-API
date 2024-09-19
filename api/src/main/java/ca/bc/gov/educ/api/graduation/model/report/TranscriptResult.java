@@ -79,7 +79,7 @@ public class TranscriptResult {
 
     @JsonIgnore
     public Date getSessionDate() {
-        return this.course != null && StringUtils.isNotBlank(this.course.getSessionDate()) ? EducGraduationApiUtils.parsingTraxDate(this.course.getSessionDate()) : null;
+        return this.course != null && StringUtils.isNotBlank(this.course.getSessionDate()) ? EducGraduationApiUtils.parsingCourseTraxDate(this.course.getSessionDate()) : null;
     }
 
     @Override
