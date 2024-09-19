@@ -74,7 +74,6 @@ public class GraduationController {
     @Operation(summary = "Get Report data from graduation by student pen", description = "Get Report data from graduation by student pen", tags = { "Graduation Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type) {
-        LOGGER.debug("Report Data By Student Pen: {}", pen);
         return response.GET(gradService.prepareReportData(pen, type));
     }
 
@@ -85,7 +84,6 @@ public class GraduationController {
     public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen,
                                                         @RequestParam(required = false) String interim,
                                                         @RequestParam(required = false) String preview) {
-        LOGGER.debug("Report Data By Student Pen");
         byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview);
         if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -101,7 +99,6 @@ public class GraduationController {
     public ResponseEntity<byte[]> reportTranscriptPdfByPen(@PathVariable @NotNull String pen,
                                                         @RequestParam(required = false) String interim,
                                                         @RequestParam(required = false) String preview) {
-        LOGGER.debug("Report Data By Student Pen");
         byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview);
         return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim), MediaType.APPLICATION_PDF);
     }
