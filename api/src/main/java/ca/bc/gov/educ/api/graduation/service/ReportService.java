@@ -295,7 +295,7 @@ public class ReportService {
                 }
                 result.setUsedForGrad(sc.getCreditsUsedForGrad() != null ? sc.getCreditsUsedForGrad().toString() : "");
                 result.setEquivalency(sc.getSpecialCase() != null && sc.getSpecialCase().compareTo("C") == 0 ? "C" : equivOrChallenge);
-                addIntoTranscriptList(result, tList);
+                addIntoTranscriptList(result, tList, xml);
             }
         }
     }
@@ -320,18 +320,28 @@ public class ReportService {
     }
 
     @Generated
-    private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList) {
+    private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList, boolean xml) {
         List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
                                 !tr.getCourse().equals(transcriptResult.getCourse())
-        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+        ).sorted(
+                Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()
+        ).toList();
 
         // Handling duplicates
         if (!dups.isEmpty()) {
-            TranscriptResult tr = dups.get(0);
+            TranscriptResult duplicatedTranscriptResult = dups.get(0);
             // GRAD2-2394: only if a course taken previously was not used for grad(= requirementMet is blank), then the highest course will be taken
-            if (StringUtils.isBlank(tr.getRequirement()) && tr.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
+            if (StringUtils.isBlank(duplicatedTranscriptResult.getRequirement()) && duplicatedTranscriptResult.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
                 // replace
-                tList.remove(tr);
+                tList.remove(duplicatedTranscriptResult);
+                tList.add(transcriptResult);
+                return;
+            }
+            if (xml &&
+                    (duplicatedTranscriptResult.getCompletedPercentage() < transcriptResult.getInterimPercentage()) &&
+                    transcriptResult.getInterimPercentage() > 49) {
+                // replace
+                tList.remove(duplicatedTranscriptResult);
                 tList.add(transcriptResult);
                 return;
             }
