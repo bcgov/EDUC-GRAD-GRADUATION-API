@@ -22,6 +22,7 @@ public class EducGraduationApiConstants {
     public static final String GRADUATE_REPORT_DATA_BY_PEN = "/report/data/{pen}";
     public static final String GRADUATE_REPORT_DATA = "/report/data";
     public static final String GRADUATE_TRANSCRIPT_REPORT = "/report/transcript/{pen}";
+    public static final String GRADUATE_TRANSCRIPT_PDF_REPORT = "/report/transcriptpdf/{pen}";
     public static final String GRADUATE_CERTIFICATE_REPORT = "/report/certificate/{pen}";
     public static final String GRADUATE_ACHIEVEMENT_REPORT = "/report/achievement/{pen}";
     public static final String SCHOOL_REPORTS = "/report/school";
