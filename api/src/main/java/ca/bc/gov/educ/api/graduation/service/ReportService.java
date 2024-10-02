@@ -788,7 +788,6 @@ public class ReportService {
 
     private Student getStudentDataAchvReport(GradSearchStudent studentObj, List<StudentOptionalProgram> optionalStudentProgram) {
         Student studObj = new Student();
-        studObj.setGender(StudentGenderEnum.valueOf(studentObj.getGenderCode()).toString());
         studObj.setCitizenship(studentObj.getStudentCitizenship());
         studObj.setFirstName(studentObj.getLegalFirstName());
         studObj.setMiddleName(studentObj.getLegalMiddleNames());
