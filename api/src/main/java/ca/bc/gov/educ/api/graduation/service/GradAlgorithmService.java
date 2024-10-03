@@ -15,18 +15,14 @@ import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 public class GradAlgorithmService {
 
 	@Autowired
-    WebClient webClient;
+    RESTService restService;
 	
 	@Autowired
     EducGraduationApiConstants educGraduationApiConstants;
 	
-	public GraduationData runGradAlgorithm(UUID studentID, String program,String accessToken,ExceptionMessage exception) {
+	public GraduationData runGradAlgorithm(UUID studentID, String program, ExceptionMessage exception) {
 		try {
-			return webClient.get().uri(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program))
-							.headers(h -> {
-								h.setBearerAuth(accessToken);
-								h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-							}).retrieve().bodyToMono(GraduationData.class).block();
+			return restService.get(String.format(educGraduationApiConstants.getGradAlgorithmEndpoint(),studentID,program), GraduationData.class);
 		}catch(Exception e) {
 			exception.setExceptionName("GRAD-ALGORITHM-API IS DOWN");
 			exception.setExceptionDetails(e.getLocalizedMessage());
@@ -34,19 +30,11 @@ public class GradAlgorithmService {
 		}
 	}
 	
-	public GraduationData runProjectedAlgorithm(UUID studentID, String program,String accessToken) {
-		return webClient.get().uri(String.format(educGraduationApiConstants.getGradProjectedAlgorithmEndpoint(), studentID,program, true))
-						.headers(h -> {
-							h.setBearerAuth(accessToken);
-							h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-						}).retrieve().bodyToMono(GraduationData.class).block();
+	public GraduationData runProjectedAlgorithm(UUID studentID, String program) {
+		return restService.get(String.format(educGraduationApiConstants.getGradProjectedAlgorithmEndpoint(), studentID,program, true), GraduationData.class);
 	}
 
-	public GraduationData runHypotheticalGraduatedAlgorithm(UUID studentID, String program, String hypothenticalGradYear, String accessToken) {
-		return webClient.get().uri(String.format(educGraduationApiConstants.getGradHypotheticalAlgorithmEndpoint(), studentID, program, hypothenticalGradYear))
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).retrieve().bodyToMono(GraduationData.class).block();
+	public GraduationData runHypotheticalGraduatedAlgorithm(UUID studentID, String program, String hypotheticalGradYear) {
+		return restService.get(String.format(educGraduationApiConstants.getGradHypotheticalAlgorithmEndpoint(), studentID, program, hypotheticalGradYear), GraduationData.class);
 	}
 }

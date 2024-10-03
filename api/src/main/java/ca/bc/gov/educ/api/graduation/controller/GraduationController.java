@@ -64,32 +64,27 @@ public class GraduationController {
     @Operation(summary = "Run different Grad Runs and Graduate Student by Student ID and projected type", description = "Run different Grad Runs and Graduate Student by Student ID and projected type", tags = { "Graduation" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<AlgorithmResponse> graduateStudentNew(@PathVariable String studentID, @PathVariable String projectedType,
-                                                                @RequestParam(required = false) Long batchId,
-                                                                @RequestHeader(name="Authorization") String accessToken) {
+                                                                @RequestParam(required = false) Long batchId) {
         LOGGER.debug("Graduate Student for Student ID: {}", studentID);
-        return response.GET(gradService.graduateStudent(studentID,batchId,accessToken.replace(BEARER, ""),projectedType));
+        return response.GET(gradService.graduateStudent(studentID,batchId,projectedType));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA_BY_PEN)
     @PreAuthorize(PermissionsContants.GRADUATE_DATA)
     @Operation(summary = "Get Report data from graduation by student pen", description = "Get Report data from graduation by student pen", tags = { "Graduation Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type,
-                                                      @RequestHeader(name="Authorization") String accessToken) {
-        LOGGER.debug("Report Data By Student Pen: {}", pen);
-        return response.GET(gradService.prepareReportData(pen, type, accessToken.replace(BEARER, "")));
+    public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type) {
+        return response.GET(gradService.prepareReportData(pen, type));
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
     @PreAuthorize(PermissionsContants.GRADUATE_TRANSCRIPT)
-    @Operation(summary = "Get Transcript binary from graduation by student pen", description = "Get Transcript binary from graduation by student pen", tags = { "Graduation Data" })
+    @Operation(summary = "Get Transcript encoded binary from graduation by student pen", description = "Get Transcript encoded binary from graduation by student pen", tags = { "Graduation Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<byte[]> reportTranscriptByPen(@PathVariable @NotNull String pen,
                                                         @RequestParam(required = false) String interim,
-                                                        @RequestParam(required = false) String preview,
-                                                        @RequestHeader(name="Authorization") String accessToken) {
-        LOGGER.debug("Report Data By Student Pen: {}", pen);
-        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview, accessToken.replace(BEARER, ""));
+                                                        @RequestParam(required = false) String preview) {
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview);
         if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -97,15 +92,25 @@ public class GraduationController {
         return handleBinaryResponse(encoded, String.format("%sTranscript%sReport.pdfencoded", pen, interim), MediaType.TEXT_PLAIN);
     }
 
+    @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_PDF_REPORT)
+    @PreAuthorize(PermissionsContants.GRADUATE_TRANSCRIPT)
+    @Operation(summary = "Get Transcript binary from graduation by student pen", description = "Get Transcript binary from graduation by student pen", tags = { "Graduation Data" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<byte[]> reportTranscriptPdfByPen(@PathVariable @NotNull String pen,
+                                                        @RequestParam(required = false) String interim,
+                                                        @RequestParam(required = false) String preview) {
+        byte[] resultBinary = gradService.prepareTranscriptReport(pen, interim, preview);
+        return handleBinaryResponse(resultBinary, String.format("%sTranscript%sReport.pdf", pen, interim), MediaType.APPLICATION_PDF);
+    }
+
     @PostMapping(EducGraduationApiConstants.GRADUATE_REPORT_DATA)
     @PreAuthorize(PermissionsContants.GRADUATE_DATA)
     @Operation(summary = "Adapt graduation data for reporting", description = "Adapt graduation data for reporting", tags = { "Graduation Data" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody @NotNull GraduationData graduationData,
-                                                               @RequestParam(required = false) String type,
-                                                               @RequestHeader(name="Authorization") String accessToken) {
+                                                               @RequestParam(required = false) String type) {
         LOGGER.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type, accessToken.replace(BEARER, "")));
+        return response.GET(gradService.prepareReportData(graduationData, type));
     }
 
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS)
@@ -113,7 +118,7 @@ public class GraduationController {
     @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = false) String type ) {
-        return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, "")));
+        return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type));
     }
 
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_LABELS)
@@ -274,9 +279,7 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "Students for year end reports", description = "When triggered, list of students, eligible for the year end reports returns", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<List<ReportGradStudentData>> getStudentsForYearEndReports(
-            @RequestHeader(name="Authorization") String accessToken
-    ) {
+    public ResponseEntity<List<ReportGradStudentData>> getStudentsForYearEndReports(@RequestHeader(name="Authorization") String accessToken) {
         return response.GET(reportService.getStudentsForSchoolYearEndReport(accessToken.replace(BEARER, "")));
     }
 
@@ -290,7 +293,7 @@ public class GraduationController {
             @RequestParam(required = false) String drt,
             @RequestParam(required = false) String srt
     ) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken.replace(BEARER, ""));
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport();
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt));
     }
 
@@ -306,7 +309,7 @@ public class GraduationController {
             @RequestBody List<String> schools) {
         List<ReportGradStudentData> reportGradStudentDataTotalList = new ArrayList<>();
         for(String mincode: schools) {
-            List<ReportGradStudentData> sd = reportService.getStudentsForSchoolNonGradYearEndReport(mincode, accessToken.replace(BEARER, ""));
+            List<ReportGradStudentData> sd = reportService.getStudentsForSchoolNonGradYearEndReport(mincode);
             reportGradStudentDataTotalList.addAll(sd);
         }
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataTotalList, slrt, drt, srt));
@@ -321,7 +324,7 @@ public class GraduationController {
             @RequestParam(required = false) String slrt,
             @RequestParam(required = false) String drt,
             @RequestParam(required = false) String srt) {
-        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport(accessToken.replace(BEARER, ""));
+        List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolNonGradYearEndReport();
         byte[] resultBinary = schoolReportsService.getSchoolDistrictReports(accessToken.replace(BEARER, ""), reportGradStudentDataList, slrt, drt, srt);
         return handleBinaryResponse(resultBinary, "DistrictSchoolYearEndNonGradReports.pdf", MediaType.APPLICATION_PDF);
     }
@@ -370,8 +373,8 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School Report Generation", description = "When triggered, School Report is generated", tags = { "Reports", "type=GRADREG", "type=NONGRADREG", "type=NONGRADPRJ" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = true) String type ) {
-        byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type,accessToken.replace(BEARER, ""));
+    public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestParam(required = true) String type ) {
+        byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type);
         if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -383,9 +386,8 @@ public class GraduationController {
     @Operation(summary = "Student Certificate Creation", description = "When triggered, Student Certificates are created for a given student", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<Integer> createAndStoreStudentCertificate(@PathVariable @NotNull String pen,
-                                                                    @RequestParam(name="isOverwrite", required=false, defaultValue="N") String isOverwrite,
-                                                                    @RequestHeader(name="Authorization") String accessToken) {
-        return response.GET(gradService.createAndStoreStudentCertificates(pen, "Y".equalsIgnoreCase(isOverwrite), accessToken.replace(BEARER, "")));
+                                                                    @RequestParam(name="isOverwrite", required=false, defaultValue="N") String isOverwrite) {
+        return response.GET(gradService.createAndStoreStudentCertificates(pen, "Y".equalsIgnoreCase(isOverwrite)));
     }
 
     private ResponseEntity<byte[]> handleBinaryResponse(byte[] resultBinary, String reportFile, MediaType contentType) {
