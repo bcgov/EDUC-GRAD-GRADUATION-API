@@ -30,22 +30,22 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @SpringBootTest
 @ActiveProfiles("test")
 public class SchoolServiceTest {
-	
-	@Autowired
-	private SchoolService schoolService;
-	
-	@Autowired
-	GradValidation validation;
-	
-	@MockBean
+
+    @Autowired
+    private SchoolService schoolService;
+
+    @Autowired
+    GradValidation validation;
+
+    @MockBean
     WebClient webClient;
 
     @Autowired
     private EducGraduationApiConstants constants;
 
-	@MockBean
-	RESTService restService;
-    
+    @MockBean
+    RESTService restService;
+
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
     @Mock
@@ -58,39 +58,41 @@ public class SchoolServiceTest {
     private WebClient.ResponseSpec responseMock;
     @Mock
     private Mono<GraduationStudentRecord> monoResponse;
-	
+
     @Before
     public void setUp() {
         openMocks(this);
-    }    
+    }
 
-	@After
+    @After
     public void tearDown() {
 
     }
 
-	@Test
-	public void testGetSchoolDetails() {
-		String mincode = "213123131";
-		String accessToken = "accessToken";
-		SchoolTrax schtrax = new SchoolTrax();
-		schtrax.setMinCode(mincode);
-		schtrax.setAddress1("1231");
-		when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, new ExceptionMessage());
-		assertNotNull(res);
-		assertEquals(res.getMinCode(),mincode);
-	}
+    @Test
+    public void testGetSchoolDetails() {
+        String mincode = "213123131";
+        String accessToken = "accessToken";
+        School schtrax = new School();
+        schtrax.setMinCode(mincode);
+        schtrax.setAddress1("1231");
+        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
+        School res = schoolService.getSchoolDetails(mincode);
+
+        assertNotNull(res);
+        assertEquals(res.getMinCode(),mincode);
+    }
 
     @Test
     public void testGetSchoolDetailsNoToken() {
         String mincode = "213123131";
-        SchoolTrax schtrax = new SchoolTrax();
+        School schtrax = new School();
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        SchoolTrax res = schoolService.getTraxSchoolDetails(mincode);
+        School res = schoolService.getSchoolDetails(mincode);
+
         assertNotNull(res);
         assertEquals(res.getMinCode(),mincode);
     }
@@ -98,12 +100,12 @@ public class SchoolServiceTest {
     @Test
     public void testGetDistrictDetailsNoToken() {
         String mincode = "213";
-        DistrictTrax schtrax = new DistrictTrax();
-        schtrax.setDistrictNumber(mincode);
-        schtrax.setAddress1("1231");
+        District schoolDistrict = new District();
+        schoolDistrict.setDistrictNumber(mincode);
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        DistrictTrax res = schoolService.getTraxDistrictDetails(mincode);
+        when(this.restService.get(any(String.class), any())).thenReturn(schoolDistrict);
+        District res = schoolService.getDistrictDetails(mincode);
+
         assertNotNull(res);
         assertEquals(res.getDistrictNumber(),mincode);
     }
@@ -126,3 +128,4 @@ public class SchoolServiceTest {
     }
 
 }
+

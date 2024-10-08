@@ -52,7 +52,7 @@ public class SchooReportsServiceTest {
 
 	@Autowired
 	private SchoolReportsService schoolReportsService;
-	
+
 	@MockBean
 	private ReportService reportService;
 
@@ -67,7 +67,7 @@ public class SchooReportsServiceTest {
 
 	@Autowired
 	GradValidation validation;
-	
+
 	@MockBean
 	WebClient webClient;
 
@@ -146,12 +146,12 @@ public class SchooReportsServiceTest {
 
 		when(this.tokenUtils.getAccessToken(any())).thenReturn(Pair.of("accessToken", System.currentTimeMillis()));
 
-		SchoolTrax traxSchool = new SchoolTrax();
+		ca.bc.gov.educ.api.graduation.model.dto.School traxSchool = new ca.bc.gov.educ.api.graduation.model.dto.School();
 		traxSchool.setMinCode("12345678");
 		traxSchool.setAddress1("1231");
 
 		when(this.restService.get(any(String.class), any(), any())).thenReturn(traxSchool);
-		when(this.schoolService.getTraxSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
+		when(this.schoolService.getSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
 
 		mockTokenResponseObject();
 
@@ -161,13 +161,12 @@ public class SchooReportsServiceTest {
 		reportsCount = schoolReportsService.createAndStoreSchoolReports(DISTREP_SC, "accessToken");
 		assertTrue(reportsCount > 0);
 
-		DistrictTrax disttrax = new DistrictTrax();
+		District disttrax = new District();
 		disttrax.setDistrictNumber("005");
-		disttrax.setDistrictName("My District");
-		disttrax.setAddress1("My Address");
+		disttrax.setDisplayName("My District");
 
-		when(this.schoolService.getTraxSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
-		when(this.schoolService.getTraxDistrictDetails(disttrax.getDistrictNumber())).thenReturn(disttrax);
+		when(this.schoolService.getSchoolDetails(traxSchool.getMinCode())).thenReturn(traxSchool);
+		when(this.schoolService.getDistrictDetails(disttrax.getDistrictNumber())).thenReturn(disttrax);
 
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");
 		assertTrue(reportsCount > 0);
@@ -273,3 +272,4 @@ public class SchooReportsServiceTest {
 		return mockToken;
 	}
 }
+

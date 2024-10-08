@@ -53,7 +53,8 @@ public class ReportService {
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
-        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryCode())?
+                getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()) : graduationDataStatus.getSchool().getSchoolCategoryCode());
         try {
             return restService.post(educGraduationApiConstants.getTranscript(), req, ProgramCertificateTranscript.class);
         } catch (Exception e) {
@@ -71,7 +72,8 @@ public class ReportService {
                 req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
             }
         }
-        req.setSchoolCategoryCode(getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()));
+        req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryCode())?
+                getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord()) : graduationDataStatus.getSchool().getSchoolCategoryCode());
         try {
             var response = restService.post(educGraduationApiConstants.getCertList(), req, List.class);
             return jsonTransformer.convertValue(response, new TypeReference<List<ProgramCertificateTranscript>>() {});
@@ -83,9 +85,8 @@ public class ReportService {
     }
 
     public String getSchoolCategoryCode(String mincode) {
-        // Send to restclient instead
-        CommonSchool commonSchool = this.restService.get(String.format(educGraduationApiConstants.getSchoolCategoryCode(), mincode), CommonSchool.class);
-        return (commonSchool == null) ? null : commonSchool.getSchoolCategoryCode();
+        ca.bc.gov.educ.api.graduation.model.dto.School school = this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(), mincode), ca.bc.gov.educ.api.graduation.model.dto.School.class);
+        return (school == null) ? null : school.getSchoolCategoryCode();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
@@ -119,7 +120,7 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, ExceptionMessage exception) {
         try {
-            School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, exception);
+            School schoolAtGrad = getSchoolAtGradData(graduationDataStatus);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             //--> Revert code back to school of record GRAD2-2758
             /**
@@ -128,7 +129,7 @@ public class ReportService {
                 String mincode = schoolAtGrad.getMincode();
                 traxSchool = schoolService.getTraxSchoolDetails(mincode, exception);
             } **/
-            SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(schoolOfRecord.getMincode(), exception);
+            ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(schoolOfRecord.getMincode());
             //<--
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
@@ -145,7 +146,7 @@ public class ReportService {
             data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, xml, exception));
             data.setNonGradReasons(isGraduated(gradResponse.getProgramCompletionDate(), graduationDataStatus.getGradStatus().getProgram()) ? new ArrayList<>() : getNonGradReasons(data.getGradProgram().getCode().getCode(), graduationDataStatus.getNonGradReasons(), xml, true));
             data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
-            if(traxSchool != null && !"N".equalsIgnoreCase(traxSchool.getCertificateEligibility())) {
+            if(schoolDetails != null && !"N".equalsIgnoreCase(schoolDetails.getCertificateEligibility())) {
                 if ("SCCP".equalsIgnoreCase(data.getGradProgram().getCode().getCode())) {
                     data.getStudent().setSccDate(graduationStatus.getProgramCompletionDate());
                 }
@@ -324,6 +325,7 @@ public class ReportService {
         List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
                                 !tr.getCourse().equals(transcriptResult.getCourse())
         ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+
 
         // Handling duplicates
         if (!dups.isEmpty()) {
@@ -709,9 +711,9 @@ public class ReportService {
         return std;
     }
 
-    private School getSchoolAtGradData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ExceptionMessage exception) {
+    private School getSchoolAtGradData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
         if (graduationDataStatus.getGradStatus() != null && !StringUtils.isBlank(graduationDataStatus.getGradStatus().getSchoolAtGrad())) {
-            SchoolTrax schoolDetails = schoolService.getTraxSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad(), exception);
+            ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(graduationDataStatus.getGradStatus().getSchoolAtGrad());
             if (schoolDetails != null) {
                 return getSchoolData(schoolDetails);
             }
@@ -719,28 +721,6 @@ public class ReportService {
         return null;
     }
 
-    @SuppressWarnings("DuplicatedCode")
-    private School getSchoolData(SchoolTrax schoolDetails) {
-        School schObj = new School();
-        Address addRess = new Address();
-        addRess.setCity(schoolDetails.getCity());
-        addRess.setCode(schoolDetails.getPostal());
-        addRess.setCountry(schoolDetails.getCountryCode());
-        addRess.setRegion(schoolDetails.getProvCode());
-        addRess.setStreetLine1(schoolDetails.getAddress1());
-        addRess.setStreetLine2(schoolDetails.getAddress2());
-        schObj.setTypeIndicator(schoolDetails.getIndependentDesignation());
-        schObj.setAddress(addRess);
-        schObj.setMincode(schoolDetails.getMinCode());
-        schObj.setName(schoolDetails.getSchoolName());
-        schObj.setSignatureCode(schoolDetails.getMinCode().substring(0, 3));
-        schObj.setDistno(schoolDetails.getMinCode().substring(0, 3));
-        schObj.setSchlno(schoolDetails.getMinCode());
-        schObj.setStudents(new ArrayList<>());
-        return schObj;
-    }
-
-    @SuppressWarnings("DuplicatedCode")
     private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.School school) {
         School schObj = new School();
         Address addRess = new Address();
@@ -750,7 +730,7 @@ public class ReportService {
         addRess.setRegion(school.getProvCode());
         addRess.setStreetLine1(school.getAddress1());
         addRess.setStreetLine2(school.getAddress2());
-        schObj.setTypeIndicator(school.getIndependentDesignation());
+        schObj.setTypeIndicator("02".equalsIgnoreCase(school.getSchoolCategoryCode())? "02" : "");
         schObj.setAddress(addRess);
         schObj.setMincode(school.getMinCode());
         schObj.setName(school.getSchoolName());
@@ -1013,7 +993,7 @@ public class ReportService {
         ReportData data = new ReportData();
         GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
         School certificateSchool;
-        School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, new ExceptionMessage());
+        School schoolAtGrad = getSchoolAtGradData(graduationDataStatus);
         if(schoolAtGrad != null) {
             //schoolAtGrad
             certificateSchool = schoolAtGrad;
@@ -1110,7 +1090,7 @@ public class ReportService {
 
     public ReportData prepareAchievementReportData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, ExceptionMessage exception) {
         try {
-            School schoolAtGrad = getSchoolAtGradData(graduationDataStatus, exception);
+            School schoolAtGrad = getSchoolAtGradData(graduationDataStatus);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
@@ -1282,3 +1262,4 @@ public class ReportService {
         return null;
     }
 }
+

@@ -1,9 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
-import ca.bc.gov.educ.api.graduation.model.dto.DistrictTrax;
+import ca.bc.gov.educ.api.graduation.model.dto.District;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.model.dto.SchoolReports;
-import ca.bc.gov.educ.api.graduation.model.dto.SchoolTrax;
 import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.*;
 import lombok.SneakyThrows;
@@ -161,8 +160,8 @@ public class SchoolReportsService {
             if(isDistrictSchool) {
                 //--> Revert code back to school of record GRAD2-2758
                 /**
-                reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3))));
-                reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincodeAtGrad(), 0, 3))));
+                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3))));
+                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.substring(st.getMincodeAtGrad(), 0, 3))));
                  **/
                 reportGradStudentDataList.removeIf(st->schools != null && !schools.isEmpty() && !schools.contains(StringUtils.substring(st.getMincode(), 0, 3)));
                 //<--
@@ -172,8 +171,8 @@ public class SchoolReportsService {
             if(isSchoolSchool) {
                 //--> Revert code back to school of record GRAD2-2758
                 /**
-                reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincode()))));
-                reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincodeAtGrad()))));
+                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isBlank(st.getMincodeAtGrad()) || StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincode()))));
+                 reportGradStudentDataList.removeIf(st -> ((StringUtils.isNotBlank(st.getMincodeAtGrad()) && !StringUtils.equals(st.getMincode(), st.getMincodeAtGrad())) && !schools.contains(StringUtils.trimToEmpty(st.getMincodeAtGrad()))));
                  **/
                 reportGradStudentDataList.removeIf(st->schools != null && !schools.isEmpty() && !schools.contains(st.getMincode()));
                 //<--
@@ -483,11 +482,11 @@ public class SchoolReportsService {
             }
         }
         if (addNewDistrict) {
-            DistrictTrax districtTrax = schoolService.getTraxDistrictDetails(distcode);
+            District districtInstitute = schoolService.getDistrictDetails(distcode);
             district = new School();
             district.setDistno(distcode);
             district.setMincode(distcode);
-            district.setName(districtTrax != null ? districtTrax.getDistrictName() : reportGradStudentData.getDistrictName());
+            district.setName(districtInstitute != null ? districtInstitute.getDistrictName() : reportGradStudentData.getDistrictName());
             districtSchoolsMap.put(district, new ArrayList<>());
         }
         return district;
@@ -498,21 +497,21 @@ public class SchoolReportsService {
         /** String mincode = StringUtils.isBlank(reportGradStudentData.getMincodeAtGrad()) ? reportGradStudentData.getMincode() : reportGradStudentData.getMincodeAtGrad();**/
         String mincode = reportGradStudentData.getMincode();
         //<--
-        SchoolTrax traxSchool = schoolService.getTraxSchoolDetails(mincode);
+        ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(mincode);
         School school = new School();
         school.setStudents(new ArrayList<>());
-        if(traxSchool != null) {
-            school.setDistno(StringUtils.substring(traxSchool.getMinCode(), 0, 3));
-            school.setMincode(traxSchool.getMinCode());
-            school.setName(traxSchool.getSchoolName());
+        if(schoolDetails != null) {
+            school.setDistno(StringUtils.substring(schoolDetails.getMinCode(), 0, 3));
+            school.setMincode(schoolDetails.getMinCode());
+            school.setName(schoolDetails.getSchoolName());
             school.setTypeBanner("Principal");
             Address address = new Address();
-            address.setStreetLine1(traxSchool.getAddress1());
-            address.setStreetLine2(traxSchool.getAddress2());
-            address.setCity(traxSchool.getCity());
-            address.setRegion(traxSchool.getProvCode());
-            address.setCountry(traxSchool.getCountryName());
-            address.setCode(traxSchool.getPostal());
+            address.setStreetLine1(schoolDetails.getAddress1());
+            address.setStreetLine2(schoolDetails.getAddress2());
+            address.setCity(schoolDetails.getCity());
+            address.setRegion(schoolDetails.getProvCode());
+            address.setCountry(schoolDetails.getCountryCode());
+            address.setCode(schoolDetails.getPostal());
             school.setAddress(address);
             return school;
         }
@@ -546,11 +545,11 @@ public class SchoolReportsService {
             }
         }
         if (addNewSchool) {
-            SchoolTrax schoolTrax = schoolService.getTraxSchoolDetails(mincode);
+            ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(mincode);
             School school = new School();
             school.setDistno(distNo);
             school.setMincode(mincode);
-            school.setName(schoolTrax != null ? schoolTrax.getSchoolName() : reportGradStudentData.getSchoolName());
+            school.setName(schoolDetails != null ? schoolDetails.getSchoolName() : reportGradStudentData.getSchoolName());
             school.setTypeBanner("Principal");
             schools.add(processDistrictSchool(school, reportGradStudentData));
         }
