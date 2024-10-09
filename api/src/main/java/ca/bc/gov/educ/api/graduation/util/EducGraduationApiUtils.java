@@ -164,15 +164,6 @@ public class EducGraduationApiUtils {
 		return toLastDayOfMonth(EducGraduationApiUtils.parseDate(sDates, EducGraduationApiConstants.DEFAULT_DATE_FORMAT));
 	}
 
-	public static Date parsingCourseTraxDate(String sessionDate) {
-		int countMatches = StringUtils.countMatches(sessionDate, "/");
-		if (countMatches == 0) {
-			StringBuilder sb = new StringBuilder(sessionDate);
-			sessionDate = sb.insert(4, '/').toString();
-		}
-		return parsingTraxDate(sessionDate);
-	}
-
 	public static LocalDate parsingTraxDateLocalDate(String sessionDate) {
 		return DateUtils.toLocalDate(parsingTraxDate(sessionDate));
 	}
