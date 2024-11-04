@@ -627,27 +627,13 @@
     "districtName": "SOUTHEAST KOOTENAY",
     "transcriptEligibility": "Y",
     "certificateEligibility": "Y",
-    "independentDesignation": "",
-    "mailerType": "1",
     "address1": "1410 BAKER STREET",
     "address2": "",
     "city": "CRANBROOK",
     "provCode": "BC",
-    "provinceName": "BRITISH COLUMBIA",
     "countryCode": "CN",
-    "countryName": "CANADA",
     "postal": "V1C1B2",
-    "independentAffiliation": "",
-    "openFlag": "Y",
-    "signatureDistrict": "",
-    "newMinCode": "09323027",
-    "schoolOrg": "S",
-    "appendTrans": "",
-    "ministryContact": "P",
-    "principalName": "MR IAN KENNEDY",
-    "schoolPhone": "2504265241",
-    "schoolFax": "2504266673",
-    "schoolEmail": ""
+    "openFlag": "Y"
   },
   "studentCourses": {
     "studentCourseList": [
