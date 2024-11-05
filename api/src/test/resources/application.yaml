@@ -142,8 +142,6 @@ endpoint:
   by-pen:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
  grad-trax-api:
-  commonschool-by-mincode:
-     url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/common/%s
   school-by-min-code:
     url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school-clob/%s
   district-by-min-code:

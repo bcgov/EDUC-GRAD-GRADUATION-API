@@ -144,8 +144,6 @@ endpoint:
 
 
  grad-trax-api:
-   commonschool-by-mincode:
-     url: ${GRAD_TRAX_API}api/v1/trax/school/common/%s
    school-by-min-code:
      url: ${GRAD_TRAX_API}api/v2/trax/school-clob/%s
    district-by-min-code:
