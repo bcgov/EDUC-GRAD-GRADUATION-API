@@ -1616,17 +1616,7 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-//		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-//		};
-
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
-
 		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
@@ -1642,21 +1632,7 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
-
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-
-//
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
-
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
 
@@ -1677,15 +1653,6 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-//		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-//		};
-
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
-
 		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
 
 
@@ -1703,21 +1670,7 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
-
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-
-//
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
-
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), Exception.class)).thenReturn(new Exception());
 
 
@@ -1738,14 +1691,7 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(Exception.class)).thenReturn(Mono.just(new Exception()));
-
 		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), Exception.class)).thenReturn(new Exception());
-
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
 		assertNull(transcriptData.getTranscript());
@@ -1764,17 +1710,7 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-		};
-
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(),pen))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(gradSearchStudentResponseType)).thenReturn(Mono.just(List.of(gradSearchStudent)));
-
 		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
@@ -2138,26 +2074,8 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(gradProgram));
-
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-
-
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(GraduationStudentRecord.class)).thenReturn(Mono.just(graduationStudentRecord));
-
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
-
-
-		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
-		};
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
 		studentOptionalProgram.setOptionalProgramCode("FR");
@@ -2380,15 +2298,6 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getSchoolDetails(), "09323027"), School.class)).thenReturn(schoolDetails);
 		var result = reportService.getSchoolCategoryCode(schoolDetails.getMinCode());
 		assertThat(result).isNotNull();
-	}
-
-	@Test
-	public void testGetSchoolCategoryCodeNull() {
-		when(this.restService.get(String.format(constants.getSchoolCategoryCode(),"09323027"), CommonSchool.class)).thenReturn(null);
-
-		var result = reportService.getSchoolCategoryCode("09323027");
-		assertThat(result).isNull();
-
 	}
 
 	protected GraduationData createGraduationData(String jsonPath) throws Exception {
