@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
@@ -71,29 +72,34 @@ public class SchoolServiceTest {
 
     @Test
     public void testGetSchoolDetails() {
+        UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
-        String accessToken = "accessToken";
         School schtrax = new School();
+        schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        School res = schoolService.getSchoolDetails(mincode);
+        School res = schoolService.getSchoolClob(schtrax.getSchoolId());
 
         assertNotNull(res);
-        assertEquals(res.getMinCode(),mincode);
+        assertEquals(res.getSchoolId(),schoolId.toString());
+        assertEquals(res.getMinCode(), mincode);
     }
 
     @Test
     public void testGetSchoolDetailsNoToken() {
+        UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
         School schtrax = new School();
+        schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        School res = schoolService.getSchoolDetails(mincode);
+        School res = schoolService.getSchoolClob(schoolId);
 
         assertNotNull(res);
+        assertEquals(res.getSchoolId(),schoolId.toString());
         assertEquals(res.getMinCode(),mincode);
     }
 

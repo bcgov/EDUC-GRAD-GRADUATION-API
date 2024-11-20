@@ -28,6 +28,7 @@ public class GradAlgorithmGraduationStudentRecord {
     private String studentCitizenship;
     private UUID studentID;
     private String schoolAtGrad;
+    private UUID schoolAtGradId;
     private String consumerEducationRequirementMet;
     private String schoolAtGradName;
     @JsonFormat(pattern=DEFAULT_DATE_FORMAT)

@@ -151,7 +151,7 @@ public class SchooReportsServiceTest {
 		traxSchool.setAddress1("1231");
 
 		when(this.restService.get(any(String.class), any(), any())).thenReturn(traxSchool);
-		when(this.schoolService.getSchoolDetails(any(String.class))).thenReturn(traxSchool);
+		when(this.schoolService.getSchoolClob(any(String.class))).thenReturn(traxSchool);
 
 		mockTokenResponseObject();
 
@@ -165,7 +165,7 @@ public class SchooReportsServiceTest {
 		disttrax.setDistrictNumber("005");
 		disttrax.setDisplayName("My District");
 
-		when(this.schoolService.getSchoolDetails(any(String.class))).thenReturn(traxSchool);
+		when(this.schoolService.getSchoolClob(any(String.class))).thenReturn(traxSchool);
 		when(this.schoolService.getDistrictDetails(disttrax.getDistrictNumber())).thenReturn(disttrax);
 
 		reportsCount = schoolReportsService.createAndStoreDistrictReports(DISTREP_YE_SD, "accessToken");

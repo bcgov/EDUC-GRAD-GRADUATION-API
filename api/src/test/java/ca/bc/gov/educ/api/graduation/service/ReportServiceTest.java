@@ -227,6 +227,7 @@ public class ReportServiceTest {
 	@Test
 	public void testSaveStudentTranscriptReport() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		String pen="212321123";
 		boolean isGraduated= false;
@@ -243,10 +244,12 @@ public class ReportServiceTest {
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
 		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentTranscript(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
@@ -258,12 +261,14 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
@@ -272,12 +277,13 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
-		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -297,11 +303,12 @@ public class ReportServiceTest {
 		list.add(spgm);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenThrow(new RuntimeException("Test - API is down"));
 
@@ -315,6 +322,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -333,8 +341,8 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
-		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -362,9 +370,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
 
@@ -375,12 +384,14 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_PFProgram() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
@@ -389,12 +400,13 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
-		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setGradMessage("Not Graduated");
@@ -423,9 +435,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -434,12 +447,14 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_PFProgram_nodogwood() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
@@ -452,8 +467,8 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
-		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -474,9 +489,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
 		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
@@ -493,6 +509,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_emptyOptionalProgram() {
 		UUID studentID = new UUID(1, 1);
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setStudentID(studentID);
@@ -500,15 +517,16 @@ public class ReportServiceTest {
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
@@ -519,8 +537,8 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
-		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		GraduationData graduationDataStatus = new GraduationData();
 		graduationDataStatus.setDualDogwood(false);
@@ -546,12 +564,14 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_FrenchImmersion() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
@@ -564,6 +584,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -586,9 +607,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -606,12 +628,14 @@ public class ReportServiceTest {
 	@Test
 	public void testGetCertificateList_FrenchImmersion_nullProgramCompletionDate() {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
 		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
@@ -620,10 +644,12 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
 		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
 		gradAlgorithmGraduationStatus.setSchoolOfRecord("06011033");
+		gradAlgorithmGraduationStatus.setSchoolOfRecordId(UUID.fromString(schoolId));
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -655,9 +681,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -736,9 +763,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("1123");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
 
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -900,9 +928,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -979,9 +1008,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("06011033");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1072,9 +1102,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1166,9 +1197,10 @@ public class ReportServiceTest {
 
 		School schoolDetails = new School();
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
 
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
@@ -1193,6 +1225,7 @@ public class ReportServiceTest {
 
 	public void testPrepareReportData_Desig_2() {
 		String accessToken = "accessToken";
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -1202,6 +1235,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
 		School schoolObj = new School();
+		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -1239,7 +1273,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradStudent(stuObj);
 
 		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
@@ -1315,6 +1350,7 @@ public class ReportServiceTest {
 	@Test
 	public void testSaveStudentAchievementReport() throws Exception {
 		String studentID = new UUID(1, 1).toString();
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		String accessToken = "accessToken";
 		String pen = "212321123";
 		boolean isGraduated = false;
@@ -1325,10 +1361,12 @@ public class ReportServiceTest {
 		ExceptionMessage exception = new ExceptionMessage();
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
 		when(this.restService.post(eq(constants.getAchievementReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
 		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentReport(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
 
@@ -1393,9 +1431,25 @@ public class ReportServiceTest {
 	@Test
 	public void testGetTranscript() throws Exception {
 
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
+		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
+		assertNotNull(gradStatus);
+		String pen = gradStatus.getGradStudent().getPen();
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(pen);
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
+
+		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+		graduationStudentRecord.setPen(pen);
+		graduationStudentRecord.setProgramCompletionDate("2003/01");
+		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
+		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
+
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
 		GraduationProgramCode gradProgram = new GraduationProgramCode();
 		gradProgram.setProgramCode("1950");
@@ -1407,20 +1461,7 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
-		assertNotNull(gradStatus);
-		String pen = gradStatus.getGradStudent().getPen();
-		GradSearchStudent gradSearchStudent = new GradSearchStudent();
-		gradSearchStudent.setPen(pen);
-		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
-
-		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
-		graduationStudentRecord.setPen(pen);
-		graduationStudentRecord.setProgramCompletionDate("2003/01");
-		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
-
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
 
 
@@ -1431,10 +1472,7 @@ public class ReportServiceTest {
 	@Test
 	public void testGetTranscriptException() throws Exception {
 
-		School schoolDetails = new School();
-		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
-
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -1448,7 +1486,13 @@ public class ReportServiceTest {
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
+		schoolDetails.setMinCode("09323027");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
+
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenThrow(new RuntimeException());
 
@@ -1461,6 +1505,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testReportDataByPen() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -1511,10 +1556,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -1539,7 +1586,7 @@ public class ReportServiceTest {
 		schtrax.setSchoolName("ROBERT DDGELL");
 		schtrax.setAddress1("My Address");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),schtrax.getMinCode()), School.class)).thenReturn(schtrax);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schtrax.getMinCode()), School.class)).thenReturn(schtrax);
 
 		District distInstitute = new District();
 		distInstitute.setDistrictNumber("005");
@@ -1703,6 +1750,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testTranscriptReportByPen() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -1728,10 +1776,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1828,6 +1878,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testReportDataByGraduationData() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -1850,10 +1901,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1912,6 +1965,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testReportDataByGraduationData_GSRNULL() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 
@@ -1926,9 +1980,11 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), GraduationStudentRecord.class)).thenReturn(null);
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2010,6 +2066,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testReportDataByGraduationData_EXCEPTION() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -2033,10 +2090,12 @@ public class ReportServiceTest {
 
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -2056,6 +2115,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareCertificateData() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -2085,10 +2145,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -2113,6 +2175,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareCertificateData_GSRNULL() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 
@@ -2128,10 +2191,12 @@ public class ReportServiceTest {
 
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2163,6 +2228,7 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareCertificateData_EXCEPTION() throws Exception {
+		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
@@ -2172,6 +2238,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setProgramCompletionDate("2003/01");
 		graduationStudentRecord.setStudentID(UUID.fromString(gradStatus.getGradStudent().getStudentID()));
 		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
+		graduationStudentRecord.setSchoolOfRecordId(gradStatus.getGradStatus().getSchoolOfRecordId());
 
 		String studentGradData = readFile("json/gradstatus.json");
 		assertNotNull(studentGradData);
@@ -2186,10 +2253,12 @@ public class ReportServiceTest {
 
 
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolDetails(),"09323027"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2292,11 +2361,14 @@ public class ReportServiceTest {
 
 	@Test
 	public void testGetSchoolCategoryCode() {
+		UUID schoolId = UUID.randomUUID();
 		School schoolDetails = new School();
+		schoolDetails.setSchoolId(schoolId.toString());
 		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("02");
-		when(this.restService.get(String.format(constants.getSchoolDetails(), "09323027"), School.class)).thenReturn(schoolDetails);
-		var result = reportService.getSchoolCategoryCode(schoolDetails.getMinCode());
+		schoolDetails.setSchoolCategoryCode("INDEPEN");
+		schoolDetails.setSchoolCategoryLegacyCode("02");
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		var result = reportService.getSchoolCategoryCode(schoolId);
 		assertThat(result).isNotNull();
 	}
 
