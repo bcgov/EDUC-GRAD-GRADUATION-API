@@ -196,11 +196,13 @@ public class GraduationService {
         for (String usl : uniqueSchoolList) {
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
-                ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(usl);
-                if (schoolDetails != null) {
+                List<ca.bc.gov.educ.api.graduation.model.dto.institute.School> schoolDetails = schoolService.getSchoolDetails(usl);
+                if (schoolDetails != null && !schoolDetails.isEmpty()) {
+                    ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolDetails.get(0);
                     School schoolObj = new School();
-                    schoolObj.setMincode(schoolDetails.getMinCode());
-                    schoolObj.setName(schoolDetails.getSchoolName());
+                    schoolObj.setSchoolId(schoolDetail.getSchoolId());
+                    schoolObj.setMincode(schoolDetail.getMincode());
+                    schoolObj.setName(schoolDetail.getDisplayName());
                     ReportData gradReport;
                     switch (type) {
                         case GRADREG:
@@ -236,13 +238,15 @@ public class GraduationService {
                     String listOfStudents = jsonTransformer.marshall(stdList);
                     logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
-                ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolDetails(usl);
-                if (schoolDetails != null) {
-                    logger.debug("*** School Details Acquired {}", schoolDetails.getSchoolName());
+                List<ca.bc.gov.educ.api.graduation.model.dto.institute.School> schoolDetails = schoolService.getSchoolDetails(usl);
+                if (schoolDetails != null && !schoolDetails.isEmpty()) {
+                    ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolDetails.get(0);
+                    logger.debug("*** School Details Acquired {}", schoolDetail.getDisplayName());
                     if (stdList != null && !stdList.isEmpty()) {
                         School schoolObj = new School();
-                        schoolObj.setMincode(schoolDetails.getMinCode());
-                        schoolObj.setName(schoolDetails.getSchoolName());
+                        schoolObj.setSchoolId(schoolDetail.getSchoolId());
+                        schoolObj.setMincode(schoolDetail.getMincode());
+                        schoolObj.setName(schoolDetail.getDisplayName());
                         if (TVRRUN.equalsIgnoreCase(type)) {
                             List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
                             logger.debug("*** Process processStudentNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());

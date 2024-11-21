@@ -37,6 +37,7 @@ public class GradSearchStudent {
 	private String trueStudentID;
 	private String program;
 	private String schoolOfRecord;
+	private String schoolOfRecordId;
 	private String schoolOfRecordName;
 	private String schoolOfRecordindependentAffiliation;
 	private String studentGrade;

@@ -61,7 +61,7 @@ public class AlgorithmSupport {
                             }
                             if(createCertificate) {
                                 reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, certType, false);
-                                graduationDataStatus.getSchool().setSchoolCategoryCode(certType.getSchoolCategoryCode());
+                                graduationDataStatus.getSchool().setSchoolCategoryLegacyCode(certType.getSchoolCategoryCode());
                                 graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
                                         .code(certType.getCertificateTypeCode())
                                         .description(certType.getCertificateTypeLabel())
@@ -69,7 +69,7 @@ public class AlgorithmSupport {
                             }
                         } else {
                             reportService.saveStudentCertificateReportJasper(graduationStatusResponse, graduationDataStatus, certType, false);
-                            graduationDataStatus.getSchool().setSchoolCategoryCode(certType.getSchoolCategoryCode());
+                            graduationDataStatus.getSchool().setSchoolCategoryLegacyCode(certType.getSchoolCategoryCode());
                             graduationDataStatus.getStudentCertificatesTranscript().addCertificateType(GradCertificateType.builder()
                                     .code(certType.getCertificateTypeCode())
                                     .description(certType.getCertificateTypeLabel())

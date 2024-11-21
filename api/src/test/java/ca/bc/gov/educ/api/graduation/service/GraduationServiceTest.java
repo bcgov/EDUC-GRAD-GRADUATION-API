@@ -1944,9 +1944,10 @@ public class GraduationServiceTest {
 	@Test
 	public void testCreateAndStoreSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
+		UUID schoolId = UUID.randomUUID();
 		String mincode = "1231231231";
 		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		uniqueList.add(schoolId.toString());
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -1991,9 +1992,9 @@ public class GraduationServiceTest {
 
 		sList.add(gsr);
 
-		School sTrax = new School();
-		sTrax.setAddress1("!23123");
-		sTrax.setMinCode("1231231231");
+		ca.bc.gov.educ.api.graduation.model.dto.institute.School sTrax = new ca.bc.gov.educ.api.graduation.model.dto.institute.School();
+		sTrax.setSchoolId(schoolId.toString());
+		sTrax.setMincode("1231231231");
 
 		byte[] bytesSAR1 = "Any String you want".getBytes();
 
@@ -2020,13 +2021,13 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(mincode)).thenReturn(sTrax);
+		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(schoolId.toString())).thenReturn(List.of(sTrax));
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 
 		assertEquals(2,numberOfRecord);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(List.of());
+		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(List.of());
 		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 		assertEquals(0,numberOfRecord);
 	}
@@ -2146,6 +2147,7 @@ public class GraduationServiceTest {
 		sList.add(gsr);
 
 		School sTrax = new School();
+		sTrax.setSchoolId(UUID.randomUUID().toString());
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
 
@@ -2175,7 +2177,7 @@ public class GraduationServiceTest {
 		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
 		when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		when(schoolService.getSchoolDetails(mincode)).thenReturn(sTrax);
+		when(schoolService.getSchoolClob(sTrax.getSchoolId())).thenReturn(sTrax);
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
@@ -2200,9 +2202,10 @@ public class GraduationServiceTest {
 	@Test
 	public void testCreateAndStoreSchoolReports_TVR() {
 		ExceptionMessage exception = new ExceptionMessage();
+		UUID schoolId = UUID.randomUUID();
 		String mincode = "1231231231";
 		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		uniqueList.add(schoolId.toString());
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2227,9 +2230,9 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
-		School sTrax = new School();
-		sTrax.setAddress1("!23123");
-		sTrax.setMinCode("1231231231");
+		ca.bc.gov.educ.api.graduation.model.dto.institute.School sTrax = new ca.bc.gov.educ.api.graduation.model.dto.institute.School();
+		sTrax.setSchoolId(schoolId.toString());
+		sTrax.setMincode(mincode);
 
 		byte[] bytesSAR = "Any String you want".getBytes();
 
@@ -2245,8 +2248,8 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(mincode)).thenReturn(sTrax);
+		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(schoolId.toString())).thenReturn(List.of(sTrax));
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
 
 		assertEquals(1,numberOfRecord);

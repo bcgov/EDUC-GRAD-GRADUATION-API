@@ -35,6 +35,7 @@ public class GraduationStudentRecord extends BaseModel {
     private String studentStatusName;
     private UUID studentID;
     private String schoolAtGrad;
+    private UUID schoolAtGradId;
     private String schoolAtGradName;
     private String legalFirstName;
     private String legalMiddleNames;
