@@ -58,7 +58,7 @@ public class JwtUtil {
 
   /**
    * Gets name string
-   * => If it is service account, get it from request header.  Otherwise, get username from jwt token
+   * => If it is service account, get it from request header. Otherwise, get username from jwt
    *
    * @param jwt the JWT
    * @param request the Request Header
