@@ -1,14 +1,15 @@
 package ca.bc.gov.educ.api.graduation.config;
 
-import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import ca.bc.gov.educ.api.graduation.util.LogHelper;
-import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.graduation.util.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
@@ -41,6 +42,14 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
 		if (correlationID != null) {
 			ThreadLocalStateUtil.setCorrelationID(correlationID);
+		}
+
+		// username
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth instanceof JwtAuthenticationToken authenticationToken) {
+			Jwt jwt = (Jwt) authenticationToken.getCredentials();
+			String username = JwtUtil.getName(jwt, request);
+			ThreadLocalStateUtil.setCurrentUser(username);
 		}
 		return true;
 	}
