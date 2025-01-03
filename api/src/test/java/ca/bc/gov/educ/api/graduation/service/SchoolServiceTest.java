@@ -71,7 +71,7 @@ public class SchoolServiceTest {
     }
 
     @Test
-    public void testGetSchoolDetails() {
+    public void testGetSchoolClob() {
         UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
         School schtrax = new School();
@@ -84,6 +84,21 @@ public class SchoolServiceTest {
         assertNotNull(res);
         assertEquals(res.getSchoolId(),schoolId.toString());
         assertEquals(res.getMinCode(), mincode);
+    }
+
+    @Test
+    public void testGetSchoolDetails() {
+        UUID schoolId = UUID.randomUUID();
+        String mincode = "213123131";
+        ca.bc.gov.educ.api.graduation.model.dto.institute.School school = new ca.bc.gov.educ.api.graduation.model.dto.institute.School ();
+        school.setSchoolId(schoolId.toString());
+        school.setMincode(mincode);
+        when(this.restService.get(any(String.class), any())).thenReturn(school);
+        ca.bc.gov.educ.api.graduation.model.dto.institute.School res = schoolService.getSchoolDetails(schoolId);
+
+        assertNotNull(res);
+        assertEquals(res.getSchoolId(),schoolId.toString());
+        assertEquals(res.getMincode(), mincode);
     }
 
     @Test
