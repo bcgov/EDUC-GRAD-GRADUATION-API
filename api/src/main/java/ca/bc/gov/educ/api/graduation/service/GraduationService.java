@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class GraduationService {
@@ -191,14 +192,13 @@ public class GraduationService {
         return graduationData.isGraduated() && graduationStudentRecord.getProgramCompletionDate() != null;
     }
 
-    public byte[] getSchoolReports(List<String> uniqueSchoolList, String type) {
+    public byte[] getSchoolReports(List<UUID> uniqueSchoolList, String type) {
         byte[] result = new byte[0];
-        for (String usl : uniqueSchoolList) {
+        for (UUID usl : uniqueSchoolList) {
             try {
-                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
-                List<ca.bc.gov.educ.api.graduation.model.dto.institute.School> schoolDetails = schoolService.getSchoolDetails(usl);
-                if (schoolDetails != null && !schoolDetails.isEmpty()) {
-                    ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolDetails.get(0);
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(usl);
+                ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolService.getSchoolDetails(usl);
+                if (schoolDetail != null) {
                     School schoolObj = new School();
                     schoolObj.setSchoolId(schoolDetail.getSchoolId());
                     schoolObj.setMincode(schoolDetail.getMincode());
@@ -222,25 +222,24 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for schoolId: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
         }
         return result;
     }
 
-    public Integer createAndStoreSchoolReports(List<String> uniqueSchoolList, String type) {
+    public Integer createAndStoreSchoolReports(List<UUID> uniqueSchoolList, String type) {
         int numberOfReports = 0;
-        for (String usl : uniqueSchoolList) {
+        for (UUID usl : uniqueSchoolList) {
             try {
-                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListByMinCode(usl);
+                List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(usl);
                 if(logger.isDebugEnabled()) {
                     int totalStudents = ObjectUtils.defaultIfNull(stdList.size(), 0);
                     String listOfStudents = jsonTransformer.marshall(stdList);
                     logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
-                List<ca.bc.gov.educ.api.graduation.model.dto.institute.School> schoolDetails = schoolService.getSchoolDetails(usl);
-                if (schoolDetails != null && !schoolDetails.isEmpty()) {
-                    ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolDetails.get(0);
+                ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolService.getSchoolDetails(usl);
+                if (schoolDetail != null) {
                     logger.debug("*** School Details Acquired {}", schoolDetail.getDisplayName());
                     if (stdList != null && !stdList.isEmpty()) {
                         School schoolObj = new School();
@@ -262,7 +261,7 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for mincode: {} due to: {}", type, usl, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for schoolId: {} due to: {}", type, usl, e.getLocalizedMessage());
             }
         }
         return numberOfReports;
@@ -283,38 +282,38 @@ public class GraduationService {
         }
     }
 
-    private int processGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
-        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+    private int processGradRegReport(School schoolObj, List<Student> stdList, UUID schoolId, int numberOfReports) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolId);
         if(studentsCount > 0) {
             ReportData gradReport = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportGradRegReport(gradReport, mincode);
+            createAndSaveSchoolReportGradRegReport(gradReport, schoolObj.getMincode());
             numberOfReports++;
         }
         return numberOfReports;
     }
 
-    private int processNonGradRegReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
-        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+    private int processNonGradRegReport(School schoolObj, List<Student> stdList, UUID schoolId, int numberOfReports) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolId);
         if(studentsCount > 0) {
             ReportData gradReport = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportNonGradRegReport(gradReport, mincode);
+            createAndSaveSchoolReportNonGradRegReport(gradReport, schoolId, schoolObj.getMincode());
             numberOfReports++;
         }
         return numberOfReports;
     }
 
-    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, String mincode, int numberOfReports) {
-        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolObj.getMincode());
+    private int processStudentNonGradPrjReport(School schoolObj, List<Student> stdList, UUID schoolId, int numberOfReports) {
+        Integer studentsCount = countStudentsForAmalgamatedSchoolReport(schoolId);
         if(studentsCount > 0) {
             ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
-            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, mincode);
+            createAndSaveSchoolReportStudentNonGradPrjReport(nongradProjected, schoolId, schoolObj.getMincode());
             numberOfReports++;
         }
         return numberOfReports;
     }
 
-    private int countStudentsForAmalgamatedSchoolReport(String mincode) {
-        return restService.get(String.format(educGraduationApiConstants.getGradStudentCountSchoolReport(), mincode), Integer.class);
+    private int countStudentsForAmalgamatedSchoolReport(UUID schoolId) {
+        return restService.get(String.format(educGraduationApiConstants.getGradStudentCountSchoolReport(), schoolId), Integer.class);
     }
 
     private ReportData getReportDataObj(School schoolObj, List<Student> stdList) {
@@ -417,8 +416,9 @@ public class GraduationService {
         byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode);
 
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
+        UUID schoolId = UUID.fromString(data.getSchool().getSchoolId());
 
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, GRADREG);
+        SchoolReports requestObj = getSchoolReports(schoolId, mincode, encodedPdf, GRADREG);
 
         updateSchoolReport(requestObj);
 
@@ -451,10 +451,10 @@ public class GraduationService {
     }
 
     @Generated
-    private void createAndSaveSchoolReportNonGradRegReport(ReportData data, String mincode) {
+    private void createAndSaveSchoolReportNonGradRegReport(ReportData data, UUID schoolId, String mincode) {
         byte[] bytesSAR = getSchoolReportNonGradRegReport(data, mincode);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADREG);
+        SchoolReports requestObj = getSchoolReports(schoolId, mincode, encodedPdf, NONGRADREG);
         updateSchoolReport(requestObj);
     }
 
@@ -490,10 +490,10 @@ public class GraduationService {
                 accessToken);
     }
 
-    private void createAndSaveSchoolReportStudentNonGradPrjReport(ReportData data, String mincode) {
+    private void createAndSaveSchoolReportStudentNonGradPrjReport(ReportData data, UUID schoolId, String mincode) {
         byte[] bytesSAR = getSchoolReportStudentNonGradPrjReport(data, mincode);
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-        SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADPRJ);
+        SchoolReports requestObj = getSchoolReports(schoolId, mincode, encodedPdf, NONGRADPRJ);
         updateSchoolReport(requestObj);
     }
 
@@ -505,9 +505,10 @@ public class GraduationService {
      updateSchoolReport(accessToken, requestObj);
      } **/
 
-    private SchoolReports getSchoolReports(String mincode, String encodedPdf, String nongradreg) {
+    private SchoolReports getSchoolReports(UUID schoolId, String mincode, String encodedPdf, String nongradreg) {
         SchoolReports requestObj = new SchoolReports();
         requestObj.setReport(encodedPdf);
+        requestObj.setSchoolOfRecordId(schoolId);
         requestObj.setSchoolOfRecord(mincode);
         requestObj.setReportTypeCode(nongradreg);
         return requestObj;

@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class GradStatusService {
@@ -107,8 +108,8 @@ public class GradStatusService {
 		restService.get(String.format(educGraduationApiConstants.getUpdateGradStatusAlgoError(),studentID,isGraduated), Boolean.class);
 	}
 
-	public List<GraduationStudentRecord> getStudentListByMinCode(String schoolOfRecord) {
-		var response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolOfRecord), List.class);
+	public List<GraduationStudentRecord> getStudentListBySchoolId(UUID schoolId) {
+		var response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolId), List.class);
 		return jsonTransformer.convertValue(response, new TypeReference<>(){});
 	}
 

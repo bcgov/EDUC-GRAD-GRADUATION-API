@@ -143,8 +143,8 @@ endpoint:
      url: ${PEN_API}api/v1/student?pen=%s
 
  grad-trax-api:
-   search-schools-by-min-code:
-     url: ${GRAD_TRAX_API}api/v2/trax/school/search?mincode=%s
+   school-detail-by-school-id:
+     url: ${GRAD_TRAX_API}api/v2/trax/school/%s
    school-clob-by-school-id:
      url: ${GRAD_TRAX_API}api/v2/trax/school-clob/%s
    district-by-min-code:

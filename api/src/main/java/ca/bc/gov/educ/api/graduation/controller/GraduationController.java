@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
 
@@ -108,7 +109,7 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School Report Creation", description = "When triggered, School Reports are created", tags = { "Reports" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody List<String> uniqueSchools, @RequestHeader(name="Authorization") String accessToken,@RequestParam(required = false) String type ) {
+    public ResponseEntity<Integer> createAndStoreSchoolReports(@RequestBody List<UUID> uniqueSchools, @RequestHeader(name="Authorization") String accessToken, @RequestParam(required = false) String type ) {
         return response.GET(gradService.createAndStoreSchoolReports(uniqueSchools,type));
     }
 
@@ -364,7 +365,7 @@ public class GraduationController {
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School Report Generation", description = "When triggered, School Report is generated", tags = { "Reports", "type=GRADREG", "type=NONGRADREG", "type=NONGRADPRJ" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-    public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<String> uniqueSchools, @RequestParam(required = true) String type ) {
+    public ResponseEntity<byte[]> getSchoolReports(@RequestBody List<UUID> uniqueSchools, @RequestParam(required = true) String type ) {
         byte[] resultBinary = gradService.getSchoolReports(uniqueSchools,type);
         if(resultBinary == null || resultBinary.length == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

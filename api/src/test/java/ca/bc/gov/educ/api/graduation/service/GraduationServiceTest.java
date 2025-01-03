@@ -1946,8 +1946,8 @@ public class GraduationServiceTest {
 		ExceptionMessage exception = new ExceptionMessage();
 		UUID schoolId = UUID.randomUUID();
 		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(schoolId.toString());
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2021,13 +2021,13 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(schoolId.toString())).thenReturn(List.of(sTrax));
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(schoolId)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 
 		assertEquals(2,numberOfRecord);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(List.of());
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(List.of());
 		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 		assertEquals(0,numberOfRecord);
 	}
@@ -2099,9 +2099,9 @@ public class GraduationServiceTest {
 	@Test
 	public void testGetSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
-		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2176,7 +2176,7 @@ public class GraduationServiceTest {
 		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR1);
 		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
-		when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
+		when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
 		when(schoolService.getSchoolClob(sTrax.getSchoolId())).thenReturn(sTrax);
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
@@ -2190,9 +2190,9 @@ public class GraduationServiceTest {
 	@Test
 	public void testGetSchoolReportsException() {
 		ExceptionMessage exception = new ExceptionMessage();
-		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
@@ -2204,8 +2204,8 @@ public class GraduationServiceTest {
 		ExceptionMessage exception = new ExceptionMessage();
 		UUID schoolId = UUID.randomUUID();
 		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(schoolId.toString());
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2248,8 +2248,8 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(schoolId.toString())).thenReturn(sList);
-		Mockito.when(schoolService.getSchoolDetails(schoolId.toString())).thenReturn(List.of(sTrax));
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolDetails(schoolId)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
 
 		assertEquals(1,numberOfRecord);

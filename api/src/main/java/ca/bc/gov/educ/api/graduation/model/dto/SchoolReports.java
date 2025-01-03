@@ -14,4 +14,5 @@ public class SchoolReports extends BaseModel {
 	private String reportTypeCode;
 	private String reportTypeLabel;
 	private String schoolOfRecord;
+	private UUID schoolOfRecordId;
 }
