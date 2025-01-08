@@ -131,9 +131,10 @@ class GraduationControllerTest {
 
 	@Test
 	void testCreateAndStoreSchoolReports() {
-		Mockito.when(graduationService.createAndStoreSchoolReports(List.of("12321312"),"NONGRAD")).thenReturn(1);
-		graduationController.createAndStoreSchoolReports(List.of("12321312"),"accessToken","NONGRAD");
-		Mockito.verify(graduationService).createAndStoreSchoolReports(List.of("12321312"),"NONGRAD");
+		UUID schoolId = UUID.randomUUID();
+		Mockito.when(graduationService.createAndStoreSchoolReports(List.of(schoolId),"NONGRAD")).thenReturn(1);
+		graduationController.createAndStoreSchoolReports(List.of(schoolId),"accessToken","NONGRAD");
+		Mockito.verify(graduationService).createAndStoreSchoolReports(List.of(schoolId),"NONGRAD");
 	}
 
 	@Test
@@ -343,48 +344,51 @@ class GraduationControllerTest {
 	@Test
 	void testGetSchoolReports() throws Exception {
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"GRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG");
+		UUID schoolId = UUID.randomUUID();
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"GRADREG")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"GRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"GRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADREG")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADPRJ");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADPRJ")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADPRJ");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADPRJ");
 	}
 
 	@Test
 	void testGetSchoolReportsEmpty() throws Exception {
 		byte[] bytesSAR1 = new byte[0];
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"GRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG");
+		UUID schoolId = UUID.randomUUID();
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"GRADREG")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"GRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"GRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADREG")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ")).thenReturn(bytesSAR1);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADPRJ");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADPRJ")).thenReturn(bytesSAR1);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADPRJ");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADPRJ");
 	}
 
 	@Test
 	void testGetSchoolReportsNull() {
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"GRADREG")).thenReturn(null);
-		graduationController.getSchoolReports(List.of("12321312"),"GRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"GRADREG");
+		UUID schoolId = UUID.randomUUID();
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"GRADREG")).thenReturn(null);
+		graduationController.getSchoolReports(List.of(schoolId),"GRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"GRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADREG")).thenReturn(null);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADREG");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADREG");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADREG")).thenReturn(null);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADREG");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADREG");
 
-		Mockito.when(graduationService.getSchoolReports(List.of("12321312"),"NONGRADPRJ")).thenReturn(null);
-		graduationController.getSchoolReports(List.of("12321312"),"NONGRADPRJ");
-		Mockito.verify(graduationService).getSchoolReports(List.of("12321312"),"NONGRADPRJ");
+		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"NONGRADPRJ")).thenReturn(null);
+		graduationController.getSchoolReports(List.of(schoolId),"NONGRADPRJ");
+		Mockito.verify(graduationService).getSchoolReports(List.of(schoolId),"NONGRADPRJ");
 	}
 
 	@Test

@@ -758,6 +758,7 @@ public class ReportService {
             //--> Revert code back to school of record GRAD2-2758
             /** gradMessage = StringUtils.replace(gradMessage, schoolOfRecord.getName(), schoolAtGrad.getName());**/
             //<--
+            gradStatus.setSchoolAtGrad(schoolAtGrad.getMincode());
             log.debug("Replace school of record {} to school at graduation {}", schoolOfRecord.getName(), schoolAtGrad.getName());
         }
         gradStatus.setGraduationMessage(gradMessage);

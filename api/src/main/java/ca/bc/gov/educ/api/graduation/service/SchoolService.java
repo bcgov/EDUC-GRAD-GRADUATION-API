@@ -24,9 +24,9 @@ public class SchoolService {
 		this.jsonTransformer = jsonTransformer;
 	}
 
-	public List<ca.bc.gov.educ.api.graduation.model.dto.institute.School> getSchoolDetails(String mincode) {
-		var response = this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),mincode), List.class);
-		return jsonTransformer.convertValue(response, new TypeReference<>() {});
+	public ca.bc.gov.educ.api.graduation.model.dto.institute.School getSchoolDetails(UUID schoolId) {
+		if (schoolId == null) return null;
+		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),schoolId), ca.bc.gov.educ.api.graduation.model.dto.institute.School.class);
 	}
 
 	public School getSchoolClob(String schoolId) {

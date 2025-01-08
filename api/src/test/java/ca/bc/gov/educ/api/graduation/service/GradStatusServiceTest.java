@@ -296,14 +296,14 @@ public class GradStatusServiceTest {
 	}
 
 	@Test
-	public void testGetStudentsbyMincode() {
-		String mincode = "12312311";
+	public void testGetStudentsBySchoolId() {
+		UUID schoolId = UUID.randomUUID();
 
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
 		gsr.setLegalLastName("qweqw");
 		when(this.restService.get(any(String.class), any())).thenReturn(List.of(gsr));
 
-		List<GraduationStudentRecord> res = gradStatusService.getStudentListByMinCode(mincode);
+		List<GraduationStudentRecord> res = gradStatusService.getStudentListBySchoolId(schoolId);
 		assertThat(res).isNotEmpty().hasSize(1);
 	}
 		

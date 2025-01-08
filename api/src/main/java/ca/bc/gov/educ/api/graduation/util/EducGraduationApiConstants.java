@@ -165,7 +165,7 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-trax-api.school-clob-by-school-id.url}")
     private String schoolClobBySchoolIdUrl;
 
-    @Value("${endpoint.grad-trax-api.search-schools-by-min-code.url}")
+    @Value("${endpoint.grad-trax-api.school-detail-by-school-id.url}")
     private String schoolDetails;
 
     @Value("${endpoint.grad-trax-api.district-by-min-code.url}")
