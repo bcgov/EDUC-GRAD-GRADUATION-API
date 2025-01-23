@@ -36,10 +36,11 @@
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <springdoc.version>1.6.11</springdoc.version>
         <junit>4.12</junit>
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>2.24.3</log4j.version>
+        <jackson.version>2.18.2</jackson.version>
     </properties>
 
     <parent>
@@ -111,7 +112,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc11</artifactId>
-            <version>21.3.0.0</version>
+            <version>23.6.0.24.10</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -162,22 +163,22 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.18.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.18.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.18.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.18.2</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -242,7 +243,7 @@
                 <plugin>
                     <groupId>org.hibernate.orm.tooling</groupId>
                     <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                    <version>6.6.4.Final</version>
+                    <version>6.6.5.Final</version>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -326,7 +327,7 @@
                     <plugin>
                         <groupId>org.hibernate.orm.tooling</groupId>
                         <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                        <version>6.6.4.Final</version>
+                        <version>6.6.5.Final</version>
                         <executions>
                             <execution>
                                 <configuration>
