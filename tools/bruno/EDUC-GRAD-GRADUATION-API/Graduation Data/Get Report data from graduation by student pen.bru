@@ -1,0 +1,19 @@
+meta {
+  name: Get Report data from graduation by student pen
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/graduate/report/data/:pen
+  body: none
+  auth: none
+}
+
+params:query {
+  ~type: 
+}
+
+params:path {
+  pen: 
+}

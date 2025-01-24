@@ -1,0 +1,21 @@
+meta {
+  name: School Report Generation
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/school/pdf
+  body: json
+  auth: none
+}
+
+params:query {
+  type: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}
