@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import org.junit.After;
@@ -59,6 +60,8 @@ public class SchoolServiceTest {
     private WebClient.ResponseSpec responseMock;
     @Mock
     private Mono<GraduationStudentRecord> monoResponse;
+  @Autowired
+  private DistrictService districtService;
 
     @Before
     public void setUp() {
@@ -74,12 +77,12 @@ public class SchoolServiceTest {
     public void testGetSchoolClob() {
         UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
-        School schtrax = new School();
+        SchoolClob schtrax = new SchoolClob();
         schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        School res = schoolService.getSchoolClob(schtrax.getSchoolId());
+        SchoolClob res = schoolService.getSchoolClob(schtrax.getSchoolId());
 
         assertNotNull(res);
         assertEquals(res.getSchoolId(),schoolId.toString());
@@ -105,13 +108,13 @@ public class SchoolServiceTest {
     public void testGetSchoolDetailsNoToken() {
         UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
-        School schtrax = new School();
+        SchoolClob schtrax = new SchoolClob();
         schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        School res = schoolService.getSchoolClob(schoolId);
+        SchoolClob res = schoolService.getSchoolClob(schoolId);
 
         assertNotNull(res);
         assertEquals(res.getSchoolId(),schoolId.toString());
@@ -120,15 +123,15 @@ public class SchoolServiceTest {
 
     @Test
     public void testGetDistrictDetailsNoToken() {
-        String mincode = "213";
+        UUID districtId = UUID.randomUUID();
         District schoolDistrict = new District();
-        schoolDistrict.setDistrictNumber(mincode);
+        schoolDistrict.setDistrictId(districtId.toString());
         mockTokenResponseObject();
         when(this.restService.get(any(String.class), any())).thenReturn(schoolDistrict);
-        District res = schoolService.getDistrictDetails(mincode);
+        District res = districtService.getDistrictDetails(districtId);
 
         assertNotNull(res);
-        assertEquals(res.getDistrictNumber(),mincode);
+        assertEquals(res.getDistrictId(),districtId.toString());
     }
 
     private String mockTokenResponseObject() {

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-public class School {
+public class SchoolClob {
 
 	private String minCode;
 	private String schoolId;

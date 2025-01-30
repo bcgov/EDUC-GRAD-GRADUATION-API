@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Transcript;
@@ -94,19 +96,19 @@ public class ReportServiceTest {
 	public void testGetStudentsForSchoolYearEndReport() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 
-		when(this.restService.get(constants.getSchoolYearEndStudents(), List.class, "accessToken")).thenReturn(gradStudentDataList);
+		when(this.restService.get(constants.getSchoolYearEndStudents(), List.class)).thenReturn(gradStudentDataList);
 
-		var result = reportService.getStudentsForSchoolYearEndReport("accessToken");
+		var result = reportService.getStudentsForSchoolYearEndReport();
 		assertNotNull(result);
 	}
 
 	@Test
 	public void testGetStudentsForSchoolYearEndReportWithSchools() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		YearEndReportRequest yearEndReportRequest = YearEndReportRequest.builder().schoolIds(List.of(UUID.randomUUID())).build();
+		when(this.restService.post(constants.getSchoolYearEndStudents(), yearEndReportRequest, List.class)).thenReturn(gradStudentDataList);
 
-		when(this.restService.post(constants.getSchoolYearEndStudents(), List.of("00502001"), List.class)).thenReturn(gradStudentDataList);
-
-		var result = reportService.getStudentsForSchoolYearEndReport(List.of("00502001"));
+		var result = reportService.getStudentsForSchoolYearEndReport(yearEndReportRequest);
 		assertNotNull(result);
 	}
 
@@ -179,7 +181,7 @@ public class ReportServiceTest {
 		stuObj.setSchoolOfRecord("06011033");
 		graduationDataStatus.setGradStudent(stuObj);
 
-		School school = new School();
+		SchoolClob school = new SchoolClob();
 		school.setMinCode("06011033");
 		school.setSchoolName("Test School");
 		school.setCity("Vancouver");
@@ -243,13 +245,13 @@ public class ReportServiceTest {
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
 		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentTranscript(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
@@ -281,7 +283,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 
@@ -302,13 +304,13 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenThrow(new RuntimeException("Test - API is down"));
 
@@ -340,7 +342,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 
@@ -368,12 +370,12 @@ public class ReportServiceTest {
 		clist.add(pc);
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
 
@@ -404,7 +406,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 
@@ -433,12 +435,12 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -466,7 +468,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 
@@ -487,12 +489,12 @@ public class ReportServiceTest {
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		list.add(spgm);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
 		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
@@ -521,12 +523,12 @@ public class ReportServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
@@ -536,7 +538,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 
@@ -583,7 +585,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
@@ -605,12 +607,12 @@ public class ReportServiceTest {
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -648,7 +650,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
@@ -679,12 +681,12 @@ public class ReportServiceTest {
 
 		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -701,7 +703,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -761,12 +763,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
 
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -893,7 +895,7 @@ public class ReportServiceTest {
 		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("2018-EN");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -926,12 +928,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -965,7 +967,7 @@ public class ReportServiceTest {
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus(program);
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -1006,12 +1008,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("06011033");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1042,7 +1044,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -1100,12 +1102,12 @@ public class ReportServiceTest {
 
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1137,7 +1139,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
@@ -1195,12 +1197,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
 
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
@@ -1234,7 +1236,7 @@ public class ReportServiceTest {
 		gradAlgorithmGraduationStatus.setStudentGrade("11");
 		gradAlgorithmGraduationStatus.setStudentStatus("A");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setSchoolId(schoolId);
 		schoolObj.setMinCode("09323027");
 		schoolObj.setSchoolId(UUID.randomUUID().toString());
@@ -1360,13 +1362,13 @@ public class ReportServiceTest {
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 		ExceptionMessage exception = new ExceptionMessage();
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
 		when(this.restService.post(eq(constants.getAchievementReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
 		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentReport(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
 
@@ -1445,7 +1447,7 @@ public class ReportServiceTest {
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
@@ -1461,7 +1463,7 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
 
 
@@ -1486,13 +1488,13 @@ public class ReportServiceTest {
 		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
 		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenThrow(new RuntimeException());
 
@@ -1555,13 +1557,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradProgram.getProgramCode()), GraduationProgramCode.class)).thenReturn(gradProgram);
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -1581,12 +1583,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
 		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
 
-		School schtrax = new School();
+		SchoolClob schtrax = new SchoolClob();
 		schtrax.setMinCode("00502001");
 		schtrax.setSchoolName("ROBERT DDGELL");
 		schtrax.setAddress1("My Address");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schtrax.getMinCode()), School.class)).thenReturn(schtrax);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schtrax.getMinCode()), SchoolClob.class)).thenReturn(schtrax);
 
 		District distInstitute = new District();
 		distInstitute.setDistrictNumber("005");
@@ -1775,13 +1777,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1900,13 +1902,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1979,12 +1981,12 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), GraduationStudentRecord.class)).thenReturn(null);
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2089,13 +2091,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), Exception.class)).thenReturn(new Exception());
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -2144,13 +2146,13 @@ public class ReportServiceTest {
 
 		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
@@ -2190,13 +2192,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), GraduationStudentRecord.class)).thenReturn(null);
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2252,13 +2254,13 @@ public class ReportServiceTest {
 		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), Exception.class)).thenReturn(new Exception());
 
 
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2362,12 +2364,12 @@ public class ReportServiceTest {
 	@Test
 	public void testGetSchoolCategoryCode() {
 		UUID schoolId = UUID.randomUUID();
-		School schoolDetails = new School();
+		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId.toString());
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), School.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
 		var result = reportService.getSchoolCategoryCode(schoolId);
 		assertThat(result).isNotNull();
 	}

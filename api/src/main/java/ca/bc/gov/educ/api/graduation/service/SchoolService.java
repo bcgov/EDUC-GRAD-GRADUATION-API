@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.constants.SchoolCategoryCodes;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.School;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -29,21 +31,25 @@ public class SchoolService {
 		return this.restService.get(String.format(educGraduationApiConstants.getSchoolDetails(),schoolId), ca.bc.gov.educ.api.graduation.model.dto.institute.School.class);
 	}
 
-	public School getSchoolClob(String schoolId) {
+	public School getSchoolById(UUID schoolId) {
+		var response = this.restService.get(String.format(educGraduationApiConstants.getSchoolById(),schoolId), School.class);
+		return jsonTransformer.convertValue(response, new TypeReference<>() {});
+	}
+
+	public boolean isIndependentSchool(School school) {
+		return List.of(SchoolCategoryCodes.INDEPEND.getCode(), SchoolCategoryCodes.INDP_FNS.getCode())
+				.contains(school.getSchoolCategoryCode());
+	}
+
+	public SchoolClob getSchoolClob(String schoolId) {
 		if (StringUtils.isBlank(schoolId)) return null;
 		return getSchoolClob(UUID.fromString(schoolId));
 	}
 
-	public School getSchoolClob(UUID schoolId) {
+	public SchoolClob getSchoolClob(UUID schoolId) {
 		if (schoolId == null) return null;
 		return this.restService.get(String.format(educGraduationApiConstants.getSchoolClobBySchoolIdUrl(),schoolId),
-				School.class);
+				SchoolClob.class);
 	}
-
-	public District getDistrictDetails(String districtCode) {
-		return this.restService.get(String.format(educGraduationApiConstants.getDistrictDetails(), districtCode),
-				District.class);
-	}
-
 }
 

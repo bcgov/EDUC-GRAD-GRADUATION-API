@@ -1,13 +1,19 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
 import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class ReportGradStudentData implements Serializable {
 

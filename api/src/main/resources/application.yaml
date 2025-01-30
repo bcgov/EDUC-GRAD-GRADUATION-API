@@ -106,11 +106,11 @@ endpoint:
   update-grad-student-report: 
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-school-report:
-     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
+     url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/schoolreports
   school-year-end-students:
-     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/getstudentsforschoolyearendreport
+     url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/getstudentsforschoolyearendreport
   school-students:
-    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/getstudentsforschoolreport
+    url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/getstudentsforschoolreport
   update-grad-student-transcript:
     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
   update-grad-student-certificate: 
@@ -147,8 +147,10 @@ endpoint:
      url: ${GRAD_TRAX_API}api/v2/trax/school/%s
    school-clob-by-school-id:
      url: ${GRAD_TRAX_API}api/v2/trax/school-clob/%s
-   district-by-min-code:
-     url: ${GRAD_TRAX_API}api/v2/trax/district?distNo=%s
+   district-by-id:
+     url: ${GRAD_TRAX_API}api/v2/trax/district/%s
+   school-by-id:
+        url: ${GRAD_TRAX_API}api/v2/trax/school/%s
 
 #Splunk LogHelper
 splunk:
