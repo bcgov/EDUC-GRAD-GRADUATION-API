@@ -2,8 +2,10 @@ package ca.bc.gov.educ.api.graduation.model.dto.institute;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 @Data
+@Component("instituteSchool")
 @EqualsAndHashCode
 @Builder
 @AllArgsConstructor
