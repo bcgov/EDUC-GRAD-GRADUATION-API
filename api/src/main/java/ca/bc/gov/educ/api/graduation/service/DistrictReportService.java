@@ -131,7 +131,7 @@ public class DistrictReportService extends BaseReportService {
       pdfs.add(is);
     }
     if (pdfs == null) {
-      UUID districtId = (districts != null && districts.size() == 1) ? UUID.fromString(districts.get(0).getDistrictId()) :UUID.fromString("00000000-0000-0000-0000-000000000000");
+      UUID districtId = (districts.size() == 1) ? UUID.fromString(districts.get(0).getDistrictId()) :UUID.fromString("00000000-0000-0000-0000-000000000000");
       saveDistrictReport(districtId, reportType, reportAsBytes);
     }
     reportsCount++;
