@@ -56,17 +56,19 @@ public class JsonTransformer implements Transformer {
 
     @Override
     public Object unmarshall(String input, Class<?> clazz, Map<Class, List<String>> additionalIgnoreFields) {
+        ObjectMapper mapper= new ObjectMapper();
         Object result = null;
         long start = System.currentTimeMillis();
         try {
-            objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
                 @Override
                 public boolean hasIgnoreMarker(final AnnotatedMember m) {
                     List<String> ignoreFields = additionalIgnoreFields.getOrDefault(m.getDeclaringClass(), List.of());
                     return ignoreFields.contains(m.getName()) || super.hasIgnoreMarker(m);
                 }
             });
-            result = objectMapper.readValue(input, clazz);
+            result = mapper.readValue(input, clazz);
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(), e);
         }
