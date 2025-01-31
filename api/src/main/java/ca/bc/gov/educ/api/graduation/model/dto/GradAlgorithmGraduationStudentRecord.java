@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +11,6 @@ import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DEFA
 
 @Data
 @Component
-@JsonIgnoreProperties({"schoolOfRecordId", "schoolAtGradId"})
 public class GradAlgorithmGraduationStudentRecord {
 
 	private String studentGradData;

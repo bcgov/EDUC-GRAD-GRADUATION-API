@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.graduation.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class JsonTransformer implements Transformer {
@@ -42,6 +46,26 @@ public class JsonTransformer implements Transformer {
         Object result = null;
         long start = System.currentTimeMillis();
         try {
+            result = objectMapper.readValue(input, clazz);
+        } catch (IOException e) {
+            log.error(e.getLocalizedMessage(), e);
+        }
+        log.debug(MARSHALLING_MSG, clazz.getName(), (System.currentTimeMillis() - start));
+        return result;
+    }
+
+    @Override
+    public Object unmarshall(String input, Class<?> clazz, Map<Class, List<String>> additionalIgnoreFields) {
+        Object result = null;
+        long start = System.currentTimeMillis();
+        try {
+            objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector(){
+                @Override
+                public boolean hasIgnoreMarker(final AnnotatedMember m) {
+                    List<String> ignoreFields = additionalIgnoreFields.getOrDefault(m.getDeclaringClass(), List.of());
+                    return ignoreFields.contains(m.getName()) || super.hasIgnoreMarker(m);
+                }
+            });
             result = objectMapper.readValue(input, clazz);
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(), e);
