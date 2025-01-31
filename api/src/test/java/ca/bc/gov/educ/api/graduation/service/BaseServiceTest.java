@@ -1,8 +1,12 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.constants.AddressTypeCodes;
+import ca.bc.gov.educ.api.graduation.constants.DistrictContactTypeCodes;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.GradCertificateType;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.DistrictAddress;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.DistrictContact;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.School;
 
 import java.util.ArrayList;
@@ -167,6 +171,28 @@ public abstract class BaseServiceTest {
     return District.builder()
         .districtId(UUID.randomUUID().toString())
         .displayName("Generic District Name")
+        .districtNumber("005")
+        .build();
+  }
+
+  public DistrictContact createDistrictContact(UUID districtId) {
+    return DistrictContact.builder()
+        .districtId(districtId.toString())
+        .districtContactId(UUID.randomUUID().toString())
+        .districtContactTypeCode(DistrictContactTypeCodes.SUPER.getCode())
+        .firstName("Super")
+        .lastName("Man")
+        .build();
+  }
+
+  public DistrictAddress createDistrictAddress(UUID districtId) {
+    return DistrictAddress.builder()
+        .districtId(districtId.toString())
+        .districtAddressId(UUID.randomUUID().toString())
+        .addressTypeCode(AddressTypeCodes.MAILING.getCode())
+        .addressLine1("1234 Generic Street")
+        .city("Generic City")
+        .postal("V1V1V1")
         .build();
   }
 }
