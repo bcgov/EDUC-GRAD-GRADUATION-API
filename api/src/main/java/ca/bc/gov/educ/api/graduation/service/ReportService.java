@@ -1271,7 +1271,7 @@ public class ReportService {
 
     private ca.bc.gov.educ.api.graduation.model.dto.GraduationData unmarshallForReport(GraduationStudentRecord graduationStudentRecord) {
         Map<Class, List<String>> ignoreFields = new HashMap<>();
-        ignoreFields.put(GradAlgorithmGraduationStudentRecord.class, Arrays.asList("schoolOfRecordId", "schoolAtGradId"));
+        ignoreFields.put(GradAlgorithmGraduationStudentRecord.class, Arrays.asList("schoolOfRecordId"));
         return (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class, ignoreFields);
     }
 }
