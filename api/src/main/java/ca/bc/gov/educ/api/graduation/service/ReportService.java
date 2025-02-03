@@ -201,8 +201,7 @@ public class ReportService {
     public ReportData prepareTranscriptData(String pen, boolean xml, ExceptionMessage exception) {
         try {
             GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen);
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
-            return prepareTranscriptData(graduationData, graduationStudentRecord, xml, exception);
+            return prepareTranscriptData(unmarshallForReport(graduationStudentRecord), graduationStudentRecord, xml, exception);
         } catch (Exception e) {
             exception.setExceptionName("PREPARE TRANSCRIPT REPORT DATA FROM PEN");
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -956,8 +955,7 @@ public class ReportService {
     public ReportData prepareCertificateData(String pen, ExceptionMessage exception) {
         try {
             GraduationStudentRecord graduationStudentRecord = getGraduationStudentRecordByPen(pen);
-            ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
-            return prepareCertificateData(graduationStudentRecord, graduationData);
+            return prepareCertificateData(graduationStudentRecord, unmarshallForReport(graduationStudentRecord));
         } catch (Exception e) {
             exception.setExceptionName("PREPARE CERTIFICATE REPORT DATA FROM PEN");
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -1270,6 +1268,12 @@ public class ReportService {
             return cal.getTime();
         }
         return null;
+    }
+
+    private ca.bc.gov.educ.api.graduation.model.dto.GraduationData unmarshallForReport(GraduationStudentRecord graduationStudentRecord) {
+        Map<Class, List<String>> ignoreFields = new HashMap<>();
+        ignoreFields.put(GradAlgorithmGraduationStudentRecord.class, Arrays.asList("schoolOfRecordId"));
+        return (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class, ignoreFields);
     }
 }
 
