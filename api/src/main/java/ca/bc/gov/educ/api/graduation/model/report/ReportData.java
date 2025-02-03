@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.model.report;
 
+import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.ExceptionMessage;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,6 +27,7 @@ import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DEFA
 @XmlSeeAlso({
 		Student.class,
 		School.class,
+		District.class,
 		Transcript.class,
 		GradProgram.class,
 		NonGradReason.class,
@@ -34,6 +36,7 @@ import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.DEFA
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Student.class),
 		@JsonSubTypes.Type(value = School.class),
+		@JsonSubTypes.Type(value = District.class),
 		@JsonSubTypes.Type(value = Transcript.class),
 		@JsonSubTypes.Type(value = GradProgram.class),
 		@JsonSubTypes.Type(value = NonGradReason.class),
@@ -53,6 +56,8 @@ public class ReportData implements Serializable {
 	private Student student;
 	@JsonDeserialize(as = School.class)
 	private School school;
+	@JsonDeserialize(as = District.class)
+	private District district;
 	private String logo;
 	@JsonDeserialize(as = Transcript.class)
 	private Transcript transcript;

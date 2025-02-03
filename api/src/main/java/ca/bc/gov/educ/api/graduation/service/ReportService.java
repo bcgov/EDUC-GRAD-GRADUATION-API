@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.report.GraduationData;
@@ -86,17 +87,18 @@ public class ReportService {
 
     public String getSchoolCategoryCode(UUID schoolId) {
         if (schoolId == null) return null;
-        ca.bc.gov.educ.api.graduation.model.dto.School school = this.restService.get(String.format(educGraduationApiConstants.getSchoolClobBySchoolIdUrl(), schoolId), ca.bc.gov.educ.api.graduation.model.dto.School.class);
+        SchoolClob school = this.restService.get(String.format(educGraduationApiConstants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class);
         return (school == null) ? null : school.getSchoolCategoryLegacyCode();
     }
 
-    public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(String accessToken) {
-        var response = restService.get(educGraduationApiConstants.getSchoolYearEndStudents(), List.class, accessToken);
-        return jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
+    public List<ReportGradStudentData> getStudentsForSchoolYearEndReport() {
+        var response = restService.get(educGraduationApiConstants.getSchoolYearEndStudents(), List.class);
+        return jsonTransformer.convertValue(response, new TypeReference<>() {
+        });
     }
 
-    public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(List<String> schools) {
-        var response = restService.post(educGraduationApiConstants.getSchoolYearEndStudents(), schools, List.class);
+    public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(YearEndReportRequest yearEndReportRequest) {
+        var response = restService.post(educGraduationApiConstants.getSchoolYearEndStudents(), yearEndReportRequest, List.class);
         return jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
     }
 
@@ -121,7 +123,7 @@ public class ReportService {
 
     public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, ExceptionMessage exception) {
         try {
-            ca.bc.gov.educ.api.graduation.model.dto.School schoolClob = graduationDataStatus.getSchool();
+            SchoolClob schoolClob = graduationDataStatus.getSchool();
             if (schoolClob == null || StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolId())) {
                 schoolClob = schoolService.getSchoolClob(gradResponse.getSchoolOfRecordId());
                 graduationDataStatus.setSchool(schoolClob);
@@ -719,7 +721,7 @@ public class ReportService {
 
     private School getSchoolAtGradData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
         if (graduationDataStatus.getGradStatus() != null && graduationDataStatus.getGradStatus().getSchoolAtGradId() != null) {
-            ca.bc.gov.educ.api.graduation.model.dto.School schoolDetails = schoolService.getSchoolClob(graduationDataStatus.getGradStatus().getSchoolAtGradId());
+            SchoolClob schoolDetails = schoolService.getSchoolClob(graduationDataStatus.getGradStatus().getSchoolAtGradId());
             if (schoolDetails != null) {
                 return getSchoolData(schoolDetails);
             }
@@ -727,7 +729,7 @@ public class ReportService {
         return null;
     }
 
-    private School getSchoolData(ca.bc.gov.educ.api.graduation.model.dto.School school) {
+    private School getSchoolData(SchoolClob school) {
         School schObj = new School();
         Address addRess = new Address();
         addRess.setCity(school.getCity());
@@ -1216,7 +1218,6 @@ public class ReportService {
             restService.post(String.format(educGraduationApiConstants.getUpdateGradStudentReport(), isGraduated), requestObj, GradStudentReports.class);
         }
         return exception;
-
     }
 
     public boolean isGraduated(String programCompletionDate, String gradProgram) {
