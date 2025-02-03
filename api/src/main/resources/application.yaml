@@ -107,6 +107,8 @@ endpoint:
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-school-report:
      url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/schoolreports
+  update-grad-district-report:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/district-report
   school-year-end-students:
      url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/getstudentsforschoolyearendreport
   school-students:
