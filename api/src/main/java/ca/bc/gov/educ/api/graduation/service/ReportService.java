@@ -109,8 +109,8 @@ public class ReportService {
         return result;
     }
 
-    public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String mincode) {
-        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataMincode(), mincode), List.class);
+    public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(UUID schoolId) {
+        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataSchoolId(), schoolId), List.class);
         List<ReportGradStudentData> result = jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
         filterCredentialsNonGradYearEndReport(result);
         return result;
@@ -518,13 +518,13 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).toList();
                 if (!provinciallyExaminable.isEmpty()) {
                     sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
+                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).toList();
                 if (!nonExaminable.isEmpty()) {
                     sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
@@ -801,11 +801,11 @@ public class ReportService {
         List<StudentCourse> studentExamList = sCList
                 .stream()
                 .filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentCourse> studentCourseList = sCList
                 .stream()
                 .filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
         List<AchievementCourse> sCourseList = new ArrayList<>();
         List<Exam> sExamList = new ArrayList<>();
