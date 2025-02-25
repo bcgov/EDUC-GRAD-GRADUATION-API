@@ -40,6 +40,14 @@ public final class LogHelper {
       if (correlationID != null) {
         httpMap.put("correlation_id", correlationID);
       }
+      val headerUserName = request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME);
+      if (headerUserName != null) {
+        httpMap.put("header_user_name", headerUserName);
+      }
+      val requestSource = request.getHeader(EducGraduationApiConstants.REQUEST_SOURCE);
+      if (requestSource != null) {
+        httpMap.put("request_source", requestSource);
+      }
       httpMap.put("server_http_request_url", String.valueOf(request.getRequestURL()));
       httpMap.put("server_http_request_processing_time_ms", totalTime);
       httpMap.put("server_http_request_payload", String.valueOf(request.getAttribute("payload")));
@@ -52,7 +60,8 @@ public final class LogHelper {
     }
   }
 
-  public void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID, final boolean logging) {
+  public void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID,
+                                              final List<String> headerUserName, final List<String> requestSource, final boolean logging) {
     if (!logging) return;
     try {
       final Map<String, Object> httpMap = new HashMap<>();
@@ -61,6 +70,12 @@ public final class LogHelper {
       httpMap.put("client_http_request_url", url);
       if (correlationID != null) {
         httpMap.put("correlation_id", String.join(",", correlationID));
+      }
+      if (headerUserName != null) {
+        httpMap.put("header_user_name", String.join(",", headerUserName));
+      }
+      if (correlationID != null) {
+        httpMap.put("request_source", String.join(",", requestSource));
       }
       MDC.putCloseable("httpEvent", jsonTransformer.marshall(httpMap));
       log.info("");

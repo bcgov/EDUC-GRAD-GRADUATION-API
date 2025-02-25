@@ -13,6 +13,8 @@ import java.util.Date;
 public class EducGraduationApiConstants {
 
     public static final String CORRELATION_ID = "correlationID";
+    public static final String HEADER_USER_NAME = "headerUserName";
+    public static final String REQUEST_SOURCE = "requestSource";
     public static final String USERNAME = "username";
 
     //API end-point Mapping constants

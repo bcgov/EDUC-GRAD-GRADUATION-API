@@ -44,6 +44,18 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 			ThreadLocalStateUtil.setCorrelationID(correlationID);
 		}
 
+		// Header userName
+		val headerUserName = request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME);
+		if (headerUserName != null) {
+			ThreadLocalStateUtil.setHeaderUserName(headerUserName);
+		}
+
+		// requestSource
+		val requestSource = request.getHeader(EducGraduationApiConstants.REQUEST_SOURCE);
+		if (requestSource != null) {
+			ThreadLocalStateUtil.setRequestSource(requestSource);
+		}
+
 		// username
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth instanceof JwtAuthenticationToken authenticationToken) {
@@ -68,6 +80,8 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
 		if (correlationID != null) {
 			response.setHeader(EducGraduationApiConstants.CORRELATION_ID, request.getHeader(EducGraduationApiConstants.CORRELATION_ID));
+			response.setHeader(EducGraduationApiConstants.HEADER_USER_NAME, request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME));
+			response.setHeader(EducGraduationApiConstants.REQUEST_SOURCE, request.getHeader(EducGraduationApiConstants.REQUEST_SOURCE));
 			ThreadLocalStateUtil.clear();
 		}
 	}

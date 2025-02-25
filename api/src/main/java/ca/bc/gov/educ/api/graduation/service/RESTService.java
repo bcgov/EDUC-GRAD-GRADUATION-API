@@ -50,7 +50,10 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
+                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
+                    })
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -80,6 +83,8 @@ public class RESTService {
                     .headers(h -> {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                         h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
+                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
+                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
                     })
                     .retrieve()
                     // if 5xx errors, throw Service error
@@ -118,7 +123,9 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID()); })
+                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
+                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource()); })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -147,6 +154,8 @@ public class RESTService {
                     .headers(h -> {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                         h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
+                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
+                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
                     })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
