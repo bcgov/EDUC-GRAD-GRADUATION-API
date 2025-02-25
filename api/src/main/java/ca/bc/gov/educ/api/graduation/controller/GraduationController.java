@@ -315,10 +315,10 @@ public class GraduationController {
             @RequestParam(required = false) String slrt,
             @RequestParam(required = false) String drt,
             @RequestParam(required = false) String srt,
-            @RequestBody List<String> schools) {
+            @RequestBody List<UUID> schools) {
         List<ReportGradStudentData> reportGradStudentDataTotalList = new ArrayList<>();
-        for(String mincode: schools) {
-            List<ReportGradStudentData> sd = reportService.getStudentsForSchoolNonGradYearEndReport(mincode);
+        for(UUID schoolId: schools) {
+            List<ReportGradStudentData> sd = reportService.getStudentsForSchoolNonGradYearEndReport(schoolId);
             reportGradStudentDataTotalList.addAll(sd);
         }
         return response.GET(schoolReportsService.createAndStoreSchoolDistrictReports(reportGradStudentDataTotalList, slrt, drt, srt));

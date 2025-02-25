@@ -113,8 +113,8 @@ public class ReportService {
         return result;
     }
 
-    public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(String mincode) {
-        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataMincode(), mincode), List.class);
+    public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(UUID schoolId) {
+        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataSchoolId(), schoolId), List.class);
         List<ReportGradStudentData> result = jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
         filterCredentialsNonGradYearEndReport(result);
         return result;

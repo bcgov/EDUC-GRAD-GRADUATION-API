@@ -127,10 +127,11 @@ public class ReportServiceTest {
 	@Test
 	public void testGetStudentsForSchoolYearEndNonGradReportWithMincode() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
+		UUID schoolId = UUID.randomUUID();
 
-		when(this.restService.get(String.format(constants.getStudentNonGradReportDataMincode(), "02396738"), List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.get(String.format(constants.getStudentNonGradReportDataSchoolId(), schoolId), List.class)).thenReturn(gradStudentDataList);
 
-		var result = reportService.getStudentsForSchoolNonGradYearEndReport("02396738");
+		var result = reportService.getStudentsForSchoolNonGradYearEndReport(schoolId);
 		assertNotNull(result);
 	}
 

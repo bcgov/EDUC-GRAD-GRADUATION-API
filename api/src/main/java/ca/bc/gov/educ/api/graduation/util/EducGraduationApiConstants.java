@@ -155,8 +155,8 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.student-nongrad-report-data}")
     private String studentNonGradReportData;
 
-    @Value("${endpoint.grad-student-api.student-nongrad-report-data-mincode}")
-    private String studentNonGradReportDataMincode;
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data-schoolId}")
+    private String studentNonGradReportDataSchoolId;
 
     @Value("${endpoint.grad-student-api.edw-snapshot-of-grad-status}")
     private String edwSnapshotOfGraduationStatus;
