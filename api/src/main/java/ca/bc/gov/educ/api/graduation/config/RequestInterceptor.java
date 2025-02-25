@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Component
 public class RequestInterceptor implements AsyncHandlerInterceptor {
@@ -43,6 +44,9 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		if (correlationID != null) {
 			ThreadLocalStateUtil.setCorrelationID(correlationID);
 		}
+		else {
+			ThreadLocalStateUtil.setCorrelationID(new UUID(1,1).toString());
+		}
 
 		// Header userName
 		val headerUserName = request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME);
@@ -51,10 +55,7 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		}
 
 		// requestSource
-		val requestSource = request.getHeader(EducGraduationApiConstants.REQUEST_SOURCE);
-		if (requestSource != null) {
-			ThreadLocalStateUtil.setRequestSource(requestSource);
-		}
+		ThreadLocalStateUtil.setRequestSource(EducGraduationApiConstants.CURRENT_API_NAME);
 
 		// username
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
