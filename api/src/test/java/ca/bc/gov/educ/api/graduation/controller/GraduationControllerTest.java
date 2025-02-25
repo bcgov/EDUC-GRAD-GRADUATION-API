@@ -251,11 +251,12 @@ class GraduationControllerTest {
 	void testCreateAndStoreDistrictSchoolYearEndNonGradReportsWithSchools() {
 		List<ReportGradStudentData> reportGradStudentData = new ArrayList<>();
 		ReportGradStudentData data = new ReportGradStudentData();
-		data.setMincode("1234567");
+		UUID schoolId = UUID.randomUUID();
+		data.setSchoolOfRecordId(schoolId.toString());
 		reportGradStudentData.add(data);
-		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport(data.getMincode())).thenReturn(reportGradStudentData);
+		Mockito.when(reportService.getStudentsForSchoolNonGradYearEndReport(schoolId)).thenReturn(reportGradStudentData);
 		Mockito.when(schoolReportsService.createAndStoreSchoolDistrictReports(reportGradStudentData, SchoolReportsService.ADDRESS_LABEL_SCHL, null, DISTREP_SC)).thenReturn(1);
-		graduationController.createAndStoreSchoolDistrictYearEndNonGradReports(ADDRESS_LABEL_SCHL, null, DISTREP_SC, List.of(data.getMincode()));
+		graduationController.createAndStoreSchoolDistrictYearEndNonGradReports(ADDRESS_LABEL_SCHL, null, DISTREP_SC, List.of(schoolId));
 		Mockito.verify(schoolReportsService).createAndStoreSchoolDistrictReports(reportGradStudentData, ADDRESS_LABEL_SCHL, null, DISTREP_SC);
 	}
 
@@ -361,7 +362,7 @@ class GraduationControllerTest {
 	}
 
 	@Test
-	void testGetSchoolReportsEmpty() throws Exception {
+	void testGetSchoolReportsEmpty() {
 		byte[] bytesSAR1 = new byte[0];
 		UUID schoolId = UUID.randomUUID();
 		Mockito.when(graduationService.getSchoolReports(List.of(schoolId),"GRADREG")).thenReturn(bytesSAR1);
