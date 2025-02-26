@@ -33,8 +33,8 @@
             src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.junit.exclusions>
-            src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java
         <sonar.coverage.exclusions>
+            src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java
         </sonar.coverage.exclusions>
         <java.version>18</java.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
