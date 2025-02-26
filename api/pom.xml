@@ -30,6 +30,7 @@
             src/main/java/ca/bc/gov/educ/api/graduation/model/**,
             src/main/java/ca/bc/gov/educ/api/graduation/util/**,
             src/main/java/ca/bc/gov/educ/api/graduation/process/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.junit.exclusions>
         <java.version>18</java.version>
