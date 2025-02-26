@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Component
 public class RequestInterceptor implements AsyncHandlerInterceptor {
@@ -40,9 +41,17 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		}
 		validation.clear();
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
-		if (correlationID != null) {
-			ThreadLocalStateUtil.setCorrelationID(correlationID);
+		ThreadLocalStateUtil.setCorrelationID(correlationID != null ? correlationID : UUID.randomUUID().toString());
+
+
+		// Header userName
+		val userName = request.getHeader(EducGraduationApiConstants.USERNAME);
+		if (userName != null) {
+			ThreadLocalStateUtil.setCurrentUser(userName);
 		}
+
+		// requestSource
+		ThreadLocalStateUtil.setRequestSource(EducGraduationApiConstants.CURRENT_API_NAME);
 
 		// username
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -65,10 +74,11 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public void afterCompletion(@NonNull final HttpServletRequest request, final HttpServletResponse response, @NonNull final Object handler, final Exception ex) {
 		logHelper.logServerHttpReqResponseDetails(request, response, constants.isSplunkLogHelperEnabled());
-		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
-		if (correlationID != null) {
-			response.setHeader(EducGraduationApiConstants.CORRELATION_ID, request.getHeader(EducGraduationApiConstants.CORRELATION_ID));
-			ThreadLocalStateUtil.clear();
-		}
+		response.setHeader(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+		response.setHeader(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
+		response.setHeader(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
+
+		ThreadLocalStateUtil.clear();
+
 	}
 }

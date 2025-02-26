@@ -7,7 +7,27 @@ public class ThreadLocalStateUtil {
 
     private static ThreadLocal<String> user = new ThreadLocal<>();
 
+    private static ThreadLocal<String> requestSource = new ThreadLocal<>();
+
+
     /**
+     * Set the requestSource for this thread
+     *
+     * @param reqSource
+     */
+    public static void setRequestSource(String reqSource){
+        requestSource.set(reqSource);
+    }
+    /**
+     * Get the requestSource for this thread
+     *
+     * @return the reqSource, or null if it is unknown.
+     */
+    public static String getRequestSource() {
+        return requestSource.get();
+    }
+
+     /**
      * Set the current correlationID for this thread
      *
      * @param correlationID
@@ -46,5 +66,6 @@ public class ThreadLocalStateUtil {
     public static void clear() {
         transaction.remove();
         user.remove();
+        requestSource.remove();
     }
 }
