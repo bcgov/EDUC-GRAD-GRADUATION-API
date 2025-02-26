@@ -51,8 +51,8 @@ public class RESTService {
                     .get()
                     .uri(url)
                     .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
                         h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
+                        h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
                     })
                     .retrieve()
                     // if 5xx errors, throw Service error
@@ -83,7 +83,6 @@ public class RESTService {
                     .headers(h -> {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                         h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
-                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
                         h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
                     })
                     .retrieve()
@@ -124,7 +123,7 @@ public class RESTService {
             obj = webClient.post()
                     .uri(url)
                     .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
+                        h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
                         h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource()); })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
@@ -154,7 +153,6 @@ public class RESTService {
                     .headers(h -> {
                         h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                         h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
-                        h.set(EducGraduationApiConstants.HEADER_USER_NAME, ThreadLocalStateUtil.getHeaderUserName());
                         h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
                     })
                     .body(BodyInserters.fromValue(body))

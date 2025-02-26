@@ -41,17 +41,13 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		}
 		validation.clear();
 		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
-		if (correlationID != null) {
-			ThreadLocalStateUtil.setCorrelationID(correlationID);
-		}
-		else {
-			ThreadLocalStateUtil.setCorrelationID(new UUID(1,1).toString());
-		}
+		ThreadLocalStateUtil.setCorrelationID(correlationID != null ? correlationID : UUID.randomUUID().toString());
+
 
 		// Header userName
-		val headerUserName = request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME);
-		if (headerUserName != null) {
-			ThreadLocalStateUtil.setHeaderUserName(headerUserName);
+		val userName = request.getHeader(EducGraduationApiConstants.USERNAME);
+		if (userName != null) {
+			ThreadLocalStateUtil.setCurrentUser(userName);
 		}
 
 		// requestSource
@@ -78,12 +74,11 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 	@Override
 	public void afterCompletion(@NonNull final HttpServletRequest request, final HttpServletResponse response, @NonNull final Object handler, final Exception ex) {
 		logHelper.logServerHttpReqResponseDetails(request, response, constants.isSplunkLogHelperEnabled());
-		val correlationID = request.getHeader(EducGraduationApiConstants.CORRELATION_ID);
-		if (correlationID != null) {
-			response.setHeader(EducGraduationApiConstants.CORRELATION_ID, request.getHeader(EducGraduationApiConstants.CORRELATION_ID));
-			response.setHeader(EducGraduationApiConstants.HEADER_USER_NAME, request.getHeader(EducGraduationApiConstants.HEADER_USER_NAME));
-			response.setHeader(EducGraduationApiConstants.REQUEST_SOURCE, request.getHeader(EducGraduationApiConstants.REQUEST_SOURCE));
-			ThreadLocalStateUtil.clear();
-		}
+		response.setHeader(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+		response.setHeader(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
+		response.setHeader(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
+
+		ThreadLocalStateUtil.clear();
+
 	}
 }

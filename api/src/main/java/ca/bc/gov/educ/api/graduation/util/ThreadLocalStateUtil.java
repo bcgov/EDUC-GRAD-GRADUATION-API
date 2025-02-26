@@ -7,47 +7,27 @@ public class ThreadLocalStateUtil {
 
     private static ThreadLocal<String> user = new ThreadLocal<>();
 
-    private static ThreadLocal<String> headerUserNameThread = new ThreadLocal<>();
-
-    private static ThreadLocal<String> requestSourceThread = new ThreadLocal<>();
+    private static ThreadLocal<String> requestSource = new ThreadLocal<>();
 
 
     /**
      * Set the requestSource for this thread
      *
-     * @param requestSource
+     * @param reqSource
      */
-    public static void setRequestSource(String requestSource){
-        requestSourceThread.set(requestSource);
+    public static void setRequestSource(String reqSource){
+        requestSource.set(reqSource);
     }
     /**
      * Get the requestSource for this thread
      *
-     * @return the requestSource, or null if it is unknown.
+     * @return the reqSource, or null if it is unknown.
      */
     public static String getRequestSource() {
-        return requestSourceThread.get();
+        return requestSource.get();
     }
 
-    /**
-     * Set the headerUserName for this thread
-     *
-     * @param headerUserName
-     */
-    public static void setHeaderUserName(String headerUserName){
-        headerUserNameThread.set(headerUserName);
-    }
-
-    /**
-     * Get the headerUserName for this thread
-     *
-     * @return the headerUserName, or null if it is unknown.
-     */
-    public static String getHeaderUserName() {
-        return headerUserNameThread.get();
-    }
-
-    /**
+     /**
      * Set the current correlationID for this thread
      *
      * @param correlationID
@@ -86,5 +66,6 @@ public class ThreadLocalStateUtil {
     public static void clear() {
         transaction.remove();
         user.remove();
+        requestSource.remove();
     }
 }

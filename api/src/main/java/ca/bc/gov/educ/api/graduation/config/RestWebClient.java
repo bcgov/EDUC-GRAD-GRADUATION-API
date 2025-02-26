@@ -88,7 +88,6 @@ public class RestWebClient {
                         //GRAD2-1929 Refactoring/Linting replaced rawStatusCode() with statusCode() as it was deprecated.
                         // clientResponse.rawStatusCode(),
                         clientRequest.headers().get(EducGraduationApiConstants.CORRELATION_ID),
-                        clientRequest.headers().get(EducGraduationApiConstants.HEADER_USER_NAME),
                         clientRequest.headers().get(EducGraduationApiConstants.REQUEST_SOURCE),
                         constants.isSplunkLogHelperEnabled())
                 ));
