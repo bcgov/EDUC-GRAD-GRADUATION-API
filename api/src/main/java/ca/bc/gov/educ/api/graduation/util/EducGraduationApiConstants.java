@@ -14,7 +14,7 @@ public class EducGraduationApiConstants {
 
     public static final String CORRELATION_ID = "correlationID";
     public static final String REQUEST_SOURCE = "Request-Source";
-    public static final String CURRENT_API_NAME = "EDUC-GRAD-GRADUATION-API";
+    public static final String API_NAME = "EDUC-GRAD-GRADUATION-API";
     public static final String USERNAME = "User-Name";
 
     //API end-point Mapping constants
