@@ -26,7 +26,8 @@ public class WebSecurityConfiguration {
                                 "/api/v1/api-docs/**",
                                 "/actuator/health",
                                 "/actuator/prometheus",
-                                "/health")
+                                "/health",
+                                "/api/v1/metadata")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
