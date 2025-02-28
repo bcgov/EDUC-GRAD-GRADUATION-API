@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -41,9 +42,7 @@ public class RestWebClient {
         ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
         filter.setDefaultClientRegistrationId("graduationclient");
         return WebClient.builder()
-                .defaultHeader(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID())
-                .defaultHeader(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser())
-                .defaultHeader(EducGraduationApiConstants.REQUEST_SOURCE,EducGraduationApiConstants.API_NAME)
+                .filter(addDynamicHeadersFilter())
                 .exchangeStrategies(ExchangeStrategies
                         .builder()
                         .codecs(codecs -> codecs
@@ -54,6 +53,18 @@ public class RestWebClient {
                 .filter(this.log())
                 .build();
     }
+
+    private ExchangeFilterFunction addDynamicHeadersFilter() {
+        return (clientRequest, next) -> {
+            ClientRequest modifiedRequest = ClientRequest.from(clientRequest)
+                    .header(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID())
+                    .header(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser())
+                    .header(EducGraduationApiConstants.REQUEST_SOURCE, EducGraduationApiConstants.API_NAME) // Static value
+                    .build();
+            return next.exchange(modifiedRequest);
+        };
+    }
+
     @Bean
     public OAuth2AuthorizedClientManager authorizedClientManager(
             ClientRegistrationRepository clientRegistrationRepository,
@@ -73,7 +84,9 @@ public class RestWebClient {
      */
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().exchangeStrategies(ExchangeStrategies.builder()
+        return WebClient.builder()
+                .filter(addDynamicHeadersFilter())
+                .exchangeStrategies(ExchangeStrategies.builder()
                 .codecs(configurer -> configurer
                         .defaultCodecs()
                         .maxInMemorySize(300 * 1024 * 1024))  // 300MB

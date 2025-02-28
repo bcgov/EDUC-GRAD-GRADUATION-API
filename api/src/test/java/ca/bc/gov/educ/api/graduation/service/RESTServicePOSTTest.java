@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,25 +67,34 @@ public class RESTServicePOSTTest {
 
     @Before
     public void setUp(){
+        Mockito.reset(webClient, graduationServiceWebClient, responseMock, requestHeadersMock, requestBodyMock, requestBodyUriMock);
+
+        ThreadLocalStateUtil.clear();
+
         when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.graduationServiceWebClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(any(String.class))).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyUriMock.uri(any(String.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(TEST_BYTES));
+        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
     }
 
     @Test
     public void testPost_GivenProperData_Expect200Response(){
-        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
+        ThreadLocalStateUtil.setCorrelationID("test-correlation-id");
+        ThreadLocalStateUtil.setCurrentUser("test-user");
         byte[] response = this.restService.post(TEST_URL, TEST_BODY, byte[].class, ACCESS_TOKEN);
         Assert.assertArrayEquals(TEST_BYTES, response);
+
     }
 
     @Test
     public void testPostOverride_GivenProperData_Expect200Response(){
+        ThreadLocalStateUtil.setCorrelationID("test-correlation-id");
+        ThreadLocalStateUtil.setCurrentUser("test-user");
         when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
         byte[] response = this.restService.post(TEST_URL, TEST_BODY, byte[].class);
         Assert.assertArrayEquals(TEST_BYTES, response);
