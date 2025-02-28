@@ -50,9 +50,7 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, ThreadLocalStateUtil.getRequestSource());
-                        h.set(EducGraduationApiConstants.USERNAME, EducGraduationApiConstants.API_NAME);
+                    .headers(h -> { h.setBearerAuth(accessToken);
                     })
                     .retrieve()
                     // if 5xx errors, throw Service error
@@ -80,11 +78,6 @@ public class RESTService {
             obj = graduationServiceWebClient
                     .get()
                     .uri(url)
-                    .headers(h -> {
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
-                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, EducGraduationApiConstants.API_NAME);
-                    })
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -122,9 +115,7 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
-                        h.set(EducGraduationApiConstants.REQUEST_SOURCE, EducGraduationApiConstants.API_NAME); })
+                    .headers(h -> { h.setBearerAuth(accessToken); })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -150,11 +141,6 @@ public class RESTService {
         try {
             obj = graduationServiceWebClient.post()
                     .uri(url)
-                    .headers(h -> {
-                        h.set(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                        h.set(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser());
-                        h.set(EducGraduationApiConstants.REQUEST_SOURCE,EducGraduationApiConstants.API_NAME);
-                    })
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,

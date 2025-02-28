@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.graduation.config;
 
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.LogHelper;
+import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
 import io.netty.handler.logging.LogLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,9 @@ public class RestWebClient {
         ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
         filter.setDefaultClientRegistrationId("graduationclient");
         return WebClient.builder()
+                .defaultHeader(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID())
+                .defaultHeader(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser())
+                .defaultHeader(EducGraduationApiConstants.REQUEST_SOURCE,EducGraduationApiConstants.API_NAME)
                 .exchangeStrategies(ExchangeStrategies
                         .builder()
                         .codecs(codecs -> codecs

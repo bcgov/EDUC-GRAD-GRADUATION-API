@@ -3,11 +3,11 @@ package ca.bc.gov.educ.api.graduation.util;
 import java.util.Objects;
 
 public class ThreadLocalStateUtil {
-    private static ThreadLocal<String> transaction = new ThreadLocal<>();
+    private static InheritableThreadLocal<String> transaction = new InheritableThreadLocal<>();
 
-    private static ThreadLocal<String> user = new ThreadLocal<>();
+    private static InheritableThreadLocal<String> user = new InheritableThreadLocal<>();
 
-    private static ThreadLocal<String> requestSource = new ThreadLocal<>();
+    private static InheritableThreadLocal<String> requestSource = new InheritableThreadLocal<>();
 
 
     /**
