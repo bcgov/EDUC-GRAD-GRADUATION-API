@@ -55,7 +55,7 @@ public class ReportService {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
         req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryLegacyCode())?
-                getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecordId()) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
+                getSchoolCategoryCode(getSchoolofRecordId(gradResponse, graduationDataStatus)) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
         try {
             return restService.post(educGraduationApiConstants.getTranscript(), req, ProgramCertificateTranscript.class);
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class ReportService {
             }
         }
         req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryLegacyCode())?
-                getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecordId()) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
+                getSchoolCategoryCode(getSchoolofRecordId(gradResponse, graduationDataStatus)) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
         try {
             var response = restService.post(educGraduationApiConstants.getCertList(), req, List.class);
             return jsonTransformer.convertValue(response, new TypeReference<List<ProgramCertificateTranscript>>() {});
@@ -83,6 +83,12 @@ public class ReportService {
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
             return new ArrayList<>();
         }
+    }
+
+    private UUID getSchoolofRecordId(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+        return gradResponse.getSchoolOfRecordId() != null
+                ? gradResponse.getSchoolOfRecordId()
+                : graduationDataStatus.getGradStatus().getSchoolOfRecordId();
     }
 
     public String getSchoolCategoryCode(UUID schoolId) {
