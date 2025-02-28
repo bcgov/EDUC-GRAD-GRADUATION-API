@@ -2,23 +2,17 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -79,13 +73,13 @@ public class RESTServicePOSTTest {
         when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
         when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(TEST_BYTES));
-        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
     }
 
     @Test
     public void testPost_GivenProperData_Expect200Response(){
         ThreadLocalStateUtil.setCorrelationID("test-correlation-id");
         ThreadLocalStateUtil.setCurrentUser("test-user");
+        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
         byte[] response = this.restService.post(TEST_URL, TEST_BODY, byte[].class, ACCESS_TOKEN);
         Assert.assertArrayEquals(TEST_BYTES, response);
 

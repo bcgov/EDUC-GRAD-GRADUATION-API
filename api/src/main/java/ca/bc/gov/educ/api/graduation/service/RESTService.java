@@ -50,8 +50,7 @@ public class RESTService {
             obj = webClient
                     .get()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken);
-                    })
+                    .headers(h -> h.setBearerAuth(accessToken))
                     .retrieve()
                     // if 5xx errors, throw Service error
                     .onStatus(HttpStatusCode::is5xxServerError,
@@ -115,7 +114,7 @@ public class RESTService {
         try {
             obj = webClient.post()
                     .uri(url)
-                    .headers(h -> { h.setBearerAuth(accessToken); })
+                    .headers(h -> h.setBearerAuth(accessToken))
                     .body(BodyInserters.fromValue(body))
                     .retrieve()
                     .onStatus(HttpStatusCode::is5xxServerError,

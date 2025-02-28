@@ -59,7 +59,7 @@ public class RestWebClient {
             ClientRequest modifiedRequest = ClientRequest.from(clientRequest)
                     .header(EducGraduationApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID())
                     .header(EducGraduationApiConstants.USERNAME, ThreadLocalStateUtil.getCurrentUser())
-                    .header(EducGraduationApiConstants.REQUEST_SOURCE, EducGraduationApiConstants.API_NAME) // Static value
+                    .header(EducGraduationApiConstants.REQUEST_SOURCE, EducGraduationApiConstants.API_NAME)
                     .build();
             return next.exchange(modifiedRequest);
         };
