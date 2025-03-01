@@ -1,15 +1,15 @@
 package ca.bc.gov.educ.api.graduation.model.dto.institute;
 
 import ca.bc.gov.educ.api.graduation.model.dto.BaseModel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DistrictAddress extends BaseModel implements Serializable {
     /**
      * The constant serialVersionUID.

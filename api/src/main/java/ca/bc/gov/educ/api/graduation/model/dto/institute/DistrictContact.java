@@ -2,9 +2,7 @@ package ca.bc.gov.educ.api.graduation.model.dto.institute;
 
 import ca.bc.gov.educ.api.graduation.model.dto.BaseModel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -12,6 +10,8 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DistrictContact extends BaseModel implements Serializable {
 
     /**
