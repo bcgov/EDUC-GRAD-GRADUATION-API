@@ -39,7 +39,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), exception);
 		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID());
-		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, exception);
+		ReportData data = reportService.prepareAchievementReportData(gradResponse.getPen(), graduationDataStatus, projectedOptionalGradResponse, exception);
 		if (checkExceptions(data.getException(), algorithmResponse,processorData)) {
 			return processorData;
 		}
