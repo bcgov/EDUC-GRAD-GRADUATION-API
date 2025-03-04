@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.School;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.Pen;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,8 +39,7 @@ import java.util.function.Consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -2095,6 +2096,13 @@ public class GraduationServiceTest {
 
 	}
 
+	private School getSchoolDetailObject(UUID schoolId) {
+		School schoolDetail = new School();
+		schoolDetail.setSchoolId(schoolId.toString());
+		schoolDetail.setMincode("1231231231");
+		return schoolDetail;
+	}
+
 	@Test
 	public void testGetSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
@@ -2177,6 +2185,7 @@ public class GraduationServiceTest {
 
 		when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
 		when(schoolService.getSchoolClob(sTrax.getSchoolId())).thenReturn(sTrax);
+		when(schoolService.getSchoolById(schoolId)).thenReturn(getSchoolDetailObject(schoolId));
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
@@ -2192,6 +2201,8 @@ public class GraduationServiceTest {
 		UUID schoolId = UUID.randomUUID();
 		List<UUID> uniqueList = new ArrayList<>();
 		uniqueList.add(schoolId);
+
+		when(gradStatusService.getStudentListBySchoolId(schoolId)).thenThrow(new RuntimeException());
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
