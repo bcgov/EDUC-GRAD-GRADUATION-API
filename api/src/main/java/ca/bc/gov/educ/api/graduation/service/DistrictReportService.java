@@ -225,8 +225,16 @@ public class DistrictReportService extends BaseReportService {
         ca.bc.gov.educ.api.graduation.model.dto.institute.School school = schoolCache.computeIfAbsent(schoolId, id -> schoolService.getSchoolById(UUID.fromString(id)));
         if (!schoolService.isIndependentSchool(school)) {
           UUID districtId = UUID.fromString(school.getDistrictId());
-          School schoolReport = processDistrictSchool(SchoolMapper.mapper.toSchoolReport(school), reportGradStudentData);
-          districtSchoolsMap.computeIfAbsent(districtId, k -> new ArrayList<>()).add(schoolReport);
+          School schoolReport = districtSchoolsMap.getOrDefault(districtId, new ArrayList<>())
+              .stream()
+              .filter(s -> s.getSchoolId().equals(school.getSchoolId()))
+              .findFirst()
+              .orElseGet(() -> {
+                School newSchool = SchoolMapper.mapper.toSchoolReport(school);
+                districtSchoolsMap.computeIfAbsent(districtId, k -> new ArrayList<>()).add(newSchool);
+                return newSchool;
+              });
+          processDistrictSchool(schoolReport, reportGradStudentData);
         } else {
           logger.debug("Skip independent school {}", schoolId);
         }
@@ -283,7 +291,7 @@ public class DistrictReportService extends BaseReportService {
     return reportRequest;
   }
 
-  private School processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
+  private void processDistrictSchool(School school, ReportGradStudentData reportGradStudentData) {
     String paperType = reportGradStudentData.getPaperType();
     String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
     String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
@@ -308,7 +316,6 @@ public class DistrictReportService extends BaseReportService {
     if("YED4".equalsIgnoreCase(paperType) || StringUtils.isBlank(certificateTypeCode)) {
       school.getSchoolStatistic().setTranscriptCount(school.getSchoolStatistic().getTranscriptCount() + 1);
     }
-    return school;
   }
 
   private String getReportOrgCode(String mincode) {
