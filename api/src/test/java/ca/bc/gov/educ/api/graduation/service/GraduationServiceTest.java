@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -2263,6 +2262,16 @@ public class GraduationServiceTest {
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
 
 		assertEquals(1,numberOfRecord);
+	}
+
+	@Test
+	public void testCreateAndStoreSchoolReports_ExceptionHandling() {
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
+		when(schoolService.getSchoolById(schoolId)).thenThrow(new RuntimeException("Database Error"));
+		int numberOfRecords = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
+		assertEquals(0, numberOfRecords);
 	}
 
 	@Test
