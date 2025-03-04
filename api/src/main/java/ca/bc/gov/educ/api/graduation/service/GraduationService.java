@@ -195,9 +195,10 @@ public class GraduationService {
     public byte[] getSchoolReports(List<UUID> uniqueSchoolList, String type) {
         byte[] result = new byte[0];
         for (UUID schoolId : uniqueSchoolList) {
+            ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = null;
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(schoolId);
-                ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolService.getSchoolById(schoolId);
+                schoolDetail = schoolService.getSchoolById(schoolId);
                 if (schoolDetail != null) {
                     School schoolObj = new School();
                     schoolObj.setSchoolId(schoolDetail.getSchoolId());
@@ -222,7 +223,8 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for schoolId: {} due to: {}", type, schoolId, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
+                        type, schoolDetail != null ? schoolDetail.getMincode() : null, schoolId, e.getLocalizedMessage());
             }
         }
         return result;
@@ -231,14 +233,15 @@ public class GraduationService {
     public Integer createAndStoreSchoolReports(List<UUID> uniqueSchoolList, String type) {
         int numberOfReports = 0;
         for (UUID schoolId : uniqueSchoolList) {
+            ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = null;
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(schoolId);
-                if(logger.isDebugEnabled()) {
+                if (logger.isDebugEnabled()) {
                     int totalStudents = ObjectUtils.defaultIfNull(stdList.size(), 0);
                     String listOfStudents = jsonTransformer.marshall(stdList);
                     logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
-                ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = schoolService.getSchoolById(schoolId);
+                schoolDetail = schoolService.getSchoolById(schoolId);
                 if (schoolDetail != null) {
                     logger.debug("*** School Details Acquired {}", schoolDetail.getDisplayName());
                     if (stdList != null && !stdList.isEmpty()) {
@@ -261,7 +264,8 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for schoolId: {} due to: {}", type, schoolId, e.getLocalizedMessage());
+                logger.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
+                        type, schoolDetail != null ? schoolDetail.getMincode() : null, schoolId, e.getLocalizedMessage());
             }
         }
         return numberOfReports;
