@@ -91,7 +91,7 @@ endpoint:
   student-count-for-school-report: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/amalgamated/schoolreport/%s/count
   school-nongrad-year-end-students: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentschoolreportdata
   student-nongrad-report-data: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnongradreportdata
-  student-nongrad-report-data-mincode: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnongradreportdata/%s
+  student-nongrad-report-data-schoolId: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnongradreportdata/%s
   edw-snapshot-of-grad-status: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/edw/snapshot
  grad-program-api:
   program_name_by_program_code: 
@@ -99,9 +99,9 @@ endpoint:
   program_requirement_codes:
    url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programrequirementcode
  gradalgorithm-api: 
-  gradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s
-  projectedgradalgorithm: https://grad-algorithm-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
-  hypotheticalgradalgorithm: https://educ-grad-algorithm-api-e8a97a-dev.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
+  gradalgorithm: https://grad-algorithm-api-e8a97a-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s
+  projectedgradalgorithm: https://grad-algorithm-api-e8a97a-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
+  hypotheticalgradalgorithm: https://educ-grad-algorithm-api-e8a97a-test.apps.silver.devops.gov.bc.ca/api/v1/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
  grad-graduation-report-api: 
   update-grad-student-report: 
    url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentreport?isGraduated=%s
@@ -110,11 +110,13 @@ endpoint:
   update-grad-student-certificate:
    url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
   update-grad-school-report:
-   url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
+    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/graduationreports/schoolreport
+  update-grad-district-report:
+    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/graduationreports/district-report
   school-year-end-students:
-    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/getstudentsforschoolyearendreport
+    url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/graduationreports/getstudentsforschoolyearendreport
   school-students:
-      url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/getstudentsforschoolreport
+      url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/graduationreports/getstudentsforschoolreport
   get-certificate-name: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/certificatetype/%s
   get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
   get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
@@ -142,12 +144,16 @@ endpoint:
   by-pen:
     url: https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
  grad-trax-api:
-  commonschool-by-mincode:
-     url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/common/%s
-  school-by-min-code:
-    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/%s
+  school-detail-by-school-id:
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school/%s
+  school-clob-by-school-id:
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school-clob/%s
   district-by-min-code:
-    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/district/%s
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/district?distNo=%s
+  district-by-id:
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/district/%s
+  school-by-id:
+    url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school/%s
 
 #Splunk LogHelper
 splunk:

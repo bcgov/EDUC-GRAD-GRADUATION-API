@@ -1,0 +1,19 @@
+meta {
+  name: Student Certificate Creation
+  type: http
+  seq: 26
+}
+
+get {
+  url: {{baseUrl}}/api/v1/graduate/report/certificate/:pen
+  body: none
+  auth: none
+}
+
+params:query {
+  ~isOverwrite: 
+}
+
+params:path {
+  pen: 
+}

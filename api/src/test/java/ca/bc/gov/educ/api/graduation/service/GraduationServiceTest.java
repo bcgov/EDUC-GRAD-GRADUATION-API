@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.School;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.Pen;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
@@ -37,8 +38,7 @@ import java.util.function.Consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringRunner.class)
@@ -543,9 +543,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -616,9 +616,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		data.setException(excep2);
@@ -696,9 +696,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
@@ -773,9 +773,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 
@@ -855,9 +855,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
 		Mockito.when(gradStatusService.getGradStatus(studentID, exception)).thenReturn(gradResponse);
@@ -920,9 +920,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -992,9 +992,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1064,9 +1064,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1141,9 +1141,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1221,9 +1221,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1300,9 +1300,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1381,9 +1381,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1454,9 +1454,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1526,9 +1526,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1598,9 +1598,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1658,12 +1658,12 @@ public class GraduationServiceTest {
 		sA.setStudentAssessmentList(new ArrayList<>());
 		graduationDataStatus.setStudentAssessments(sA);
 
-		School school = new School();
+		SchoolClob school = new SchoolClob();
 		school.setMinCode("012345");
 		school.setSchoolName("XYZ");
 		school.setSchoolCategoryCode("01");
-		school.setSchoolPhone("123456");
-		school.setIndependentDesignation("2");
+//		school.setSchoolPhone("123456");
+		school.setSchoolId(UUID.randomUUID().toString());
 		graduationDataStatus.setSchool(school);
 
 		GradSearchStudent gradStudent = new GradSearchStudent();
@@ -1771,9 +1771,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		ReportData data = new ReportData();
 		data.setGradMessage("ABC");
@@ -1840,9 +1840,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		List<ProgramCertificateTranscript> pList = new ArrayList<>();
 		ProgramCertificateTranscript pcr = new ProgramCertificateTranscript();
@@ -1921,9 +1921,9 @@ public class GraduationServiceTest {
 		GraduationMessages gM = new GraduationMessages();
 		gM.setGradMessage("asdad");
 
-		School schoolObj = new School();
+		SchoolClob schoolObj = new SchoolClob();
 		schoolObj.setMinCode("1231123");
-		schoolObj.setIndependentDesignation("2");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
 
 		List<ProgramCertificateTranscript> pList = new ArrayList<>();
 		ProgramCertificateTranscript pcr = new ProgramCertificateTranscript();
@@ -1944,9 +1944,9 @@ public class GraduationServiceTest {
 	@Test
 	public void testCreateAndStoreSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
-		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -1991,9 +1991,9 @@ public class GraduationServiceTest {
 
 		sList.add(gsr);
 
-		SchoolTrax sTrax = new SchoolTrax();
-		sTrax.setAddress1("!23123");
-		sTrax.setMinCode("1231231231");
+		ca.bc.gov.educ.api.graduation.model.dto.institute.School sTrax = new ca.bc.gov.educ.api.graduation.model.dto.institute.School();
+		sTrax.setSchoolId(schoolId.toString());
+		sTrax.setMincode("1231231231");
 
 		byte[] bytesSAR1 = "Any String you want".getBytes();
 
@@ -2020,12 +2020,13 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		Mockito.when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolById(schoolId)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
+
 		assertEquals(2,numberOfRecord);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(List.of());
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(List.of());
 		numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"REGALG");
 		assertEquals(0,numberOfRecord);
 	}
@@ -2094,12 +2095,19 @@ public class GraduationServiceTest {
 
 	}
 
+	private School getSchoolDetailObject(UUID schoolId) {
+		School schoolDetail = new School();
+		schoolDetail.setSchoolId(schoolId.toString());
+		schoolDetail.setMincode("1231231231");
+		return schoolDetail;
+	}
+
 	@Test
 	public void testGetSchoolReports() {
 		ExceptionMessage exception = new ExceptionMessage();
-		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2144,7 +2152,8 @@ public class GraduationServiceTest {
 
 		sList.add(gsr);
 
-		SchoolTrax sTrax = new SchoolTrax();
+		SchoolClob sTrax = new SchoolClob();
+		sTrax.setSchoolId(String.valueOf(schoolId));
 		sTrax.setAddress1("!23123");
 		sTrax.setMinCode("1231231231");
 
@@ -2173,8 +2182,9 @@ public class GraduationServiceTest {
 		when(this.restService.post(any(String.class), any(), any(), any())).thenReturn(bytesSAR1);
 		when(this.restService.post(any(String.class), any(), any())).thenReturn(bytesSAR1);
 
-		when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
+		when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
+		when(schoolService.getSchoolClob(sTrax.getSchoolId())).thenReturn(sTrax);
+		when(schoolService.getSchoolById(schoolId)).thenReturn(getSchoolDetailObject(schoolId));
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
@@ -2187,9 +2197,11 @@ public class GraduationServiceTest {
 	@Test
 	public void testGetSchoolReportsException() {
 		ExceptionMessage exception = new ExceptionMessage();
-		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
+
+		when(gradStatusService.getStudentListBySchoolId(schoolId)).thenThrow(new RuntimeException());
 
 		byte[] result = graduationService.getSchoolReports(uniqueList,"GRADREG");
 		assertNotNull(result);
@@ -2199,9 +2211,10 @@ public class GraduationServiceTest {
 	@Test
 	public void testCreateAndStoreSchoolReports_TVR() {
 		ExceptionMessage exception = new ExceptionMessage();
+		UUID schoolId = UUID.randomUUID();
 		String mincode = "1231231231";
-		List<String> uniqueList = new ArrayList<>();
-		uniqueList.add(mincode);
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
 
 		List<GraduationStudentRecord> sList = new ArrayList<>();
 		List<GradRequirement> nonList = new ArrayList<>();
@@ -2226,9 +2239,9 @@ public class GraduationServiceTest {
 		}
 
 		sList.add(gsr);
-		SchoolTrax sTrax = new SchoolTrax();
-		sTrax.setAddress1("!23123");
-		sTrax.setMinCode("1231231231");
+		ca.bc.gov.educ.api.graduation.model.dto.institute.School sTrax = new ca.bc.gov.educ.api.graduation.model.dto.institute.School();
+		sTrax.setSchoolId(schoolId.toString());
+		sTrax.setMincode(mincode);
 
 		byte[] bytesSAR = "Any String you want".getBytes();
 
@@ -2244,10 +2257,21 @@ public class GraduationServiceTest {
 
 		when(this.restService.get(any(), any())).thenReturn(1);
 
-		Mockito.when(gradStatusService.getStudentListByMinCode(mincode)).thenReturn(sList);
-		Mockito.when(schoolService.getTraxSchoolDetails(mincode, exception)).thenReturn(sTrax);
+		Mockito.when(gradStatusService.getStudentListBySchoolId(schoolId)).thenReturn(sList);
+		Mockito.when(schoolService.getSchoolById(schoolId)).thenReturn(sTrax);
 		int numberOfRecord = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
+
 		assertEquals(1,numberOfRecord);
+	}
+
+	@Test
+	public void testCreateAndStoreSchoolReports_ExceptionHandling() {
+		UUID schoolId = UUID.randomUUID();
+		List<UUID> uniqueList = new ArrayList<>();
+		uniqueList.add(schoolId);
+		when(schoolService.getSchoolById(schoolId)).thenThrow(new RuntimeException("Database Error"));
+		int numberOfRecords = graduationService.createAndStoreSchoolReports(uniqueList,"TVRRUN");
+		assertEquals(0, numberOfRecords);
 	}
 
 	@Test
@@ -2358,3 +2382,4 @@ public class GraduationServiceTest {
 		return sb.toString();
 	}
 }
+

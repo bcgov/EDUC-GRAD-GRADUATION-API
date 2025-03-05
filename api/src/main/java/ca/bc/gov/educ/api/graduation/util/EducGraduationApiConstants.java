@@ -47,7 +47,9 @@ public class EducGraduationApiConstants {
     public static final String SCHOOL_AND_DISTRICT_REPORTS_SUPP_PDF = "/report/schooldistrictsupppdf";
     public static final String SCHOOL_REPORTS_PDF = "/report/school/pdf";
     public static final String SCHOOL_REPORTS_LABELS = "/report/school/labels";
+    public static final String DISTRICT_REPORTS_LABELS = "/report/district/labels";
     public static final String SCHOOL_REPORTS_LABELS_PDF = "/report/school/labels/pdf";
+    public static final String DISTRICT_REPORTS_LABELS_PDF = "/report/district/labels/pdf";
     public static final String STUDENT_FOR_YEAR_END_REPORT = "/report/studentsforyearend";
     public static final String EDW_GRADUATION_SNAPSHOT = "/edw/snapshot";
     
@@ -144,9 +146,6 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
     private String specialCase;
 
-    @Value("${endpoint.grad-trax-api.commonschool-by-mincode.url}")
-    private String schoolCategoryCode;
-
     @Value("${endpoint.grad-student-api.update-grad-status-projected}")
     private String saveStudentRecordProjectedRun;
 
@@ -156,8 +155,8 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.grad-student-api.student-nongrad-report-data}")
     private String studentNonGradReportData;
 
-    @Value("${endpoint.grad-student-api.student-nongrad-report-data-mincode}")
-    private String studentNonGradReportDataMincode;
+    @Value("${endpoint.grad-student-api.student-nongrad-report-data-schoolId}")
+    private String studentNonGradReportDataSchoolId;
 
     @Value("${endpoint.grad-student-api.edw-snapshot-of-grad-status}")
     private String edwSnapshotOfGraduationStatus;
@@ -165,14 +164,23 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
-    @Value("${endpoint.grad-trax-api.school-by-min-code.url}")
+    @Value("${endpoint.grad-trax-api.school-clob-by-school-id.url}")
+    private String schoolClobBySchoolIdUrl;
+
+    @Value("${endpoint.grad-trax-api.school-detail-by-school-id.url}")
     private String schoolDetails;
 
-    @Value("${endpoint.grad-trax-api.district-by-min-code.url}")
+    @Value("${endpoint.grad-trax-api.school-by-id.url}")
+    private String schoolById;
+
+    @Value("${endpoint.grad-trax-api.district-by-id.url}")
     private String districtDetails;
 
     @Value("${endpoint.grad-graduation-report-api.update-grad-school-report.url}")
     private String updateSchoolReport;
+
+    @Value("${endpoint.grad-graduation-report-api.update-grad-district-report.url}")
+    private String updateDistrictReport;
 
     @Value("${endpoint.grad-graduation-report-api.school-year-end-students.url}")
     private String schoolYearEndStudents;

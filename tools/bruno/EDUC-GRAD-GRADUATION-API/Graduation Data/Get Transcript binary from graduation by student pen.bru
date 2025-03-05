@@ -1,0 +1,20 @@
+meta {
+  name: Get Transcript binary from graduation by student pen
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/graduate/report/transcript/:pen
+  body: none
+  auth: none
+}
+
+params:query {
+  ~interim: 
+  ~preview: 
+}
+
+params:path {
+  pen: 
+}

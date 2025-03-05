@@ -7,7 +7,7 @@
     <groupId>ca.bc.gov.educ</groupId>
     <artifactId>educ-grad-graduation-api</artifactId>
 
-    <version>1.8.66</version>
+    <version>1.8.67</version>
     <name>educ-grad-graduation-api</name>
     <description>Ministry of Education GRAD GRADUATION API</description>
 
@@ -30,8 +30,12 @@
             src/main/java/ca/bc/gov/educ/api/graduation/model/**,
             src/main/java/ca/bc/gov/educ/api/graduation/util/**,
             src/main/java/ca/bc/gov/educ/api/graduation/process/**,
+            src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java,
             src/main/test/ca/bc/gov/educ/api/graduation/**
         </sonar.junit.exclusions>
+        <sonar.coverage.exclusions>
+            src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java
+        </sonar.coverage.exclusions>
         <java.version>18</java.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -302,6 +306,11 @@
                                     <artifactId>lombok</artifactId>
                                     <version>${lombok.version}</version>
                                 </path>
+                                <dependency>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok-mapstruct-binding</artifactId>
+                                    <version>0.2.0</version>
+                                </dependency>
                                 <path>
                                     <groupId>org.springframework</groupId>
                                     <artifactId>spring-context-indexer</artifactId>

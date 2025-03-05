@@ -22,11 +22,13 @@ public class GradAlgorithmGraduationStudentRecord {
     private String honoursStanding;
     private String recalculateGradStatus;   
     private String schoolOfRecord;
+    private UUID schoolOfRecordId;
     private String studentGrade;	
     private String studentStatus;
     private String studentCitizenship;
     private UUID studentID;
     private String schoolAtGrad;
+    private UUID schoolAtGradId;
     private String consumerEducationRequirementMet;
     private String schoolAtGradName;
     @JsonFormat(pattern=DEFAULT_DATE_FORMAT)

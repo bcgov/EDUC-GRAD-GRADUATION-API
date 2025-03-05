@@ -1,0 +1,20 @@
+meta {
+  name: Run different Grad Runs and Graduate Student by Student ID and projected type
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/graduate/studentid/:studentID/run/:projectedType
+  body: none
+  auth: none
+}
+
+params:query {
+  ~batchId: 
+}
+
+params:path {
+  studentID: 
+  projectedType: 
+}

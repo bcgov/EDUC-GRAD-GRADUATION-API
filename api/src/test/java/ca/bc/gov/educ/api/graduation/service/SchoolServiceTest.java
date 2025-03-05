@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import org.junit.After;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
@@ -30,22 +32,22 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @SpringBootTest
 @ActiveProfiles("test")
 public class SchoolServiceTest {
-	
-	@Autowired
-	private SchoolService schoolService;
-	
-	@Autowired
-	GradValidation validation;
-	
-	@MockBean
+
+    @Autowired
+    private SchoolService schoolService;
+
+    @Autowired
+    GradValidation validation;
+
+    @MockBean
     WebClient webClient;
 
     @Autowired
     private EducGraduationApiConstants constants;
 
-	@MockBean
-	RESTService restService;
-    
+    @MockBean
+    RESTService restService;
+
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
     @Mock
@@ -58,54 +60,78 @@ public class SchoolServiceTest {
     private WebClient.ResponseSpec responseMock;
     @Mock
     private Mono<GraduationStudentRecord> monoResponse;
-	
+  @Autowired
+  private DistrictService districtService;
+
     @Before
     public void setUp() {
         openMocks(this);
-    }    
+    }
 
-	@After
+    @After
     public void tearDown() {
 
     }
 
-	@Test
-	public void testGetSchoolDetails() {
-		String mincode = "213123131";
-		String accessToken = "accessToken";
-		SchoolTrax schtrax = new SchoolTrax();
-		schtrax.setMinCode(mincode);
-		schtrax.setAddress1("1231");
-		when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-		SchoolTrax res = schoolService.getTraxSchoolDetails(mincode, new ExceptionMessage());
-		assertNotNull(res);
-		assertEquals(res.getMinCode(),mincode);
-	}
+    @Test
+    public void testGetSchoolClob() {
+        UUID schoolId = UUID.randomUUID();
+        String mincode = "213123131";
+        SchoolClob schtrax = new SchoolClob();
+        schtrax.setSchoolId(schoolId.toString());
+        schtrax.setMinCode(mincode);
+        schtrax.setAddress1("1231");
+        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
+        SchoolClob res = schoolService.getSchoolClob(schtrax.getSchoolId());
+
+        assertNotNull(res);
+        assertEquals(res.getSchoolId(),schoolId.toString());
+        assertEquals(res.getMinCode(), mincode);
+    }
+
+    @Test
+    public void testGetSchoolDetails() {
+        UUID schoolId = UUID.randomUUID();
+        String mincode = "213123131";
+        ca.bc.gov.educ.api.graduation.model.dto.institute.School school = new ca.bc.gov.educ.api.graduation.model.dto.institute.School ();
+        school.setSchoolId(schoolId.toString());
+        school.setMincode(mincode);
+        when(this.restService.get(any(String.class), any())).thenReturn(school);
+        ca.bc.gov.educ.api.graduation.model.dto.institute.School res = schoolService.getSchoolDetails(schoolId);
+
+        assertNotNull(res);
+        assertEquals(res.getSchoolId(),schoolId.toString());
+        assertEquals(res.getMincode(), mincode);
+    }
 
     @Test
     public void testGetSchoolDetailsNoToken() {
+        UUID schoolId = UUID.randomUUID();
         String mincode = "213123131";
-        SchoolTrax schtrax = new SchoolTrax();
+        SchoolClob schtrax = new SchoolClob();
+        schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
         when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        SchoolTrax res = schoolService.getTraxSchoolDetails(mincode);
+        SchoolClob res = schoolService.getSchoolClob(schoolId);
+
         assertNotNull(res);
+        assertEquals(res.getSchoolId(),schoolId.toString());
         assertEquals(res.getMinCode(),mincode);
     }
 
     @Test
     public void testGetDistrictDetailsNoToken() {
-        String mincode = "213";
-        DistrictTrax schtrax = new DistrictTrax();
-        schtrax.setDistrictNumber(mincode);
-        schtrax.setAddress1("1231");
+        UUID districtId = UUID.randomUUID();
+        District schoolDistrict = new District();
+        schoolDistrict.setDistrictId(districtId.toString());
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
-        DistrictTrax res = schoolService.getTraxDistrictDetails(mincode);
+        when(this.restService.get(any(String.class), any())).thenReturn(schoolDistrict);
+        District res = districtService.getDistrictDetails(districtId);
+
         assertNotNull(res);
-        assertEquals(res.getDistrictNumber(),mincode);
+        assertEquals(res.getDistrictId(),districtId.toString());
     }
 
     private String mockTokenResponseObject() {
@@ -126,3 +152,4 @@ public class SchoolServiceTest {
     }
 
 }
+

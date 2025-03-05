@@ -91,7 +91,7 @@ endpoint:
   student-count-for-school-report: ${GRAD_STUDENT_API}api/v1/student/amalgamated/schoolreport/%s/count
   school-nongrad-year-end-students: ${GRAD_STUDENT_API}api/v1/student/studentschoolreportdata
   student-nongrad-report-data: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata
-  student-nongrad-report-data-mincode: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
+  student-nongrad-report-data-schoolId: ${GRAD_STUDENT_API}api/v1/student/studentnongradreportdata/%s
   edw-snapshot-of-grad-status: ${GRAD_STUDENT_API}api/v1/student/edw/snapshot
  grad-program-api:
   program_name_by_program_code: 
@@ -106,11 +106,13 @@ endpoint:
   update-grad-student-report: 
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
   update-grad-school-report:
-     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
+     url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/schoolreports
+  update-grad-district-report:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/district-report
   school-year-end-students:
-     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/getstudentsforschoolyearendreport
+     url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/getstudentsforschoolyearendreport
   school-students:
-    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/getstudentsforschoolreport
+    url: ${GRAD_GRADUATION_REPORT_API}api/v2/graduationreports/getstudentsforschoolreport
   update-grad-student-transcript:
     url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
   update-grad-student-certificate: 
@@ -142,14 +144,15 @@ endpoint:
    by-pen:
      url: ${PEN_API}api/v1/student?pen=%s
 
-
  grad-trax-api:
-   commonschool-by-mincode:
-     url: ${GRAD_TRAX_API}api/v1/trax/school/common/%s
-   school-by-min-code:
-     url: ${GRAD_TRAX_API}api/v1/trax/school/%s
-   district-by-min-code:
-     url: ${GRAD_TRAX_API}api/v1/trax/district/%s
+   school-detail-by-school-id:
+     url: ${GRAD_TRAX_API}api/v2/trax/school/%s
+   school-clob-by-school-id:
+     url: ${GRAD_TRAX_API}api/v2/trax/school-clob/%s
+   district-by-id:
+     url: ${GRAD_TRAX_API}api/v2/trax/district/%s
+   school-by-id:
+        url: ${GRAD_TRAX_API}api/v2/trax/school/%s
 
 #Splunk LogHelper
 splunk:

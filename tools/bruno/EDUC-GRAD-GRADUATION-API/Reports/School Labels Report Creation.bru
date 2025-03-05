@@ -1,0 +1,23 @@
+meta {
+  name: School Labels Report Creation
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/school/labels/pdf
+  body: json
+  auth: none
+}
+
+params:query {
+  reportType: 
+}
+
+
+
+body:json {
+  [
+    {}
+  ]
+}
