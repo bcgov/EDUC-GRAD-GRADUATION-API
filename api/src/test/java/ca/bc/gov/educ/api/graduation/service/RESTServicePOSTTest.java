@@ -115,8 +115,8 @@ public class RESTServicePOSTTest {
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
         Throwable cause = new RuntimeException("Simulated cause");
-        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
-        restService.post(TEST_URL, null, String.class);
+        when(responseMock.bodyToMono(byte[].class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
+        this.restService.post(TEST_URL, TEST_BODY, byte[].class);
     }
 
     @Test(expected = ServiceException.class)
@@ -125,8 +125,8 @@ public class RESTServicePOSTTest {
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
         Throwable cause = new RuntimeException("Simulated cause");
-        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
-        restService.post(TEST_URL, "TEST", String.class, "ABC");
+        when(responseMock.bodyToMono(byte[].class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
+        this.restService.post(TEST_URL, TEST_BODY, byte[].class, "ABC");
     }
 
 }
