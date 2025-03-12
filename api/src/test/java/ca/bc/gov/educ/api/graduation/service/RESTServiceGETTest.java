@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import io.netty.channel.ConnectTimeoutException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -74,14 +73,14 @@ public class RESTServiceGETTest {
     public void testGet_GivenProperData_Expect200Response(){
         when(this.responseMock.bodyToMono(String.class)).thenReturn(Mono.just(OK_RESPONSE));
         String response = this.restService.get(TEST_URL_200, String.class, "1234");
-        Assert.assertEquals("200 OK", response);
+        assertEquals("200 OK", response);
     }
 
     @Test
     public void testGetOverride_GivenProperData_Expect200Response(){
         when(this.responseMock.bodyToMono(String.class)).thenReturn(Mono.just(OK_RESPONSE));
         String response = this.restService.get(TEST_URL_200, String.class);
-        Assert.assertEquals(OK_RESPONSE, response);
+        assertEquals(OK_RESPONSE, response);
     }
 
     @Test(expected = ServiceException.class)
@@ -108,56 +107,34 @@ public class RESTServiceGETTest {
         this.restService.get(TEST_URL_403, String.class);
     }
 
-    @Test
+    @Test(expected = ServiceException.class)
     public void testGet_Given5xxErrorFromService_ExpectConnectionError(){
         when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
         Throwable cause = new RuntimeException("Simulated cause");
         when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new ConnectTimeoutException("Connection closed")));
-
-        assertThrows(ServiceException.class, () -> {
-            restService.get(TEST_URL_503, String.class);
-        });
+        restService.get(TEST_URL_503, String.class);
     }
 
-    @Test
+    @Test(expected = ServiceException.class)
     public void testGet_Given5xxErrorFromService_ExpectWebClientRequestError(){
         when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
         Throwable cause = new RuntimeException("Simulated cause");
         when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.GET, null, new HttpHeaders())));
-
-        assertThrows(ServiceException.class, () -> {
-            restService.get(TEST_URL_503, String.class);
-        });
+        restService.get(TEST_URL_503, String.class);
     }
 
-    @Test
-    public void testPost_Given5xxErrorFromService_ExpectConnectionError(){
-        when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
-        when(requestBodyMock.retrieve()).thenReturn(responseMock);
-
-        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new ConnectTimeoutException("Connection closed")));
-
-        assertThrows(ServiceException.class, () -> {
-            restService.post(TEST_URL_503, null, String.class);
-        });
-    }
-
-    @Test
-    public void testPost_Given5xxErrorFromService_ExpectWebClientRequestError(){
+    @Test(expected = ServiceException.class)
+    public void testGetWithToken_Given5xxErrorFromService_ExpectWebClientRequestError(){
         when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
         when(requestBodyMock.retrieve()).thenReturn(responseMock);
 
         Throwable cause = new RuntimeException("Simulated cause");
-        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
-
-        assertThrows(ServiceException.class, () -> {
-            restService.post(TEST_URL_503, null, String.class);
-        });
+        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.GET, null, new HttpHeaders())));
+        restService.get(TEST_URL_503, String.class, "ABC");
     }
-
 
 }
