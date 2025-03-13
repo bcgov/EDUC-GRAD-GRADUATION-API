@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.graduation.model.dto;
 
 import ca.bc.gov.educ.api.graduation.model.report.NonGradReason;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportGradStudentData implements Serializable {
 
     private static final long serialVersionUID = 1L;
