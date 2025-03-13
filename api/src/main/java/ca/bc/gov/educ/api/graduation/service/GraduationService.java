@@ -195,10 +195,9 @@ public class GraduationService {
     public byte[] getSchoolReports(List<UUID> uniqueSchoolList, String type) {
         byte[] result = new byte[0];
         for (UUID schoolId : uniqueSchoolList) {
-            ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = null;
+            ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail =  schoolService.getSchoolById(schoolId);
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(schoolId);
-                schoolDetail = schoolService.getSchoolById(schoolId);
                 if (schoolDetail != null) {
                     School schoolObj = new School();
                     schoolObj.setSchoolId(schoolDetail.getSchoolId());
