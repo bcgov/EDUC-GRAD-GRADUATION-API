@@ -233,6 +233,12 @@ public class ReportService {
     }
 
     @Generated
+    private GradSearchStudent getStudentByStudentIDFromStudentApi(UUID studentID) {
+        return restService.get(String.format(educGraduationApiConstants.getPenStudentApiByStudentIdUrl(), studentID), GradSearchStudent.class);
+    }
+
+
+    @Generated
     private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID) {
         GraduationStudentRecord graduationStudentRecord = restService.get(String.format(educGraduationApiConstants.getReadGradStudentRecord(), studentID), GraduationStudentRecord.class);
         if (graduationStudentRecord != null) {
@@ -1107,14 +1113,14 @@ public class ReportService {
         }
     }
 
-    public ReportData prepareAchievementReportData(String pen, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, ExceptionMessage exception) {
+    public ReportData prepareAchievementReportData(UUID studentID, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<StudentOptionalProgram> optionalProgramList, ExceptionMessage exception) {
         try {
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
             ReportData data = new ReportData();
             data.setSchool(schoolOfRecord);
             //Override student demog information
-            overrideDemogProperties(getStudentByPenFromStudentApi(pen),graduationDataStatus);
+            overrideDemogProperties(getStudentByStudentIDFromStudentApi(studentID),graduationDataStatus);
             data.setStudent(getStudentDataAchvReport(graduationDataStatus.getGradStudent(), optionalProgramList));
             data.setOrgCode(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
             data.setGraduationStatus(getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord));
@@ -1155,6 +1161,7 @@ public class ReportService {
 
     private void overrideDemogProperties(GradSearchStudent student, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData) {
         if (student == null || graduationData == null || graduationData.getGradStudent() == null) {
+            log.info("Student or GraduationData is null. Skipping overrideDemogProperties");
             return;
         }
         modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull()); // Copy only non-null values
