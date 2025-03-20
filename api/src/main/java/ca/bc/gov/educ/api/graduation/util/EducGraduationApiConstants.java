@@ -166,6 +166,9 @@ public class EducGraduationApiConstants {
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
+    @Value("${endpoint.pen-student-api.by-studentid.url}")
+    private String penStudentApiByStudentIdUrl;
+
     @Value("${endpoint.grad-trax-api.school-clob-by-school-id.url}")
     private String schoolClobBySchoolIdUrl;
 
