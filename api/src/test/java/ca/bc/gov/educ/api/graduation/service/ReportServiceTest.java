@@ -1429,8 +1429,8 @@ public class ReportServiceTest {
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(spc);
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),gradStatus.getGradStudent().getPen()), List.class)).thenReturn(List.of(gradSearchStudent));
-		ReportData data = reportService.prepareAchievementReportData(gradStatus.getGradStudent().getPen(), gradStatus,optionalProgram, exception);
+		when(this.restService.get(String.format(constants.getPenStudentApiByStudentIdUrl(),gradStatus.getGradStudent().getPen()), GradSearchStudent.class)).thenReturn(gradSearchStudent);
+		ReportData data = reportService.prepareAchievementReportData(UUID.fromString(gradStatus.getGradStudent().getStudentID()), gradStatus,optionalProgram, exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudentExams());
 		assertNotNull(data.getStudentCourses());
