@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_AT_GRAD;
+import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_OF_RECORD;
+
 @Service
 public class SchoolReportsService extends BaseReportService {
 
@@ -310,9 +313,13 @@ public class SchoolReportsService extends BaseReportService {
     }
 
     private School populateSchoolObjectByReportGradStudentData(ReportGradStudentData reportGradStudentData) {
-        //--> Revert code back to school of record GRAD2-2758
-        /** String schoolId = reportGradStudentData.getSchoolAtGradId() == null? reportGradStudentData.getSchoolOfRecordId() : reportGradStudentData.getSchoolAtGradId();**/
+        //if not year end, reportingSchoolTypeCode isn't set, so check old way
         String schoolId = reportGradStudentData.getSchoolOfRecordId();
+        if(reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_AT_GRAD.name())) {
+            schoolId = reportGradStudentData.getSchoolAtGradId();
+        } else if (reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_OF_RECORD.name())) {
+            schoolId = reportGradStudentData.getSchoolOfRecordId();
+        }
         School school = new School();
         school.setStudents(new ArrayList<>());
 
@@ -337,9 +344,13 @@ public class SchoolReportsService extends BaseReportService {
     }
 
     private School populateSchoolObjectByReportGradStudentData(Map<String, School> schoolMap, ReportGradStudentData reportGradStudentData) {
-        //--> Revert code back to school of record GRAD2-2758
-        /** String schoolId = reportGradStudentData.getSchoolAtGradId() == null? reportGradStudentData.getSchoolOfRecordId() : reportGradStudentData.getSchoolAtGradId();**/
+        //if not year end, reportingSchoolTypeCode isn't set, so check old way
         String schoolId = reportGradStudentData.getSchoolOfRecordId();
+        if(reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_AT_GRAD.name())) {
+            schoolId = reportGradStudentData.getSchoolAtGradId();
+        } else if (reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_OF_RECORD.name())) {
+            schoolId = reportGradStudentData.getSchoolOfRecordId();
+        }
         //<--
         School school = schoolMap.get(schoolId);
         if (school == null) {
