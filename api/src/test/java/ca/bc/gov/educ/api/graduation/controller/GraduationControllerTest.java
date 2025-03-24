@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.graduation.controller;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.GradProgram;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
+import ca.bc.gov.educ.api.graduation.model.report.School;
 import ca.bc.gov.educ.api.graduation.service.DistrictReportService;
 import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.graduation.constants.ReportTypeCodes.ADDRESS_LABEL_SCH_YE;
 import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
 
 
@@ -213,6 +216,18 @@ class GraduationControllerTest {
 		Mockito.when(schoolReportsService.getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC)).thenReturn(new byte[0]);
 		graduationController.getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		Mockito.verify(schoolReportsService).getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
+	}
+
+	@Test
+	void testCreateAndStoreDistrictLabelsReportsBySchools() {
+		UUID districtId = UUID.randomUUID();
+		ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+		school.setSchoolId(UUID.randomUUID().toString());
+		Mockito.when(districtReportService.createAndStoreDistrictLabelsReportsFromSchools(ADDRESS_LABEL_SCH_YE.name(), districtId, List.of(school), null)).thenReturn(1);
+		graduationController.createAndStoreDistrictLabelsReportsBySchools(List.of(school), districtId, ADDRESS_LABEL_SCH_YE.name());
+		Mockito.verify(districtReportService).createAndStoreDistrictLabelsReportsFromSchools(ADDRESS_LABEL_SCH_YE.name(), districtId, List.of(school), null);
 	}
 
 	@Test
