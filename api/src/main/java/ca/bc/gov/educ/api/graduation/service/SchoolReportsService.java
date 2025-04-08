@@ -222,7 +222,7 @@ public class SchoolReportsService extends BaseReportService {
                 reportData.setSchool(transcriptSchool);
                 reportData.setOrgCode(getReportOrgCode(transcriptSchool.getMincode()));
                 reportRequest.getDataMap().put("issuedTranscriptsReportData", reportData);
-                School newCredentialsSchool = newCredentialsSchoolMap.get(transcriptSchool.getMincode());
+                School newCredentialsSchool = newCredentialsSchoolMap.get(transcriptSchool.getSchoolId());
                 if (newCredentialsSchool != null) {
                     reportData = new ReportData();
                     reportData.setSchool(newCredentialsSchool);
@@ -247,7 +247,7 @@ public class SchoolReportsService extends BaseReportService {
                 reportData.setSchool(newCredentialsSchool);
                 reportData.setOrgCode(getReportOrgCode(newCredentialsSchool.getMincode()));
                 reportRequest.getDataMap().put("newCredentialsReportData", reportData);
-                School transcriptSchool = issuedTranscriptsSchoolMap.get(newCredentialsSchool.getMincode());
+                School transcriptSchool = issuedTranscriptsSchoolMap.get(newCredentialsSchool.getSchoolId());
                 if (transcriptSchool != null) {
                     reportData = new ReportData();
                     reportData.setSchool(transcriptSchool);
