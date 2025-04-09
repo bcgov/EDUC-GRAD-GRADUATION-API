@@ -15,4 +15,5 @@ import java.util.UUID;
 public class YearEndReportRequest {
   List<UUID> schoolIds;
   List<UUID> districtIds;
+  List<String> schoolCategoryCodes;
 }
