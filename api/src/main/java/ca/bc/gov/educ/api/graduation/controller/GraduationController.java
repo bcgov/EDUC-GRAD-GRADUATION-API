@@ -294,6 +294,14 @@ public class GraduationController {
         return response.GET(reportService.getStudentsForSchoolYearEndReport());
     }
 
+    @PostMapping(EducGraduationApiConstants.STUDENT_FOR_YEAR_END_REPORT)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "Students for year end reports by search criteria", description = "When triggered, list of students, eligible for the year end reports returns", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<List<ReportGradStudentData>> getStudentsForYearEndReports(@RequestBody YearEndReportRequest yearEndReportRequest) {
+        return response.GET(reportService.getStudentsForSchoolYearEndReport(yearEndReportRequest));
+    }
+
     @GetMapping(EducGraduationApiConstants.SCHOOL_AND_DISTRICT_REPORTS_NONGRAD_YEAR_END)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School & District Report Creation", description = "When triggered, School & District Reports are created", tags = { "Reports" })

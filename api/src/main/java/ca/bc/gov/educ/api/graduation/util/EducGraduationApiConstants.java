@@ -13,7 +13,9 @@ import java.util.Date;
 public class EducGraduationApiConstants {
 
     public static final String CORRELATION_ID = "correlationID";
-    public static final String USERNAME = "username";
+    public static final String REQUEST_SOURCE = "Request-Source";
+    public static final String API_NAME = "EDUC-GRAD-GRADUATION-API";
+    public static final String USERNAME = "User-Name";
 
     //API end-point Mapping constants
 	public static final String API_ROOT_MAPPING = "";
@@ -163,6 +165,9 @@ public class EducGraduationApiConstants {
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
+
+    @Value("${endpoint.pen-student-api.by-studentid.url}")
+    private String penStudentApiByStudentIdUrl;
 
     @Value("${endpoint.grad-trax-api.school-clob-by-school-id.url}")
     private String schoolClobBySchoolIdUrl;

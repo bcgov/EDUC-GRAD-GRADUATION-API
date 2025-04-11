@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static ca.bc.gov.educ.api.graduation.constants.ReportTypeCodes.DISTREP_YE_SD;
+import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_AT_GRAD;
+import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_OF_RECORD;
+
 @Service
 public class DistrictReportService extends BaseReportService {
 
@@ -68,7 +72,7 @@ public class DistrictReportService extends BaseReportService {
   public byte[] getDistrictYearEndReports() throws IOException {
     List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport();
     List<InputStream> pdfs = new ArrayList<>();
-    createAndStoreDistrictReports(ReportTypeCodes.DISTREP_YE_SD.getCode(), reportGradStudentDataList, pdfs);
+    createAndStoreDistrictReports(DISTREP_YE_SD.getCode(), reportGradStudentDataList, pdfs);
     return mergeDocuments(pdfs);
   }
 
@@ -89,7 +93,7 @@ public class DistrictReportService extends BaseReportService {
   public Integer createAndStoreDistrictYearEndReports() {
     List<ReportGradStudentData> reportGradStudentDataList;
     reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport();
-    return createAndStoreDistrictReports(ReportTypeCodes.DISTREP_YE_SD.getCode(), reportGradStudentDataList, null);
+    return createAndStoreDistrictReports(DISTREP_YE_SD.getCode(), reportGradStudentDataList, null);
   }
 
   public Integer createAndStoreDistrictNonGradYearEndReport() {
@@ -220,7 +224,15 @@ public class DistrictReportService extends BaseReportService {
     Map<String, ca.bc.gov.educ.api.graduation.model.dto.institute.School> schoolCache = new HashMap<>();
 
     reportGradStudentDataList.forEach(reportGradStudentData -> {
+      //if not year end, reportingSchoolTypeCode isn't set, so check old way
       String schoolId = StringUtils.defaultIfBlank(reportGradStudentData.getSchoolAtGradId(), reportGradStudentData.getSchoolOfRecordId());
+
+      if(reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_AT_GRAD.name())) {
+        schoolId = reportGradStudentData.getSchoolAtGradId();
+      } else if (reportGradStudentData.getReportingSchoolTypeCode() != null && reportGradStudentData.getReportingSchoolTypeCode().equals(SCHOOL_OF_RECORD.name())) {
+        schoolId = reportGradStudentData.getSchoolOfRecordId();
+      }
+
       if (StringUtils.isNotBlank(schoolId)) {
         ca.bc.gov.educ.api.graduation.model.dto.institute.School school = schoolCache.computeIfAbsent(schoolId, id -> schoolService.getSchoolById(UUID.fromString(id)));
         if (!schoolService.isIndependentSchool(school)) {
@@ -269,7 +281,7 @@ public class DistrictReportService extends BaseReportService {
   }
 
   private byte[] generateReport(String reportType, ReportRequest reportRequest) {
-    if (ReportTypeCodes.DISTREP_YE_SD.getCode().equalsIgnoreCase(reportType)) {
+    if (DISTREP_YE_SD.getCode().equalsIgnoreCase(reportType)) {
       return getDistrictYearEndReportJasper(reportRequest);
     } else {
       return getDistrictYearEndNonGradReportJasper(reportRequest);

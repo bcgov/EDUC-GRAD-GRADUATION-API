@@ -1421,10 +1421,16 @@ public class ReportServiceTest {
 		spc.setDescription("wasd");
 		spc.setSpCase("A");
 		spc.setPassFlag("Y");
+		GradSearchStudent gradSearchStudent = new GradSearchStudent();
+		gradSearchStudent.setPen(gradStatus.getGradStudent().getPen());
+		gradSearchStudent.setLegalFirstName(gradStatus.getGradStudent().getLegalFirstName());
+		gradSearchStudent.setLegalMiddleNames(gradStatus.getGradStudent().getLegalMiddleNames());
+		gradSearchStudent.setLegalLastName(gradStatus.getGradStudent().getLegalLastName());
+		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
 		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(spc);
-
-		ReportData data = reportService.prepareAchievementReportData(gradStatus,optionalProgram, exception);
+		when(this.restService.get(String.format(constants.getPenStudentApiByStudentIdUrl(),gradStatus.getGradStudent().getPen()), GradSearchStudent.class)).thenReturn(gradSearchStudent);
+		ReportData data = reportService.prepareAchievementReportData(UUID.fromString(gradStatus.getGradStudent().getStudentID()), gradStatus,optionalProgram, exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudentExams());
 		assertNotNull(data.getStudentCourses());

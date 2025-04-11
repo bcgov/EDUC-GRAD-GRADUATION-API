@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Component
@@ -39,7 +40,7 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		gradStatusService.saveStudentRecordProjectedRun(projectedRunClob, processorData.getStudentID(), processorData.getBatchId(), exception);
 		gradResponse = gradStatusService.processProjectedResults(gradResponse, graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID());
-		ReportData data = reportService.prepareAchievementReportData(graduationDataStatus, projectedOptionalGradResponse, exception);
+		ReportData data = reportService.prepareAchievementReportData(UUID.fromString(processorData.getStudentID()), graduationDataStatus, projectedOptionalGradResponse, exception);
 		if (checkExceptions(data.getException(), algorithmResponse,processorData)) {
 			return processorData;
 		}
