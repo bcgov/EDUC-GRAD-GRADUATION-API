@@ -16,4 +16,5 @@ public class YearEndReportRequest {
   List<UUID> schoolIds;
   List<UUID> districtIds;
   List<String> schoolCategoryCodes;
+  List<YearEndStudentCredentialDistribution> studentList;
 }
