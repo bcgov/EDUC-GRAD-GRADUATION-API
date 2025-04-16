@@ -146,13 +146,14 @@ public class DistrictReportService extends BaseReportService {
     Integer reportsCount = 0;
     ReportRequest reportRequest = buildSchoolLabelsReportRequest(schools);
     byte[] reportAsBytes = getDistrictLabelsReportJasper(reportRequest);
-    if (reportAsBytes != null && pdfs != null) {
-      ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
-      pdfs.add(is);
-    }
-    if (pdfs == null) {
-      UUID districtIdValue = districtId != null ? districtId :UUID.fromString("00000000-0000-0000-0000-000000000000");
-      saveDistrictReport(districtIdValue, reportType, reportAsBytes);
+    if (reportAsBytes != null) {
+      if (pdfs != null) {
+        ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
+        pdfs.add(is);
+      } else {
+        UUID districtIdValue = districtId != null ? districtId :UUID.fromString("00000000-0000-0000-0000-000000000000");
+        saveDistrictReport(districtIdValue, reportType, reportAsBytes);
+      }
     }
     reportsCount++;
     return reportsCount;
