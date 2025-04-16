@@ -142,18 +142,13 @@ public class DistrictReportService extends BaseReportService {
     return reportsCount;
   }
 
-  public int createAndStoreDistrictLabelsReportsFromSchools(String reportType, UUID districtId, List<School> schools, List<InputStream> pdfs) {
+  public int createAndStoreDistrictLabelsReportsFromSchools(String reportType, UUID districtId, List<School> schools) {
     Integer reportsCount = 0;
     ReportRequest reportRequest = buildSchoolLabelsReportRequest(schools);
     byte[] reportAsBytes = getDistrictLabelsReportJasper(reportRequest);
     if (reportAsBytes != null) {
-      if (pdfs != null) {
-        ByteArrayInputStream is = new ByteArrayInputStream(reportAsBytes);
-        pdfs.add(is);
-      } else {
         UUID districtIdValue = districtId != null ? districtId :UUID.fromString("00000000-0000-0000-0000-000000000000");
         saveDistrictReport(districtIdValue, reportType, reportAsBytes);
-      }
     }
     reportsCount++;
     return reportsCount;
