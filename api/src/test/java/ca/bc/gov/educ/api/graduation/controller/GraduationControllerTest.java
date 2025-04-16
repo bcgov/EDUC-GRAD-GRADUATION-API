@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.graduation.constants.ReportTypeCodes.ADDRESS_LABEL_SCH_YE;
 import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
 
 
@@ -213,6 +214,18 @@ class GraduationControllerTest {
 		Mockito.when(schoolReportsService.getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC)).thenReturn(new byte[0]);
 		graduationController.getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
 		Mockito.verify(schoolReportsService).getSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC);
+	}
+
+	@Test
+	void testCreateAndStoreDistrictLabelsReportsBySchools() {
+		UUID districtId = UUID.randomUUID();
+		ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
+		school.setMincode("005994567");
+		school.setName("Test School Name");
+		school.setSchoolId(UUID.randomUUID().toString());
+		Mockito.when(districtReportService.createAndStoreDistrictLabelsReportsFromSchools(ADDRESS_LABEL_SCH_YE.name(), districtId, List.of(school))).thenReturn(1);
+		graduationController.createAndStoreDistrictLabelsReportsBySchools(List.of(school), districtId, ADDRESS_LABEL_SCH_YE.name());
+		Mockito.verify(districtReportService).createAndStoreDistrictLabelsReportsFromSchools(ADDRESS_LABEL_SCH_YE.name(), districtId, List.of(school));
 	}
 
 	@Test

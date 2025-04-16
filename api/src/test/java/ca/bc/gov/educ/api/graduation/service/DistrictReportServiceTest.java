@@ -121,6 +121,19 @@ class DistrictReportServiceTest extends BaseServiceTest {
   }
 
   @Test
+  void createAndStoreDistrictSchoolLabelsReportsFromDistricts() throws IOException {
+    District district = createDistrict();
+    ca.bc.gov.educ.api.graduation.model.report.School school = new ca.bc.gov.educ.api.graduation.model.report.School();
+    school.setMincode("005994567");
+    school.setName("Test School Name");
+    school.setSchoolId(UUID.randomUUID().toString());
+    byte[] mockPdfBytes = Files.readAllBytes(Paths.get("src/test/resources/data/sample.pdf"));
+    when(restService.post(any(), any(), any())).thenReturn(mockPdfBytes);
+    int result = districtReportService.createAndStoreDistrictLabelsReportsFromSchools(ReportTypeCodes.ADDRESS_LABEL_SCH_YE.getCode(), UUID.fromString(district.getDistrictId()), List.of(school));
+    assertEquals(1, result);
+  }
+
+  @Test
   void getDistrictYearEndReports() throws IOException {
     List<ReportGradStudentData> studentData = createStudentSchoolYearEndData();
     District district = createDistrict();

@@ -142,6 +142,25 @@ public class DistrictReportService extends BaseReportService {
     return reportsCount;
   }
 
+  public int createAndStoreDistrictLabelsReportsFromSchools(String reportType, UUID districtId, List<School> schools) {
+    Integer reportsCount = 0;
+    ReportRequest reportRequest = buildSchoolLabelsReportRequest(schools);
+    byte[] reportAsBytes = getDistrictLabelsReportJasper(reportRequest);
+    if (reportAsBytes != null) {
+        UUID districtIdValue = districtId != null ? districtId :UUID.fromString("00000000-0000-0000-0000-000000000000");
+        saveDistrictReport(districtIdValue, reportType, reportAsBytes);
+    }
+    reportsCount++;
+    return reportsCount;
+  }
+
+  private ReportRequest buildSchoolLabelsReportRequest(List<School> schools) {
+    ReportRequest reportRequest = new ReportRequest();
+    reportRequest.setOptions(createReportOptions());
+    reportRequest.setData(createReportData(schools));
+    return reportRequest;
+  }
+
   /**
    *  currently grad-report-api is set up such that all label reports
    *  (even for districts) take school objects as input. This is reflected

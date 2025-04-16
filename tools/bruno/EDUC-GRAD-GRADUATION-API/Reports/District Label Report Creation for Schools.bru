@@ -1,0 +1,22 @@
+meta {
+  name: District Label Report Creation for Schools
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/district/school/labels
+  body: json
+  auth: none
+}
+
+params:query {
+  districtId: 
+  reportType: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}

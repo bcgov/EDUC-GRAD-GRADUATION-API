@@ -135,6 +135,14 @@ public class GraduationController {
         return response.GET(districtReportService.createAndStoreDistrictLabelsReportsFromDistricts(reportType, districts, null));
     }
 
+    @PostMapping(EducGraduationApiConstants.DISTRICT_SCHOOL_REPORTS_LABELS)
+    @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
+    @Operation(summary = "District Label Report Creation for Schools", description = "When triggered, District Labels Reports are created from list of schools", tags = { "Reports" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public ResponseEntity<Integer> createAndStoreDistrictLabelsReportsBySchools(@RequestBody List<School> schools, @RequestParam UUID districtId, @RequestParam String reportType) {
+        return response.GET(districtReportService.createAndStoreDistrictLabelsReportsFromSchools(reportType, districtId, schools));
+    }
+
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS_LABELS_PDF)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
     @Operation(summary = "School Labels Report PDF", description = "When triggered, School Labels Reports PDF are created from list of Schools", tags = { "Reports" })
