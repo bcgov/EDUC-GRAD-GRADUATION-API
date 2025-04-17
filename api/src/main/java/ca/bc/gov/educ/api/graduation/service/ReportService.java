@@ -58,8 +58,7 @@ public class ReportService {
     public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
-        req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryLegacyCode())?
-                getSchoolCategoryCode(getSchoolofRecordId(gradResponse, graduationDataStatus)) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
+        req.setSchoolCategoryCode(getSchoolCategoryCode(getSchoolOfRecordId(gradResponse, graduationDataStatus)));
         try {
             return restService.post(educGraduationApiConstants.getTranscript(), req, ProgramCertificateTranscript.class);
         } catch (Exception e) {
@@ -77,8 +76,7 @@ public class ReportService {
                 req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
             }
         }
-        req.setSchoolCategoryCode(StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolCategoryLegacyCode())?
-                getSchoolCategoryCode(getSchoolofRecordId(gradResponse, graduationDataStatus)) : graduationDataStatus.getSchool().getSchoolCategoryLegacyCode());
+        req.setSchoolCategoryCode(getSchoolCategoryCode(getSchoolAtGradId(gradResponse, graduationDataStatus)));
         try {
             var response = restService.post(educGraduationApiConstants.getCertList(), req, List.class);
             return jsonTransformer.convertValue(response, new TypeReference<List<ProgramCertificateTranscript>>() {});
@@ -89,7 +87,13 @@ public class ReportService {
         }
     }
 
-    private UUID getSchoolofRecordId(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+    private UUID getSchoolAtGradId(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
+        return gradResponse.getSchoolAtGradId() != null
+            ? gradResponse.getSchoolAtGradId()
+            : graduationDataStatus.getGradStatus().getSchoolAtGradId();
+    }
+
+    private UUID getSchoolOfRecordId(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
         return gradResponse.getSchoolOfRecordId() != null
                 ? gradResponse.getSchoolOfRecordId()
                 : graduationDataStatus.getGradStatus().getSchoolOfRecordId();
