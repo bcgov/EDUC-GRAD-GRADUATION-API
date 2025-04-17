@@ -326,12 +326,11 @@ public class ReportServiceTest {
 	public void testGetCertificateList() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
 		gradResponse.setProgramCompletionDate(null);
-		gradResponse.setSchoolOfRecord("06011033");
+		gradResponse.setSchoolAtGradId(UUID.randomUUID());
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
