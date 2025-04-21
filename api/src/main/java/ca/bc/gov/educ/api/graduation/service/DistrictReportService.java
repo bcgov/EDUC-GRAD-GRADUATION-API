@@ -182,27 +182,9 @@ public class DistrictReportService extends BaseReportService {
     School school = new School();
     school.setMincode(district.getDistrictNumber());
     school.setTypeBanner("SUPERINTENDENT");
-    school.setName(getSuperintendentName(district));
+    school.setName(district.getDistrictName());
     school.setAddress(getMailingAddress(district));
     return school;
-  }
-
-  private String getSuperintendentName(District district) {
-    return district.getContacts().stream()
-        .filter(contact -> DistrictContactTypeCodes.SUPER.getCode().equals(contact.getDistrictContactTypeCode()))
-        .findFirst()
-        .map(contact -> {
-          String firstName = contact.getFirstName();
-          String lastName = contact.getLastName();
-          if (StringUtils.isNotBlank(firstName) && StringUtils.isNotBlank(lastName)) {
-            return firstName + " " + lastName;
-          } else if (StringUtils.isNotBlank(firstName)) {
-            return firstName;
-          } else {
-            return lastName;
-          }
-        })
-        .orElse(null);
   }
 
   private Address getMailingAddress(District district) {
