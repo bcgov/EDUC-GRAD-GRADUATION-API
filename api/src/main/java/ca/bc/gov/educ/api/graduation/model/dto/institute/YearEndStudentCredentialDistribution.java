@@ -5,16 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
-public class YearEndReportRequest {
-  List<UUID> schoolIds;
-  List<UUID> districtIds;
-  List<String> schoolCategoryCodes;
-  List<YearEndStudentCredentialDistribution> studentList;
+public class YearEndStudentCredentialDistribution {
+
+    private UUID studentID;
+    private String paperType;
+    private String certificateTypeCode;
+    private String reportingSchoolTypeCode;
+
 }
