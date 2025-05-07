@@ -216,6 +216,9 @@ public class ReportService {
         try {
             Pair<GraduationStudentRecord,ca.bc.gov.educ.api.graduation.model.dto.GraduationData> graduationStudentRecord = getGraduationStudentRecordAndGraduationData(pen);
             return prepareTranscriptData(graduationStudentRecord.getRight(), graduationStudentRecord.getLeft(), xml, exception);
+        } catch (EntityNotFoundException e) {
+            log.error("Student data not found for PEN {}: {}", pen, e.getMessage());
+            return null;
         } catch (Exception e) {
             exception.setExceptionName("PREPARE TRANSCRIPT REPORT DATA FROM PEN");
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -976,6 +979,9 @@ public class ReportService {
         try {
             Pair<GraduationStudentRecord,ca.bc.gov.educ.api.graduation.model.dto.GraduationData> graduationStudentRecord = getGraduationStudentRecordAndGraduationData(pen);
             return prepareCertificateData(graduationStudentRecord.getLeft(), graduationStudentRecord.getRight());
+        } catch (EntityNotFoundException e) {
+            log.error("Student data not found for PEN {}: {}", pen, e.getMessage());
+            return null;
         } catch (Exception e) {
             exception.setExceptionName("PREPARE CERTIFICATE REPORT DATA FROM PEN");
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -1147,16 +1153,26 @@ public class ReportService {
         String graduationDataJson = "{}";
         try {
             GradSearchStudent student = getStudentByPenFromStudentApi(pen);
+            if (student == null || student.getStudentID() == null) {
+                throw new EntityNotFoundException(
+                        ReportService.class,
+                        String.format("Student with PEN %s not found in Student API", pen));
+            }
+
             GraduationStudentRecord graduationStudentRecord = getGradStatusFromGradStudentApi(student.getStudentID());
             if (graduationStudentRecord.getStudentGradData() == null) {
                 throw new EntityNotFoundException(
                         ReportService.class,
                         String.format("Student with PEN %s doesn't have graduation data in GRAD Student system", pen));
             }
+
             ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationData = (ca.bc.gov.educ.api.graduation.model.dto.GraduationData) jsonTransformer.unmarshall(graduationStudentRecord.getStudentGradData(), ca.bc.gov.educ.api.graduation.model.dto.GraduationData.class);
             //Override student demog information
             overrideDemogProperties(student,graduationData);
             return Pair.of(graduationStudentRecord, graduationData);
+        } catch (EntityNotFoundException e) {
+            log.error("Graduation student record not found for student {}: {}", pen, e.getLocalizedMessage());
+            throw e;
         } catch (Exception e) {
             log.error("GraduationData {} unmarshal error for student {}: {}", graduationDataJson, pen, e.getLocalizedMessage());
             return null;

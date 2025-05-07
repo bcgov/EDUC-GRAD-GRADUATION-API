@@ -82,7 +82,11 @@ public class GraduationController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<ReportData> reportDataByPen(@PathVariable @NotNull String pen, @RequestParam(required = false) String type) {
         LOGGER.debug("Report Data By Student Pen: {}", pen);
-        return response.GET(gradService.prepareReportData(pen, type));
+        ReportData resultReportData = gradService.prepareReportData(pen, type);
+        if (resultReportData == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return response.GET(resultReportData);
     }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_TRANSCRIPT_REPORT)
@@ -108,7 +112,11 @@ public class GraduationController {
     public ResponseEntity<ReportData> reportDataFromGraduation(@RequestBody @NotNull GraduationData graduationData,
                                                                @RequestParam(required = false) String type) {
         LOGGER.debug("Report Data from graduation for student: {}", graduationData.getGradStudent().getStudentID());
-        return response.GET(gradService.prepareReportData(graduationData, type));
+        ReportData resultReportData = gradService.prepareReportData(graduationData, type);
+        if (resultReportData == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return response.GET(resultReportData);
     }
 
     @PostMapping(EducGraduationApiConstants.SCHOOL_REPORTS)
