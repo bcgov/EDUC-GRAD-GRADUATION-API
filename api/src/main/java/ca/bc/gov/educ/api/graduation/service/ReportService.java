@@ -252,7 +252,7 @@ public class ReportService {
             return graduationStudentRecord;
         }
         throw new EntityNotFoundException(
-                ReportService.class, String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
+                ReportService.class, "Error", String.format("Student with PEN %s value not exists in GRAD Student system", studentID));
     }
 
     @Generated
