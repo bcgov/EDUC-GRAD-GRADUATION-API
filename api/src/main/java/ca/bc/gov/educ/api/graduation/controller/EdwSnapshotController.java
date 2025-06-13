@@ -12,20 +12,18 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @CrossOrigin
 @RestController
 @RequestMapping(EducGraduationApiConstants.GRADUATION_API_ROOT_MAPPING)
-@OpenAPIDefinition(info = @Info(title = "API for EDW Snapshot of Graduation Status", description = "This API is for EDW Snapshot of Graduation Status.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
+@OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class EdwSnapshotController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EdwSnapshotController.class);
 
     @Autowired
     EdwSnapshotService edwSnapshotService;
@@ -41,7 +39,7 @@ public class EdwSnapshotController {
     @Operation(summary = "Run a Graduation snapshot for EDW", description = "Run a Graduation snapshot for EDW", tags = { "EDW Snapshot" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public ResponseEntity<EdwGraduationSnapshot> snapshotGraduationStatus(@RequestBody EdwGraduationSnapshot snapshotRequest) {
-        LOGGER.debug("Snapshot Graduation Status for Student - pen# {}", snapshotRequest.getPen());
+        log.debug("Snapshot Graduation Status for Student - pen# {}", snapshotRequest.getPen());
         return response.GET(edwSnapshotService.processSnapshot(snapshotRequest));
     }
 

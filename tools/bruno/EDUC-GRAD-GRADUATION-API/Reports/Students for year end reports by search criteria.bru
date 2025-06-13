@@ -1,0 +1,27 @@
+meta {
+  name: Students for year end reports by search criteria
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/studentsforyearend
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "schoolIds": [],
+    "districtIds": [],
+    "schoolCategoryCodes": [],
+    "studentList": [
+      {
+        "studentID": "",
+        "paperType": "",
+        "certificateTypeCode": "",
+        "reportingSchoolTypeCode": ""
+      }
+    ]
+  }
+}

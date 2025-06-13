@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,8 +35,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @SpringBootTest
 @ActiveProfiles("test")
 public class GradAlgorithmServiceTest {
-	
-	
+
 	@Autowired
 	private GradAlgorithmService gradAlgorithmService;
 	
@@ -49,7 +49,12 @@ public class GradAlgorithmServiceTest {
 	RESTService restService;
 
 	@MockBean
-	WebClient webClient;
+	@Qualifier("graduationApiClient")
+	WebClient graduationApiClient;
+
+	@MockBean
+	@Qualifier("gradEducStudentApiClient")
+	WebClient gradEducStudentApiClient;
 
 	@TestConfiguration
 	static class TestConfig {
@@ -82,7 +87,8 @@ public class GradAlgorithmServiceTest {
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
 
-		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode), GraduationData.class)).thenThrow(new RuntimeException("Test - API is down"));
+		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode),
+				GraduationData.class, graduationApiClient)).thenThrow(new RuntimeException("Test - API is down"));
 		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,exception);
 		assertNull(res);
 
@@ -92,7 +98,6 @@ public class GradAlgorithmServiceTest {
 	
 	@Test
 	public void testRunGradAlgorithm() {
-		String pen = "12312123123";
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
 
@@ -111,16 +116,15 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode), GraduationData.class)).thenReturn(graduationDataStatus);
+		when(this.restService.get(String.format(constants.getGradAlgorithmEndpoint(),studentID,programCode),
+				GraduationData.class, graduationApiClient)).thenReturn(graduationDataStatus);
         
 		GraduationData res = gradAlgorithmService.runGradAlgorithm(studentID, programCode,exception);
 		assertNotNull(res);
-       
 	}
 	
 	@Test
 	public void testRunProjectedGradAlgorithm() {
-		String pen = "12312123123";
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
 
@@ -140,7 +144,8 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 		
-		when(this.restService.get(String.format(constants.getGradProjectedAlgorithmEndpoint(),studentID,programCode, true), GraduationData.class)).thenReturn(graduationDataStatus);
+		when(this.restService.get(String.format(constants.getGradProjectedAlgorithmEndpoint(),studentID,programCode, true),
+				GraduationData.class, graduationApiClient)).thenReturn(graduationDataStatus);
 
 		GraduationData res = gradAlgorithmService.runProjectedAlgorithm(studentID, programCode);
 		assertNotNull(res);       
@@ -148,10 +153,8 @@ public class GradAlgorithmServiceTest {
 
 	@Test
 	public void testRunHypotheticalGradAlgorithm() {
-		String pen = "12312123123";
 		UUID studentID = new UUID(1, 1);
 		String programCode="2018-EN";
-		String accessToken = "accessToken";
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
@@ -169,10 +172,10 @@ public class GradAlgorithmServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setStudentCourses(null);
 
-		when(this.restService.get(String.format(constants.getGradHypotheticalAlgorithmEndpoint(),studentID,programCode, "2023"), GraduationData.class)).thenReturn(graduationDataStatus);
+		when(this.restService.get(String.format(constants.getGradHypotheticalAlgorithmEndpoint(),studentID,programCode, "2023"),
+				GraduationData.class, graduationApiClient)).thenReturn(graduationDataStatus);
 
 		GraduationData res = gradAlgorithmService.runHypotheticalGraduatedAlgorithm(studentID, programCode, "2023");
 		assertNotNull(res);
 	}
-		
 }

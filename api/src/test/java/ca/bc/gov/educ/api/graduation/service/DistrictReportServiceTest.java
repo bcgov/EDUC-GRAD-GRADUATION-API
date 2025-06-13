@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -41,14 +43,14 @@ class DistrictReportServiceTest extends BaseServiceTest {
   @Mock
   private DistrictService districtService;
 
-  @Mock
-  private WebClient webClient;
+  @MockBean(name = "graduationApiClient")
+  @Qualifier("graduationApiClient")
+  WebClient graduationApiClient;
 
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
   }
-
 
   @Test
   void createAndStoreDistrictYearEndReports() {
@@ -62,10 +64,9 @@ class DistrictReportServiceTest extends BaseServiceTest {
         }
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
-    when(restService.post(any(), any(), any())).thenReturn(new byte[0]);
+    when(restService.post(any(), any(), any(), any())).thenReturn(new byte[0]);
 
     int result = districtReportService.createAndStoreDistrictYearEndReports();
-
     assertEquals(1, result);
   }
 
@@ -81,10 +82,9 @@ class DistrictReportServiceTest extends BaseServiceTest {
         }
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
-    when(restService.post(any(), any(), any())).thenReturn(new byte[0]);
+    when(restService.post(any(), any(), any(), any())).thenReturn(new byte[0]);
 
     int result = districtReportService.createAndStoreDistrictReportMonth();
-
     assertEquals(1, result);
   }
 
@@ -100,10 +100,9 @@ class DistrictReportServiceTest extends BaseServiceTest {
         }
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
-    when(restService.post(any(), any(), any())).thenReturn(new byte[0]);
+    when(restService.post(any(), any(), any(), any())).thenReturn(new byte[0]);
 
     int result = districtReportService.createAndStoreDistrictNonGradYearEndReport();
-
     assertEquals(1, result);
   }
 
@@ -112,12 +111,10 @@ class DistrictReportServiceTest extends BaseServiceTest {
     District district = createDistrict();
     district.setContacts(List.of(createDistrictContact(UUID.fromString(district.getDistrictId()))));
     district.setAddresses(List.of(createDistrictAddress(UUID.fromString(district.getDistrictId()))));
-    when(restService.post(any(), any(), any())).thenReturn(new byte[0]);
+    when(restService.post(any(), any(), any(), any())).thenReturn(new byte[0]);
 
     int result = districtReportService.createAndStoreDistrictLabelsReportsFromDistricts(ReportTypeCodes.ADDRESS_LABEL_YE.getCode(), List.of(district), null);
-
     assertEquals(1, result);
-
   }
 
   @Test
@@ -128,7 +125,7 @@ class DistrictReportServiceTest extends BaseServiceTest {
     school.setName("Test School Name");
     school.setSchoolId(UUID.randomUUID().toString());
     byte[] mockPdfBytes = Files.readAllBytes(Paths.get("src/test/resources/data/sample.pdf"));
-    when(restService.post(any(), any(), any())).thenReturn(mockPdfBytes);
+    when(restService.post(any(), any(), any(), any())).thenReturn(mockPdfBytes);
     int result = districtReportService.createAndStoreDistrictLabelsReportsFromSchools(ReportTypeCodes.ADDRESS_LABEL_SCH_YE.getCode(), UUID.fromString(district.getDistrictId()), List.of(school));
     assertEquals(1, result);
   }
@@ -146,13 +143,13 @@ class DistrictReportServiceTest extends BaseServiceTest {
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
     byte[] mockPdfBytes = Files.readAllBytes(Paths.get("src/test/resources/data/sample.pdf"));
-    when(restService.post(any(), any(), any())).thenReturn(mockPdfBytes);
+    when(restService.post(any(), any(), any(), any())).thenReturn(mockPdfBytes);
 
     byte[] result = districtReportService.getDistrictYearEndReports();
 
     assertNotNull(result);
     verify(reportService, times(1)).getStudentsForSchoolYearEndReport();
-    verify(restService, atLeastOnce()).post(any(), any(), any());
+    verify(restService, atLeastOnce()).post(any(), any(), any(), any());
   }
 
   @Test
@@ -168,13 +165,13 @@ class DistrictReportServiceTest extends BaseServiceTest {
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
     byte[] mockPdfBytes = Files.readAllBytes(Paths.get("src/test/resources/data/sample.pdf"));
-    when(restService.post(any(), any(), any())).thenReturn(mockPdfBytes);
+    when(restService.post(any(), any(), any(), any())).thenReturn(mockPdfBytes);
 
     byte[] result = districtReportService.getDistrictYearEndNonGradReports();
 
     assertNotNull(result);
     verify(reportService, times(1)).getStudentsForSchoolNonGradYearEndReport();
-    verify(restService, atLeastOnce()).post(any(), any(), any());
+    verify(restService, atLeastOnce()).post(any(), any(), any(), any());
   }
 
   @Test
@@ -190,12 +187,12 @@ class DistrictReportServiceTest extends BaseServiceTest {
     );
     when(districtService.getDistrictDetails(any(UUID.class))).thenReturn(district);
     byte[] mockPdfBytes = Files.readAllBytes(Paths.get("src/test/resources/data/sample.pdf"));
-    when(restService.post(any(), any(), any())).thenReturn(mockPdfBytes);
+    when(restService.post(any(), any(), any(), any())).thenReturn(mockPdfBytes);
 
     byte[] result = districtReportService.getDistrictReports();
 
     assertNotNull(result);
     verify(reportService, times(1)).getStudentsForSchoolReport();
-    verify(restService, atLeastOnce()).post(any(), any(), any());
+    verify(restService, atLeastOnce()).post(any(), any(), any(), any());
   }
 }

@@ -1,0 +1,21 @@
+meta {
+  name: School Report Generation -PDF- by SchoolIds
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/school/pdf
+  body: json
+  auth: none
+}
+
+params:query {
+  type: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}

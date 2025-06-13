@@ -13,7 +13,6 @@ import java.util.List;
 
 public class BaseReportService {
 
-
   protected String getEncodedPdfFromBytes(byte[] bytesSAR) {
     byte[] encoded = Base64.encodeBase64(bytesSAR);
     return new String(encoded, StandardCharsets.US_ASCII);
