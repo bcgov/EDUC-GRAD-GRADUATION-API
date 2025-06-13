@@ -48,6 +48,6 @@
       "serviceAccountsEnabled": true,
       "standardFlowEnabled": false,
       "directAccessGrantsEnabled": false
-    }
+    },
   }
 ]
