@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.graduation.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -14,11 +13,11 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
+@Slf4j
 public class EducGraduationApiUtils {
 
 	private EducGraduationApiUtils() {}
 
-	private static final Logger logger = LoggerFactory.getLogger(EducGraduationApiUtils.class);
 	private static final String ERROR_MSG  = "Error {}";
 
 	public static String formatDate(Date date) {
@@ -114,7 +113,7 @@ public class EducGraduationApiUtils {
 		try {
 			return myFormat.format(fromUser.parse(updatedTimestamp));
 		} catch (ParseException e) {
-			logger.debug(ERROR_MSG,e.getLocalizedMessage());
+			log.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return updatedTimestamp;
 
@@ -126,7 +125,7 @@ public class EducGraduationApiUtils {
 		try {
 			return myFormat.format(fromUser.parse(updatedTimestamp));
 		} catch (ParseException e) {
-			logger.debug(ERROR_MSG,e.getLocalizedMessage());
+			log.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return updatedTimestamp;
 
@@ -138,7 +137,7 @@ public class EducGraduationApiUtils {
 		try {
 			return new SimpleDateFormat(EducGraduationApiConstants.DEFAULT_DATE_FORMAT).parse(myFormat.format(fromUser.parse(updatedTimestamp)));
 		} catch (ParseException e) {
-			logger.debug(ERROR_MSG,e.getLocalizedMessage());
+			log.debug(ERROR_MSG,e.getLocalizedMessage());
 		}
 		return null;
 	}

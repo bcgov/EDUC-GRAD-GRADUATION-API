@@ -19,8 +19,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -44,23 +46,33 @@ public class ReportService {
     OptionalProgramService optionalProgramService;
     RESTService restService;
     ModelMapper modelMapper;
+    WebClient graduationApiClient;
+    WebClient educStudentApiClient;
 
     @Autowired
-    public ReportService(JsonTransformer jsonTransformer, EducGraduationApiConstants educGraduationApiConstants, SchoolService schoolService, OptionalProgramService optionalProgramService, RESTService restService) {
+    public ReportService(JsonTransformer jsonTransformer, EducGraduationApiConstants educGraduationApiConstants,
+                         SchoolService schoolService, OptionalProgramService optionalProgramService, RESTService restService,
+                         @Qualifier("graduationApiClient") WebClient graduationApiClient,
+                         @Qualifier("gradEducStudentApiClient") WebClient educStudentApiClient) {
         this.jsonTransformer = jsonTransformer;
         this.educGraduationApiConstants = educGraduationApiConstants;
         this.schoolService = schoolService;
         this.optionalProgramService = optionalProgramService;
         this.restService = restService;
         this.modelMapper = new ModelMapper();
+        this.graduationApiClient = graduationApiClient;
+        this.educStudentApiClient = educStudentApiClient;
     }
 
-    public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, ExceptionMessage exception) {
+    public ProgramCertificateTranscript getTranscript(GraduationStudentRecord gradResponse,
+                                                      ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,
+                                                      ExceptionMessage exception) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradResponse.getProgram());
         req.setSchoolCategoryCode(getSchoolCategoryCode(getSchoolOfRecordId(gradResponse, graduationDataStatus)));
         try {
-            return restService.post(educGraduationApiConstants.getTranscript(), req, ProgramCertificateTranscript.class);
+            return restService.post(educGraduationApiConstants.getTranscript(), req, ProgramCertificateTranscript.class,
+                    graduationApiClient);
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
@@ -78,7 +90,7 @@ public class ReportService {
         }
         req.setSchoolCategoryCode(getSchoolCategoryCode(getSchoolAtGradId(gradResponse, graduationDataStatus)));
         try {
-            var response = restService.post(educGraduationApiConstants.getCertList(), req, List.class);
+            var response = restService.post(educGraduationApiConstants.getCertList(), req, List.class, graduationApiClient);
             return jsonTransformer.convertValue(response, new TypeReference<List<ProgramCertificateTranscript>>() {});
         } catch (Exception e) {
             exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
@@ -101,41 +113,45 @@ public class ReportService {
 
     public String getSchoolCategoryCode(UUID schoolId) {
         if (schoolId == null) return null;
-        SchoolClob school = this.restService.get(String.format(educGraduationApiConstants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class);
+        SchoolClob school = this.restService.get(String.format(educGraduationApiConstants.getSchoolClobBySchoolIdUrl(), schoolId),
+                SchoolClob.class, graduationApiClient);
         return (school == null) ? null : school.getSchoolCategoryLegacyCode();
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport() {
-        var response = restService.get(educGraduationApiConstants.getSchoolYearEndStudents(), List.class);
+        var response = restService.get(educGraduationApiConstants.getSchoolYearEndStudents(), List.class, graduationApiClient);
         return jsonTransformer.convertValue(response, new TypeReference<>() {
         });
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolYearEndReport(YearEndReportRequest yearEndReportRequest) {
-        var response = restService.post(educGraduationApiConstants.getSchoolYearEndStudents(), yearEndReportRequest, List.class);
+        var response = restService.post(educGraduationApiConstants.getSchoolYearEndStudents(), yearEndReportRequest,
+                List.class, graduationApiClient);
         return jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport() {
-        var response = restService.get(educGraduationApiConstants.getStudentNonGradReportData(), List.class);
+        var response = restService.get(educGraduationApiConstants.getStudentNonGradReportData(), List.class, graduationApiClient);
         List<ReportGradStudentData> result = jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
         filterCredentialsNonGradYearEndReport(result);
         return result;
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolNonGradYearEndReport(UUID schoolId) {
-        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataSchoolId(), schoolId), List.class);
+        var response = restService.get(String.format(educGraduationApiConstants.getStudentNonGradReportDataSchoolId(), schoolId),
+                List.class, graduationApiClient);
         List<ReportGradStudentData> result = jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
         filterCredentialsNonGradYearEndReport(result);
         return result;
     }
 
     public List<ReportGradStudentData> getStudentsForSchoolReport() {
-        var response = restService.get(educGraduationApiConstants.getSchoolStudents(), List.class);
+        var response = restService.get(educGraduationApiConstants.getSchoolStudents(), List.class, graduationApiClient);
         return jsonTransformer.convertValue(response, new TypeReference<List<ReportGradStudentData>>(){});
     }
 
-    public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, GraduationStudentRecord gradResponse, boolean xml, ExceptionMessage exception) {
+    public ReportData prepareTranscriptData(ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus,
+                                            GraduationStudentRecord gradResponse, boolean xml, ExceptionMessage exception) {
         try {
             SchoolClob schoolClob = graduationDataStatus.getSchool();
             if (schoolClob == null || StringUtils.isBlank(graduationDataStatus.getSchool().getSchoolId())) {
@@ -145,14 +161,6 @@ public class ReportService {
 
             School schoolAtGrad = getSchoolAtGradData(graduationDataStatus);
             School schoolOfRecord = getSchoolData(graduationDataStatus.getSchool());
-            //--> Revert code back to school of record GRAD2-2758
-            /**
-            SchoolTrax traxSchool = null;
-            if(schoolAtGrad != null) {
-                String mincode = schoolAtGrad.getMincode();
-                traxSchool = schoolService.getTraxSchoolDetails(mincode, exception);
-            } **/
-            //<--
             GraduationStatus graduationStatus = getGraduationStatus(graduationDataStatus, schoolAtGrad, schoolOfRecord);
             GraduationData graduationData = getGraduationData(graduationDataStatus, gradResponse);
             graduationStatus.setProgramCompletionDate(EducGraduationApiUtils.getSimpleDateFormat(graduationData.getGraduationDate()));
@@ -230,7 +238,8 @@ public class ReportService {
 
     @Generated
     private GradSearchStudent getStudentByPenFromStudentApi(String pen) {
-        var response = restService.get(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(), pen), List.class);
+        var response = restService.get(String.format(educGraduationApiConstants.getPenStudentApiByPenUrl(), pen),
+                List.class, educStudentApiClient);
         List<GradSearchStudent> stuDataList = jsonTransformer.convertValue(response, new TypeReference<List<GradSearchStudent>>(){});
         if (stuDataList != null && !stuDataList.isEmpty()) {
             return stuDataList.get(0);
@@ -241,13 +250,16 @@ public class ReportService {
 
     @Generated
     private GradSearchStudent getStudentByStudentIDFromStudentApi(UUID studentID) {
-        return restService.get(String.format(educGraduationApiConstants.getPenStudentApiByStudentIdUrl(), studentID), GradSearchStudent.class);
+        return restService.get(String.format(educGraduationApiConstants.getPenStudentApiByStudentIdUrl(), studentID),
+                GradSearchStudent.class, educStudentApiClient);
     }
 
 
     @Generated
     private GraduationStudentRecord getGradStatusFromGradStudentApi(String studentID) {
-        GraduationStudentRecord graduationStudentRecord = restService.get(String.format(educGraduationApiConstants.getReadGradStudentRecord(), studentID), GraduationStudentRecord.class);
+        GraduationStudentRecord graduationStudentRecord = restService
+                .get(String.format(educGraduationApiConstants.getReadGradStudentRecord(), studentID),
+                        GraduationStudentRecord.class, graduationApiClient);
         if (graduationStudentRecord != null) {
             return graduationStudentRecord;
         }
@@ -256,7 +268,8 @@ public class ReportService {
     }
 
     @Generated
-    private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons, boolean xml, boolean applyFilters) {
+    private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<ca.bc.gov.educ.api.graduation.model.dto.GradRequirement> nonGradReasons,
+                                                  boolean xml, boolean applyFilters) {
         List<NonGradReason> nList = new ArrayList<>();
         if (nonGradReasons != null) {
             Map<String, String> traxReqCodes = new HashMap<>();
@@ -540,13 +553,13 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).toList();
                 if (!provinciallyExaminable.isEmpty()) {
                     sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
+                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).toList();
                 if (!nonExaminable.isEmpty()) {
                     sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
@@ -612,7 +625,8 @@ public class ReportService {
     @Generated
     private String getSpecialCase(StudentAssessment sA) {
         String finalPercent;
-        SpecialCase spC = restService.get(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase()), SpecialCase.class);
+        SpecialCase spC = restService.get(String.format(educGraduationApiConstants.getSpecialCase(), sA.getSpecialCase()),
+                SpecialCase.class, graduationApiClient);
         finalPercent = spC != null ? spC.getLabel() : "";
 
         if(sA.getExceededWriteFlag() != null && StringUtils.isNotBlank(sA.getExceededWriteFlag().trim()) && sA.getExceededWriteFlag().compareTo("Y")==0) {
@@ -705,7 +719,9 @@ public class ReportService {
         GradProgram gPgm = new GradProgram();
         Code code = new Code();
         if (graduationDataStatus.getGradStatus().getProgram() != null) {
-            GraduationProgramCode gradProgram = restService.get(String.format(educGraduationApiConstants.getProgramNameEndpoint(), graduationDataStatus.getGradStatus().getProgram()), GraduationProgramCode.class);
+            GraduationProgramCode gradProgram = restService
+                    .get(String.format(educGraduationApiConstants.getProgramNameEndpoint(), graduationDataStatus.getGradStatus().getProgram()),
+                            GraduationProgramCode.class, graduationApiClient);
             if (gradProgram != null) {
                 code.setDescription(gradProgram.getProgramName());
                 code.setName(gradProgram.getProgramName());
@@ -718,7 +734,7 @@ public class ReportService {
     }
 
     private List<ProgramRequirementCode> getAllProgramRequirementCodeList() {
-        var response = this.restService.get(educGraduationApiConstants.getProgramRequirementsEndpoint(), List.class);
+        var response = this.restService.get(educGraduationApiConstants.getProgramRequirementsEndpoint(), List.class, graduationApiClient);
         return jsonTransformer.convertValue(response, new TypeReference<List<ProgramRequirementCode>>(){});
     }
 
@@ -823,11 +839,11 @@ public class ReportService {
         List<StudentCourse> studentExamList = sCList
                 .stream()
                 .filter(sc -> "Y".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentCourse> studentCourseList = sCList
                 .stream()
                 .filter(sc -> "N".compareTo(sc.getProvExamCourse()) == 0)
-                .collect(Collectors.toList());
+                .toList();
         List<StudentAssessment> studentAssessmentList = graduationDataStatus.getStudentAssessments().getStudentAssessmentList();
         List<AchievementCourse> sCourseList = new ArrayList<>();
         List<Exam> sExamList = new ArrayList<>();
@@ -937,7 +953,8 @@ public class ReportService {
                 requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
             try {
-                restService.post(String.format(educGraduationApiConstants.getUpdateGradStudentTranscript(), isGraduated), requestObj, GradStudentReports.class);
+                restService.post(String.format(educGraduationApiConstants.getUpdateGradStudentTranscript(), isGraduated),
+                        requestObj, GradStudentReports.class, graduationApiClient);
             } catch (Exception e) {
                 if (exception.getExceptionName() == null) {
                     exception.setExceptionName(GRAD_GRADUATION_REPORT_API_DOWN);
@@ -956,7 +973,8 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(sample);
         try {
-            byte[] bytes = restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class);
+            byte[] bytes = restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams,
+                    byte[].class, graduationApiClient);
             return getEncodedStringFromBytes(bytes);
         } catch (ServiceException ex) {
             exception.setExceptionName(GRAD_REPORT_API_DOWN);
@@ -1063,9 +1081,9 @@ public class ReportService {
             requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
             requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
             requestObj.setOverwrite(isOverwrite);
-            restService.post(educGraduationApiConstants.getUpdateGradStudentCertificate(), requestObj, GradStudentCertificates.class);
+            restService.post(educGraduationApiConstants.getUpdateGradStudentCertificate(), requestObj,
+                    GradStudentCertificates.class, graduationApiClient);
         }
-
     }
 
     private Certificate getCertificateData(GraduationStudentRecord gradResponse, ProgramCertificateTranscript certData) {
@@ -1093,7 +1111,8 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(sample);
         try {
-            byte[] bytesSAR = restService.post(educGraduationApiConstants.getCertificateReport(), reportParams, byte[].class);
+            byte[] bytesSAR = restService.post(educGraduationApiConstants.getCertificateReport(),
+                    reportParams, byte[].class, graduationApiClient);
             return getEncodedStringFromBytes(bytesSAR);
         } catch (ServiceException ex) {
             boolean noContent = HttpStatus.NO_CONTENT.value() == ex.getStatusCode();
@@ -1112,7 +1131,8 @@ public class ReportService {
         reportParams.setOptions(options);
         reportParams.setData(data);
         try {
-            byte[] bytesSAR = restService.post(educGraduationApiConstants.getAchievementReport(), reportParams, byte[].class);
+            byte[] bytesSAR = restService.post(educGraduationApiConstants.getAchievementReport(),
+                    reportParams, byte[].class, graduationApiClient);
             return getEncodedStringFromBytes(bytesSAR);
         } catch (ServiceException ex) {
             boolean noContent = HttpStatus.NO_CONTENT.value() == ex.getStatusCode();
@@ -1256,7 +1276,8 @@ public class ReportService {
             requestObj.setDocumentStatusCode("IP");
             if (isGraduated)
                 requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
-            restService.post(String.format(educGraduationApiConstants.getUpdateGradStudentReport(), isGraduated), requestObj, GradStudentReports.class);
+            restService.post(String.format(educGraduationApiConstants.getUpdateGradStudentReport(), isGraduated),
+                    requestObj, GradStudentReports.class, graduationApiClient);
         }
         return exception;
     }

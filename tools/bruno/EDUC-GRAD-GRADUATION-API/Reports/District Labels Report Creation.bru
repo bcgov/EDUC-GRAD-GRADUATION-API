@@ -1,0 +1,74 @@
+meta {
+  name: District Labels Report Creation
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/district/labels
+  body: json
+  auth: none
+}
+
+params:query {
+  reportType: 
+}
+
+body:json {
+  [
+    {
+      "createUser": "",
+      "createDate": "",
+      "updateUser": "",
+      "updateDate": "",
+      "districtId": "",
+      "districtNumber": "",
+      "faxNumber": "",
+      "phoneNumber": "",
+      "email": "",
+      "website": "",
+      "displayName": "",
+      "districtRegionCode": "",
+      "districtStatusCode": "",
+      "contacts": [
+        {
+          "createUser": "",
+          "createDate": "",
+          "updateUser": "",
+          "updateDate": "",
+          "districtContactId": "",
+          "districtId": "",
+          "districtContactTypeCode": "",
+          "phoneNumber": "",
+          "jobTitle": "",
+          "phoneExtension": "",
+          "alternatePhoneNumber": "",
+          "alternatePhoneExtension": "",
+          "email": "",
+          "firstName": "",
+          "lastName": "",
+          "effectiveDate": "",
+          "expiryDate": ""
+        }
+      ],
+      "addresses": [
+        {
+          "createUser": "",
+          "createDate": "",
+          "updateUser": "",
+          "updateDate": "",
+          "districtAddressId": "",
+          "districtId": "",
+          "addressTypeCode": "",
+          "addressLine1": "",
+          "addressLine2": "",
+          "city": "",
+          "postal": "",
+          "provinceCode": "",
+          "countryCode": ""
+        }
+      ],
+      "districtName": ""
+    }
+  ]
+}

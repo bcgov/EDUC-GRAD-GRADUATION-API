@@ -6,10 +6,10 @@ import ca.bc.gov.educ.api.graduation.model.dto.SchoolReports;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,10 +21,9 @@ import java.util.*;
 import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_AT_GRAD;
 import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_OF_RECORD;
 
+@Slf4j
 @Service
 public class SchoolReportsService extends BaseReportService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SchoolReportsService.class);
 
     public static final String DISTREP_YE_SC = "DISTREP_YE_SC";
     public static final String DISTREP_YE_SD = "DISTREP_YE_SD";
@@ -39,8 +38,7 @@ public class SchoolReportsService extends BaseReportService {
     private static final String SCHOOL_DISTRICT_REPORTS_CREATED = "***** {} of School Districts Reports Created *****";
     private static final String SCHOOL_LABEL_REPORTS_CREATED = "***** {} of School Labels Reports Created *****";
 
-
-    WebClient webClient;
+    WebClient graduationApiClient;
     ReportService reportService;
     SchoolService schoolService;
     DistrictReportService districtReportService;
@@ -50,8 +48,10 @@ public class SchoolReportsService extends BaseReportService {
     JsonTransformer jsonTransformer;
 
     @Autowired
-    public SchoolReportsService(WebClient webClient, ReportService reportService, SchoolService schoolService, TokenUtils tokenUtils, EducGraduationApiConstants educGraduationApiConstants, RESTService restService, JsonTransformer jsonTransformer, DistrictReportService districtReportService) {
-        this.webClient = webClient;
+    public SchoolReportsService(@Qualifier("graduationApiClient") WebClient graduationApiClient, ReportService reportService, SchoolService schoolService, TokenUtils tokenUtils,
+                                EducGraduationApiConstants educGraduationApiConstants, RESTService restService,
+                                JsonTransformer jsonTransformer, DistrictReportService districtReportService) {
+        this.graduationApiClient = graduationApiClient;
         this.reportService = reportService;
         this.schoolService = schoolService;
         this.tokenUtils = tokenUtils;
@@ -103,9 +103,9 @@ public class SchoolReportsService extends BaseReportService {
 
     @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String slrt, String drt, String srt) {
-        logger.debug("***** Get Students for School Year End Reports Starts *****");
+        log.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport();
-        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        log.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         return createAndStoreReports(reportGradStudentDataList, slrt, drt, srt, null);
     }
 
@@ -113,37 +113,37 @@ public class SchoolReportsService extends BaseReportService {
         int schoolLabelsCount = 0;
         if(StringUtils.isNotBlank(slrt)) {
             schoolLabelsCount += createAndStoreSchoolLabelsReports(slrt, reportGradStudentDataList, pdfs);
-            logger.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
+            log.debug(SCHOOL_LABEL_REPORTS_CREATED, schoolLabelsCount);
         }
         int districtReportsCount = 0;
         if(StringUtils.isNotBlank(drt)) {
             districtReportsCount += districtReportService.createAndStoreDistrictReports(drt, reportGradStudentDataList, pdfs);
-            logger.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
+            log.debug(SCHOOL_DISTRICT_REPORTS_CREATED, districtReportsCount);
         }
         int schoolReportsCount = 0;
         if(StringUtils.isNotBlank(srt)) {
             schoolReportsCount += createAndStoreSchoolReports(srt, reportGradStudentDataList, pdfs);
-            logger.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
+            log.debug(SCHOOL_REPORTS_CREATED, schoolReportsCount);
         }
         return schoolLabelsCount + districtReportsCount + schoolReportsCount;
     }
 
     @Generated
     public Integer createAndStoreSchoolDistrictYearEndReports(String slrt, String drt, String srt, YearEndReportRequest yearEndReportRequest) {
-        logger.debug("***** Get Students for School Year End Reports Starts *****");
+        log.debug("***** Get Students for School Year End Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolYearEndReport(yearEndReportRequest);
-        logger.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
+        log.debug("***** {} Students Retrieved *****", reportGradStudentDataList.size());
         return createAndStoreReports(reportGradStudentDataList, slrt, drt, srt, null);
     }
 
     @Generated
     public Integer createAndStoreSchoolDistrictReports(List<ReportGradStudentData> reportGradStudentDataList, String slrt, String drt, String srt) {
-        logger.debug("***** Get Students for School Monthly Reports Starts *****");
+        log.debug("***** Get Students for School Monthly Reports Starts *****");
         return createAndStoreReports(reportGradStudentDataList, slrt, drt, srt, null);
     }
 
     public Integer createAndStoreSchoolDistrictReports(String slrt, String drt, String srt) {
-        logger.debug("***** Get Students for School Monthly Reports Starts *****");
+        log.debug("***** Get Students for School Monthly Reports Starts *****");
         List<ReportGradStudentData> reportGradStudentDataList = reportService.getStudentsForSchoolReport();
         return createAndStoreSchoolDistrictReports(reportGradStudentDataList, slrt, drt, srt);
     }
@@ -371,7 +371,7 @@ public class SchoolReportsService extends BaseReportService {
         String paperType = reportGradStudentData.getPaperType();
         String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
         String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
-        logger.debug("Processing school {} transcript {} for student {} and paper type {}", reportGradStudentData.getMincode(), transcriptTypeCode, reportGradStudentData.getPen(), paperType);
+        log.debug("Processing school {} transcript {} for student {} and paper type {}", reportGradStudentData.getMincode(), transcriptTypeCode, reportGradStudentData.getPen(), paperType);
         if("YED4".equalsIgnoreCase(paperType) || StringUtils.isBlank(certificateTypeCode)) {
             return populateStudentObjectByReportGradStudentData(reportGradStudentData);
         }
@@ -412,16 +412,15 @@ public class SchoolReportsService extends BaseReportService {
 
     private void updateSchoolReport(SchoolReports requestObj) {
         this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
-                requestObj,
-                SchoolReports.class);
+                requestObj, SchoolReports.class, graduationApiClient);
     }
 
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest) {
-        return restService.post(educGraduationApiConstants.getSchoolDistributionYearEnd(), reportRequest, byte[].class);
+        return restService.post(educGraduationApiConstants.getSchoolDistributionYearEnd(), reportRequest, byte[].class, graduationApiClient);
     }
 
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest) {
-        return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class);
+        return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class, graduationApiClient);
     }
 
     private SchoolReports getSchoolReports(UUID schoolId, String encodedPdf, String reportType) {

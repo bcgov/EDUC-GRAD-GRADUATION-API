@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,7 +21,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -49,9 +49,14 @@ public class GradStatusServiceTest {
 	RESTService restService;
 
 	@MockBean
-	WebClient webClient;
+	@Qualifier("graduationApiClient")
+	WebClient graduationApiClient;
 
-    @Autowired
+	@MockBean
+	@Qualifier("gradEducStudentApiClient")
+	WebClient gradEducStudentApiClient;
+
+	@Autowired
     private EducGraduationApiConstants constants;
 	
     @Before
@@ -69,7 +74,8 @@ public class GradStatusServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		exception = new ExceptionMessage();
 
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),studentID), GraduationStudentRecord.class)).thenThrow(new RuntimeException("Test - API is down"));
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),studentID),
+				GraduationStudentRecord.class, graduationApiClient)).thenThrow(new RuntimeException("Test - API is down"));
 
 		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID,exception);
 		assertNull(res);
@@ -86,12 +92,12 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(), studentID), GraduationStudentRecord.class)).thenReturn(gradResponse);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(), studentID),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(gradResponse);
 		
 		GraduationStudentRecord res = gradStatusService.getGradStatus(studentID, exception);
 		assertNotNull(res);
 		assertEquals(res.getPen(), gradResponse.getPen());
-       
 	}
 
 	@Test
@@ -133,13 +139,11 @@ public class GradStatusServiceTest {
 
 		gradStatusService.prepareGraduationStatusData(gradResponse, graduationDataStatus);
 		assertNotNull(gradResponse.getStudentGradData());
-
 	}
 
 	@Test
 	public void testSaveStudentGradStatus_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
@@ -148,7 +152,8 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
-		when(this.restService.post(String.format(constants.getUpdateGradStatus(),studentID), gradResponse, GraduationStudentRecord.class)).thenThrow(new RuntimeException("Test - API is down"));
+		when(this.restService.post(String.format(constants.getUpdateGradStatus(),studentID), gradResponse,
+				GraduationStudentRecord.class, graduationApiClient)).thenThrow(new RuntimeException("Test - API is down"));
 		
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID, null,gradResponse,exception);
 		assertNotNull(res);
@@ -165,7 +170,8 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
 
-		when(this.restService.post(String.format(constants.getUpdateGradStatus(), studentID, null), gradResponse, GraduationStudentRecord.class)).thenReturn(gradResponse);
+		when(this.restService.post(String.format(constants.getUpdateGradStatus(), studentID, null), gradResponse,
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(gradResponse);
 
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID,null,gradResponse,exception);
 		assertNotNull(res);
@@ -186,7 +192,8 @@ public class GradStatusServiceTest {
 
 		String url = constants.getUpdateGradStatus() + "?batchId=%s";
 
-		when(this.restService.post(String.format(url, studentID,batchId), gradResponse, GraduationStudentRecord.class)).thenReturn(gradResponse);
+		when(this.restService.post(String.format(url, studentID,batchId), gradResponse, GraduationStudentRecord.class, graduationApiClient))
+				.thenReturn(gradResponse);
 
 		GraduationStudentRecord res = gradStatusService.saveStudentGradStatus(studentID,batchId,gradResponse,exception);
 		assertNotNull(res);
@@ -236,7 +243,8 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentStatus("D");
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).nonGradReasons(new ArrayList<>()).build();
 
-		when(this.restService.post(String.format(constants.getSaveStudentRecordProjectedRun(), studentID), projectedRunClob, GraduationStudentRecord.class)).thenReturn(gradResponse);
+		when(this.restService.post(String.format(constants.getSaveStudentRecordProjectedRun(), studentID), projectedRunClob,
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(gradResponse);
 
 		GraduationStudentRecord res = gradStatusService.saveStudentRecordProjectedRun(projectedRunClob,studentID,null, exception);
 		assertNotNull(res);
@@ -256,9 +264,10 @@ public class GradStatusServiceTest {
 		gradResponse.setStudentStatus("D");
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).nonGradReasons(new ArrayList<>()).build();
 
-		String url = constants.getSaveStudentRecordProjectedRun() + "?batchId=%s";;
+		String url = constants.getSaveStudentRecordProjectedRun() + "?batchId=%s";
 
-		when(this.restService.post(String.format(url, studentID, batchId), projectedRunClob, GraduationStudentRecord.class)).thenReturn(gradResponse);
+		when(this.restService.post(String.format(url, studentID, batchId), projectedRunClob,
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(gradResponse);
 
 		GraduationStudentRecord res = gradStatusService.saveStudentRecordProjectedRun(projectedRunClob,studentID,batchId,exception);
 		assertNotNull(res);
@@ -275,12 +284,13 @@ public class GradStatusServiceTest {
 		gradResponse.setSchoolOfRecord("06011033");
 		gradResponse.setStudentGrade("11");
 		gradResponse.setStudentStatus("D");
-		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder().graduated(true).nonGradReasons(new ArrayList<>()).build();
 
-		when(this.restService.post(String.format(constants.getSaveStudentRecordProjectedRun(), studentID), projectedRunClob, GraduationStudentRecord.class)).thenThrow(new RuntimeException("Unexpected Error!"));
+		when(this.restService.post(String.format(constants.getSaveStudentRecordProjectedRun(), studentID), projectedRunClob,
+				GraduationStudentRecord.class, graduationApiClient)).thenThrow(new RuntimeException("Unexpected Error!"));
 
-		GraduationStudentRecord res = gradStatusService.saveStudentRecordProjectedRun(projectedRunClob,studentID,null,exception);
+		GraduationStudentRecord res = gradStatusService.saveStudentRecordProjectedRun(projectedRunClob,studentID,null,exceptionMessage);
 		assertNull(res);
 	}
 
@@ -289,7 +299,8 @@ public class GradStatusServiceTest {
 		String studentID = new UUID(1, 1).toString();
 		boolean isGraduated = false;
 
-		when(this.restService.get(String.format(constants.getUpdateGradStatusAlgoError(),studentID,isGraduated), Boolean.class)).thenReturn(false);
+		when(this.restService.get(String.format(constants.getUpdateGradStatusAlgoError(),studentID,isGraduated),
+				Boolean.class, graduationApiClient)).thenReturn(false);
 
 		gradStatusService.restoreStudentGradStatus(studentID, isGraduated);
 		assertThat(isGraduated).isFalse();
@@ -298,10 +309,12 @@ public class GradStatusServiceTest {
 	@Test
 	public void testGetStudentsBySchoolId() {
 		UUID schoolId = UUID.randomUUID();
+		final String TEST_URL_TEMPLATE = "https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/batch/schoolreport/%s";
+		String expectedUrl = String.format(TEST_URL_TEMPLATE, schoolId);
 
 		GraduationStudentRecord gsr = new GraduationStudentRecord();
 		gsr.setLegalLastName("qweqw");
-		when(this.restService.get(any(String.class), any())).thenReturn(List.of(gsr));
+		when(this.restService.get(expectedUrl, List.class, graduationApiClient)).thenReturn(List.of(gsr));
 
 		List<GraduationStudentRecord> res = gradStatusService.getStudentListBySchoolId(schoolId);
 		assertThat(res).isNotEmpty().hasSize(1);

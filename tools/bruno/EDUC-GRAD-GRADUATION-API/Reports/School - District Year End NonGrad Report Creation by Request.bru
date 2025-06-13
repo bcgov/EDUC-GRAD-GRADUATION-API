@@ -1,0 +1,23 @@
+meta {
+  name: School - District Year End NonGrad Report Creation by Request
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/schooldistrictnongradyearend
+  body: json
+  auth: none
+}
+
+params:query {
+  ~slrt: 
+  ~drt: 
+  ~srt: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}

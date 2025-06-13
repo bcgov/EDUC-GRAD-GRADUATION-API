@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public final class LogHelper {
-  JsonTransformer jsonTransformer;
+  static JsonTransformer jsonTransformer;
 
   private static final String EXCEPTION = "Exception ";
 
@@ -56,7 +56,7 @@ public final class LogHelper {
     }
   }
 
-  public void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID,
+  public static void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID,
                                               final List<String> requestSource, final boolean logging) {
     if (!logging) return;
     try {

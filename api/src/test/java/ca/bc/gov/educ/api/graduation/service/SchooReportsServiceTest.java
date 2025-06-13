@@ -11,6 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +43,10 @@ class SchooReportsServiceTest extends BaseServiceTest {
 	@Mock
 	private RESTService restService;
 
+	@MockBean(name = "graduationApiClient")
+	@Qualifier("graduationApiClient")
+	WebClient graduationApiClient;
+
 	@Mock
 	private SchoolService schoolService;
 
@@ -60,7 +67,7 @@ class SchooReportsServiceTest extends BaseServiceTest {
 		Mockito.when(reportService.getStudentsForSchoolYearEndReport()).thenReturn(gradStudentDataList);
 		Mockito.when(reportService.getStudentsForSchoolReport()).thenReturn(gradStudentDataList);
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(restService.post(any(), any(), any())).thenReturn(bytesSAR1);
+		Mockito.when(restService.post(any(), any(), any(), any())).thenReturn(bytesSAR1);
 		ca.bc.gov.educ.api.graduation.model.dto.SchoolClob schoolClob = new ca.bc.gov.educ.api.graduation.model.dto.SchoolClob();
 		schoolClob.setMinCode("12345678");
 		schoolClob.setAddress1("1231");
@@ -83,7 +90,7 @@ class SchooReportsServiceTest extends BaseServiceTest {
 		Mockito.when(reportService.getStudentsForSchoolReport()).thenReturn(gradStudentDataList);
 
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(restService.post(any(), any(), any())).thenReturn(bytesSAR1);
+		Mockito.when(restService.post(any(), any(), any(), any())).thenReturn(bytesSAR1);
 
 		District disttrax = new District();
 		disttrax.setDistrictNumber("005");
@@ -96,7 +103,6 @@ class SchooReportsServiceTest extends BaseServiceTest {
 		schoolClob.setMinCode("12345678");
 		schoolClob.setAddress1("1231");
 
-		when(this.restService.get(any(String.class), any(), any())).thenReturn(traxSchool);
 		when(this.schoolService.getSchoolClob(any(String.class))).thenReturn(schoolClob);
 		when(this.schoolService.getSchoolById(any())).thenReturn(traxSchool);
 		when(this.districtReportService.createAndStoreDistrictReports(any(), any(), any())).thenReturn(1);
@@ -109,7 +115,7 @@ class SchooReportsServiceTest extends BaseServiceTest {
 	void testCreateAndStoreSchoolDistrictYearEndReportsWithRequest() throws Exception {
 		YearEndReportRequest yearEndReportRequest = YearEndReportRequest.builder().schoolIds(List.of(UUID.randomUUID())).districtIds(List.of(UUID.randomUUID())).build();
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(restService.post(any(), any(), any())).thenReturn(bytesSAR1);
+		Mockito.when(restService.post(any(), any(), any(), any())).thenReturn(bytesSAR1);
 
 		Integer reportsCount = schoolReportsService.createAndStoreSchoolDistrictYearEndReports(ADDRESS_LABEL_YE, DISTREP_YE_SD, DISTREP_YE_SC, yearEndReportRequest);
 		assertTrue(reportsCount > 0);
@@ -122,7 +128,7 @@ class SchooReportsServiceTest extends BaseServiceTest {
 		Mockito.when(reportService.getStudentsForSchoolYearEndReport(any())).thenReturn(gradStudentDataList);
 		Mockito.when(reportService.getStudentsForSchoolReport()).thenReturn(gradStudentDataList);
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(restService.post(any(), any(), any())).thenReturn(bytesSAR1);
+		Mockito.when(restService.post(any(), any(), any(), any())).thenReturn(bytesSAR1);
 		ca.bc.gov.educ.api.graduation.model.dto.SchoolClob schoolClob = new ca.bc.gov.educ.api.graduation.model.dto.SchoolClob();
 		schoolClob.setMinCode("12345678");
 		schoolClob.setAddress1("1231");
@@ -142,7 +148,7 @@ class SchooReportsServiceTest extends BaseServiceTest {
 		school.setName("Test School Name");
 		school.setSchoolId(UUID.randomUUID().toString());
 		byte[] bytesSAR1 = readBinaryFile("data/sample.pdf");
-		Mockito.when(restService.post(any(), any(), any())).thenReturn(bytesSAR1);
+		Mockito.when(restService.post(any(), any(), any(), any())).thenReturn(bytesSAR1);
 
 		Integer reportsCount = schoolReportsService.createAndStoreSchoolLabelsReportsFromSchools(ADDRESS_LABEL_PSI, List.of(school), null);
 		assertTrue(reportsCount > 0);

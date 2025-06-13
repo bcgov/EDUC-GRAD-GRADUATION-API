@@ -12,13 +12,13 @@ import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessFactory;
 import ca.bc.gov.educ.api.graduation.process.AlgorithmProcessType;
 import ca.bc.gov.educ.api.graduation.util.*;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,10 +30,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class GraduationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(GraduationService.class);
 
     private static final String GRADREG = "GRADREG";
     private static final String NONGRADREG = "NONGRADREG";
@@ -41,8 +40,7 @@ public class GraduationService {
     private static final String REGALG = "REGALG";
     private static final String TVRRUN = "TVRRUN";
 
-
-    WebClient webClient;
+    WebClient graduationApiClient;
     AlgorithmProcessFactory algorithmProcessFactory;
     GradStatusService gradStatusService;
     SchoolService schoolService;
@@ -53,8 +51,12 @@ public class GraduationService {
     JsonTransformer jsonTransformer;
 
     @Autowired
-    public GraduationService(WebClient webClient, AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService, SchoolService schoolService, ReportService reportService, RESTService restService, EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates, JsonTransformer jsonTransformer) {
-        this.webClient = webClient;
+    public GraduationService(@Qualifier("graduationApiClient") WebClient graduationApiClient,
+                             AlgorithmProcessFactory algorithmProcessFactory, GradStatusService gradStatusService,
+                             SchoolService schoolService, ReportService reportService, RESTService restService,
+                             EducGraduationApiConstants educGraduationApiConstants, SchoolYearDates schoolYearDates,
+                             JsonTransformer jsonTransformer) {
+        this.graduationApiClient = graduationApiClient;
         this.algorithmProcessFactory = algorithmProcessFactory;
         this.gradStatusService = gradStatusService;
         this.schoolService = schoolService;
@@ -69,7 +71,7 @@ public class GraduationService {
 
         ExceptionMessage exception = new ExceptionMessage();
         AlgorithmProcessType pType = AlgorithmProcessType.valueOf(StringUtils.toRootUpperCase(projectedType));
-        logger.debug("\n************* NEW STUDENT:***********************");
+        log.debug("\n************* NEW STUDENT:***********************");
         GraduationStudentRecord gradResponse = gradStatusService.getGradStatus(studentID, exception);
         if (exception.getExceptionName() != null) {
             AlgorithmResponse aR = new AlgorithmResponse();
@@ -77,7 +79,7 @@ public class GraduationService {
             return aR;
         }
         if (gradResponse != null && !gradResponse.getStudentStatus().equals("MER")) {
-            logger.debug("**** Fetched Student Information: {} ****", gradResponse.getStudentID());
+            log.debug("**** Fetched Student Information: {} ****", gradResponse.getStudentID());
             ProcessorData data = new ProcessorData(gradResponse, null, studentID, batchId, exception);
             AlgorithmProcess process = algorithmProcessFactory.createProcess(pType);
             data = process.fire(data);
@@ -139,7 +141,7 @@ public class GraduationService {
         reportParams.setData(reportData);
 
         try {
-            return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class);
+            return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class, graduationApiClient);
         } catch (ServiceException ex) {
             if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
                 return new byte[0];
@@ -181,7 +183,7 @@ public class GraduationService {
                 for (ProgramCertificateTranscript certType : certificateList) {
                     reportService.saveStudentCertificateReportJasper(graduationStudentRecord, graduationData, certType, i == 0 && isOverwrite);
                     i++;
-                    logger.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
+                    log.debug("**** Saved Certificates: {} ****", certType.getCertificateTypeCode());
                 }
             }
         }
@@ -222,7 +224,7 @@ public class GraduationService {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
+                log.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
                         type, schoolDetail != null ? schoolDetail.getMincode() : null, schoolId, e.getLocalizedMessage());
             }
         }
@@ -235,14 +237,14 @@ public class GraduationService {
             ca.bc.gov.educ.api.graduation.model.dto.institute.School schoolDetail = null;
             try {
                 List<GraduationStudentRecord> stdList = gradStatusService.getStudentListBySchoolId(schoolId);
-                if (logger.isDebugEnabled()) {
+                if (log.isDebugEnabled()) {
                     int totalStudents = ObjectUtils.defaultIfNull(stdList.size(), 0);
                     String listOfStudents = jsonTransformer.marshall(stdList);
-                    logger.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
+                    log.debug("*** Student List of {} Acquired {}", totalStudents, listOfStudents);
                 }
                 schoolDetail = schoolService.getSchoolById(schoolId);
                 if (schoolDetail != null) {
-                    logger.debug("*** School Details Acquired {}", schoolDetail.getDisplayName());
+                    log.debug("*** School Details Acquired {}", schoolDetail.getDisplayName());
                     if (stdList != null && !stdList.isEmpty()) {
                         School schoolObj = new School();
                         schoolObj.setSchoolId(schoolDetail.getSchoolId());
@@ -250,20 +252,20 @@ public class GraduationService {
                         schoolObj.setName(schoolDetail.getDisplayName());
                         if (TVRRUN.equalsIgnoreCase(type)) {
                             List<Student> nonGradPrjStudents = processStudentList(filterStudentList(stdList, NONGRADPRJ), type);
-                            logger.debug("*** Process processStudentNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
+                            log.debug("*** Process processStudentNonGradPrjReport {} for {} students", schoolObj.getMincode(), nonGradPrjStudents.size());
                             numberOfReports = processStudentNonGradPrjReport(schoolObj, nonGradPrjStudents, schoolId, numberOfReports);
                         } else {
                             List<Student> gradRegStudents = processStudentList(filterStudentList(stdList, GRADREG), type);
-                            logger.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
+                            log.debug("*** Process processGradRegReport {} for {} students", schoolObj.getMincode(), gradRegStudents.size());
                             numberOfReports = processGradRegReport(schoolObj, gradRegStudents, schoolId, numberOfReports);
                             List<Student> nonGradRegStudents = processStudentList(filterStudentList(stdList, NONGRADREG), type);
-                            logger.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
+                            log.debug("*** Process processNonGradRegReport {} for {} students", schoolObj.getMincode(), nonGradRegStudents.size());
                             numberOfReports = processNonGradRegReport(schoolObj, nonGradRegStudents, schoolId, numberOfReports);
                         }
                     }
                 }
             } catch (Exception e) {
-                logger.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
+                log.error("Failed to generate {} report for Mincode: {} (SchoolId: {}) due to: {}",
                         type, schoolDetail != null ? schoolDetail.getMincode() : null, schoolId, e.getLocalizedMessage());
             }
         }
@@ -316,7 +318,8 @@ public class GraduationService {
     }
 
     private int countStudentsForAmalgamatedSchoolReport(UUID schoolId) {
-        return restService.get(String.format(educGraduationApiConstants.getGradStudentCountSchoolReport(), schoolId), Integer.class);
+        return restService.get(String.format(educGraduationApiConstants.getGradStudentCountSchoolReport(),
+                schoolId), Integer.class, graduationApiClient);
     }
 
     private ReportData getReportDataObj(School schoolObj, List<Student> stdList) {
@@ -327,14 +330,6 @@ public class GraduationService {
         data.setIssueDate(EducGraduationApiUtils.formatIssueDateForReportJasper(new java.sql.Date(System.currentTimeMillis()).toString()));
         return data;
     }
-
-    /**
-     private int processStudentNonGradReport(School schoolObj, List<Student> stdList, String mincode, String accessToken, int numberOfReports) {
-     ReportData nongradProjected = getReportDataObj(schoolObj, stdList);
-     createAndSaveSchoolReportStudentNonGradReport(nongradProjected, mincode, accessToken);
-     numberOfReports++;
-     return numberOfReports;
-     }**/
 
     @SneakyThrows
     private List<Student> processStudentList(List<GraduationStudentRecord> gradStudList, String type) {
@@ -407,30 +402,22 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return this.restService.post(educGraduationApiConstants.getSchoolGraduation(),
-                reportParams,
-                byte[].class);
-
+        return this.restService.post(educGraduationApiConstants.getSchoolGraduation(), reportParams, byte[].class, graduationApiClient);
     }
 
     @Generated
     private byte[] createAndSaveSchoolReportGradRegReport(ReportData data, String mincode, UUID schoolId) {
 
         byte[] bytesSAR = getSchoolReportGradRegReport(data, mincode);
-
         String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-
         SchoolReports requestObj = getSchoolReports(schoolId, encodedPdf, GRADREG);
-
         updateSchoolReport(requestObj);
 
         return bytesSAR;
     }
 
     private void updateSchoolReport(SchoolReports requestObj) {
-        this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(),
-                requestObj,
-                SchoolReports.class);
+        this.restService.post(educGraduationApiConstants.getUpdateSchoolReport(), requestObj, SchoolReports.class, graduationApiClient);
     }
 
     private String getEncodedPdfFromBytes(byte[] bytesSAR) {
@@ -446,10 +433,7 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(),
-                reportParams,
-                byte[].class);
-
+        return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(), reportParams, byte[].class, graduationApiClient);
     }
 
     @Generated
@@ -470,9 +454,7 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return this.restService.post(educGraduationApiConstants.getStudentNonGradProjected(),
-                reportParams,
-                byte[].class);
+        return this.restService.post(educGraduationApiConstants.getStudentNonGradProjected(), reportParams, byte[].class, graduationApiClient);
     }
 
     @Generated
@@ -486,10 +468,7 @@ public class GraduationService {
         reportParams.setOptions(options);
         reportParams.setData(data);
 
-        return this.restService.post(educGraduationApiConstants.getStudentNonGrad(),
-                reportParams,
-                byte[].class,
-                accessToken);
+        return this.restService.post(educGraduationApiConstants.getStudentNonGrad(), reportParams, byte[].class, graduationApiClient);
     }
 
     private void createAndSaveSchoolReportStudentNonGradPrjReport(ReportData data, String mincode, UUID schoolId) {
@@ -498,14 +477,6 @@ public class GraduationService {
         SchoolReports requestObj = getSchoolReports(schoolId, encodedPdf, NONGRADPRJ);
         updateSchoolReport(requestObj);
     }
-
-    /**
-     private void createAndSaveSchoolReportStudentNonGradReport(ReportData data, String mincode, String accessToken) {
-     byte[] bytesSAR = getSchoolReportStudentNonGradReport(data, mincode, accessToken);
-     String encodedPdf = getEncodedPdfFromBytes(bytesSAR);
-     SchoolReports requestObj = getSchoolReports(mincode, encodedPdf, NONGRADPRJ);
-     updateSchoolReport(accessToken, requestObj);
-     } **/
 
     private SchoolReports getSchoolReports(UUID schoolId, String encodedPdf, String nongradreg) {
         SchoolReports requestObj = new SchoolReports();

@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,7 +50,12 @@ public class OptionalProgramServiceTest {
 	TokenUtils tokenUtils;
 
 	@MockBean
-	WebClient webClient;
+	@Qualifier("graduationApiClient")
+	WebClient graduationApiClient;
+
+	@MockBean
+	@Qualifier("gradEducStudentApiClient")
+	WebClient gradEducStudentApiClient;
 
 	@TestConfiguration
 	static class TestConfig {
@@ -109,25 +115,11 @@ public class OptionalProgramServiceTest {
 		spgm.setOptionalProgramCode("BD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentOptionalProgram);
-//		when(this.monoResponseGradStudentOptionalProgram.block()).thenReturn(spgm);
 
-		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)), StudentOptionalProgram.class)).thenReturn(spgm);
-		
-//		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-//        when(this.requestBodyUriMock.uri(constants.getSaveOptionalProgramGradStatus())).thenReturn(this.requestBodyUriMock);
-//        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-//        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-//        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-//        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//        when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
-
-		when(this.restService.post(constants.getSaveOptionalProgramGradStatus(), graduationDataStatus, StudentOptionalProgram.class)).thenReturn(spgm);
+		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID, new UUID(1, 1)),
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(spgm);
+		when(this.restService.post(constants.getSaveOptionalProgramGradStatus(), graduationDataStatus,
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(spgm);
 		
 		List<StudentOptionalProgram> spList;
 		spList = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, studentID, new ArrayList<>());
@@ -166,32 +158,16 @@ public class OptionalProgramServiceTest {
 		spgm.setOptionalProgramCode("DD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentOptionalProgram);
-//		when(this.monoResponseGradStudentOptionalProgram.block()).thenReturn(spgm);
 
-		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)), StudentOptionalProgram.class)).thenReturn(spgm);
-
-
-//		when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-//        when(this.requestBodyUriMock.uri(constants.getSaveOptionalProgramGradStatus())).thenReturn(this.requestBodyUriMock);
-//        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-//        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-//        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-//        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//        when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(Mono.just(spgm));
-
-		when(this.restService.post(constants.getSaveOptionalProgramGradStatus(), graduationDataStatus, StudentOptionalProgram.class)).thenReturn(spgm);
+		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID, new UUID(1, 1)),
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(spgm);
+		when(this.restService.post(constants.getSaveOptionalProgramGradStatus(), graduationDataStatus,
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(spgm);
 
 		List<StudentOptionalProgram> spList;
 		spList = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, studentID, new ArrayList<>());
 		assertEquals(1,spList.size());
 	}
-	
 	
 	@Test
 	public void testSaveAndLogOptionalProgramsDualDogwood() {
@@ -225,16 +201,9 @@ public class OptionalProgramServiceTest {
 		spgm.setOptionalProgramCode("DD");
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setStudentID(UUID.fromString(studentID));
-		
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentOptionalProgram);
-//		when(this.monoResponseGradStudentOptionalProgram.block()).thenReturn(null);
 
-		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)), StudentOptionalProgram.class)).thenReturn(null);
-
+		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID, new UUID(1, 1)),
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(null);
 
 		List<StudentOptionalProgram> spList;
 		spList = optionalProgramService.saveAndLogOptionalPrograms(graduationDataStatus, studentID, new ArrayList<>());
@@ -274,15 +243,9 @@ public class OptionalProgramServiceTest {
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentOptionalProgram);
-//		when(this.monoResponseGradStudentOptionalProgram.block()).thenReturn(spgm);
 
-		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)), StudentOptionalProgram.class)).thenReturn(spgm);
+		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID, new UUID(1, 1)),
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(spgm);
 
 		List<StudentOptionalProgram> spList;
 		spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID);
@@ -322,19 +285,12 @@ public class OptionalProgramServiceTest {
 		spgm.setOptionalProgramName("International Bacculaurette");
 		spgm.setProgramCode("2018-EN");
 		spgm.setStudentID(UUID.fromString(studentID));
-		
-//		when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//		when(this.requestHeadersUriMock.uri(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-//		when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-//		when(this.responseMock.bodyToMono(StudentOptionalProgram.class)).thenReturn(monoResponseGradStudentOptionalProgram);
-//		when(this.monoResponseGradStudentOptionalProgram.block()).thenReturn(null);
 
-		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID,new UUID(1, 1)), StudentOptionalProgram.class)).thenReturn(null);
+		when(this.restService.get(String.format(constants.getGetOptionalProgramDetails(), studentID, new UUID(1, 1)),
+				StudentOptionalProgram.class, graduationApiClient)).thenReturn(null);
 
 		List<StudentOptionalProgram> spList;
 		spList = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, studentID);
 		assertEquals(1,spList.size());
 	}
-	
 }

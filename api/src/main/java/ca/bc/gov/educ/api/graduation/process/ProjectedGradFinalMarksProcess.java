@@ -4,24 +4,22 @@ import ca.bc.gov.educ.api.graduation.model.dto.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Data
 @Component
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ProjectedGradFinalMarksProcess extends BaseProcess {
 	
-	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksProcess.class);
-
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
 		long startTime = System.currentTimeMillis();
-		logger.debug("************* TIME START  ************ {}",startTime);
+		log.debug("************* TIME START  ************ {}",startTime);
 		ExceptionMessage exception = new ExceptionMessage();
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
@@ -29,7 +27,7 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
-		logger.debug("**** Grad Algorithm Completed: ****");
+		log.debug("**** Grad Algorithm Completed: ****");
 		gradResponse = gradStatusService.processProjectedResults(gradResponse,graduationDataStatus);
 		List<StudentOptionalProgram> projectedOptionalGradResponse = optionalProgramService.projectedOptionalPrograms(graduationDataStatus, processorData.getStudentID());
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
@@ -37,7 +35,7 @@ public class ProjectedGradFinalMarksProcess extends BaseProcess {
 
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.debug("************* TIME Taken  ************ {} secs",diff);
+		log.debug("************* TIME Taken  ************ {} secs",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 	}
