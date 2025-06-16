@@ -8,10 +8,10 @@ import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,20 +19,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class GradStatusService {
 
-	private static final Logger logger = LoggerFactory.getLogger(GradStatusService.class);
 	private static final String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
-    WebClient webClient;
+    WebClient graduationApiClient;
 	RESTService restService;
 	RestTemplate restTemplate;
     EducGraduationApiConstants educGraduationApiConstants;
 	JsonTransformer jsonTransformer;
 
 	@Autowired
-	public GradStatusService(WebClient webClient, RESTService restService, RestTemplate restTemplate, EducGraduationApiConstants educGraduationApiConstants, JsonTransformer jsonTransformer) {
-		this.webClient = webClient;
+	public GradStatusService(@Qualifier("graduationApiClient") WebClient graduationApiClient, RESTService restService,
+							 RestTemplate restTemplate, EducGraduationApiConstants educGraduationApiConstants, JsonTransformer jsonTransformer) {
+		this.graduationApiClient = graduationApiClient;
 		this.restService = restService;
 		this.restTemplate = restTemplate;
 		this.educGraduationApiConstants = educGraduationApiConstants;
@@ -42,7 +43,8 @@ public class GradStatusService {
 	public GraduationStudentRecord getGradStatus(String studentID, ExceptionMessage exception) {
 		try
 		{
-			return restService.get(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID), GraduationStudentRecord.class);
+			return restService.get(String.format(educGraduationApiConstants.getReadGradStudentRecord(),studentID),
+					GraduationStudentRecord.class, graduationApiClient);
 		} catch (Exception e) {
 			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
@@ -68,7 +70,8 @@ public class GradStatusService {
 			if(batchId != null) {
 				url = url + "?batchId=%s";
 			}
-			return restService.post(String.format(url,studentID,batchId), toBeSaved, GraduationStudentRecord.class);
+			return restService.post(String.format(url,studentID,batchId), toBeSaved, GraduationStudentRecord.class,
+					graduationApiClient);
 		} catch(Exception e) {
 			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
@@ -84,7 +87,8 @@ public class GradStatusService {
 			if(batchId != null) {
 				url = url + "?batchId=%s";
 			}
-			return restService.post(String.format(url,studentID,batchId), projectedRunClob, GraduationStudentRecord.class);
+			return restService.post(String.format(url,studentID,batchId), projectedRunClob,
+					GraduationStudentRecord.class, graduationApiClient);
 		}catch(Exception e) {
 			exception.setExceptionName(studentAPIDown);
 			exception.setExceptionDetails(e.getLocalizedMessage());
@@ -105,11 +109,13 @@ public class GradStatusService {
 	}
 
 	public void restoreStudentGradStatus(String studentID, boolean isGraduated) {
-		restService.get(String.format(educGraduationApiConstants.getUpdateGradStatusAlgoError(),studentID,isGraduated), Boolean.class);
+		restService.get(String.format(educGraduationApiConstants.getUpdateGradStatusAlgoError(), studentID, isGraduated),
+				Boolean.class, graduationApiClient);
 	}
 
 	public List<GraduationStudentRecord> getStudentListBySchoolId(UUID schoolId) {
-		var response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolId), List.class);
+		var response = this.restService.get(String.format(educGraduationApiConstants.getGradStudentListSchoolReport(),schoolId),
+				List.class, graduationApiClient);
 		return jsonTransformer.convertValue(response, new TypeReference<>(){});
 	}
 

@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.constants.AddressTypeCodes;
-import ca.bc.gov.educ.api.graduation.constants.DistrictContactTypeCodes;
 import ca.bc.gov.educ.api.graduation.constants.ReportTypeCodes;
 import ca.bc.gov.educ.api.graduation.mapper.SchoolMapper;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.DistrictAddress;
@@ -10,10 +9,10 @@ import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.DistrictReport;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,28 +25,28 @@ import static ca.bc.gov.educ.api.graduation.constants.ReportTypeCodes.DISTREP_YE
 import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_AT_GRAD;
 import static ca.bc.gov.educ.api.graduation.constants.ReportingSchoolTypesEnum.SCHOOL_OF_RECORD;
 
+@Slf4j
 @Service
 public class DistrictReportService extends BaseReportService {
-
-  private static final Logger logger = LoggerFactory.getLogger(DistrictReportService.class);
 
   EducGraduationApiConstants educGraduationApiConstants;
   RESTService restService;
   ReportService reportService;
   SchoolService schoolService;
   DistrictService districtService;
-  WebClient webClient;
+  WebClient graduationApiClient;
 
   @Autowired
-  public DistrictReportService(EducGraduationApiConstants educGraduationApiConstants, RESTService restService, ReportService reportService, WebClient webClient, SchoolService schoolService, DistrictService districtService) {
+  public DistrictReportService(EducGraduationApiConstants educGraduationApiConstants, RESTService restService,
+                               ReportService reportService, @Qualifier("graduationApiClient") WebClient graduationApiClient,
+                               SchoolService schoolService, DistrictService districtService) {
     this.educGraduationApiConstants = educGraduationApiConstants;
     this.restService = restService;
     this.reportService = reportService;
     this.schoolService = schoolService;
     this.districtService = districtService;
-    this.webClient = webClient;
+    this.graduationApiClient = graduationApiClient;
   }
-
 
   private void saveDistrictReport(UUID districtId, String reportType, byte[] reportAsBytes) {
     String encodedPdf = getEncodedPdfFromBytes(reportAsBytes);
@@ -65,8 +64,7 @@ public class DistrictReportService extends BaseReportService {
 
   private void updateDistrictReport(DistrictReport districtReport) {
     this.restService.post(educGraduationApiConstants.getUpdateDistrictReport(),
-            districtReport,
-            DistrictReport.class);
+            districtReport, DistrictReport.class, graduationApiClient);
   }
 
   public byte[] getDistrictYearEndReports() throws IOException {
@@ -249,7 +247,7 @@ public class DistrictReportService extends BaseReportService {
               });
           processDistrictSchool(schoolReport, reportGradStudentData);
         } else {
-          logger.debug("Skip independent school {}", schoolId);
+          log.debug("Skip independent school {}", schoolId);
         }
       }
     });
@@ -308,7 +306,7 @@ public class DistrictReportService extends BaseReportService {
     String paperType = reportGradStudentData.getPaperType();
     String transcriptTypeCode = reportGradStudentData.getTranscriptTypeCode();
     String certificateTypeCode = reportGradStudentData.getCertificateTypeCode();
-    logger.debug("Processing district school {} student {} for transcript {} & certificate {} and paper type {}", school.getMincode(), reportGradStudentData.getPen(), transcriptTypeCode, certificateTypeCode, paperType);
+    log.debug("Processing district school {} student {} for transcript {} & certificate {} and paper type {}", school.getMincode(), reportGradStudentData.getPen(), transcriptTypeCode, certificateTypeCode, paperType);
     if (StringUtils.isNotBlank(certificateTypeCode)) {
       switch (certificateTypeCode) {
         case "E", "EI", "O", "FN" -> school.getSchoolStatistic().setDogwoodCount(school.getSchoolStatistic().getDogwoodCount() + 1);
@@ -336,14 +334,16 @@ public class DistrictReportService extends BaseReportService {
   }
 
   private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest) {
-    return restService.post(educGraduationApiConstants.getDistrictDistributionYearEnd(), reportRequest, byte[].class);
+    return restService.post(educGraduationApiConstants.getDistrictDistributionYearEnd(),
+            reportRequest, byte[].class, graduationApiClient);
   }
 
   private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest) {
-    return restService.post(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad(), reportRequest, byte[].class);
+    return restService.post(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad(),
+            reportRequest, byte[].class, graduationApiClient);
   }
 
   private byte[] getDistrictLabelsReportJasper(ReportRequest reportRequest) {
-    return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class);
+    return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class, graduationApiClient);
   }
 }

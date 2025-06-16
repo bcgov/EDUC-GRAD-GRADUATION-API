@@ -10,6 +10,9 @@ env:
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   GRAD_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
+  KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+  TARGET_ENV: dev
 
   # 🖊️ EDIT to change the image registry settings.
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
@@ -81,6 +84,20 @@ jobs:
           registry: ${{ env.IMAGE_REGISTRY }}
           username: ${{ env.IMAGE_REGISTRY_USER }}
           password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Create/Update clients
+        run: node ./tools/config/clients-and-scopes.js
+
+      - name: Create/Update secrets
+        run: node ./tools/openshift/fetch-and-create-secrets.js
 
       # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
       - name: Install oc

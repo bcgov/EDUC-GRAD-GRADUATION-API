@@ -1,27 +1,25 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
-import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
 import ca.bc.gov.educ.api.graduation.model.report.Code;
 import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import ca.bc.gov.educ.api.graduation.model.report.Transcript;
-import ca.bc.gov.educ.api.graduation.model.report.TranscriptResult;
 import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -77,7 +74,12 @@ public class ReportServiceTest {
 	RESTService restService;
 
 	@MockBean
-	WebClient webClient;
+	@Qualifier("graduationApiClient")
+	WebClient graduationApiClient;
+
+	@MockBean
+	@Qualifier("gradEducStudentApiClient")
+	WebClient educStudentApiClient;
 
 	@Autowired
 	private EducGraduationApiConstants constants;
@@ -96,7 +98,7 @@ public class ReportServiceTest {
 	public void testGetStudentsForSchoolYearEndReport() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 
-		when(this.restService.get(constants.getSchoolYearEndStudents(), List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.get(constants.getSchoolYearEndStudents(), List.class, graduationApiClient)).thenReturn(gradStudentDataList);
 
 		var result = reportService.getStudentsForSchoolYearEndReport();
 		assertNotNull(result);
@@ -106,7 +108,8 @@ public class ReportServiceTest {
 	public void testGetStudentsForSchoolYearEndReportWithSchools() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 		YearEndReportRequest yearEndReportRequest = YearEndReportRequest.builder().schoolIds(List.of(UUID.randomUUID())).build();
-		when(this.restService.post(constants.getSchoolYearEndStudents(), yearEndReportRequest, List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.post(constants.getSchoolYearEndStudents(), yearEndReportRequest, List.class, graduationApiClient))
+				.thenReturn(gradStudentDataList);
 
 		var result = reportService.getStudentsForSchoolYearEndReport(yearEndReportRequest);
 		assertNotNull(result);
@@ -115,10 +118,8 @@ public class ReportServiceTest {
 	@Test
 	public void testGetStudentsForSchoolYearEndNonGradReport() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
-		ParameterizedTypeReference<List<ReportGradStudentData>> reportGradStudentDataType = new ParameterizedTypeReference<>() {
-		};
 
-		when(this.restService.get(constants.getStudentNonGradReportData(), List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.get(constants.getStudentNonGradReportData(), List.class, graduationApiClient)).thenReturn(gradStudentDataList);
 
 		var result = reportService.getStudentsForSchoolNonGradYearEndReport();
 		assertNotNull(result);
@@ -129,7 +130,8 @@ public class ReportServiceTest {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 		UUID schoolId = UUID.randomUUID();
 
-		when(this.restService.get(String.format(constants.getStudentNonGradReportDataSchoolId(), schoolId), List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.get(String.format(constants.getStudentNonGradReportDataSchoolId(), schoolId), List.class, graduationApiClient))
+				.thenReturn(gradStudentDataList);
 
 		var result = reportService.getStudentsForSchoolNonGradYearEndReport(schoolId);
 		assertNotNull(result);
@@ -139,7 +141,7 @@ public class ReportServiceTest {
 	public void testGetStudentsForSchoolReport() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 
-		when(this.restService.get(constants.getSchoolStudents(), List.class)).thenReturn(gradStudentDataList);
+		when(this.restService.get(constants.getSchoolStudents(), List.class, graduationApiClient)).thenReturn(gradStudentDataList);
 
 		var result = reportService.getStudentsForSchoolReport();
 		assertNotNull(result);
@@ -148,8 +150,7 @@ public class ReportServiceTest {
 	@Test
 	public void testSaveStudentCertificateReport() {
 		UUID studentID = new UUID(1, 1);
-		ExceptionMessage exception = new ExceptionMessage();
-		String accessToken = "accessToken";
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
 		String pen="212321123";
 		List<ProgramCertificateTranscript> certificateList = new ArrayList<ProgramCertificateTranscript>();
 		ProgramCertificateTranscript pc= new ProgramCertificateTranscript();
@@ -204,34 +205,32 @@ public class ReportServiceTest {
 		gradResponse.setStudentStatus("A");
 		gradResponse.setUpdateDate(LocalDateTime.now());
 
-		ParameterizedTypeReference<List<StudentOptionalProgram>> optionalProgramsResponseType = new ParameterizedTypeReference<>() {
-		};
-
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
 		studentOptionalProgram.setOptionalProgramCode("AD");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(studentID);
 
-		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), studentID), List.class)).thenReturn(List.of(studentOptionalProgram));
-
+		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), studentID), List.class, graduationApiClient))
+				.thenReturn(List.of(studentOptionalProgram));
 
 		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
-		when(this.restService.get(constants.getCertificateReport(), byte[].class)).thenReturn(bytesSAR);
-		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentCertificate(),pen)), any(), eq(GradStudentCertificates.class))).thenReturn(rep);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
+		when(this.restService.get(constants.getCertificateReport(), byte[].class, graduationApiClient)).thenReturn(bytesSAR);
+		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentCertificate(),pen)),
+				any(), eq(GradStudentCertificates.class), eq(graduationApiClient))).thenReturn(rep);
 
 		reportService.saveStudentCertificateReportJasper(gradResponse, graduationDataStatus, pc,false);
-		assertThat(exception.getExceptionName()).isNull();
+		assertThat(exceptionMessage.getExceptionName()).isNull();
 	}
 
 	@Test
 	public void testSaveStudentTranscriptReport() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		String pen="212321123";
 		boolean isGraduated= false;
 		ReportData data = new ReportData();
@@ -241,7 +240,7 @@ public class ReportServiceTest {
 		code.setCode("BC1996-PUB");
 		transcript.setTranscriptTypeCode(code);
 		data.setTranscript(transcript);
-		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
 		GradStudentReports rep = new GradStudentReports();
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
@@ -252,20 +251,20 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
+		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class), eq(graduationApiClient))).thenReturn(bytesSAR);
+		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentTranscript(),isGraduated)), any(),
+				eq(GradStudentReports.class), eq(graduationApiClient))).thenReturn(rep);
 
-		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
-		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentTranscript(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
-
-		reportService.saveStudentTranscriptReportJasper(data, UUID.fromString(studentID),exception,isGraduated, false);
-		assertThat(exception.getExceptionName()).isNull();
+		reportService.saveStudentTranscriptReportJasper(data, UUID.fromString(studentID),exceptionMessage,isGraduated, false);
+		assertThat(exceptionMessage.getExceptionName()).isNull();
 	}
 
 	@Test
 	public void testGetCertificateList_whenAPIisDown_throwsException() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
@@ -311,9 +310,11 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenThrow(new RuntimeException("Test - API is down"));
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), eq(graduationApiClient)))
+				.thenThrow(new RuntimeException("Test - API is down"));
 
 		var results = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertNotNull(results);
@@ -375,9 +376,9 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
-
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), eq(graduationApiClient))).thenReturn(clist);
 
 		List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -387,7 +388,6 @@ public class ReportServiceTest {
 	public void testGetCertificateList_PFProgram() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
@@ -424,7 +424,7 @@ public class ReportServiceTest {
 		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), eq(graduationApiClient))).thenReturn(clist);
 
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -440,7 +440,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -450,7 +451,6 @@ public class ReportServiceTest {
 	public void testGetCertificateList_PFProgram_nodogwood() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-PF");
@@ -494,7 +494,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
 		ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
@@ -502,7 +503,7 @@ public class ReportServiceTest {
 		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), any())).thenReturn(clist);
 
 		List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -512,7 +513,6 @@ public class ReportServiceTest {
 	public void testGetCertificateList_emptyOptionalProgram() {
 		UUID studentID = new UUID(1, 1);
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setStudentID(studentID);
 		gradResponse.setPen("123090109");
@@ -528,7 +528,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
@@ -556,7 +557,7 @@ public class ReportServiceTest {
 		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), any())).thenReturn(clist);
 
 		List<StudentOptionalProgram> list = new ArrayList<StudentOptionalProgram>();
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
@@ -567,7 +568,6 @@ public class ReportServiceTest {
 	public void testGetCertificateList_FrenchImmersion() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
@@ -604,7 +604,7 @@ public class ReportServiceTest {
 		pc.setSchoolCategoryCode(" ");
 		clist.add(pc);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), eq(graduationApiClient))).thenReturn(clist);
 
 
 		SchoolClob schoolDetails = new SchoolClob();
@@ -612,7 +612,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		StudentOptionalProgram spgm = new StudentOptionalProgram();
 		spgm.setPen("123090109");
@@ -631,7 +632,6 @@ public class ReportServiceTest {
 	public void testGetCertificateList_FrenchImmersion_nullProgramCompletionDate() {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
 		gradResponse.setProgram("2018-EN");
@@ -679,14 +679,15 @@ public class ReportServiceTest {
 		pc.setSchoolCategoryCode("02");
 		clist.add(pc);
 
-		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class))).thenReturn(clist);
+		when(this.restService.post(eq(constants.getCertList()), any(), eq(List.class), eq(graduationApiClient))).thenReturn(clist);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("1123");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(gradResponse, graduationDataStatus, list,exception);
 		assertThat(listCC).hasSize(1);
@@ -694,7 +695,6 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareReportData() {
-		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -759,8 +759,9 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 
 		SchoolClob schoolDetails = new SchoolClob();
@@ -768,7 +769,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
 		gradResponse.setPen("123090109");
@@ -892,7 +894,6 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareReportData_nullProgramData() {
-		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus("2018-EN");
 
 		SchoolClob schoolObj = new SchoolClob();
@@ -925,15 +926,17 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -956,14 +959,13 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareReportData_exams_notnull() {
-		String accessToken = "accessToken";
-		testPrepareReportData_exams_notnull("1996-EN",accessToken);
-		testPrepareReportData_exams_notnull("1950",accessToken);
-		testPrepareReportData_exams_notnull("2004-EN",accessToken);
+		testPrepareReportData_exams_notnull("1996-EN");
+		testPrepareReportData_exams_notnull("1950");
+		testPrepareReportData_exams_notnull("2004-EN");
 	}
 
 
-	public void testPrepareReportData_exams_notnull(String program,String accessToken) {
+	public void testPrepareReportData_exams_notnull(String program) {
 
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = getGradAlgorithmGraduationStatus(program);
 
@@ -1005,15 +1007,17 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("06011033");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1035,7 +1039,6 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareReportData_Desig_3() {
-		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -1088,26 +1091,29 @@ public class ReportServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradStudent(stuObj);
 
 		SpecialCase sp = new SpecialCase();
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
 
 		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1130,7 +1136,6 @@ public class ReportServiceTest {
 
 	@Test
 	public void testPrepareReportData_Desig_4() {
-		String accessToken = "accessToken";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
 		gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -1184,7 +1189,8 @@ public class ReportServiceTest {
 		graduationDataStatus.setGraduated(false);
 		graduationDataStatus.setSchool(schoolObj);
 		graduationDataStatus.setStudentCourses(sCourses);
-		graduationDataStatus.setStudentAssessments(sAssessments);		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradStudent(stuObj);
 
 		GraduationProgramCode gP = new GraduationProgramCode();
 		gP.setProgramCode("2018-EN");
@@ -1194,16 +1200,17 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class)).thenReturn(schoolDetails);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "06011033"), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1226,7 +1233,6 @@ public class ReportServiceTest {
 
 
 	public void testPrepareReportData_Desig_2() {
-		String accessToken = "accessToken";
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
 		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
 		gradAlgorithmGraduationStatus.setPen("123090109");
@@ -1282,8 +1288,8 @@ public class ReportServiceTest {
 		gP.setProgramCode("2018-EN");
 		gP.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()), GraduationProgramCode.class)).thenReturn(gP);
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradAlgorithmGraduationStatus.getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
 
 		List<CodeDTO> optionalProgram = new ArrayList<CodeDTO>();
 		CodeDTO cDto = new CodeDTO();
@@ -1353,14 +1359,13 @@ public class ReportServiceTest {
 	public void testSaveStudentAchievementReport() throws Exception {
 		String studentID = new UUID(1, 1).toString();
 		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		String accessToken = "accessToken";
 		String pen = "212321123";
 		boolean isGraduated = false;
 		ReportData data = createReportData("json/reportdataAchv.json");
 		GradStudentReports rep = new GradStudentReports();
 		rep.setPen(pen);
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
-		ExceptionMessage exception = new ExceptionMessage();
+		ExceptionMessage exceptionMessage = new ExceptionMessage();
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -1368,12 +1373,14 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class)).thenReturn(schoolDetails);
-		when(this.restService.post(eq(constants.getAchievementReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
-		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentReport(),isGraduated)), any(), eq(GradStudentReports.class))).thenReturn(rep);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolId), SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
+		when(this.restService.post(eq(constants.getAchievementReport()), any(), eq(byte[].class), eq(graduationApiClient))).thenReturn(bytesSAR);
+		when(this.restService.post(eq(String.format(constants.getUpdateGradStudentReport(),isGraduated)), any(),
+				eq(GradStudentReports.class), eq(graduationApiClient))).thenReturn(rep);
 
-		reportService.saveStudentAchivementReportJasper(pen, data, UUID.fromString(studentID), exception, isGraduated);
-		assertThat(exception.getExceptionName()).isNull();
+		reportService.saveStudentAchivementReportJasper(pen, data, UUID.fromString(studentID), exceptionMessage, isGraduated);
+		assertThat(exceptionMessage.getExceptionName()).isNull();
 	}
 
 	@Test
@@ -1385,7 +1392,8 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
 
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
@@ -1413,7 +1421,7 @@ public class ReportServiceTest {
 
 		programRequirementCodes.add(programRequirementCode);
 
-		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class)).thenReturn(programRequirementCodes);
+		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class, graduationApiClient)).thenReturn(programRequirementCodes);
 
 		SpecialCase spc = new SpecialCase();
 		spc.setLabel("dfsdgs");
@@ -1427,9 +1435,11 @@ public class ReportServiceTest {
 		gradSearchStudent.setLegalLastName(gradStatus.getGradStudent().getLegalLastName());
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(spc);
-		when(this.restService.get(String.format(constants.getPenStudentApiByStudentIdUrl(),gradStatus.getGradStudent().getPen()), GradSearchStudent.class)).thenReturn(gradSearchStudent);
-		ReportData data = reportService.prepareAchievementReportData(UUID.fromString(gradStatus.getGradStudent().getStudentID()), gradStatus,optionalProgram, exception);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(spc);
+		when(this.restService.get(String.format(constants.getPenStudentApiByStudentIdUrl(),gradStatus.getGradStudent().getPen()),
+				GradSearchStudent.class, educStudentApiClient)).thenReturn(gradSearchStudent);
+		ReportData data = reportService.prepareAchievementReportData(UUID.fromString(gradStatus.getGradStudent().getStudentID()),
+				gradStatus,optionalProgram, exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudentExams());
 		assertNotNull(data.getStudentCourses());
@@ -1469,9 +1479,10 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, new ExceptionMessage());
 		assertNotNull(result);
@@ -1500,166 +1511,16 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
-
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenThrow(new RuntimeException());
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenThrow(new RuntimeException());
 
 		ExceptionMessage message = new ExceptionMessage();
 
 		var result = reportService.getTranscript(graduationStudentRecord, gradStatus, message);
 		assertNull(result);
 		assertEquals("GRAD-GRADUATION-REPORT-API IS DOWN", message.getExceptionName());
-	}
-
-	@Test
-	public void testReportDataByPen() throws Exception {
-		String schoolId = "b69bc244-b93b-2a9f-d2b1-3d8ffae92866";
-		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
-		assertNotNull(gradStatus);
-		String pen = gradStatus.getGradStudent().getPen();
-		GradSearchStudent gradSearchStudent = new GradSearchStudent();
-		gradSearchStudent.setPen(pen);
-		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
-
-		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-		};
-
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-
-		StudentCareerProgram studentCareerProgram1 = new StudentCareerProgram();
-		studentCareerProgram1.setCareerProgramCode("XH");
-		StudentCareerProgram studentCareerProgram2 = new StudentCareerProgram();
-		studentCareerProgram2.setCareerProgramCode("FR");
-
-		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
-		graduationStudentRecord.setPen(pen);
-		graduationStudentRecord.setProgramCompletionDate("2003/01");
-		graduationStudentRecord.setStudentID(UUID.fromString(gradSearchStudent.getStudentID()));
-		graduationStudentRecord.setUpdateDate(LocalDateTime.now());
-		graduationStudentRecord.setCareerPrograms(List.of(studentCareerProgram1,studentCareerProgram2));
-
-		GraduationProgramCode gradProgram = new GraduationProgramCode();
-		gradProgram.setProgramCode("1950");
-		gradProgram.setProgramName("1950 Adult Graduation Program");
-
-		GraduationProgramCode graduationProgramCode = new GraduationProgramCode();
-		graduationProgramCode.setProgramCode(gradProgram.getProgramCode());
-		graduationProgramCode.setProgramName(gradProgram.getProgramName());
-		gradStatus.setGradProgram(graduationProgramCode);
-		gradStatus.getGradStatus().setProgram(gradProgram.getProgramCode());
-		gradStatus.getGradStatus().setProgramName(gradProgram.getProgramName());
-
-		String studentGradData = readFile("json/gradstatus.json");
-		assertNotNull(studentGradData);
-		graduationStudentRecord.setStudentGradData(new ObjectMapper().writeValueAsString(gradStatus));
-
-		for(StudentCourse result: gradStatus.getStudentCourses().getStudentCourseList()) {
-			if("3, 4".equalsIgnoreCase(result.getGradReqMet())) {
-				assertEquals("3, 4", result.getGradReqMet());
-				assertTrue(StringUtils.contains(result.getGradReqMetDetail(), "3 - met, 4 - met again"));
-			}
-		}
-
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradProgram.getProgramCode()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
-
-		SchoolClob schoolDetails = new SchoolClob();
-		schoolDetails.setSchoolId(schoolId);
-		schoolDetails.setMinCode("09323027");
-		schoolDetails.setSchoolCategoryCode("INDEPEN");
-		schoolDetails.setSchoolCategoryLegacyCode("02");
-
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
-
-
-		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
-		programCertificateTranscript.setPcId(UUID.randomUUID());
-		programCertificateTranscript.setGraduationProgramCode(gradProgram.getProgramCode());
-		programCertificateTranscript.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
-		programCertificateTranscript.setCertificateTypeCode("E");
-
-		ProgramCertificateReq req = new ProgramCertificateReq();
-		req.setProgramCode(gradProgram.getProgramCode());
-		req.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
-
-		SpecialCase sp = new SpecialCase();
-		sp.setSpCase("A");
-		sp.setLabel("AEG");
-
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
-
-		SchoolClob schtrax = new SchoolClob();
-		schtrax.setMinCode("00502001");
-		schtrax.setSchoolName("ROBERT DDGELL");
-		schtrax.setAddress1("My Address");
-
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schtrax.getMinCode()), SchoolClob.class)).thenReturn(schtrax);
-
-		District distInstitute = new District();
-		distInstitute.setDistrictNumber("005");
-		distInstitute.setDisplayName("My District");
-
-		when(this.restService.get(String.format(constants.getDistrictDetails(),schtrax.getMinCode()), District.class)).thenReturn(distInstitute);
-
-
-		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
-
-		ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("105");
-		programRequirementCode.setTraxReqChar("h");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("109");
-		programRequirementCode.setTraxReqChar("I");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("113");
-		programRequirementCode.setTraxReqChar("n");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		programRequirementCode = new ProgramRequirementCode();
-		programRequirementCode.setProReqCode("117");
-		programRequirementCode.setTraxReqChar("i");
-
-		programRequirementCodes.add(programRequirementCode);
-
-		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class)).thenReturn(programRequirementCodes);
-
-		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
-		studentOptionalProgram.setOptionalProgramCode("DD");
-		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
-		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
-
-		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
-
-		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
-		assertNotNull(transcriptData);
-		assertNotNull(transcriptData.getStudent());
-		assertNotNull(transcriptData.getTranscript());
-		assertEquals("1950", transcriptData.getGradProgram().getCode().getCode());
-
-		transcriptData = reportService.prepareTranscriptData(pen, false, exception);
-		assertNotNull(transcriptData);
-		assertNotNull(transcriptData.getStudent());
-		assertNotNull(transcriptData.getTranscript());
-		assertEquals("false", transcriptData.getTranscript().getInterim());
-
-		for(TranscriptResult result: transcriptData.getTranscript().getResults()) {
-			assertFalse(result.getRequirement(), StringUtils.contains(result.getRequirement(), "3, 4"));
-			assertFalse(result.getRequirementName(), StringUtils.contains(result.getRequirementName(), "3 - met, 4 - met again"));
-		}
-
-		ReportData certificateData = reportService.prepareCertificateData(pen, exception);
-		assertNotNull(certificateData);
-		assertNotNull(certificateData.getStudent());
-		assertNotNull(certificateData.getCertificate());
-
 	}
 
 	@Test
@@ -1671,7 +1532,8 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class, graduationApiClient))
+				.thenReturn(List.of(gradSearchStudent));
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
@@ -1687,16 +1549,16 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(graduationStudentRecord);
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
 		assertNull(transcriptData.getTranscript());
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, exception);
 		assertNull(certificateData.getCertificate());
-
 	}
 
 	@Test
@@ -1708,8 +1570,8 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class, educStudentApiClient))
+				.thenReturn(List.of(gradSearchStudent));
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
@@ -1725,16 +1587,16 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), Exception.class)).thenReturn(new Exception());
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				Exception.class, graduationApiClient)).thenReturn(new Exception());
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
-		assertNull(transcriptData.getTranscript());
+		assertNull(transcriptData);
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, exception);
-		assertNull(certificateData.getCertificate());
-
+		assertNull(certificateData);
 	}
 
 	@Test
@@ -1746,14 +1608,14 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), Exception.class)).thenReturn(new Exception());
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), Exception.class, graduationApiClient))
+				.thenReturn(new Exception());
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
 		assertNull(transcriptData.getTranscript());
 
 		ReportData certificateData = reportService.prepareCertificateData(pen, exception);
 		assertNull(certificateData.getGraduationData());
-
 	}
 
 	@Test
@@ -1766,7 +1628,8 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class, educStudentApiClient))
+				.thenReturn(List.of(gradSearchStudent));
 
 		GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
 		graduationStudentRecord.setPen(pen);
@@ -1780,8 +1643,10 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(graduationStudentRecord);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -1789,7 +1654,9 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient))
+				.thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1801,13 +1668,14 @@ public class ReportServiceTest {
 		req.setProgramCode(gradProgram.getProgramCode());
 		req.setSchoolCategoryCode(schoolDetails.getSchoolCategoryCode());
 
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		SpecialCase sp = new SpecialCase();
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
 
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
@@ -1835,14 +1703,15 @@ public class ReportServiceTest {
 
 		programRequirementCodes.add(programRequirementCode);
 
-		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class)).thenReturn(programRequirementCodes);
+		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class, graduationApiClient)).thenReturn(programRequirementCodes);
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
 		studentOptionalProgram.setOptionalProgramCode("FI");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
-		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
+		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()),
+				List.class, graduationApiClient)).thenReturn(List.of(studentOptionalProgram));
 
 		ReportData transcriptData = reportService.prepareTranscriptData(pen, true, exception);
 		assertNotNull(transcriptData);
@@ -1851,12 +1720,11 @@ public class ReportServiceTest {
 
 		byte[] bytesSAR = RandomUtils.nextBytes(20);
 
-		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenReturn(bytesSAR);
+		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class), eq(graduationApiClient))).thenReturn(bytesSAR);
 
 		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true");
 		assertNotNull(result);
 		assertNotEquals(0, result.length);
-
 	}
 
 	@Test
@@ -1865,12 +1733,12 @@ public class ReportServiceTest {
 		assertNotNull(gradStatus);
 		String pen = gradStatus.getGradStudent().getPen();
 
-		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenThrow(new ServiceException("NO_CONTENT", 204));
+		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class), eq(graduationApiClient)))
+				.thenThrow(new ServiceException("NO_CONTENT", 204));
 
 		byte[] result = graduationService.prepareTranscriptReport(pen, "Interim", "true");
 		assertNotNull(result);
 		assertEquals(0, result.length);
-
 	}
 
 	@Test(expected = ServiceException.class)
@@ -1878,11 +1746,11 @@ public class ReportServiceTest {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		String pen = gradStatus.getGradStudent().getPen();
 
-		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class))).thenThrow(new ServiceException("INTERNAL_SERVER_ERROR", 500));
+		when(this.restService.post(eq(constants.getTranscriptReport()), any(), eq(byte[].class), eq(graduationApiClient)))
+				.thenThrow(new ServiceException("INTERNAL_SERVER_ERROR", 500));
 
 		graduationService.prepareTranscriptReport(pen, "Interim", "true");
 	}
-
 
 	@Test
 	public void testReportDataByGraduationData() throws Exception {
@@ -1905,8 +1773,10 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(graduationStudentRecord);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -1914,7 +1784,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -1926,8 +1797,9 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		List<ProgramRequirementCode> programRequirementCodes = new ArrayList<>();
 
@@ -1955,20 +1827,20 @@ public class ReportServiceTest {
 
 		programRequirementCodes.add(programRequirementCode);
 
-		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class)).thenReturn(programRequirementCodes);
+		when(this.restService.get(constants.getProgramRequirementsEndpoint(), List.class, graduationApiClient)).thenReturn(programRequirementCodes);
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
 		studentOptionalProgram.setOptionalProgramCode("CP");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
-		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
+		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()),
+				List.class, graduationApiClient)).thenReturn(List.of(studentOptionalProgram));
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudent());
 		assertNotNull(data.getTranscript());
-
 	}
 
 	@Test
@@ -1984,15 +1856,18 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), GraduationStudentRecord.class)).thenReturn(null);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(null);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2000,13 +1875,13 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode("02");
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, exception);
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getTranscript());
-
 	}
 
 	@Test
@@ -2029,8 +1904,10 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class, educStudentApiClient))
+				.thenReturn(List.of(gradSearchStudent));
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(), graduationStudentRecord.getStudentID().toString()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(graduationStudentRecord);
 
 		var result = reportService.getGraduationStudentRecordAndGraduationData(pen);
 		assertNotNull(result);
@@ -2038,7 +1915,7 @@ public class ReportServiceTest {
 		assertNotNull(result.getRight());
 	}
 
-	@Test
+	@Test(expected = EntityNotFoundException.class)
 	public void testGetGraduationStudentRecordAndGraduationData_Exception() throws Exception {
 		GraduationData gradStatus = createGraduationData("json/gradstatus.json");
 		assertNotNull(gradStatus);
@@ -2049,11 +1926,10 @@ public class ReportServiceTest {
 		gradSearchStudent.setPen(pen);
 		gradSearchStudent.setStudentID(gradStatus.getGradStudent().getStudentID());
 
-		final ParameterizedTypeReference<List<GradSearchStudent>> gradSearchStudentResponseType = new ParameterizedTypeReference<>() {
-		};
-
-		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class)).thenReturn(List.of(gradSearchStudent));
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),studentID), GraduationStudentRecord.class)).thenReturn(null);
+		when(this.restService.get(String.format(constants.getPenStudentApiByPenUrl(),pen), List.class, educStudentApiClient))
+				.thenReturn(List.of(gradSearchStudent));
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),studentID),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(null);
 
 		var result = reportService.getGraduationStudentRecordAndGraduationData(pen);
 		assertNull(result);
@@ -2069,7 +1945,6 @@ public class ReportServiceTest {
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getTranscript());
-
 	}
 
 	@Test
@@ -2093,9 +1968,10 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), Exception.class)).thenReturn(new Exception());
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				Exception.class, graduationApiClient)).thenReturn(new Exception());
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -2103,8 +1979,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2112,13 +1988,13 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode("02");
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		ReportData data = reportService.prepareTranscriptData(gradStatus, true, exception);
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getTranscript());
-
 	}
 
 	@Test
@@ -2142,15 +2018,18 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()), GraduationStudentRecord.class)).thenReturn(graduationStudentRecord);
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),graduationStudentRecord.getStudentID().toString()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(graduationStudentRecord);
 
 		StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
 		studentOptionalProgram.setOptionalProgramCode("FR");
 		studentOptionalProgram.setOptionalProgramName("Advanced Placement");
 		studentOptionalProgram.setStudentID(graduationStudentRecord.getStudentID());
 
-		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()), List.class)).thenReturn(List.of(studentOptionalProgram));
+		when(this.restService.get(String.format(constants.getStudentOptionalPrograms(), graduationStudentRecord.getStudentID()),
+				List.class, graduationApiClient)).thenReturn(List.of(studentOptionalProgram));
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -2158,8 +2037,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
-
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2171,14 +2050,14 @@ public class ReportServiceTest {
 		sp.setSpCase("A");
 		sp.setLabel("AEG");
 
-		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class)).thenReturn(sp);
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.get(String.format(constants.getSpecialCase(),"A"), SpecialCase.class, graduationApiClient)).thenReturn(sp);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		ReportData data = reportService.prepareCertificateData(gradStatus, exception);
 		assertNotNull(data);
 		assertNotNull(data.getStudent());
 		assertNotNull(data.getCertificate());
-
 	}
 
 	@Test
@@ -2194,9 +2073,10 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), GraduationStudentRecord.class)).thenReturn(null);
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()),
+				GraduationStudentRecord.class, graduationApiClient)).thenReturn(null);
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -2204,7 +2084,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2212,13 +2093,13 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode("02");
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		ReportData data = reportService.prepareCertificateData(gradStatus, exception);
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getCertificate());
-
 	}
 
 	@Test
@@ -2231,7 +2112,6 @@ public class ReportServiceTest {
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getCertificate());
-
 	}
 
 	@Test
@@ -2256,9 +2136,10 @@ public class ReportServiceTest {
 		gradProgram.setProgramCode("2018-EN");
 		gradProgram.setProgramName("2018 Graduation Program");
 
-		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()), GraduationProgramCode.class)).thenReturn(gradProgram);
-		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()), Exception.class)).thenReturn(new Exception());
-
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),gradStatus.getGradStudent().getProgram()),
+				GraduationProgramCode.class, graduationApiClient)).thenReturn(gradProgram);
+		when(this.restService.get(String.format(constants.getReadGradStudentRecord(),gradStatus.getGradStudent().getStudentID()),
+				Exception.class, graduationApiClient)).thenReturn(new Exception());
 
 		SchoolClob schoolDetails = new SchoolClob();
 		schoolDetails.setSchoolId(schoolId);
@@ -2266,7 +2147,8 @@ public class ReportServiceTest {
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
 
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(),schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 
 		ProgramCertificateTranscript programCertificateTranscript = new ProgramCertificateTranscript();
 		programCertificateTranscript.setPcId(UUID.randomUUID());
@@ -2274,17 +2156,17 @@ public class ReportServiceTest {
 		programCertificateTranscript.setSchoolCategoryCode("02");
 		programCertificateTranscript.setCertificateTypeCode("E");
 
-		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class))).thenReturn(programCertificateTranscript);
+		when(this.restService.post(eq(constants.getTranscript()), any(), eq(ProgramCertificateTranscript.class), eq(graduationApiClient)))
+				.thenReturn(programCertificateTranscript);
 
 		ReportData data = reportService.prepareCertificateData(gradStatus, exception);
 		assertNotNull(data);
 		assertNull(data.getStudent());
 		assertNull(data.getCertificate());
-
 	}
 
 	@Test
-	public void testRemoveDuplicatedAssessments() throws Exception {
+	public void testRemoveDuplicatedAssessments() {
 		StudentAssessment assessment1 = new StudentAssessment();
 		assessment1.setPen("128309473");
 		assessment1.setAssessmentCode("LTE12");
@@ -2363,7 +2245,7 @@ public class ReportServiceTest {
 				.map((StudentAssessment studentAssessment) -> new StudentAssessmentDuplicatesWrapper(studentAssessment, true))
 				.distinct()
 				.map(StudentAssessmentDuplicatesWrapper::getStudentAssessment)
-				.collect(Collectors.toList());
+				.toList();
 		assertTrue(result.size() < 8);
 	}
 
@@ -2375,7 +2257,8 @@ public class ReportServiceTest {
 		schoolDetails.setMinCode("09323027");
 		schoolDetails.setSchoolCategoryCode("INDEPEN");
 		schoolDetails.setSchoolCategoryLegacyCode("02");
-		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()), SchoolClob.class)).thenReturn(schoolDetails);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), schoolDetails.getSchoolId()),
+				SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
 		var result = reportService.getSchoolCategoryCode(schoolId);
 		assertThat(result).isNotNull();
 	}
@@ -2383,7 +2266,6 @@ public class ReportServiceTest {
 	protected GraduationData createGraduationData(String jsonPath) throws Exception {
 		File file = new File(Objects.requireNonNull(ReportServiceTest.class.getClassLoader().getResource(jsonPath)).getFile());
 		return new ObjectMapper().readValue(file, GraduationData.class);
-
 	}
 
 	protected ReportData createReportData(String jsonPath) throws Exception {

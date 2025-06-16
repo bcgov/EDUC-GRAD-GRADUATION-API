@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.graduation.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.hibernate.exception.ConstraintViolationException;
-import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataRetrievalFailureException;
@@ -20,27 +20,26 @@ import ca.bc.gov.educ.api.graduation.util.ApiResponseModel;
 import ca.bc.gov.educ.api.graduation.util.GradBusinessRuleException;
 import ca.bc.gov.educ.api.graduation.util.GradValidation;
 
+@Slf4j
 @ControllerAdvice
 public class RestErrorHandler extends ResponseEntityExceptionHandler {
-
-	private static final Logger LOGGER = Logger.getLogger(RestErrorHandler.class);
 
 	@Autowired
 	GradValidation validation;
 
 	@ExceptionHandler(value = { IllegalArgumentException.class, IllegalStateException.class })
 	protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) {
-		LOGGER.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
+		log.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
 		ApiResponseModel<?> reponse = ApiResponseModel.ERROR(null, ex.getLocalizedMessage());
-		validation.ifErrors(errorList -> reponse.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> reponse.addWarningMessages(warningList));
+		validation.ifErrors(reponse::addErrorMessages);
+		validation.ifWarnings(reponse::addWarningMessages);
 		validation.clear();
 		return new ResponseEntity<>(reponse, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 	@ExceptionHandler(value = { JpaObjectRetrievalFailureException.class, DataRetrievalFailureException.class })
 	protected ResponseEntity<Object> handleEntityNotFound(RuntimeException ex, WebRequest request) {
-		LOGGER.error("JPA ERROR IS: " + ex.getClass().getName(), ex);
+		log.error("JPA ERROR IS: " + ex.getClass().getName(), ex);
 		validation.clear();
 		return new ResponseEntity<>(ApiResponseModel.ERROR(null, ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST);
 	}
@@ -48,7 +47,7 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { AccessDeniedException.class })
 	protected ResponseEntity<Object> handleAuthorizationErrors(Exception ex, WebRequest request) {
 
-		LOGGER.error("Authorization error EXCETPION IS: " + ex.getClass().getName());
+		log.error("Authorization error EXCETPION IS: " + ex.getClass().getName());
 		String message = "You are not authorized to access this resource.";
 		validation.clear();
 		return new ResponseEntity<>(ApiResponseModel.ERROR(null, message), HttpStatus.FORBIDDEN);
@@ -57,8 +56,8 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { GradBusinessRuleException.class })
 	protected ResponseEntity<Object> handleIrisBusinessException(Exception ex, WebRequest request) {
 		ApiResponseModel<?> response = ApiResponseModel.ERROR(null);
-		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
+		validation.ifErrors(response::addErrorMessages);
+		validation.ifWarnings(response::addWarningMessages);
 		if (response.getMessages().isEmpty()) {
 			response.addMessageItem(ex.getLocalizedMessage(), MessageTypeEnum.ERROR);
 		}
@@ -69,11 +68,11 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { OptimisticEntityLockException.class })
 	protected ResponseEntity<Object> handleOptimisticEntityLockException(OptimisticEntityLockException ex, WebRequest request) {
 
-		LOGGER.error("EXCEPTION IS: " + ex.getClass().getName(), ex);
-		LOGGER.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
+		log.error("EXCEPTION IS: " + ex.getClass().getName(), ex);
+		log.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
 		ApiResponseModel<?> response = ApiResponseModel.ERROR(null);
-		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
+		validation.ifErrors(response::addErrorMessages);
+		validation.ifWarnings(response::addWarningMessages);
 		if (!validation.hasErrors()) {
 			response.addMessageItem(ex.getLocalizedMessage(), MessageTypeEnum.ERROR);
 		}
@@ -84,7 +83,7 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { DataIntegrityViolationException.class })
 	protected ResponseEntity<Object> handleSQLException(DataIntegrityViolationException ex, WebRequest request) {
 
-		LOGGER.error("DATA INTEGRITY VIOLATION IS: " + ex.getClass().getName(), ex);
+		log.error("DATA INTEGRITY VIOLATION IS: " + ex.getClass().getName(), ex);
 		String msg = ex.getLocalizedMessage();
 
 		Throwable cause = ex.getCause();
@@ -97,8 +96,8 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 		}
 
 		ApiResponseModel<?> reponse = ApiResponseModel.ERROR(null, msg);
-		validation.ifErrors(errorList -> reponse.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> reponse.addWarningMessages(warningList));
+		validation.ifErrors(reponse::addErrorMessages);
+		validation.ifWarnings(reponse::addWarningMessages);
 		validation.clear();
 		return new ResponseEntity<>(reponse, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
@@ -106,11 +105,11 @@ public class RestErrorHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(value = { Exception.class })
 	protected ResponseEntity<Object> handleUncaughtException(Exception ex, WebRequest request) {
 
-		LOGGER.error("EXCEPTION IS: " + ex.getClass().getName(), ex);
-		LOGGER.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
+		log.error("EXCEPTION IS: " + ex.getClass().getName(), ex);
+		log.error("Illegal argument ERROR IS: " + ex.getClass().getName(), ex);
 		ApiResponseModel<?> response = ApiResponseModel.ERROR(null);
-		validation.ifErrors(errorList -> response.addErrorMessages(errorList));
-		validation.ifWarnings(warningList -> response.addWarningMessages(warningList));
+		validation.ifErrors(response::addErrorMessages);
+		validation.ifWarnings(response::addWarningMessages);
 		if (!validation.hasErrors()) {
 			response.addMessageItem(ex.getLocalizedMessage(), MessageTypeEnum.ERROR);
 		}

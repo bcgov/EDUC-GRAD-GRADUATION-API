@@ -50,7 +50,7 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		}
 
 		// userName
-		val userName = request.getHeader(EducGraduationApiConstants.USERNAME);
+		val userName = request.getHeader(EducGraduationApiConstants.USER_NAME);
 		if (userName != null) {
 			ThreadLocalStateUtil.setCurrentUser(userName);
 		}

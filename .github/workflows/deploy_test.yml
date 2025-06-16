@@ -9,6 +9,9 @@ env:
   OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-test
   COMMON_NAMESPACE: ${{ vars.COMMON_NAMESPACE }}
   BUSINESS_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}
+  KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
+  KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+  TARGET_ENV: test
 
   SPRING_BOOT_IMAGE_NAME: educ-grad-graduation-api
 
@@ -42,6 +45,20 @@ jobs:
       - name: Get latest tag
         uses: actions-ecosystem/action-get-latest-tag@v1
         id: get-latest-tag
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Create/Update clients
+        run: node ./tools/config/clients-and-scopes.js
+
+      - name: Create/Update secrets
+        run: node ./tools/openshift/fetch-and-create-secrets.js
 
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1

@@ -36,8 +36,12 @@ public class TokenUtilsTest {
     TokenUtils restUtils;
 
     @MockBean
-    @Qualifier("graduationClient")
-    WebClient webClient;
+    @Qualifier("graduationApiClient")
+    WebClient graduationApiClient;
+
+    @MockBean
+    @Qualifier("gradEducStudentApiClient")
+    WebClient gradEducStudentApiClient;
 
     @TestConfiguration
     static class TestConfig {
@@ -81,7 +85,7 @@ public class TokenUtilsTest {
         tokenObject.setAccess_token(mockToken);
         tokenObject.setRefresh_token("456");
 
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.graduationApiClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(educDistributionApiConstants.getTokenUrl())).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
