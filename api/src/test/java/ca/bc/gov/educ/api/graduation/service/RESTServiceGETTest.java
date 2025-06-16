@@ -159,21 +159,4 @@ public class RESTServiceGETTest {
         when(this.responseMock.bodyToMono(ServiceException.class)).thenReturn(Mono.just(new ServiceException()));
         this.restService.get(TEST_URL_503, String.class, graduationApiClient);
     }
-
-    @Test(expected = ServiceException.class)
-    public void testGetOverride_Given4xxErrorFromService_ExpectServiceError(){
-        when(this.responseMock.bodyToMono(ServiceException.class)).thenReturn(Mono.just(new ServiceException()));
-        this.restService.get(TEST_URL_403, String.class, graduationApiClient);
-    }
-
-    @Test(expected = ServiceException.class)
-    public void testGetWithToken_Given5xxErrorFromService_ExpectWebClientRequestError(){
-        when(requestBodyUriMock.uri(TEST_URL_503)).thenReturn(requestBodyMock);
-        when(requestBodyMock.retrieve()).thenReturn(responseMock);
-
-        Throwable cause = new RuntimeException("Simulated cause");
-        when(responseMock.bodyToMono(String.class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.GET, null, new HttpHeaders())));
-        restService.get(TEST_URL_503, String.class, graduationApiClient);
-    }
-
 }

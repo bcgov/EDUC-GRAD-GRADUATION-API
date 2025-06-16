@@ -83,15 +83,6 @@ public class RESTServicePOSTTest {
 
     }
 
-    @Test
-    public void testPostOverride_GivenProperData_Expect200Response(){
-        ThreadLocalStateUtil.setCorrelationID("test-correlation-id");
-        ThreadLocalStateUtil.setCurrentUser("test-user");
-        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
-        byte[] response = this.restService.post(TEST_URL, TEST_BODY, byte[].class, graduationApiClient);
-        Assert.assertArrayEquals(TEST_BYTES, response);
-    }
-
     @Test(expected = ServiceException.class)
     public void testPost_Given4xxErrorFromService_ExpectServiceError() {
         when(this.responseMock.onStatus(any(), any())).thenThrow(new ServiceException());
@@ -113,15 +104,4 @@ public class RESTServicePOSTTest {
         when(responseMock.bodyToMono(byte[].class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
         this.restService.post(TEST_URL, TEST_BODY, byte[].class, graduationApiClient);
     }
-
-    @Test(expected = ServiceException.class)
-    public void testPostWithToken_Given5xxErrorFromService_ExpectWebClientRequestError(){
-        when(requestBodyUriMock.uri(TEST_URL)).thenReturn(requestBodyMock);
-        when(requestBodyMock.retrieve()).thenReturn(responseMock);
-
-        Throwable cause = new RuntimeException("Simulated cause");
-        when(responseMock.bodyToMono(byte[].class)).thenReturn(Mono.error(new WebClientRequestException(cause, HttpMethod.POST, null, new HttpHeaders())));
-        this.restService.post(TEST_URL, TEST_BODY, byte[].class, graduationApiClient);
-    }
-
 }

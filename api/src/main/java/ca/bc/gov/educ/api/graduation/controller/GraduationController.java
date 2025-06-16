@@ -12,7 +12,6 @@ import ca.bc.gov.educ.api.graduation.service.GraduationService;
 import ca.bc.gov.educ.api.graduation.service.ReportService;
 import ca.bc.gov.educ.api.graduation.service.SchoolReportsService;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
 import ca.bc.gov.educ.api.graduation.util.PermissionsContants;
 import ca.bc.gov.educ.api.graduation.util.ResponseHelper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -24,7 +23,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,23 +44,22 @@ import static ca.bc.gov.educ.api.graduation.service.SchoolReportsService.*;
 @OpenAPIDefinition(info = @Info(title = "API for Graduating Student.", description = "This API is for Graduating Student.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"GRAD_GRADUATE_STUDENT"})})
 public class GraduationController {
 
-    @Autowired
     GraduationService gradService;
-
-    @Autowired
     SchoolReportsService schoolReportsService;
-
-    @Autowired
     DistrictReportService districtReportService;
-
-    @Autowired
     ReportService reportService;
 
-    @Autowired
-    GradValidation validation;
-
-    @Autowired
     ResponseHelper response;
+
+    public GraduationController(GraduationService gradService, SchoolReportsService schoolReportsService,
+                                DistrictReportService districtReportService, ReportService reportService,
+                                ResponseHelper response) {
+        this.gradService = gradService;
+        this.schoolReportsService = schoolReportsService;
+        this.districtReportService = districtReportService;
+        this.reportService = reportService;
+        this.response = response;
+    }
 
     @GetMapping(EducGraduationApiConstants.GRADUATE_STUDENT_BY_STUDENT_ID_AND_PROJECTED_TYPE)
     @PreAuthorize(PermissionsContants.GRADUATE_STUDENT)
