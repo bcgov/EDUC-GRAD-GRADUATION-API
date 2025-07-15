@@ -2,18 +2,17 @@ package ca.bc.gov.educ.api.graduation.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+@Slf4j
 @Component
 public class JsonTransformer implements Transformer {
 
-    private static final Logger log = LoggerFactory.getLogger(JsonTransformer.class);
     private static final String MARSHALLING_MSG = "Time taken for unmarshalling response from String to {} is {} ms";
 
     final ObjectMapper objectMapper;

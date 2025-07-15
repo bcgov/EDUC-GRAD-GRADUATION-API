@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -40,7 +41,12 @@ public class SchoolServiceTest {
     GradValidation validation;
 
     @MockBean
-    WebClient webClient;
+    @Qualifier("graduationApiClient")
+    WebClient graduationApiClient;
+
+    @MockBean
+    @Qualifier("gradEducStudentApiClient")
+    WebClient gradEducStudentApiClient;
 
     @Autowired
     private EducGraduationApiConstants constants;
@@ -81,7 +87,8 @@ public class SchoolServiceTest {
         schtrax.setSchoolId(schoolId.toString());
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
-        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
+        String url = String.format("https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school-clob/%s", schoolId);
+        when(this.restService.get(url, SchoolClob.class, graduationApiClient)).thenReturn(schtrax);
         SchoolClob res = schoolService.getSchoolClob(schtrax.getSchoolId());
 
         assertNotNull(res);
@@ -96,7 +103,10 @@ public class SchoolServiceTest {
         ca.bc.gov.educ.api.graduation.model.dto.institute.School school = new ca.bc.gov.educ.api.graduation.model.dto.institute.School ();
         school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        when(this.restService.get(any(String.class), any())).thenReturn(school);
+
+        String url = String.format("https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school/%s", schoolId);
+        when(this.restService.get(url, ca.bc.gov.educ.api.graduation.model.dto.institute.School.class, graduationApiClient))
+                .thenReturn(school);
         ca.bc.gov.educ.api.graduation.model.dto.institute.School res = schoolService.getSchoolDetails(schoolId);
 
         assertNotNull(res);
@@ -113,7 +123,8 @@ public class SchoolServiceTest {
         schtrax.setMinCode(mincode);
         schtrax.setAddress1("1231");
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any())).thenReturn(schtrax);
+        String url = String.format("https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/school-clob/%s", schoolId);
+        when(this.restService.get(url, SchoolClob.class, graduationApiClient)).thenReturn(schtrax);
         SchoolClob res = schoolService.getSchoolClob(schoolId);
 
         assertNotNull(res);
@@ -127,7 +138,8 @@ public class SchoolServiceTest {
         District schoolDistrict = new District();
         schoolDistrict.setDistrictId(districtId.toString());
         mockTokenResponseObject();
-        when(this.restService.get(any(String.class), any())).thenReturn(schoolDistrict);
+        String url = String.format("https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v2/trax/district/%s", districtId);
+        when(this.restService.get(url, District.class, graduationApiClient)).thenReturn(schoolDistrict);
         District res = districtService.getDistrictDetails(districtId);
 
         assertNotNull(res);
@@ -140,7 +152,7 @@ public class SchoolServiceTest {
         tokenObject.setAccess_token(mockToken);
         tokenObject.setRefresh_token("456");
 
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.graduationApiClient.post()).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.uri(constants.getTokenUrl())).thenReturn(this.requestBodyUriMock);
         when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
         when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);

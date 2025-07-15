@@ -1,7 +1,7 @@
 meta {
   name: District Label Report Creation for Schools
   type: http
-  seq: 10
+  seq: 12
 }
 
 post {
@@ -17,6 +17,112 @@ params:query {
 
 body:json {
   [
-    {}
+    {
+      "schoolId": "",
+      "mincode": "",
+      "name": "",
+      "typeIndicator": "",
+      "typeBanner": "",
+      "signatureCode": "",
+      "distno": "",
+      "schlno": "",
+      "schoolCategoryCode": "",
+      "address": {
+        "streetLine1": "",
+        "streetLine2": "",
+        "streetLine3": "",
+        "city": "",
+        "region": "",
+        "country": "",
+        "code": ""
+      },
+      "phoneNumber": "",
+      "dogwoodElig": "",
+      "schoolStatistic": {
+        "transcriptCount": "",
+        "dogwoodCount": "",
+        "adultDogwoodCount": "",
+        "frenchImmersionCount": "",
+        "programFrancophoneCount": "",
+        "evergreenCount": "",
+        "totalCertificateCount": ""
+      },
+      "students": [
+        {
+          "pen": {
+            "pen": "",
+            "entityID": {}
+          },
+          "firstName": "",
+          "middleName": "",
+          "lastName": "",
+          "gender": "",
+          "citizenship": "",
+          "birthdate": "",
+          "address": {
+            "streetLine1": "",
+            "streetLine2": "",
+            "streetLine3": "",
+            "city": "",
+            "region": "",
+            "country": "",
+            "code": ""
+          },
+          "grade": "",
+          "gradProgram": "",
+          "studStatus": "",
+          "sccDate": "",
+          "mincodeGrad": "",
+          "englishCert": "",
+          "frenchCert": "",
+          "consumerEducReqt": "",
+          "localId": "",
+          "hasOtherProgram": "",
+          "lastUpdateDate": "",
+          "otherProgramParticipation": [
+            {
+              "programCode": "",
+              "programName": ""
+            }
+          ],
+          "nonGradReasons": [
+            {
+              "code": "",
+              "description": ""
+            }
+          ],
+          "certificateTypes": [
+            {
+              "reportName": "",
+              "paperType": {
+                "code": ""
+              }
+            }
+          ],
+          "transcriptTypes": [],
+          "graduationData": {
+            "graduationDate": "",
+            "honorsFlag": "",
+            "dogwoodFlag": "",
+            "programCodes": [],
+            "programNames": [],
+            "totalCreditsUsedForGrad": ""
+          },
+          "graduationStatus": {
+            "programCompletionDate": "",
+            "honours": "",
+            "gpa": "",
+            "studentGrade": "",
+            "studentStatus": "",
+            "studentStatusName": "",
+            "schoolAtGrad": "",
+            "schoolOfRecord": "",
+            "certificates": "",
+            "graduationMessage": "",
+            "programName": ""
+          }
+        }
+      ]
+    }
   ]
 }

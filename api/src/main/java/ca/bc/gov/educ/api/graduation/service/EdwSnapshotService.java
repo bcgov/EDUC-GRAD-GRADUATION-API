@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,16 +21,13 @@ import java.util.UUID;
 public class EdwSnapshotService {
 
     final GradAlgorithmService gradAlgorithmService;
-
     final GradStatusService gradStatusService;
-
     final ReportService reportService;
-
     final EducGraduationApiConstants constants;
-
     final RESTService restService;
-
     final JsonTransformer jsonTransformer;
+    WebClient graduationApiClient;
+    WebClient educStudentApiClient;
 
     @Autowired
     public EdwSnapshotService(EducGraduationApiConstants constants,
@@ -36,13 +35,17 @@ public class EdwSnapshotService {
                               GradStatusService gradStatusService,
                               ReportService reportService,
                               RESTService restService,
-                              JsonTransformer jsonTransformer) {
+                              JsonTransformer jsonTransformer,
+                              @Qualifier("graduationApiClient") WebClient graduationApiClient,
+                              @Qualifier("gradEducStudentApiClient") WebClient educStudentApiClient) {
         this.constants = constants;
         this.gradAlgorithmService = gradAlgorithmService;
         this.gradStatusService = gradStatusService;
         this.reportService = reportService;
         this.restService = restService;
         this.jsonTransformer = jsonTransformer;
+        this.graduationApiClient = graduationApiClient;
+        this.educStudentApiClient = educStudentApiClient;
     }
 
     public EdwGraduationSnapshot processSnapshot(EdwGraduationSnapshot snapshotRequest) {
@@ -101,9 +104,8 @@ public class EdwSnapshotService {
     }
 
     public void saveEdwSnapshotOfGraduationStatus(EdwGraduationSnapshot requestObj) {
-        this.restService.post(constants.getEdwSnapshotOfGraduationStatus(),
-                requestObj,
-                EdwGraduationSnapshot.class);
+        this.restService.post(constants.getEdwSnapshotOfGraduationStatus(), requestObj,
+                EdwGraduationSnapshot.class, graduationApiClient);
     }
 
     public UUID getStudentID(String pen) {
@@ -117,7 +119,7 @@ public class EdwSnapshotService {
 
     public GradSearchStudent getStudentByPenFromStudentApi(String pen) {
         var response = this.restService.get(String.format(constants.getPenStudentApiByPenUrl(), pen),
-                List.class);
+                List.class, educStudentApiClient);
         if (response != null && !response.isEmpty()) {
             List<GradSearchStudent> studentList = jsonTransformer.convertValue(response, new TypeReference<>(){});
             return studentList.get(0);

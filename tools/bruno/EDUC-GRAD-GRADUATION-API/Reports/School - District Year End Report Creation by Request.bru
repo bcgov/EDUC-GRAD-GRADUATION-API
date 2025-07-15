@@ -1,0 +1,33 @@
+meta {
+  name: School - District Year End Report Creation by Request
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/graduate/report/schooldistrictyearend
+  body: json
+  auth: none
+}
+
+params:query {
+  ~slrt: 
+  ~drt: 
+  ~srt: 
+}
+
+body:json {
+  {
+    "schoolIds": [],
+    "districtIds": [],
+    "schoolCategoryCodes": [],
+    "studentList": [
+      {
+        "studentID": "",
+        "paperType": "",
+        "certificateTypeCode": "",
+        "reportingSchoolTypeCode": ""
+      }
+    ]
+  }
+}

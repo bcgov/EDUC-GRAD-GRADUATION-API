@@ -4,9 +4,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -18,9 +17,8 @@ import java.time.temporal.TemporalAdjusters;
 
 import static ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants.*;
 
+@Slf4j
 public class GradLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
-
-    private static final Logger logger = LoggerFactory.getLogger(GradLocalDateTimeDeserializer.class);
 
     @Override
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {

@@ -1,0 +1,53 @@
+[
+  {
+    "clientId": "grad-graduation-api-client",
+    "scopes": ["GET_GRADUATION_DATA",
+      "GET_GRADUATION_TRANSCRIPT",
+      "RUN_GRAD_ALGORITHM",
+      "READ_GRAD_GRADUATION_STATUS",
+      "UPDATE_GRAD_GRADUATION_STATUS",
+      "READ_GRAD_STUDENT_SPECIAL_DATA",
+      "UPDATE_GRAD_STUDENT_SPECIAL_DATA",
+      "READ_GRAD_STUDENT_STATUS_CODE_DATA",
+      "READ_GRAD_PROGRAM_CODE_DATA",
+      "READ_GRAD_PROGRAM_RULES_DATA",
+      "RUN_GRAD_ALGORITHM",
+      "READ_GRAD_STUDENT_REPORT_DATA",
+      "UPDATE_GRAD_STUDENT_REPORT_DATA",
+      "READ_GRAD_STUDENT_CERTIFICATE_DATA",
+      "READ_GRAD_CERTIFICATE_CODE_DATA",
+      "READ_GRAD_REPORT_CODE_DATA",
+      "CREATE_STUDENT_ACHIEVEMENT_REPORT",
+      "CREATE_STUDENT_TRANSCRIPT_REPORT",
+      "CREATE_STUDENT_CERTIFICATE",
+      "CREATE_STUDENT_NON_GRAD",
+      "CREATE_SCHOOL_GRADUATION",
+      "CREATE_SCHOOL_NON_GRADUATION",
+      "CREATE_SCHOOL_DISTRIBUTION",
+      "CREATE_SCHOOL_LABEL",
+      "READ_GRAD_SPECIAL_CASE_DATA",
+      "READ_GRAD_SCHOOL_DATA"
+    ],
+    "settings": {
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    }
+  },
+  {
+    "clientId": "grad-educ-student-api-client",
+    "scopes": ["READ_STUDENT"
+    ],
+    "settings": {
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+  }
+]

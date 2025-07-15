@@ -5,33 +5,31 @@ import ca.bc.gov.educ.api.graduation.model.report.ReportData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Data
 @Component
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 	
-	private static Logger logger = LoggerFactory.getLogger(ProjectedGradFinalMarksRegistrationsProcess.class);
-
 	@Override
 	public ProcessorData fire(ProcessorData processorData) {
 		ExceptionMessage exception = new ExceptionMessage();
 		long startTime = System.currentTimeMillis();
-		logger.debug("************* TIME START  ************ {}",startTime);
+		log.debug("************* TIME START  ************ {}",startTime);
 		AlgorithmResponse algorithmResponse = new AlgorithmResponse();
 		GraduationStudentRecord gradResponse = processorData.getGradResponse();
 		GraduationData graduationDataStatus = gradAlgorithmService.runProjectedAlgorithm(gradResponse.getStudentID(), gradResponse.getProgram());
 		if(algorithmSupport.checkForErrors(graduationDataStatus,algorithmResponse,processorData)){
 			return processorData;
 		}
-		logger.debug("**** Grad Algorithm Completed: ****");
+		log.debug("**** Grad Algorithm Completed: ****");
 		//Code to prepare achievement report
 		ProjectedRunClob projectedRunClob = ProjectedRunClob.builder()
 				.graduated(graduationDataStatus.isGraduated())
@@ -46,14 +44,14 @@ public class ProjectedGradFinalMarksRegistrationsProcess extends BaseProcess {
 		}
 		ExceptionMessage excp = reportService.saveStudentAchivementReportJasper(gradResponse.getPen(), data, gradResponse.getStudentID(), exception, graduationDataStatus.isGraduated());
 		if (checkExceptions(excp,algorithmResponse,processorData)) {
-			logger.debug("**** Problem Generating TVR: ****");
+			log.debug("**** Problem Generating TVR: ****");
 			return processorData;
 		}
 		algorithmResponse.setStudentOptionalProgram(projectedOptionalGradResponse);
 		algorithmResponse.setGraduationStudentRecord(gradResponse);
 		long endTime = System.currentTimeMillis();
 		long diff = (endTime - startTime)/1000;
-		logger.debug("************* TIME Taken  ************ {}",diff);
+		log.debug("************* TIME Taken  ************ {}",diff);
 		processorData.setAlgorithmResponse(algorithmResponse);
 		return processorData;
 

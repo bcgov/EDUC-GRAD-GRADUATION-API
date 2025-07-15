@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,7 +59,12 @@ public class EdwSnapshotServiceTest {
     private EducGraduationApiConstants constants;
 
     @MockBean
-    WebClient webClient;
+    @Qualifier("graduationApiClient")
+    WebClient graduationApiClient;
+
+    @MockBean
+    @Qualifier("gradEducStudentApiClient")
+    WebClient educStudentApiClient;
 
     @Before
     public void setUp() {
@@ -110,7 +116,8 @@ public class EdwSnapshotServiceTest {
         when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), any())).thenReturn(gradResponse);
         when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString())).thenReturn(graduationData);
 
-        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class)).thenReturn(List.of(penStudent));
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()),
+                List.class, educStudentApiClient)).thenReturn(List.of(penStudent));
 
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
@@ -148,7 +155,8 @@ public class EdwSnapshotServiceTest {
         penStudent.setPen(snapshotRequest.getPen());
         penStudent.setStudentID(snapshotRequest.getStudentID().toString());
 
-        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()), List.class)).thenReturn(List.of(penStudent));
+        when(restService.get(String.format(constants.getPenStudentApiByPenUrl(), snapshotRequest.getPen()),
+                List.class, educStudentApiClient)).thenReturn(List.of(penStudent));
         when(gradStatusService.getGradStatus(eq(snapshotRequest.getStudentID().toString()), any())).thenReturn(gradResponse);
         when(gradAlgorithmService.runHypotheticalGraduatedAlgorithm(snapshotRequest.getStudentID(), gradResponse.getProgram(), snapshotRequest.getGradYear().toString())).thenReturn(graduationData);
 
@@ -159,6 +167,4 @@ public class EdwSnapshotServiceTest {
         assertThat(result.getGpa()).isEqualTo("3.80");
         assertThat(result.getHonoursStanding()).isEqualTo("Y");
     }
-
-
 }
