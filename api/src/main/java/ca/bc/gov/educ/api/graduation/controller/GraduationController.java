@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,6 +52,7 @@ public class GraduationController {
 
     ResponseHelper response;
 
+    @Autowired
     public GraduationController(GraduationService gradService, SchoolReportsService schoolReportsService,
                                 DistrictReportService districtReportService, ReportService reportService,
                                 ResponseHelper response) {
