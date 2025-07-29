@@ -53,7 +53,6 @@ PARSER_CONFIG="
 echo Creating config map "$APP_NAME"-config-map
 oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
  --from-literal=APP_LOG_LEVEL="$APP_LOG_LEVEL" \
- --from-literal=EDUC_SCHOOL_API="http://school-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
  --from-literal=ENABLE_SPLUNK_LOG_HELPER="true" \
  --from-literal=GRAD_ALGORITHM_API="http://educ-grad-algorithm-api.$BUSINESS_NAMESPACE-$envValue.svc.cluster.local:8080/" \
  --from-literal=GRAD_GRADUATION_REPORT_API="http://educ-grad-graduation-report-api.$GRAD_NAMESPACE-$envValue.svc.cluster.local:8080/" \
