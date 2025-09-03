@@ -50,6 +50,14 @@ PARSER_CONFIG="
 ###########################################################
 #Setup for config-maps
 ###########################################################
+
+if [ "$ENV" == "prod" ]
+then
+  ALGORITHM_API_VERSION="v1"
+else
+  ALGORITHM_API_VERSION="v2"
+fi
+
 echo Creating config map "$APP_NAME"-config-map
 oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
  --from-literal=APP_LOG_LEVEL="$APP_LOG_LEVEL" \
@@ -63,6 +71,7 @@ oc create -n "$GRAD_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
  --from-literal=GRAD_TRAX_API="http://educ-grad-trax-api.$GRAD_NAMESPACE-$envValue.svc.cluster.local:8080/" \
  --from-literal=KEYCLOAK_TOKEN_URL="https://soam-$envValue.apps.silver.devops.gov.bc.ca/" \
  --from-literal=PEN_API="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
+ --from-literal=ALGORITHM_API_VERSION=$ALGORITHM_API_VERSION \
  --dry-run=client -o yaml | oc apply -f -
 echo
 

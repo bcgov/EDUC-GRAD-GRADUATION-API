@@ -111,9 +111,9 @@ endpoint:
   program_requirement_codes:
    url: ${GRAD_PROGRAM_API}api/v1/program/programrequirementcode
  gradalgorithm-api: 
-  gradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s
-  projectedgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
-  hypotheticalgradalgorithm: ${GRAD_ALGORITHM_API}api/v1/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
+  gradalgorithm: ${GRAD_ALGORITHM_API}api/${ALGORITHM_API_VERSION}/graduatestudent?studentID=%s&gradProgram=%s
+  projectedgradalgorithm: ${GRAD_ALGORITHM_API}api/${ALGORITHM_API_VERSION}/graduatestudent?studentID=%s&gradProgram=%s&projected=%b
+  hypotheticalgradalgorithm: ${GRAD_ALGORITHM_API}api/${ALGORITHM_API_VERSION}/graduatestudent?studentID=%s&gradProgram=%s&hypotheticalGradYear=%s
  grad-graduation-report-api: 
   update-grad-student-report: 
    url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentreport?isGraduated=%s
