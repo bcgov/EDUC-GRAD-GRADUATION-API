@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.graduation.service;
 
+import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.GradRequirement;
 import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
@@ -143,8 +144,12 @@ public class GraduationService {
         try {
             return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class, graduationApiClient);
         } catch (ServiceException ex) {
-            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode() || HttpStatus.NOT_FOUND.value() == ex.getStatusCode()) {
-                return new byte[0];
+            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()){
+              return new byte[0];
+            } else if(HttpStatus.NOT_FOUND.value() == ex.getStatusCode()) {
+                throw new EntityNotFoundException(
+                        GraduationService.class,
+                        "No report found for student " + reportParams); 
             } else {
                 throw ex;
             }
