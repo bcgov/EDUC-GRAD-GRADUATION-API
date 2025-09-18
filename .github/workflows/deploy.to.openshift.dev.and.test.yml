@@ -37,11 +37,11 @@ jobs:
       KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
       KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
       MIN_CPU: "20m"
-      MAX_CPU: "120m"
+      MAX_CPU: "220m"
       MIN_MEM: "600Mi"
       MAX_MEM: "1500Mi"
-      MIN_REPLICAS: "3"
-      MAX_REPLICAS: "7"
+      MIN_REPLICAS: "1"
+      MAX_REPLICAS: "2"
 
     steps:
       - name: Check out repository
@@ -167,11 +167,11 @@ jobs:
       KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
       KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
       MIN_CPU: "20m"
-      MAX_CPU: "120m"
+      MAX_CPU: "220m"
       MIN_MEM: "600Mi"
       MAX_MEM: "1500Mi"
-      MIN_REPLICAS: "3"
-      MAX_REPLICAS: "7"
+      MIN_REPLICAS: "2"
+      MAX_REPLICAS: "3"
 
     steps:
       - name: Check out repository
