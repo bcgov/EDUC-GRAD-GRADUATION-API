@@ -144,12 +144,8 @@ public class GraduationService {
         try {
             return restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams, byte[].class, graduationApiClient);
         } catch (ServiceException ex) {
-            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()){
+            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode() || HttpStatus.NOT_FOUND.value() == ex.getStatusCode()){
               return new byte[0];
-            } else if(HttpStatus.NOT_FOUND.value() == ex.getStatusCode()) {
-                throw new EntityNotFoundException(
-                        GraduationService.class,
-                        "No report found for student " + reportParams); 
             } else {
                 throw ex;
             }
