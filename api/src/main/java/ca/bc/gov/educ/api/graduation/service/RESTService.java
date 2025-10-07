@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
 import ca.bc.gov.educ.api.graduation.util.ThreadLocalStateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -19,6 +20,7 @@ import reactor.util.retry.Retry;
 import java.io.IOException;
 import java.time.Duration;
 
+@Slf4j
 @Service
 public class RESTService {
 
@@ -112,6 +114,8 @@ public class RESTService {
                     .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
                             .filter(ex -> ex instanceof ServiceException || ex instanceof IOException || ex instanceof WebClientRequestException)
                             .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                                var ex = retrySignal.failure();
+                                log.error("Error occurred while trying to process the request after max retries: {}", ex.getMessage());
                                 throw new ServiceException(getErrorMessage(url, SERVICE_FAILED_ERROR), HttpStatus.SERVICE_UNAVAILABLE.value());
                             }))
                     .block();
