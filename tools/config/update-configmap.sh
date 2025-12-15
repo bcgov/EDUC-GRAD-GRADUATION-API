@@ -51,7 +51,7 @@ PARSER_CONFIG="
 #Setup for config-maps
 ###########################################################
 
-if [ "$ENV" == "prod" ]
+if [ "$envValue" == "prod" ]
 then
   ALGORITHM_API_VERSION="v1"
 else
