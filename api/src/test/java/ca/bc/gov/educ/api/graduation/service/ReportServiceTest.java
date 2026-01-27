@@ -24,6 +24,7 @@ import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.BufferedReader;
@@ -123,6 +124,29 @@ public class ReportServiceTest {
 
 		var result = reportService.getStudentsForSchoolNonGradYearEndReport();
 		assertNotNull(result);
+	}
+
+	@Test
+	public void testIsValidCutOffCoursePrefersHighestNonNullPercentage() {
+		StudentCourse nullAttempt = StudentCourse.builder()
+				.courseCode("WH")
+				.courseLevel("12")
+				.sessionDate("2025/08")
+				.completedCoursePercentage(null)
+				.build();
+		StudentCourse passingAttempt = StudentCourse.builder()
+				.courseCode("WH")
+				.courseLevel("12")
+				.sessionDate("2025/06")
+				.completedCoursePercentage(88.0)
+				.build();
+		List<StudentCourse> attempts = List.of(nullAttempt, passingAttempt);
+
+		Boolean passingResult = ReflectionTestUtils.invokeMethod(reportService, "isValidCutOffCourse", attempts, passingAttempt);
+		Boolean nullResult = ReflectionTestUtils.invokeMethod(reportService, "isValidCutOffCourse", attempts, nullAttempt);
+
+		assertTrue(passingResult);
+		assertFalse(nullResult);
 	}
 
 	@Test
@@ -2302,4 +2326,3 @@ public class ReportServiceTest {
 		return sb.toString();
 	}
 }
-
