@@ -354,7 +354,7 @@ public class ReportService {
     private boolean isValidCutOffCourse(List<StudentCourse> studentCourseList, StudentCourse cutOffCourse) {
         List<StudentCourse> dups = studentCourseList.stream().filter(sc ->
                 StringUtils.equalsIgnoreCase(sc.getCourseCode(), cutOffCourse.getCourseCode()) && StringUtils.equalsIgnoreCase(sc.getCourseLevel(), cutOffCourse.getCourseLevel())
-        ).sorted(Comparator.comparing(StudentCourse::getCompletedCoursePercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+        ).sorted(Comparator.comparing(StudentCourse::getCompletedCoursePercentage, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
 
         if (!dups.isEmpty()) {
             StudentCourse topMarkCourse = dups.get(0);
@@ -1334,4 +1334,3 @@ public class ReportService {
         return null;
     }
 }
-
