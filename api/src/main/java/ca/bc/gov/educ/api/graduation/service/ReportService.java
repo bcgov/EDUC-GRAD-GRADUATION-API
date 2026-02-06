@@ -863,7 +863,7 @@ public class ReportService {
                 equivOrChallenge = sc.getEquivOrChallenge();
             }
             crse.setCourseCode(sc.getCourseCode());
-            crse.setCredits(sc.getCredits().toString());
+            crse.setCredits(sc.getCredits() != null ? sc.getCredits().toString() : "");
             crse.setCourseLevel(sc.getCourseLevel());
             crse.setCourseName(getCourseNameLogic(sc));
             crse.setSessionDate(sc.getSessionDate() != null ? sc.getSessionDate() : "");
@@ -896,7 +896,7 @@ public class ReportService {
             }
 
             crse.setCourseCode(sc.getCourseCode());
-            crse.setCredits(sc.getCredits().toString());
+            crse.setCredits(sc.getCredits() != null ? sc.getCredits().toString() : "");
             crse.setCourseLevel(sc.getCourseLevel());
             crse.setCourseName(getCourseNameLogic(sc));
             crse.setProjected(sc.isProjected());
