@@ -971,6 +971,7 @@ public class ReportService {
         options.setReportName("Transcript Report.pdf");
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(sample);
         reportParams.setData(sample);
         try {
             byte[] bytes = restService.post(educGraduationApiConstants.getTranscriptReport(), reportParams,
@@ -1109,6 +1110,7 @@ public class ReportService {
         options.setReportName("Certificate.pdf");
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(sample);
         reportParams.setData(sample);
         try {
             byte[] bytesSAR = restService.post(educGraduationApiConstants.getCertificateReport(),
@@ -1129,6 +1131,7 @@ public class ReportService {
         options.setReportName("Student Achievement Report.pdf");
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(data);
         reportParams.setData(data);
         try {
             byte[] bytesSAR = restService.post(educGraduationApiConstants.getAchievementReport(),
