@@ -53,7 +53,7 @@ PARSER_CONFIG="
 
 if [ "$envValue" == "prod" ]
 then
-  ALGORITHM_API_VERSION="v1"
+  ALGORITHM_API_VERSION="v2"
 else
   ALGORITHM_API_VERSION="v2"
 fi
