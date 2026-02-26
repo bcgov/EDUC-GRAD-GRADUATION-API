@@ -386,7 +386,6 @@ public class ReportService {
         tList.add(transcriptResult);
     }
 
-    @Generated
     private boolean isHigherCompletedPercentage(TranscriptResult existing, TranscriptResult candidate) {
         if (existing == null || candidate == null) {
             return false;
