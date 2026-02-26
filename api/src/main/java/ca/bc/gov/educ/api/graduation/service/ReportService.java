@@ -374,7 +374,7 @@ public class ReportService {
         if (!dups.isEmpty()) {
             TranscriptResult tr = dups.get(0);
             // GRAD2-2394: only if a course taken previously was not used for grad(= requirementMet is blank), then the highest course will be taken
-            if (StringUtils.isBlank(tr.getRequirement()) && tr.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
+            if (StringUtils.isBlank(tr.getRequirement()) && isHigherCompletedPercentage(tr, transcriptResult)) {
                 // replace
                 tList.remove(tr);
                 tList.add(transcriptResult);
@@ -382,6 +382,13 @@ public class ReportService {
             }
         }
         tList.add(transcriptResult);
+    }
+
+    @Generated
+    private boolean isHigherCompletedPercentage(TranscriptResult existing, TranscriptResult candidate) {
+        return existing.getCompletedPercentage() != null
+                && candidate.getCompletedPercentage() != null
+                && existing.getCompletedPercentage() < candidate.getCompletedPercentage();
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
