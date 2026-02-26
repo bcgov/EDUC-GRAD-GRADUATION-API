@@ -39,6 +39,7 @@ public class ReportService {
     private static final String GRAD_REPORT_API_DOWN = "GRAD-REPORT-API IS DOWN";
     private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
     private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
+    private static final String REPORT_NOT_GENERATED = "UNABLE TO GENERATE REPORT DATA";
 
     JsonTransformer jsonTransformer;
     EducGraduationApiConstants educGraduationApiConstants;
@@ -191,7 +192,8 @@ public class ReportService {
             data.getStudent().setOtherProgramParticipation(otherPrograms);
             return data;
         } catch (Exception e) {
-            exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
+            log.error("{} for student: {} due to:", REPORT_NOT_GENERATED, gradResponse != null ? gradResponse.getStudentID() : "unknown", e);
+            exception.setExceptionName(REPORT_NOT_GENERATED);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
         }
         ReportData errorData = new ReportData();
@@ -367,14 +369,14 @@ public class ReportService {
     private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList) {
         List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
                                 !tr.getCourse().equals(transcriptResult.getCourse())
-        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
 
 
         // Handling duplicates
         if (!dups.isEmpty()) {
             TranscriptResult tr = dups.get(0);
             // GRAD2-2394: only if a course taken previously was not used for grad(= requirementMet is blank), then the highest course will be taken
-            if (StringUtils.isBlank(tr.getRequirement()) && tr.getCompletedPercentage() < transcriptResult.getCompletedPercentage()) {
+            if (StringUtils.isBlank(tr.getRequirement()) && isHigherCompletedPercentage(tr, transcriptResult)) {
                 // replace
                 tList.remove(tr);
                 tList.add(transcriptResult);
@@ -382,6 +384,21 @@ public class ReportService {
             }
         }
         tList.add(transcriptResult);
+    }
+
+    private boolean isHigherCompletedPercentage(TranscriptResult existing, TranscriptResult candidate) {
+        if (existing == null || candidate == null) {
+            return false;
+        }
+        Double existingPercentage = existing.getCompletedPercentage();
+        Double candidatePercentage = candidate.getCompletedPercentage();
+        if (candidatePercentage == null) {
+            return false;
+        }
+        if (existingPercentage == null) {
+            return true;
+        }
+        return candidatePercentage > existingPercentage;
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
