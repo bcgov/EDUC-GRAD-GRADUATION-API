@@ -3,10 +3,9 @@ package ca.bc.gov.educ.api.graduation.service;
 import ca.bc.gov.educ.api.graduation.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.graduation.exception.ServiceException;
 import ca.bc.gov.educ.api.graduation.model.dto.*;
+import ca.bc.gov.educ.api.graduation.model.dto.GraduationData;
 import ca.bc.gov.educ.api.graduation.model.dto.institute.YearEndReportRequest;
-import ca.bc.gov.educ.api.graduation.model.report.Code;
-import ca.bc.gov.educ.api.graduation.model.report.ReportData;
-import ca.bc.gov.educ.api.graduation.model.report.Transcript;
+import ca.bc.gov.educ.api.graduation.model.report.*;
 import ca.bc.gov.educ.api.graduation.util.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -147,6 +146,41 @@ public class ReportServiceTest {
 
 		assertTrue(passingResult);
 		assertFalse(nullResult);
+	}
+
+	@Test
+	public void testIsHigherCompletedPercentageHandlesNullsAndComparison() {
+		TranscriptResult existing = new TranscriptResult();
+		Mark existingMark = new Mark();
+		existingMark.setCompletedCoursePercentage(70.0);
+		existing.setMark(existingMark);
+
+		TranscriptResult higherCandidate = new TranscriptResult();
+		Mark higherCandidateMark = new Mark();
+		higherCandidateMark.setCompletedCoursePercentage(85.0);
+		higherCandidate.setMark(higherCandidateMark);
+
+		Boolean higherResult = ReflectionTestUtils.invokeMethod(reportService, "isHigherCompletedPercentage", existing, higherCandidate);
+		assertTrue(higherResult);
+
+		TranscriptResult lowerCandidate = new TranscriptResult();
+		Mark lowerCandidateMark = new Mark();
+		lowerCandidateMark.setCompletedCoursePercentage(65.0);
+		lowerCandidate.setMark(lowerCandidateMark);
+
+		Boolean lowerResult = ReflectionTestUtils.invokeMethod(reportService, "isHigherCompletedPercentage", existing, lowerCandidate);
+		assertFalse(lowerResult);
+
+		TranscriptResult nullCandidate = new TranscriptResult();
+		Boolean nullResult = ReflectionTestUtils.invokeMethod(reportService, "isHigherCompletedPercentage", existing, nullCandidate);
+		assertFalse(nullResult);
+
+		TranscriptResult nullExisting = new TranscriptResult();
+		Boolean nullExistingResult = ReflectionTestUtils.invokeMethod(reportService, "isHigherCompletedPercentage", nullExisting, higherCandidate);
+		assertTrue(nullExistingResult);
+
+		Boolean bothNullResult = ReflectionTestUtils.invokeMethod(reportService, "isHigherCompletedPercentage", nullExisting, nullCandidate);
+		assertFalse(bothNullResult);
 	}
 
 	@Test

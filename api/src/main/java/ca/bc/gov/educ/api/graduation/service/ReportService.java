@@ -369,7 +369,7 @@ public class ReportService {
     private void addIntoTranscriptList(TranscriptResult transcriptResult, List<TranscriptResult> tList) {
         List<TranscriptResult> dups = tList.stream().filter(tr -> tr.getCourse().isDuplicate(transcriptResult.getCourse()) &&
                                 !tr.getCourse().equals(transcriptResult.getCourse())
-        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Double::compareTo)).reversed()).toList();
+        ).sorted(Comparator.comparing(TranscriptResult::getCompletedPercentage, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
 
 
         // Handling duplicates
@@ -388,9 +388,18 @@ public class ReportService {
 
     @Generated
     private boolean isHigherCompletedPercentage(TranscriptResult existing, TranscriptResult candidate) {
-        return existing.getCompletedPercentage() != null
-                && candidate.getCompletedPercentage() != null
-                && existing.getCompletedPercentage() < candidate.getCompletedPercentage();
+        if (existing == null || candidate == null) {
+            return false;
+        }
+        Double existingPercentage = existing.getCompletedPercentage();
+        Double candidatePercentage = candidate.getCompletedPercentage();
+        if (candidatePercentage == null) {
+            return false;
+        }
+        if (existingPercentage == null) {
+            return true;
+        }
+        return candidatePercentage > existingPercentage;
     }
 
     private TranscriptCourse setCourseObjForTranscript(StudentCourse sc, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus) {
