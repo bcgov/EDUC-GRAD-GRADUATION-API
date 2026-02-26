@@ -39,6 +39,7 @@ public class ReportService {
     private static final String GRAD_REPORT_API_DOWN = "GRAD-REPORT-API IS DOWN";
     private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
     private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
+    private static final String REPORT_NOT_GENERATED = "UNABLE TO GENERATE REPORT DATA";
 
     JsonTransformer jsonTransformer;
     EducGraduationApiConstants educGraduationApiConstants;
@@ -191,7 +192,8 @@ public class ReportService {
             data.getStudent().setOtherProgramParticipation(otherPrograms);
             return data;
         } catch (Exception e) {
-            exception.setExceptionName("UNABLE TO GENERATE REPORT DATA");
+            log.error("{} for student: {} due to:", REPORT_NOT_GENERATED, gradResponse != null ? gradResponse.getStudentID() : "unknown", e);
+            exception.setExceptionName(REPORT_NOT_GENERATED);
             exception.setExceptionDetails(e.getCause() == null ? e.getLocalizedMessage() : e.getCause().getLocalizedMessage());
         }
         ReportData errorData = new ReportData();
