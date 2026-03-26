@@ -666,13 +666,29 @@ public class ReportService {
 
     @Generated
     private String getCourseNameLogic(StudentCourse sc) {
-        if (sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
-            return "IDS " + sc.getRelatedCourseName();
+        if (isIndependentDirectedStudiesCourse(sc)) {
+            if (StringUtils.isNotBlank(sc.getRelatedCourseName())) {
+                return "IDS " + sc.getRelatedCourseName();
+            }
+
+            String baseCourseTitle = StringUtils.defaultIfBlank(sc.getCustomizedCourseName(), sc.getCourseName());
+            if (StringUtils.isNotBlank(baseCourseTitle)) {
+                return StringUtils.startsWithIgnoreCase(baseCourseTitle, "IDS ") ? baseCourseTitle : "IDS " + baseCourseTitle;
+            }
         }
         if (StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
             return sc.getCustomizedCourseName();
         }
         return sc.getCourseName();
+    }
+
+    private boolean isIndependentDirectedStudiesCourse(StudentCourse sc) {
+        return sc != null && (
+                sc.isIndependentDirectedStudies()
+                        || StringUtils.equalsIgnoreCase(sc.getGenericCourseType(), "I")
+                        || StringUtils.startsWithIgnoreCase(sc.getCourseCode(), "IDS")
+                        || StringUtils.startsWithIgnoreCase(sc.getCourseName(), "Independent Directed Studies")
+        );
     }
 
     private String getValue(Double value) {
