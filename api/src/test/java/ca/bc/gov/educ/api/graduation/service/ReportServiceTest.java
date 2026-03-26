@@ -184,6 +184,49 @@ public class ReportServiceTest {
 	}
 
 	@Test
+	public void testGetCourseNameLogicForIdsUsesRelatedCourseName() {
+		StudentCourse idsCourse = StudentCourse.builder()
+				.genericCourseType("I")
+				.courseCode("IDS")
+				.courseName("Independent Directed Studies 12A")
+				.relatedCourse("MATH")
+				.relatedLevel("12")
+				.relatedCourseName("Calculus 12")
+				.build();
+
+		String result = ReflectionTestUtils.invokeMethod(reportService, "getCourseNameLogic", idsCourse);
+
+		assertEquals("IDS Calculus 12", result);
+	}
+
+	@Test
+	public void testGetCourseNameLogicForIdsFallsBackToCourseNameWhenRelatedCourseBlank() {
+		StudentCourse idsCourse = StudentCourse.builder()
+				.genericCourseType("I")
+				.courseCode("IDS")
+				.courseName("Independent Directed Studies 10A")
+				.build();
+
+		String result = ReflectionTestUtils.invokeMethod(reportService, "getCourseNameLogic", idsCourse);
+
+		assertEquals("IDS Independent Directed Studies 10A", result);
+	}
+
+	@Test
+	public void testGetCourseNameLogicForIdsFallsBackToCustomizedCourseNameWhenRelatedCourseBlank() {
+		StudentCourse idsCourse = StudentCourse.builder()
+				.isIndependentDirectedStudies(true)
+				.courseCode("IDS")
+				.courseName("Independent Directed Studies 10A")
+				.customizedCourseName("Marine Studies 12A")
+				.build();
+
+		String result = ReflectionTestUtils.invokeMethod(reportService, "getCourseNameLogic", idsCourse);
+
+		assertEquals("IDS Marine Studies 12A", result);
+	}
+
+	@Test
 	public void testGetStudentsForSchoolYearEndNonGradReportWithMincode() {
 		List<ReportGradStudentData> gradStudentDataList = createStudentSchoolYearEndData("json/studentSchoolYearEndResponse.json");
 		UUID schoolId = UUID.randomUUID();
