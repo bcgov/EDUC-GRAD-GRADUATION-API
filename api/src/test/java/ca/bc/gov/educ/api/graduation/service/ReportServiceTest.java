@@ -32,10 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -2401,5 +2398,515 @@ public class ReportServiceTest {
 			sb.append(line);
 		}
 		return sb.toString();
+	}
+
+	@Test
+	public void testPrepareTranscriptData_1950_WithNullSpecialCase() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("197676760");
+		gradAlgorithmGraduationStatus.setProgram("1950");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+		gradAlgorithmGraduationStatus.setStudentGrade("AD");
+		gradAlgorithmGraduationStatus.setStudentStatus("CUR");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("197676760");
+		stuObj.setLegalFirstName("TEST");
+		stuObj.setLegalLastName("STUDENT");
+		stuObj.setSchoolOfRecord("03434041");
+
+		StudentAssessment sA = new StudentAssessment();
+		sA.setAssessmentCode("LTE12");
+		sA.setAssessmentName("Literacy 12");
+		sA.setSessionDate("2026/04");
+		sA.setSpecialCase(null);
+		List<StudentAssessment> aList = new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setDualDogwood(false);
+		graduationDataStatus.setGradMessage("Not Graduated");
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setGraduated(false);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradStudent(stuObj);
+
+		GraduationProgramCode gP = new GraduationProgramCode();
+		gP.setProgramCode("1950");
+		gP.setProgramName("Adult Graduation Program");
+		gP.setAssessmentReleaseDate(new java.util.Date());
+
+		graduationDataStatus.setGradProgram(gP);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),"1950"), GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("197676760");
+		gradResponse.setProgram("1950");
+		gradResponse.setProgramCompletionDate(null);
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+		gradResponse.setUpdateDate(LocalDateTime.now());
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_1950_WithSpecialCaseE() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("123456789");
+		gradAlgorithmGraduationStatus.setProgram("1950");
+		gradAlgorithmGraduationStatus.setProgramCompletionDate(null);
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+		gradAlgorithmGraduationStatus.setStudentGrade("AD");
+		gradAlgorithmGraduationStatus.setStudentStatus("CUR");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("123456789");
+		stuObj.setLegalFirstName("TEST");
+		stuObj.setLegalLastName("STUDENT");
+
+		StudentAssessment sA = new StudentAssessment();
+		sA.setAssessmentCode("LTE12");
+		sA.setSessionDate("2026/04");
+		sA.setSpecialCase("E");
+		List<StudentAssessment> aList = new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+
+		GraduationProgramCode gP = new GraduationProgramCode();
+		gP.setProgramCode("1950");
+		gP.setAssessmentReleaseDate(new java.util.Date());
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),"1950"), GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("123456789");
+		gradResponse.setProgram("1950");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_SCCP_WithNullSpecialCase() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("987654321");
+		gradAlgorithmGraduationStatus.setProgram("SCCP");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("987654321");
+
+		StudentAssessment sA = new StudentAssessment();
+		sA.setAssessmentCode("NME10");
+		sA.setSessionDate("2026/04");
+		sA.setSpecialCase(null);
+		List<StudentAssessment> aList = new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+
+		GraduationProgramCode gP = new GraduationProgramCode();
+		gP.setProgramCode("SCCP");
+		gP.setAssessmentReleaseDate(new java.util.Date());
+
+		graduationDataStatus.setGradProgram(gP);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),"SCCP"), GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("987654321");
+		gradResponse.setProgram("SCCP");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_2018_WithNullSpecialCase() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("111222333");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("111222333");
+
+		StudentAssessment sA = new StudentAssessment();
+		sA.setAssessmentCode("LTE12");
+		sA.setSessionDate("2026/04");
+		sA.setSpecialCase(null);
+		sA.setWroteFlag("Y");
+		sA.setProficiencyScore(75.0);
+		List<StudentAssessment> aList = new ArrayList<>();
+		aList.add(sA);
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(aList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+
+		GraduationProgramCode gP = new GraduationProgramCode();
+		gP.setProgramCode("2018-EN");
+		gP.setAssessmentReleaseDate(new java.util.Date());
+
+		graduationDataStatus.setGradProgram(gP);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getProgramNameEndpoint(),"2018-EN"), GraduationProgramCode.class, graduationApiClient)).thenReturn(gP);
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("111222333");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+		assertFalse(result.getTranscript().getResults().isEmpty());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_1950_WithNullGradProgram_Courses() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("999888777");
+		gradAlgorithmGraduationStatus.setProgram("1950");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+		gradAlgorithmGraduationStatus.setStudentGrade("AD");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("999888777");
+		stuObj.setLegalFirstName("TEST");
+		stuObj.setLegalLastName("GRADPROGRAM");
+
+		StudentCourse course = new StudentCourse();
+		course.setCourseCode("MATH");
+		course.setCourseLevel("12");
+		course.setCourseName("Math 12");
+		course.setSessionDate("2026/06");
+		course.setGradReqMet("3, 4");
+		course.setGradReqMetDetail("Elective, Career Life");
+		course.setCompletedCoursePercentage(85.0);
+		course.setCredits(4);
+		course.setProvExamCourse("N");
+		List<StudentCourse> courseList = new ArrayList<>();
+		courseList.add(course);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(courseList);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradProgram(null);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("999888777");
+		gradResponse.setProgram("1950");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+		assertNotNull(result.getTranscript().getResults());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_WithNullGradProgram_Assessments() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("888777666");
+		gradAlgorithmGraduationStatus.setProgram("2018-EN");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("888777666");
+		stuObj.setLegalFirstName("TEST");
+		stuObj.setLegalLastName("ASSESSMENT");
+
+		StudentAssessment assessment = new StudentAssessment();
+		assessment.setAssessmentCode("LTE12");
+		assessment.setAssessmentName("Literacy 12");
+		assessment.setSessionDate("2026/04");
+		assessment.setProficiencyScore(75.0);
+		assessment.setSpecialCase(null);
+		List<StudentAssessment> assessmentList = new ArrayList<>();
+		assessmentList.add(assessment);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(assessmentList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradProgram(null);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("888777666");
+		gradResponse.setProgram("2018-EN");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+		assertNotNull(result.getTranscript().getResults());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_1950_WithNullGradProgram_CoursesAndAssessments() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("777666555");
+		gradAlgorithmGraduationStatus.setProgram("1950");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+		gradAlgorithmGraduationStatus.setStudentGrade("AD");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("777666555");
+		stuObj.setLegalFirstName("FULL");
+		stuObj.setLegalLastName("TEST");
+
+		StudentCourse course = new StudentCourse();
+		course.setCourseCode("ENGL");
+		course.setCourseLevel("12");
+		course.setCourseName("English 12");
+		course.setSessionDate("2025/11");
+		course.setGradReqMet("3, 4");
+		course.setGradReqMetDetail("Elective, Career Life");
+		course.setCompletedCoursePercentage(78.0);
+		course.setCredits(4);
+		course.setProvExamCourse("Y");
+		List<StudentCourse> courseList = new ArrayList<>();
+		courseList.add(course);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(courseList);
+
+		StudentAssessment assessment = new StudentAssessment();
+		assessment.setAssessmentCode("LTE12");
+		assessment.setAssessmentName("Literacy 12");
+		assessment.setSessionDate("2025/12");
+		assessment.setProficiencyScore(68.0);
+		assessment.setSpecialCase(null);
+		List<StudentAssessment> assessmentList = new ArrayList<>();
+		assessmentList.add(assessment);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(assessmentList);
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradProgram(null);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("777666555");
+		gradResponse.setProgram("1950");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+		assertNotNull(result.getTranscript().getResults());
+	}
+
+	@Test
+	public void testPrepareTranscriptData_SCCP_WithNullGradProgram() throws Exception {
+		ExceptionMessage exception = new ExceptionMessage();
+
+		GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
+		gradAlgorithmGraduationStatus.setPen("666555444");
+		gradAlgorithmGraduationStatus.setProgram("SCCP");
+		gradAlgorithmGraduationStatus.setSchoolOfRecord("03434041");
+
+		SchoolClob schoolObj = new SchoolClob();
+		schoolObj.setMinCode("03434041");
+		schoolObj.setSchoolId(UUID.randomUUID().toString());
+
+		GradSearchStudent stuObj = new GradSearchStudent();
+		stuObj.setPen("666555444");
+		stuObj.setLegalFirstName("SCCP");
+		stuObj.setLegalLastName("STUDENT");
+
+		StudentAssessment assessment = new StudentAssessment();
+		assessment.setAssessmentCode("NME10");
+		assessment.setAssessmentName("Numeracy 10");
+		assessment.setSessionDate("2026/03");
+		assessment.setProficiencyScore(82.0);
+		assessment.setSpecialCase(null);
+		List<StudentAssessment> assessmentList = new ArrayList<>();
+		assessmentList.add(assessment);
+
+		StudentAssessments sAssessments = new StudentAssessments();
+		sAssessments.setStudentAssessmentList(assessmentList);
+
+		StudentCourses sCourses = new StudentCourses();
+		sCourses.setStudentCourseList(new ArrayList<>());
+
+		GraduationData graduationDataStatus = new GraduationData();
+		graduationDataStatus.setGradStatus(gradAlgorithmGraduationStatus);
+		graduationDataStatus.setSchool(schoolObj);
+		graduationDataStatus.setGradStudent(stuObj);
+		graduationDataStatus.setStudentCourses(sCourses);
+		graduationDataStatus.setStudentAssessments(sAssessments);
+		graduationDataStatus.setGradProgram(null);
+
+		SchoolClob schoolDetails = new SchoolClob();
+		schoolDetails.setMinCode("03434041");
+		schoolDetails.setSchoolCategoryCode("PUBLIC");
+
+		when(this.restService.get(String.format(constants.getSchoolClobBySchoolIdUrl(), "03434041"), SchoolClob.class, graduationApiClient)).thenReturn(schoolDetails);
+
+		GraduationStudentRecord gradResponse = new GraduationStudentRecord();
+		gradResponse.setPen("666555444");
+		gradResponse.setProgram("SCCP");
+		gradResponse.setSchoolOfRecordId(UUID.fromString(schoolObj.getSchoolId()));
+
+		ReportData result = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, true, exception);
+
+		assertNotNull(result);
+		assertNotNull(result.getTranscript());
+		assertNotNull(result.getTranscript().getResults());
 	}
 }
