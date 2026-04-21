@@ -332,7 +332,7 @@ public class ReportService {
                 }
                 result.setCourse(setCourseObjForTranscript(sc, graduationDataStatus));
                 result.setMark(setMarkObjForTranscript(sc, graduationDataStatus.getGradStatus().getProgram(), provincially));
-                if ("1950".equalsIgnoreCase(graduationDataStatus.getGradProgram().getProgramCode()) && "3, 4".equalsIgnoreCase(sc.getGradReqMet())) {
+                if (graduationDataStatus.getGradProgram() != null && "1950".equalsIgnoreCase(graduationDataStatus.getGradProgram().getProgramCode()) && "3, 4".equalsIgnoreCase(sc.getGradReqMet())) {
                     result.setRequirement(StringUtils.substringBefore(sc.getGradReqMet(), ","));
                     result.setRequirementName(StringUtils.substringBefore(sc.getGradReqMetDetail(), ","));
                 } else {
@@ -502,21 +502,25 @@ public class ReportService {
                 notCompletedCourse = xml && diff <= 0;
             }
             if (!sc.isDuplicate() && !sc.isFailed() && !sc.isNotCompleted() && ((notCompletedCourse) || !sc.isProjected())) {
-                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950")) && (sc.getSpecialCase().compareTo("E") == 0 || sc.getSpecialCase().compareTo("A") == 0)) {
+                if ((graduationDataStatus.getGradStatus().getProgram().contains("SCCP") || graduationDataStatus.getGradStatus().getProgram().contains("1950"))
+                        && sc.getSpecialCase() != null
+                        && (sc.getSpecialCase().compareTo("E") == 0 || sc.getSpecialCase().compareTo("A") == 0)) {
                     skipProcessing = true;
                 }
                 if (!skipProcessing) {
                     String finalPercent = getValue(sc.getProficiencyScore());
-                    String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
-                    if(sc.getSessionDate() != null) {
-                        String sessionDate = sc.getSessionDate() + "/01";
-                        Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
-                        sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+                    if (graduationDataStatus.getGradProgram() != null && graduationDataStatus.getGradProgram().getAssessmentReleaseDate() != null) {
+                        String cutoffDate = EducGraduationApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+                        if(sc.getSessionDate() != null) {
+                            String sessionDate = sc.getSessionDate() + "/01";
+                            Date temp = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sessionDate, EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
+                            sessionDate = EducGraduationApiUtils.formatDate(temp, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
 
-                        int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
+                            int diff = EducGraduationApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
 
-                        if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-                            continue;
+                            if (diff < 0 && !finalPercent.isEmpty() && !finalPercent.equals("0")) {
+                                continue;
+                            }
                         }
                     }
                     TranscriptResult result = new TranscriptResult();
@@ -570,13 +574,13 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
                 if (!provinciallyExaminable.isEmpty()) {
                     sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
+                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
                 if (!nonExaminable.isEmpty()) {
                     sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
