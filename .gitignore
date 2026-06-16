@@ -1,3 +1,4 @@
+.DS_Store
 # Compiled class file
 *.class
 
@@ -55,6 +56,6 @@ build/
 .vscode/
 
 ### Local dev ###
-**/application-local.yaml
+**/application-local*.yaml
 **/generate-local-env.sh
 AGENTS.md
