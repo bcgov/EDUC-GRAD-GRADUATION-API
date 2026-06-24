@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-sonar
       - name: Run Sonar Analysis
         run: mvn sonar:sonar
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
           -Dsonar.organization=${{ vars.SONAR_ORG }}
           -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
