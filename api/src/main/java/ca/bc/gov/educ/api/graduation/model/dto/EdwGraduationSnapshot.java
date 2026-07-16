@@ -34,4 +34,5 @@ public class EdwGraduationSnapshot {
     private LocalDate sessionDate;
 
     private String schoolOfRecord;
+    private UUID schoolOfRecordId;
 }

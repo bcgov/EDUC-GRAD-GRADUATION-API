@@ -78,27 +78,32 @@ public class EdwSnapshotServiceTest {
 
     @Test
     public void testProcessSnapshotForGradStudent() {
+        UUID schoolOfRecordId = UUID.randomUUID();
         EdwGraduationSnapshot snapshotRequest = new EdwGraduationSnapshot();
         snapshotRequest.setGradYear(Integer.valueOf("2023"));
         snapshotRequest.setPen("123456789");
         snapshotRequest.setStudentID(UUID.randomUUID());
         snapshotRequest.setGraduatedDate("202306");
         snapshotRequest.setSchoolOfRecord("12345678");
+        snapshotRequest.setSchoolOfRecordId(schoolOfRecordId);
 
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");
+        assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
     }
 
     @Test
     public void testProcessSnapshotForNonGradStudent() {
+        UUID schoolOfRecordId = UUID.randomUUID();
         EdwGraduationSnapshot snapshotRequest = new EdwGraduationSnapshot();
         snapshotRequest.setGradYear(Integer.valueOf("2023"));
         snapshotRequest.setPen("123456789");
         snapshotRequest.setStudentID(UUID.randomUUID());
         snapshotRequest.setGraduatedDate("");
         snapshotRequest.setSchoolOfRecord("12345678");
+        snapshotRequest.setSchoolOfRecordId(schoolOfRecordId);
 
         GraduationStudentRecord gradResponse = new GraduationStudentRecord();
         gradResponse.setStudentID(snapshotRequest.getStudentID());
@@ -123,17 +128,19 @@ public class EdwSnapshotServiceTest {
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
-        assertThat(result.getGraduationFlag()).isEqualTo("N");
+        assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
     }
 
     @Test
     public void testProcessSnapshotForHypotheticalGradStudent() {
+        UUID schoolOfRecordId = UUID.randomUUID();
         EdwGraduationSnapshot snapshotRequest = new EdwGraduationSnapshot();
         snapshotRequest.setGradYear(Integer.valueOf("2023"));
         snapshotRequest.setPen("123456789");
         snapshotRequest.setStudentID(UUID.randomUUID());
         snapshotRequest.setGraduatedDate("");
         snapshotRequest.setSchoolOfRecord("12345678");
+        snapshotRequest.setSchoolOfRecordId(schoolOfRecordId);
 
         GraduationStudentRecord gradResponse = new GraduationStudentRecord();
         gradResponse.setStudentID(snapshotRequest.getStudentID());
@@ -164,7 +171,8 @@ public class EdwSnapshotServiceTest {
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");
-        assertThat(result.getGpa()).isEqualTo("3.80");
+        assertThat(result.getGpa()).isEqualByComparingTo("3.80");
         assertThat(result.getHonoursStanding()).isEqualTo("Y");
+        assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
     }
 }
