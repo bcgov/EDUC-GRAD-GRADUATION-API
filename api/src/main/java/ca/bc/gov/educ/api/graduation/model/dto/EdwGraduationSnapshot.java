@@ -35,4 +35,5 @@ public class EdwGraduationSnapshot {
 
     private String schoolOfRecord;
     private UUID schoolOfRecordId;
+    private String eligible;
 }
