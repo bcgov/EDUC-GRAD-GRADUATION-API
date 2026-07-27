@@ -47,6 +47,7 @@ public class EdwSnapshotServiceTest {
 
     @MockBean
     @Qualifier("graduationApiClient")
+    @SuppressWarnings("unused")
     WebClient graduationApiClient;
 
     @MockBean
