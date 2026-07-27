@@ -38,6 +38,11 @@ jobs:
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
+      - name: Set up JDK 21 for Sonar
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: 21
       - name: Run Sonar Analysis
         run: mvn sonar:sonar
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
