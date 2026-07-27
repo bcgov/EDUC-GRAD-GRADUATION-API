@@ -59,7 +59,7 @@ public class EdwSnapshotService {
         boolean isGraduated = StringUtils.isNotBlank(graduatedDate);
         if (isGraduated) {
             // retrieve honour_flag, gpa
-            snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y", snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord, schoolOfRecordId);
+            snapshot = populateSnapshot(gradYear, pen, graduatedDate, "Y", snapshotRequest.getHonoursStanding(), snapshotRequest.getGpa(), schoolOfRecord, schoolOfRecordId, null);
         } else {
             snapshot = runHypotheticalGradAlgorithm(pen, gradYear, schoolOfRecord, schoolOfRecordId);
         }
@@ -95,11 +95,11 @@ public class EdwSnapshotService {
             String gpaStr = graduationData.getGradStatus().getGpa();
             BigDecimal gpa = NumberUtils.isCreatable(gpaStr)? new BigDecimal(gpaStr) : null;
             String honoursStanding = graduationData.getGradStatus().getHonoursStanding();
-            snapshot = populateSnapshot(gradYear, pen, null, "Y", honoursStanding, gpa, schoolOfRecord, schoolOfRecordId);
+            snapshot = populateSnapshot(gradYear, pen, null, "N", honoursStanding, gpa, schoolOfRecord, schoolOfRecordId, "Y");
         } else {
             // non-graduated student
             log.debug(" ==> Not Graduated!");
-            snapshot = populateSnapshot(gradYear, pen, null, "N", null, BigDecimal.ZERO, schoolOfRecord, schoolOfRecordId);
+            snapshot = populateSnapshot(gradYear, pen, null, "N", null, BigDecimal.ZERO, schoolOfRecord, schoolOfRecordId, "N");
         }
         return snapshot;
     }
@@ -128,7 +128,7 @@ public class EdwSnapshotService {
         return null;
     }
 
-    private EdwGraduationSnapshot populateSnapshot(Integer gradYear, String pen, String graduatedDate, String gradFlag, String honourFlag, BigDecimal gpa, String schoolOfRecord, UUID schoolOfRecordId) {
+    private EdwGraduationSnapshot populateSnapshot(Integer gradYear, String pen, String graduatedDate, String gradFlag, String honourFlag, BigDecimal gpa, String schoolOfRecord, UUID schoolOfRecordId, String eligible) {
         EdwGraduationSnapshot obj = new EdwGraduationSnapshot();
         obj.setGradYear(gradYear);
         obj.setPen(pen);
@@ -138,6 +138,7 @@ public class EdwSnapshotService {
         obj.setGraduatedDate(graduatedDate);
         obj.setSchoolOfRecord(schoolOfRecord);
         obj.setSchoolOfRecordId(schoolOfRecordId);
+        obj.setEligible(eligible);
         return obj;
     }
 }
