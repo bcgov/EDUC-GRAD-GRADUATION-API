@@ -73,6 +73,7 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");
         assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
         assertThat(result.getEligible()).isNull();
@@ -111,6 +112,7 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
         assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
         assertThat(result.getEligible()).isEqualTo("N");
@@ -155,6 +157,7 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
         assertThat(result.getGpa()).isEqualByComparingTo("3.80");
         assertThat(result.getHonoursStanding()).isEqualTo("Y");
