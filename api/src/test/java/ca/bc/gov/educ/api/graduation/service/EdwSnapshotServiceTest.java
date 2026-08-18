@@ -2,9 +2,6 @@ package ca.bc.gov.educ.api.graduation.service;
 
 import ca.bc.gov.educ.api.graduation.model.dto.*;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
-import ca.bc.gov.educ.api.graduation.util.GradValidation;
-import ca.bc.gov.educ.api.graduation.util.JsonTransformer;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,25 +38,14 @@ public class EdwSnapshotServiceTest {
     GradStatusService gradStatusService;
 
     @MockBean
-    ReportService reportService;
-
-    @MockBean
     RESTService restService;
-
-    @Autowired
-    JsonTransformer jsonTransformer;
-
-    @Autowired
-    GradValidation validation;
-
-    @Autowired
-    private ExceptionMessage exception;
 
     @Autowired
     private EducGraduationApiConstants constants;
 
     @MockBean
     @Qualifier("graduationApiClient")
+    @SuppressWarnings("unused")
     WebClient graduationApiClient;
 
     @MockBean
@@ -69,11 +55,6 @@ public class EdwSnapshotServiceTest {
     @Before
     public void setUp() {
         openMocks(this);
-    }
-
-    @After
-    public void tearDown() {
-
     }
 
     @Test
@@ -90,8 +71,10 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
         assertThat(result.getGraduationFlag()).isEqualTo("Y");
         assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
+        assertThat(result.getEligible()).isNull();
     }
 
     @Test
@@ -127,8 +110,10 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
         assertThat(result.getGraduationFlag()).isEqualTo("N");
         assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
+        assertThat(result.getEligible()).isEqualTo("N");
     }
 
     @Test
@@ -170,9 +155,11 @@ public class EdwSnapshotServiceTest {
         var result = edwSnapshotService.processSnapshot(snapshotRequest);
         assertNotNull(result);
         assertThat(result.getPen()).isEqualTo(snapshotRequest.getPen());
-        assertThat(result.getGraduationFlag()).isEqualTo("Y");
+        assertThat(result.getStudentID()).isEqualTo(snapshotRequest.getStudentID());
+        assertThat(result.getGraduationFlag()).isEqualTo("N");
         assertThat(result.getGpa()).isEqualByComparingTo("3.80");
         assertThat(result.getHonoursStanding()).isEqualTo("Y");
         assertThat(result.getSchoolOfRecordId()).isEqualTo(schoolOfRecordId);
+        assertThat(result.getEligible()).isEqualTo("Y");
     }
 }
