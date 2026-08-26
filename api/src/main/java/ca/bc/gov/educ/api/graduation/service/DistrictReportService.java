@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.graduation.model.dto.institute.District;
 import ca.bc.gov.educ.api.graduation.model.dto.DistrictReport;
 import ca.bc.gov.educ.api.graduation.model.dto.ReportGradStudentData;
 import ca.bc.gov.educ.api.graduation.util.EducGraduationApiConstants;
+import ca.bc.gov.educ.api.graduation.util.TextNormalizer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -334,16 +335,19 @@ public class DistrictReportService extends BaseReportService {
   }
 
   private byte[] getDistrictYearEndReportJasper(ReportRequest reportRequest) {
+    TextNormalizer.normalizeObject(reportRequest.getData());
     return restService.post(educGraduationApiConstants.getDistrictDistributionYearEnd(),
             reportRequest, byte[].class, graduationApiClient);
   }
 
   private byte[] getDistrictYearEndNonGradReportJasper(ReportRequest reportRequest) {
+    TextNormalizer.normalizeObject(reportRequest.getData());
     return restService.post(educGraduationApiConstants.getDistrictDistributionYearEndNonGrad(),
             reportRequest, byte[].class, graduationApiClient);
   }
 
   private byte[] getDistrictLabelsReportJasper(ReportRequest reportRequest) {
+    TextNormalizer.normalizeObject(reportRequest.getData());
     return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class, graduationApiClient);
   }
 }

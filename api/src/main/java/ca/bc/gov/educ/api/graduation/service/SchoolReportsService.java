@@ -416,10 +416,12 @@ public class SchoolReportsService extends BaseReportService {
     }
 
     private byte[] getSchoolYearEndReportJasper(ReportRequest reportRequest) {
+        TextNormalizer.normalizeObject(reportRequest.getData());
         return restService.post(educGraduationApiConstants.getSchoolDistributionYearEnd(), reportRequest, byte[].class, graduationApiClient);
     }
 
     private byte[] getSchoolLabelsReportJasper(ReportRequest reportRequest) {
+        TextNormalizer.normalizeObject(reportRequest.getData());
         return restService.post(educGraduationApiConstants.getSchoolLabels(), reportRequest, byte[].class, graduationApiClient);
     }
 

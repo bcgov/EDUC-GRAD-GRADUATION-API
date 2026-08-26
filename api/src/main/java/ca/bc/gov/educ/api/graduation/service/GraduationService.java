@@ -139,6 +139,7 @@ public class GraduationService {
         options.setPreview(isPreview);
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(reportData);
         reportParams.setData(reportData);
 
         try {
@@ -401,6 +402,7 @@ public class GraduationService {
         options.setReportName(String.format("%s_%s00_GRADREG.pdf", mincode, LocalDate.now().getYear()));
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(data);
         reportParams.setData(data);
 
         return this.restService.post(educGraduationApiConstants.getSchoolGraduation(), reportParams, byte[].class, graduationApiClient);
@@ -432,6 +434,7 @@ public class GraduationService {
         options.setReportName(String.format("%s_%s00_NONGRADREG.pdf", mincode, LocalDate.now().getYear()));
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(data);
         reportParams.setData(data);
 
         return this.restService.post(educGraduationApiConstants.getSchoolNonGraduation(), reportParams, byte[].class, graduationApiClient);
@@ -453,6 +456,7 @@ public class GraduationService {
         options.setReportName(String.format("%s_%s00_NONGRADPRJ.pdf", mincode, LocalDate.now().getYear()));
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(data);
         reportParams.setData(data);
 
         return this.restService.post(educGraduationApiConstants.getStudentNonGradProjected(), reportParams, byte[].class, graduationApiClient);
@@ -467,6 +471,7 @@ public class GraduationService {
         options.setReportName(String.format("%s_%s00_NONGRADDISTREP_SC.pdf", mincode, LocalDate.now().getYear()));
         ReportRequest reportParams = new ReportRequest();
         reportParams.setOptions(options);
+        TextNormalizer.normalizeObject(data);
         reportParams.setData(data);
 
         return this.restService.post(educGraduationApiConstants.getStudentNonGrad(), reportParams, byte[].class, graduationApiClient);
