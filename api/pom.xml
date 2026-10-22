@@ -36,7 +36,10 @@
         <sonar.coverage.exclusions>
             src/main/java/ca/bc/gov/educ/api/graduation/controller/APIMetadataController.java
         </sonar.coverage.exclusions>
-        <java.version>18</java.version>
+        <java.version>21</java.version>
+        <lombok.version>1.18.32</lombok.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <byte-buddy.version>1.14.19</byte-buddy.version>
         <maven.compiler.version>3.10.1</maven.compiler.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -49,7 +52,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.2</version>
+        <version>3.0.13</version>
     </parent>
 
     <dependencies>
@@ -236,17 +239,24 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.9.1.2184</version>
+                    <version>5.8.0.7211</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.8</version>
+                    <version>${jacoco.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.hibernate.orm.tooling</groupId>
                     <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                    <version>6.1.1.Final</version>
+                    <version>${hibernate.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.bytebuddy</groupId>
+                            <artifactId>byte-buddy</artifactId>
+                            <version>${byte-buddy.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -335,7 +345,7 @@
                     <plugin>
                         <groupId>org.hibernate.orm.tooling</groupId>
                         <artifactId>hibernate-enhance-maven-plugin</artifactId>
-                        <version>6.1.1.Final</version>
+                        <version>${hibernate.version}</version>
                         <executions>
                             <execution>
                                 <configuration>
