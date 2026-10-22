@@ -22,7 +22,7 @@ COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 ENTRYPOINT ["java","-Duser.name=EDUC_GRAD_GRADUATION_API","-Xms1300m","-Xmx1300m",\
             "-XX:TieredStopAtLevel=1","-XX:+UseParallelGC","-XX:MinHeapFreeRatio=20",\
             "-XX:MaxHeapFreeRatio=40","-XX:GCTimeRatio=4","-XX:AdaptiveSizePolicyWeight=90",\
-            "-XX:MaxMetaspaceSize=100m","-XX:ParallelGCThreads=1",\
+            "-XX:MaxMetaspaceSize=300m","-XX:ParallelGCThreads=1",\
             "-Djava.util.concurrent.ForkJoinPool.common.parallelism=1","-XX:CICompilerCount=2",\
             "-XX:+ExitOnOutOfMemoryError","-Djava.security.egd=file:/dev/./urandom",\
             "-Dspring.backgroundpreinitializer.ignore=true","-cp","app:app/lib/*",\
