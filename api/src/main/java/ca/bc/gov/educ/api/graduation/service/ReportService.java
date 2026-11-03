@@ -314,7 +314,7 @@ public class ReportService {
 
     @Generated
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(EducGraduationApiConstants.BC_TIME_ZONE), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         for (StudentCourse sc : studentCourseList) {
             Date sessionDate = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
@@ -489,7 +489,7 @@ public class ReportService {
 
     @Generated
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("PST"), Locale.CANADA);
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(EducGraduationApiConstants.BC_TIME_ZONE), Locale.CANADA);
         String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
         List<StudentAssessment> processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList, xml);
         for (StudentAssessment sc : processList) {

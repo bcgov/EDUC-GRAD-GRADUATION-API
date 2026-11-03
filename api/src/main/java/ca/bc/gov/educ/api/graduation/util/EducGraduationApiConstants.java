@@ -16,6 +16,7 @@ public class EducGraduationApiConstants {
     public static final String REQUEST_SOURCE = "Request-Source";
     public static final String API_NAME = "EDUC-GRAD-GRADUATION-API";
     public static final String USER_NAME = "User-Name";
+    public static final String BC_TIME_ZONE = "America/Vancouver";
 
     //API end-point Mapping constants
 	public static final String API_ROOT_MAPPING = "";
