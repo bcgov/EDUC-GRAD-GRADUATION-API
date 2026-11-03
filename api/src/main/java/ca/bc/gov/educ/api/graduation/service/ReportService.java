@@ -29,6 +29,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,7 @@ public class ReportService {
     private static final String GRAD_GRADUATION_REPORT_API_DOWN = "GRAD-GRADUATION-REPORT-API IS DOWN";
     private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
     private static final String REPORT_NOT_GENERATED = "UNABLE TO GENERATE REPORT DATA";
+    private static final ZoneId BC_ZONE_ID = ZoneId.of(EducGraduationApiConstants.BC_TIME_ZONE);
 
     JsonTransformer jsonTransformer;
     EducGraduationApiConstants educGraduationApiConstants;
@@ -307,15 +309,14 @@ public class ReportService {
             code.setCode(pcObj.getTranscriptTypeCode());
             transcriptData.setTranscriptTypeCode(code);
         }
-        transcriptData.setIssueDate(LocalDate.now());
+        transcriptData.setIssueDate(LocalDate.now(BC_ZONE_ID));
         transcriptData.setResults(getTranscriptResults(graduationDataStatus, xml));
         return transcriptData;
     }
 
     @Generated
     private void createCourseListForTranscript(List<StudentCourse> studentCourseList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, String provincially, boolean xml) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(EducGraduationApiConstants.BC_TIME_ZONE), Locale.CANADA);
-        String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+        String today = LocalDate.now(BC_ZONE_ID).toString();
         for (StudentCourse sc : studentCourseList) {
             Date sessionDate = toLastDayOfMonth(EducGraduationApiUtils.parseDate(sc.getSessionDate() + "/01", EducGraduationApiConstants.SECONDARY_DATE_FORMAT));
             String sDate = EducGraduationApiUtils.formatDate(sessionDate, EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
@@ -489,8 +490,7 @@ public class ReportService {
 
     @Generated
     private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, ca.bc.gov.educ.api.graduation.model.dto.GraduationData graduationDataStatus, List<TranscriptResult> tList, boolean xml) {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone(EducGraduationApiConstants.BC_TIME_ZONE), Locale.CANADA);
-        String today = EducGraduationApiUtils.formatDate(cal.getTime(), EducGraduationApiConstants.DEFAULT_DATE_FORMAT);
+        String today = LocalDate.now(BC_ZONE_ID).toString();
         List<StudentAssessment> processList = removeDuplicatedAssessmentsForTranscript(studentAssessmentList, xml);
         for (StudentAssessment sc : processList) {
             boolean skipProcessing = false;
@@ -574,15 +574,19 @@ public class ReportService {
         List<StudentCourse> studentCourseList = graduationDataStatus.getStudentCourses().getStudentCourseList();
         if (!studentCourseList.isEmpty()) {
             if (program.contains("1950") || program.contains("1986")) {
-                List<StudentCourse> provinciallyExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("Y") == 0).collect(Collectors.toList());
+                List<StudentCourse> provinciallyExaminable = studentCourseList.stream()
+                        .filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("Y") == 0)
+                        .sorted(Comparator.comparing(StudentCourse::getCourseCode))
+                        .toList();
                 if (!provinciallyExaminable.isEmpty()) {
-                    sortOnCourseCode(provinciallyExaminable);
                     createCourseListForTranscript(provinciallyExaminable, graduationDataStatus, tList, "provincially", xml);
                 }
 
-                List<StudentCourse> nonExaminable = studentCourseList.stream().filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("N") == 0).collect(Collectors.toList());
+                List<StudentCourse> nonExaminable = studentCourseList.stream()
+                        .filter(sc -> sc.getProvExamCourse() != null && sc.getProvExamCourse().compareTo("N") == 0)
+                        .sorted(Comparator.comparing(StudentCourse::getCourseCode))
+                        .toList();
                 if (!nonExaminable.isEmpty()) {
-                    sortOnCourseCode(nonExaminable);
                     createCourseListForTranscript(nonExaminable, graduationDataStatus, tList, "non-examinable", xml);
                 }
             } else {
@@ -600,10 +604,6 @@ public class ReportService {
 
         createAssessmentListForTranscript(studentAssessmentList, graduationDataStatus, tList, xml);
         return tList;
-    }
-
-    private void sortOnCourseCode(List<StudentCourse> cList) {
-        cList.sort(Comparator.comparing(StudentCourse::getCourseCode));
     }
 
     private String getCredits(String program, String courseCode, Integer totalCredits, boolean isRestricted) {
@@ -886,7 +886,7 @@ public class ReportService {
         List<Exam> sExamList = new ArrayList<>();
         data.setStudentCourses(processStudentCourses(sCourseList, studentCourseList));
         Assessment achv = new Assessment();
-        achv.setIssueDate(LocalDate.now());
+        achv.setIssueDate(LocalDate.now(BC_ZONE_ID));
         achv.setResults(getAssessmentResults(studentAssessmentList, graduationDataStatus.getGradProgram()));
         data.setAssessment(achv);
         data.setStudentExams(processStudentExams(sExamList, studentExamList));
