@@ -49,8 +49,15 @@ on:
           - develop/mchintha
           - grad-hotfix
 
+permissions:
+  contents: read
+
 jobs:
   openshift-ci-cd:
+    permissions:
+      contents: read
+      packages: write
+      issues: write
     name: Build and deploy to OpenShift DEV from Developer branch
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-22.04

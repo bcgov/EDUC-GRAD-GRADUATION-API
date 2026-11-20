@@ -26,8 +26,14 @@ on:
       - 'api/**'
       - 'tools/**'
 
+permissions:
+  contents: read
+
 jobs:
   build-and-deploy-dev:
+    permissions:
+      contents: read
+      packages: write
     name: Build and deploy to OpenShift DEV
     runs-on: ubuntu-22.04
     environment: dev
@@ -243,6 +249,9 @@ jobs:
           oc rollout status deployment/${{ env.SPRING_BOOT_IMAGE_NAME }}
 
   zap-scan:
+    permissions:
+      contents: read
+      issues: write
     name: Zap Scan
     needs: build-and-deploy-dev
     runs-on: ubuntu-22.04

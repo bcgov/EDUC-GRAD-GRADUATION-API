@@ -44,8 +44,15 @@ on:
       - 'api/**'
       - 'tools/**'
 
+permissions:
+  contents: read
+
 jobs:
   openshift-ci-cd:
+    permissions:
+      contents: read
+      packages: write
+      issues: write
     name: Build and deploy to OpenShift DEV from release branch
     runs-on: ubuntu-22.04
     environment: dev
