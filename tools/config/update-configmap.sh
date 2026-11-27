@@ -24,6 +24,7 @@ FLB_CONFIG="[SERVICE]
    Parser docker
    Mem_Buf_Limit 20MB
    Buffer_Max_Size 4MB
+   Skip_Long_Lines On
 [FILTER]
    Name record_modifier
    Match *
